@@ -1,0 +1,13 @@
+{
+  "environment": "development",
+  "proxyToVite": false,
+  "admins": [
+    {
+      "username": "admin",
+      "email": "admin@sylve.local",
+      "password": "admin"
+    }
+  ],
+  "logLevel": 0,
+  "port": 8181
+}

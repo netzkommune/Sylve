@@ -1,6 +1,7 @@
 # Sylve
 
 <a href="https://discord.gg/bJB826JvXK"><img src="https://img.shields.io/discord/1075365732143071232" alt="Discord"></a>
+<a href="https://sylve-ci.alchemilla.io"><img src="https://sylve-ci.alchemilla.io/job/Sylve%20Build/badge/icon"></a>
 
 > [!WARNING]
 > This project is still in development so expect breaking changes!

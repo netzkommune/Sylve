@@ -2,6 +2,8 @@
 
 Sylve consists of several core components, each playing a crucial role in virtualization and storage management.
 
+![architecture](https://downloads-bucket.difuse.io/3f437b62_architecture.png)
+
 ## Storage
 
 Sylve provides full control over storage management using ZFS, enabling disk operations, dataset creation, and snapshot handling.

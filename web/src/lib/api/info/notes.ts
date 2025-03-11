@@ -1,3 +1,4 @@
+import { APIResponseSchema, type APIResponse } from '$lib/types/common';
 import { NotesSchema, type Notes } from '$lib/types/info/notes';
 import { apiRequest } from '$lib/utils/http';
 
@@ -5,9 +6,10 @@ async function notesRequest(
 	endpoint: string,
 	method: 'GET' | 'POST' | 'PUT' | 'DELETE',
 	body?: object
-): Promise<Notes> {
-	const data = await apiRequest(endpoint, NotesSchema, method, body);
-	return NotesSchema.parse(data);
+): Promise<Notes | APIResponse> {
+	const schema = method === 'GET' ? NotesSchema : APIResponseSchema;
+	const data = await apiRequest(endpoint, schema, method, body);
+	return schema.parse(data);
 }
 
 export const getNotes = () => notesRequest('/info/notes', 'GET');

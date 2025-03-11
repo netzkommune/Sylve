@@ -11,6 +11,7 @@ package utils
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -32,4 +33,13 @@ func SendJSONResponse(c *gin.Context, httpCode int, data interface{}) {
 	}
 
 	c.JSON(httpCode, data)
+}
+
+func GetIdFromParam(c *gin.Context) (int, error) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
 }

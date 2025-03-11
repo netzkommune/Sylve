@@ -9,36 +9,19 @@
 package infoHandlers
 
 import (
-	"encoding/json"
 	"net/http"
-	"strconv"
+	"sylve/internal"
+	infoModels "sylve/internal/db/models/info"
 	"sylve/internal/services/info"
+	"sylve/internal/utils"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
-type Response struct {
-	Status string      `json:"status"`
-	Data   interface{} `json:"data,omitempty"`
-	Error  string      `json:"error,omitempty"`
-}
-
 type NoteRequest struct {
-	Title   string `json:"title"`
-	Content string `json:"content"`
-}
-
-func validateNoteRequest(note NoteRequest) error {
-	return Validate.StructPartial(note, "Title", "Content")
-}
-
-func getNoteID(c *gin.Context) (int, error) {
-	idStr := c.Param("id")
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		return 0, err
-	}
-	return id, nil
+	Title   string `json:"title" binding:"required,min=3,max=128"`
+	Content string `json:"content" binding:"required,min=3"`
 }
 
 func NotesHandler(infoService *info.Service) gin.HandlerFunc {
@@ -53,123 +36,203 @@ func NotesHandler(infoService *info.Service) gin.HandlerFunc {
 		case http.MethodPut:
 			handleUpdateNoteByID(c, infoService)
 		default:
-			c.JSON(http.StatusMethodNotAllowed, Response{
-				Status: "error",
-				Error:  "Method not allowed",
+			c.JSON(http.StatusMethodNotAllowed, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "method_not_allowed",
+				Error:   "",
+				Data:    nil,
 			})
 		}
 	}
 }
 
+// @Summary Get All Notes
+// @Description Get all notes stored in the database
+// @Tags Info
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} internal.APIResponse[[]infoModels.Note] "Success"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /info/notes [get]
 func handleGetNotes(c *gin.Context, infoService *info.Service) {
 	notes, err := infoService.GetNotes()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, Response{
-			Status: "error",
-			Error:  err.Error(),
+		c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+			Status:  "error",
+			Message: "notes_fetch_failed",
+			Error:   err.Error(),
+			Data:    nil,
 		})
 		return
 	}
-	c.JSON(http.StatusOK, Response{
-		Status: "success",
-		Data:   notes,
+
+	c.JSON(http.StatusOK, internal.APIResponse[[]infoModels.Note]{
+		Status:  "success",
+		Message: "notes_fetched",
+		Error:   "",
+		Data:    notes,
 	})
 }
 
+// @Summary Create a new note
+// @Description Add a new note to the database
+// @Tags Info
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /info/notes [post]
 func handlePostNotes(c *gin.Context, infoService *info.Service) {
-	decoder := json.NewDecoder(c.Request.Body)
-	decoder.DisallowUnknownFields()
+	var req NoteRequest
 
-	var newNote NoteRequest
-	if err := decoder.Decode(&newNote); err != nil {
-		c.JSON(http.StatusBadRequest, Response{
-			Status: "error",
-			Error:  "Invalid request payload, unknown fields are not allowed",
+	if err := c.ShouldBindJSON(&req); err != nil {
+		validationErrors := utils.MapValidationErrors(err, NoteRequest{})
+
+		c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+			Status:  "error",
+			Message: "invalid_request_payload",
+			Error:   "validation_error",
+			Data:    validationErrors,
 		})
 		return
 	}
 
-	if err := validateNoteRequest(newNote); err != nil {
-		c.JSON(http.StatusBadRequest, Response{
-			Status: "error",
-			Error:  err.Error(),
-		})
-		return
-	}
+	err := infoService.AddNote(req.Title, req.Content)
 
-	err := infoService.AddNote(newNote.Title, newNote.Content)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, Response{
-			Status: "error",
-			Error:  err.Error(),
+		c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+			Status:  "error",
+			Message: "note_creation_failed",
+			Error:   err.Error(),
+			Data:    nil,
 		})
 		return
 	}
-	c.JSON(http.StatusCreated, Response{
-		Status: "success",
+
+	c.JSON(http.StatusCreated, internal.APIResponse[any]{
+		Status:  "success",
+		Message: "note_created",
+		Error:   "",
+		Data:    nil,
 	})
 }
 
+// @Summary Delete a note by ID
+// @Description Delete a note from the database by its ID
+// @Tags Info
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Failure 400 {object} internal.APIResponse[any] "Invalid note ID"
+// @Failure 404 {object} internal.APIResponse[any] "Note not found"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /info/notes/:id [delete]
 func handleDeleteNoteByID(c *gin.Context, infoService *info.Service) {
-	id, err := getNoteID(c)
+	id, err := utils.GetIdFromParam(c)
+
 	if err != nil {
-		c.JSON(http.StatusBadRequest, Response{
-			Status: "error",
-			Error:  "Invalid note ID",
+		c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+			Status:  "error",
+			Message: "invalid_note_id",
+			Error:   err.Error(),
+			Data:    nil,
 		})
 		return
 	}
 
 	err = infoService.DeleteNoteByID(id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, Response{
-			Status: "error",
-			Error:  err.Error(),
+		if err.Error() == "record not found" {
+			c.JSON(http.StatusNotFound, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "note_not_found",
+				Error:   "",
+				Data:    nil,
+			})
+
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+			Status:  "error",
+			Message: "note_delete_failed",
+			Error:   err.Error(),
+			Data:    nil,
 		})
+
 		return
 	}
-	c.JSON(http.StatusOK, Response{
-		Status: "success",
+
+	c.JSON(http.StatusOK, internal.APIResponse[any]{
+		Status:  "success",
+		Message: "note_deleted",
+		Error:   "",
+		Data:    nil,
 	})
 }
 
+// @Summary Update a note by ID
+// @Description Update a note in the database by its ID
+// @Tags Info
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Failure 400 {object} internal.APIResponse[any] "Invalid note ID"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /info/notes/:id [put]
 func handleUpdateNoteByID(c *gin.Context, infoService *info.Service) {
-	id, err := getNoteID(c)
+	id, err := utils.GetIdFromParam(c)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, Response{
-			Status: "error",
-			Error:  "Invalid note ID",
+		c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+			Status:  "error",
+			Message: "invalid_note_id",
+			Error:   err.Error(),
+			Data:    nil,
 		})
 		return
 	}
 
-	var updateData NoteRequest
-	if err := c.ShouldBindJSON(&updateData); err != nil {
-		c.JSON(http.StatusBadRequest, Response{
-			Status: "error",
-			Error:  "Invalid request payload",
+	var req NoteRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		var validationErrors []string
+
+		if ve, ok := err.(validator.ValidationErrors); ok {
+			for _, fieldErr := range ve {
+				validationErrors = append(validationErrors, fieldErr.Field()+" failed validation: "+fieldErr.Tag())
+			}
+		} else {
+			validationErrors = append(validationErrors, err.Error())
+		}
+
+		c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+			Status:  "error",
+			Message: "invalid_request_payload",
+			Error:   "validation_error",
+			Data:    validationErrors,
 		})
 		return
 	}
 
-	if err := validateNoteRequest(updateData); err != nil {
-		c.JSON(http.StatusBadRequest, Response{
-			Status: "error",
-			Error:  err.Error(),
-		})
-		return
-	}
-
-	err = infoService.UpdateNoteByID(id, updateData.Title, updateData.Content)
+	err = infoService.UpdateNoteByID(id, req.Title, req.Content)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, Response{
-			Status: "error",
-			Error:  err.Error(),
+		c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+			Status:  "error",
+			Message: "note_update_failed",
+			Error:   err.Error(),
+			Data:    nil,
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, Response{
-		Status: "success",
+	c.JSON(http.StatusOK, internal.APIResponse[any]{
+		Status:  "success",
+		Message: "note_updated",
+		Error:   "",
+		Data:    nil,
 	})
 }

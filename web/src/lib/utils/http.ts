@@ -12,7 +12,7 @@ import { api } from '$lib/api/common';
 import { APIResponseSchema } from '$lib/types/common';
 import type { QueryFunctionContext } from '@sveltestack/svelte-query';
 import adze from 'adze';
-import type { z } from 'zod';
+import { z } from 'zod';
 
 export async function apiRequest<T extends z.ZodType>(
 	endpoint: string,
@@ -27,12 +27,15 @@ export async function apiRequest<T extends z.ZodType>(
 			...(body ? { data: body } : {})
 		};
 
-		const response = await api.request(config);
+		const response = await api.request({ ...config, validateStatus: () => true });
 		const apiResponse = APIResponseSchema.safeParse(response.data);
 
 		if (!apiResponse.success) {
-			adze.withEmoji.warn('Invalid API response structure:', apiResponse.error);
-			return schema.parse({});
+			return getDefaultValue(schema);
+		}
+
+		if (apiResponse.data.status !== 'success') {
+			return apiResponse.data;
 		}
 
 		const responseData = apiResponse.data.data;
@@ -49,12 +52,22 @@ export async function apiRequest<T extends z.ZodType>(
 			}
 		}
 
-		adze.withEmoji.warn('Failed to parse API response data:', parsedResult.error);
-		return schema.parse({});
+		return getDefaultValue(schema);
 	} catch (error) {
-		adze.withEmoji.error(`Error in ${method} request to ${endpoint}:`, error);
-		return schema.parse({});
+		return getDefaultValue(schema);
 	}
+}
+
+function getDefaultValue<T extends z.ZodType>(schema: T): z.infer<T> {
+	if (schema instanceof z.ZodArray) {
+		return [] as z.infer<T>;
+	}
+
+	if (schema instanceof z.ZodObject) {
+		return {} as z.infer<T>;
+	}
+
+	return undefined as z.infer<T>;
 }
 
 type CacheEntry<T> = {

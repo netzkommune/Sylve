@@ -76,17 +76,17 @@ export function handleAxiosError(error: unknown): void {
 	}
 
 	const axiosError = error as AxiosError<{ message?: string }>;
-	adze.withEmoji.error('Axios error:', axiosError.message);
+	// adze.withEmoji.error('Axios error:', axiosError.message);
 
 	if (axiosError.response) {
 		const errorMessage =
 			axiosError.response.data?.message || axiosError.message || 'An error occurred';
-		adze.withEmoji.error('Status:', axiosError.response.status);
-		adze.withEmoji.error('Data:', axiosError.response.data);
-		adze.withEmoji.error('Error message:', errorMessage);
+		// adze.withEmoji.error('Status:', axiosError.response.status);
+		// adze.withEmoji.error('Data:', axiosError.response.data);
+		// adze.withEmoji.error('Error message:', errorMessage);
 		// showToast({ text: errorMessage, type: 'error', timeout: 5000 });
 	} else if (axiosError.request) {
-		adze.withEmoji.error('No response:', axiosError.request);
+		// adze.withEmoji.error('No response:', axiosError.request);
 		// showToast({
 		// 	text: 'No response from server',
 		// 	type: 'error',

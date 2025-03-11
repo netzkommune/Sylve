@@ -67,6 +67,7 @@
 		"human-format": "^1.2.1",
 		"layerchart": "^1.0.5",
 		"mode-watcher": "^0.5.1",
+		"svelte-exmarkdown": "^4.0.3",
 		"svelte-ux": "^1.0.0"
 	}
 }

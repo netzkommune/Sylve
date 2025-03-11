@@ -30,3 +30,10 @@ type SylveConfig struct {
 	DataPath    string            `json:"dataPath"`
 	TLS         TLSConfig         `json:"tlsConfig"`
 }
+
+type APIResponse[T any] struct {
+	Status  string `json:"status"`
+	Message string `json:"message"`
+	Data    T      `json:"data"`
+	Error   string `json:"error"`
+}

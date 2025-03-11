@@ -3,6 +3,7 @@
 	import Icon from '@iconify/svelte';
 	import { TableHandler } from '@vincjo/datatables';
 	import humanFormat from 'human-format';
+	import { onMount } from 'svelte';
 
 	let { data }: { data: Disk[] } = $props();
 
@@ -52,6 +53,9 @@
 			locales: 'en',
 			options: { numeric: true, sensitivity: 'base' }
 		});
+	});
+	onMount(() => {
+		console.log('data', data);
 	});
 </script>
 
@@ -128,26 +132,39 @@
 								>
 									{#each keys as key, keyIndex}
 										{#if key === 'Device'}
-											<td class="whitespace-nowrap px-3 py-1.5">
-												<div class="flex items-center">
-													<span class="w-4 text-center text-gray-400">│</span>
-													<span class="ml-2 text-gray-400">
-														{childIndex === row.Partitions.length - 1 ? '└─' : '├─'}
-													</span>
+											<td class="whitespace-nowrap px-3 py-0">
+												<div class="relative flex items-center">
+													{#if row.Partitions.length > 1}
+														<div
+															class="bg-muted-foreground absolute left-1.5 top-0 h-full w-0.5"
+															style="height: calc(100% + 0.8rem);"
+															class:hidden={childIndex === row.Partitions.length - 1}
+														></div>
+													{:else}
+														<div
+															class="bg-muted-foreground absolute left-1.5 top-0 h-3 w-0.5"
+														></div>
+													{/if}
+													<div class="relative left-1.5 top-0 mr-2 w-4">
+														<div class="bg-muted-foreground h-0.5 w-4"></div>
+													</div>
+													{#if childIndex === row.Partitions.length - 1}
+														<div class="absolute bottom-0 left-2 h-1/2 w-0.5 bg-transparent"></div>
+													{/if}
 													<Icon icon="mdi:harddisk" class="mr-1.5 h-4 w-4" />
 													<span>{child.name}</span>
 												</div>
 											</td>
 										{:else if key === 'Type'}
-											<td class="whitespace-nowrap px-3 py-1.5">partition</td>
+											<td class="whitespace-nowrap px-3 py-0">partition</td>
 										{:else if key === 'Usage'}
-											<td class="whitespace-nowrap px-3 py-1.5">{child.usage}</td>
+											<td class="whitespace-nowrap px-3 py-0">{child.usage}</td>
 										{:else if key === 'Size'}
-											<td class="whitespace-nowrap px-3 py-1.5">{humanFormat(child.size)}</td>
+											<td class="whitespace-nowrap px-3 py-0">{humanFormat(child.size)}</td>
 										{:else if key === 'GPT'}
-											<td class="whitespace-nowrap px-3 py-1.5">{row.GPT}</td>
+											<td class="whitespace-nowrap px-3 py-0">{row.GPT}</td>
 										{:else}
-											<td class="whitespace-nowrap px-3 py-1.5"></td>
+											<td class="whitespace-nowrap px-3 py-0"></td>
 										{/if}
 									{/each}
 								</tr>

@@ -25,6 +25,25 @@ import (
 	zfsService "sylve/internal/services/zfs"
 )
 
+// @title           Sylve API
+// @version         0.0.1
+// @description     Sylve is a lightweight GUI for managing Bhyve, Jails, ZFS, networking, and more on FreeBSD.
+// @termsOfService  https://github.com/AlchemillaHQ/Sylve/blob/master/LICENSE
+
+// @contact.name   Alchemilla Ventures Pvt. Ltd.
+// @contact.url    https://alchemilla.io
+// @contact.email  hello@alchemilla.io
+
+// @license.name  BSD-2-Clause
+// @license.url   https://github.com/AlchemillaHQ/Sylve/blob/master/LICENSE
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
+
+// @host      sylve.lan:8181
+// @BasePath  /api
 func RegisterRoutes(r *gin.Engine,
 	environment string,
 	proxyToVite bool,
@@ -46,7 +65,10 @@ func RegisterRoutes(r *gin.Engine,
 	info.Use(middleware.EnsureAuthenticated(authService))
 	{
 		info.GET("/basic", infoHandlers.BasicInfo(infoService))
-		info.GET("/cpu", infoHandlers.CPUInfo(infoService))
+
+		info.GET("/cpu", infoHandlers.RealTimeCPUInfoHandler(infoService))
+		info.GET("/cpu/historical", infoHandlers.HistoricalCPUInfoHandler(infoService))
+
 		info.GET("/ram", infoHandlers.RAMInfo(infoService))
 		info.GET("/swap", infoHandlers.SwapInfo(infoService))
 
@@ -65,7 +87,9 @@ func RegisterRoutes(r *gin.Engine,
 	zfs.Use(middleware.EnsureAuthenticated(authService))
 	{
 		zfs.GET("/pool/list", zfsHandlers.GetPools(zfsService))
+
 		zfs.GET("/pool/io-delay", zfsHandlers.AvgIODelay(zfsService))
+		zfs.GET("/pool/io-delay/historical", zfsHandlers.AvgIODelayHistorical(zfsService))
 	}
 
 	disk := api.Group("/disk")

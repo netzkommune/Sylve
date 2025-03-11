@@ -9,31 +9,72 @@
 package infoHandlers
 
 import (
+	"net/http"
+	"sylve/internal"
+	infoServiceInterfaces "sylve/internal/interfaces/services/info"
 	"sylve/internal/services/info"
 
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary Get RAM Info
+// @Description Get the RAM information about the system
+// @Tags Info
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} internal.APIResponse[infoServiceInterfaces.RAMInfo] "Success"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /info/ram [get]
 func RAMInfo(infoService *info.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		info, err := infoService.GetRAMInfo()
 
 		if err != nil {
-			c.JSON(400, gin.H{"status": "error", "message": "invalid_request", "error": err.Error()})
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    nil,
+			})
 		}
 
-		c.JSON(200, gin.H{"status": "success", "data": info})
+		c.JSON(http.StatusOK, internal.APIResponse[infoServiceInterfaces.RAMInfo]{
+			Status:  "success",
+			Message: "ram_info",
+			Error:   "",
+			Data:    info,
+		})
 	}
 }
 
+// @Summary Get Swap Info
+// @Description Get the Swap information about the system
+// @Tags Info
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} internal.APIResponse[infoServiceInterfaces.SwapInfo] "Success"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /info/swap [get]
 func SwapInfo(infoService *info.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		info, err := infoService.GetSwapInfo()
 
 		if err != nil {
-			c.JSON(400, gin.H{"status": "error", "message": "invalid_request", "error": err.Error()})
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    nil,
+			})
 		}
 
-		c.JSON(200, gin.H{"status": "success", "data": info})
+		c.JSON(http.StatusOK, internal.APIResponse[infoServiceInterfaces.SwapInfo]{
+			Status:  "success",
+			Message: "swap_info",
+			Error:   "",
+			Data:    info,
+		})
 	}
 }

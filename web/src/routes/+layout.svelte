@@ -12,6 +12,7 @@
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
 	import { ModeWatcher } from 'mode-watcher';
 	import { onMount, tick } from 'svelte';
+	import { Toaster } from 'svelte-french-toast';
 	import '../app.css';
 
 	const queryClient = new QueryClient();
@@ -63,6 +64,7 @@
 			if (await login(username, password, type, remember)) {
 				isLoggedIn = true;
 				const path = window.location.pathname;
+
 				if (path === '/' || !path.startsWith(`/${$hostname}`)) {
 					await goto(`/${$hostname}/summary`, { replaceState: true });
 				}
@@ -79,6 +81,7 @@
 	}
 </script>
 
+<Toaster />
 <ModeWatcher />
 
 {#if isLoading}

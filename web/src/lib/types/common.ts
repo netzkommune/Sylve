@@ -27,3 +27,5 @@ export interface HistoricalData {
 	date: Date;
 	[key: string]: number | string | Date;
 }
+
+export type APIResponse = z.infer<typeof APIResponseSchema>;

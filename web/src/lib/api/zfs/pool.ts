@@ -15,7 +15,7 @@ export async function getIODelay(
 	if (queryObj) {
 		if (queryObj.queryKey.includes('ioDelayHistorical')) {
 			const data = await apiRequest(
-				'/zfs/pool/io-delay?historical=1',
+				'/zfs/pool/io-delay/historical',
 				IODelayHistoricalSchema,
 				'GET'
 			);

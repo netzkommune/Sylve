@@ -14,12 +14,8 @@ import { oldStore, store } from '$lib/stores/auth';
 import { hostname } from '$lib/stores/basic';
 import adze from 'adze';
 import axios, { AxiosError } from 'axios';
+import { toast } from 'svelte-french-toast';
 import { get } from 'svelte/store';
-
-interface Token {
-	value: string;
-	expiry: number;
-}
 
 export async function login(
 	username: string,
@@ -34,47 +30,40 @@ export async function login(
 			authType,
 			remember
 		});
-		store.set(response.data.token);
-		hostname.set(response.data.hostname);
-		return true;
+
+		if (response.status === 200 && response.data) {
+			if (response.data.data?.hostname && response.data.data?.token) {
+				hostname.set(response.data.data.hostname);
+				store.set(response.data.data.token);
+				return true;
+			} else {
+				toast.error('Error logging in');
+			}
+		} else {
+			toast.error('Error logging in');
+			return false;
+		}
+
+		return false;
 	} catch (error) {
 		if (axios.isAxiosError(error)) {
 			const axiosError = error as AxiosError;
 			if (axiosError.response) {
 				if (axiosError.response.status === 401) {
-					// showToast({
-					// 	text: 'Invalid credentials',
-					// 	type: 'error',
-					// 	timeout: 5000
-					// });
-					console.log('Invalid credentials');
+					toast.error('Invalid credentials');
 				} else {
-					// showToast({
-					// 	text: 'An error occurred during login',
-					// 	type: 'error',
-					// 	timeout: 5000
-					// });
-					console.log('An error occurred during login');
+					toast.error('Error logging in');
 				}
 			} else if (axiosError.request) {
-				// showToast({
-				// 	text: 'No response from server',
-				// 	type: 'error',
-				// 	timeout: 5000
-				// });
-				console.log('No response from server');
+				toast.error('Error logging in');
 			} else {
-				// showToast({ text: 'An error occurred', type: 'error', timeout: 5000 });
-				console.log('An error occurred');
+				toast.error('Error logging in');
 			}
 		} else {
-			// showToast({
-			// 	text: 'An unexpected error occurred',
-			// 	type: 'error',
-			// 	timeout: 5000
-			// });
-			console.log('An unexpected error occurred');
+			toast.error('Error logging in');
 		}
+
+		adze.withEmoji.error('Login failed', error);
 		return false;
 	}
 }

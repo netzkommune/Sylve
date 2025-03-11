@@ -1,0 +1,815 @@
+basePath: /api
+definitions:
+  internal_handlers.LoginRequest:
+    properties:
+      authType:
+        type: string
+      password:
+        maxLength: 128
+        minLength: 3
+        type: string
+      remember:
+        type: boolean
+      username:
+        maxLength: 128
+        minLength: 3
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  internal_handlers.SuccessfulLogin:
+    properties:
+      hostname:
+        type: string
+      token:
+        type: string
+    type: object
+  internal_handlers_disk.DiskActionRequest:
+    properties:
+      device:
+        minLength: 2
+        type: string
+    required:
+    - device
+    type: object
+  sylve_internal.APIResponse-any:
+    properties:
+      data: {}
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-array_sylve_internal_db_models_info_AuditLog:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models_info.AuditLog'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-array_sylve_internal_db_models_info_CPU:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models_info.CPU'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-array_sylve_internal_db_models_info_IODelay:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models_info.IODelay'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-array_sylve_internal_db_models_info_Note:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models_info.Note'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-array_sylve_internal_interfaces_services_disk_Disk:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_internal_interfaces_services_disk.Disk'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-array_sylve_internal_interfaces_services_zfs_Zpool:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_internal_interfaces_services_zfs.Zpool'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-float64:
+    properties:
+      data:
+        type: number
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-sylve_internal_interfaces_services_info_BasicInfo:
+    properties:
+      data:
+        $ref: '#/definitions/sylve_internal_interfaces_services_info.BasicInfo'
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-sylve_internal_interfaces_services_info_CPUInfo:
+    properties:
+      data:
+        $ref: '#/definitions/sylve_internal_interfaces_services_info.CPUInfo'
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-sylve_internal_interfaces_services_info_RAMInfo:
+    properties:
+      data:
+        $ref: '#/definitions/sylve_internal_interfaces_services_info.RAMInfo'
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-sylve_internal_interfaces_services_info_SwapInfo:
+    properties:
+      data:
+        $ref: '#/definitions/sylve_internal_interfaces_services_info.SwapInfo'
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal_db_models_info.AuditLog:
+    properties:
+      action:
+        type: string
+      authType:
+        type: string
+      createdAt:
+        type: string
+      ended:
+        type: string
+      id:
+        type: integer
+      node:
+        type: string
+      started:
+        type: string
+      status:
+        type: string
+      updatedAt:
+        type: string
+      user:
+        type: string
+      userId:
+        type: integer
+    type: object
+  sylve_internal_db_models_info.CPU:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      usage:
+        type: number
+    type: object
+  sylve_internal_db_models_info.IODelay:
+    properties:
+      createdAt:
+        type: string
+      delay:
+        type: number
+      id:
+        type: integer
+    type: object
+  sylve_internal_db_models_info.Note:
+    properties:
+      content:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+      updateAt:
+        type: string
+    type: object
+  sylve_internal_interfaces_services_disk.Disk:
+    properties:
+      device:
+        type: string
+      gpt:
+        type: boolean
+      model:
+        type: string
+      partitions:
+        items:
+          $ref: '#/definitions/sylve_internal_interfaces_services_disk.Partition'
+        type: array
+      serial:
+        type: string
+      size:
+        type: integer
+      smartData: {}
+      type:
+        type: string
+      usage:
+        type: string
+      wearOut:
+        type: string
+    type: object
+  sylve_internal_interfaces_services_disk.Partition:
+    properties:
+      name:
+        type: string
+      size:
+        type: integer
+      usage:
+        type: string
+    type: object
+  sylve_internal_interfaces_services_info.BasicInfo:
+    properties:
+      bootMode:
+        type: string
+      hostname:
+        type: string
+      loadAverage:
+        type: string
+      os:
+        type: string
+      sylveVersion:
+        type: string
+      uptime:
+        type: integer
+    type: object
+  sylve_internal_interfaces_services_info.CPUInfo:
+    properties:
+      cache:
+        properties:
+          l1d:
+            type: integer
+          l1i:
+            type: integer
+          l2:
+            type: integer
+          l3:
+            type: integer
+        type: object
+      cacheLine:
+        type: integer
+      family:
+        type: integer
+      features:
+        items:
+          type: string
+        type: array
+      frequency:
+        type: integer
+      logicalCores:
+        type: integer
+      model:
+        type: integer
+      name:
+        type: string
+      physicalCores:
+        type: integer
+      threadsPerCore:
+        type: integer
+      usage:
+        type: number
+    type: object
+  sylve_internal_interfaces_services_info.RAMInfo:
+    properties:
+      free:
+        type: integer
+      total:
+        type: integer
+      usedPercent:
+        type: number
+    type: object
+  sylve_internal_interfaces_services_info.SwapInfo:
+    properties:
+      free:
+        type: integer
+      total:
+        type: integer
+      usedPercent:
+        type: number
+    type: object
+  sylve_internal_interfaces_services_zfs.Zpool:
+    properties:
+      allocated:
+        type: integer
+      dedupRatio:
+        type: number
+      free:
+        type: integer
+      freeing:
+        type: integer
+      health:
+        type: string
+      leaked:
+        type: integer
+      name:
+        type: string
+      readOnly:
+        type: boolean
+      size:
+        type: integer
+    type: object
+host: sylve.lan:8181
+info:
+  contact:
+    email: hello@alchemilla.io
+    name: Alchemilla Ventures Pvt. Ltd.
+    url: https://alchemilla.io
+  description: Sylve is a lightweight GUI for managing Bhyve, Jails, ZFS, networking,
+    and more on FreeBSD.
+  license:
+    name: BSD-2-Clause
+    url: https://github.com/AlchemillaHQ/Sylve/blob/master/LICENSE
+  termsOfService: https://github.com/AlchemillaHQ/Sylve/blob/master/LICENSE
+  title: Sylve API
+  version: 0.0.1
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Create a new JWT token
+      parameters:
+      - description: Login request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/internal_handlers.SuccessfulLogin'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      summary: Login
+      tags:
+      - Authentication
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Revoke a JWT token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Logout
+      tags:
+      - Authentication
+  /disk/initialize-gpt:
+    post:
+      consumes:
+      - application/json
+      description: Initialize a disk with a GPT partition table
+      parameters:
+      - description: Initialize GPT request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_disk.DiskActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Initialize GPT
+      tags:
+      - Disk
+  /disk/list:
+    get:
+      consumes:
+      - application/json
+      description: List all disk devices on the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_internal_interfaces_services_disk_Disk'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: List disk devices
+      tags:
+      - Disk
+  /disk/wipe:
+    post:
+      consumes:
+      - application/json
+      description: Wipe the partition table of a disk device
+      parameters:
+      - description: Wipe disk request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_disk.DiskActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Wipe disk
+      tags:
+      - Disk
+  /health/basic:
+    get:
+      consumes:
+      - application/json
+      description: Overall basic health check of the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Basic health check
+      tags:
+      - Health
+  /info/audit-logs:
+    get:
+      consumes:
+      - application/json
+      description: Get the latest audit logs
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_internal_db_models_info_AuditLog'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Get Audit Logs
+      tags:
+      - Info
+  /info/basic:
+    get:
+      consumes:
+      - application/json
+      description: Get the basic information about the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-sylve_internal_interfaces_services_info_BasicInfo'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Get Basic Info
+      tags:
+      - Info
+  /info/cpu:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves real-time CPU info
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-sylve_internal_interfaces_services_info_CPUInfo'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      summary: Get Current CPU information
+      tags:
+      - system
+  /info/cpu/historical:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves historical CPU info
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_internal_db_models_info_CPU'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      summary: Get Historical CPU information
+      tags:
+      - system
+  /info/notes:
+    get:
+      consumes:
+      - application/json
+      description: Get all notes stored in the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_internal_db_models_info_Note'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Get All Notes
+      tags:
+      - Info
+    post:
+      consumes:
+      - application/json
+      description: Add a new note to the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Create a new note
+      tags:
+      - Info
+  /info/notes/:id:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a note from the database by its ID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Invalid note ID
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "404":
+          description: Note not found
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Delete a note by ID
+      tags:
+      - Info
+    put:
+      consumes:
+      - application/json
+      description: Update a note in the database by its ID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Invalid note ID
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Update a note by ID
+      tags:
+      - Info
+  /info/ram:
+    get:
+      consumes:
+      - application/json
+      description: Get the RAM information about the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-sylve_internal_interfaces_services_info_RAMInfo'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Get RAM Info
+      tags:
+      - Info
+  /info/swap:
+    get:
+      consumes:
+      - application/json
+      description: Get the Swap information about the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-sylve_internal_interfaces_services_info_SwapInfo'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Get Swap Info
+      tags:
+      - Info
+  /zfs/avg-io-delay:
+    get:
+      consumes:
+      - application/json
+      description: Get the average IO delay of all pools
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-float64'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Get Average IO Delay
+      tags:
+      - ZFS
+  /zfs/avg-io-delay-historical:
+    get:
+      consumes:
+      - application/json
+      description: Get the historical IO delays of all pools
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_internal_db_models_info_IODelay'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Get Average IO Delay Historical
+      tags:
+      - ZFS
+  /zfs/pools:
+    get:
+      consumes:
+      - application/json
+      description: Get all ZFS pools
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_internal_interfaces_services_zfs_Zpool'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Get Pools
+      tags:
+      - ZFS
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

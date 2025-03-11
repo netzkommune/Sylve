@@ -37,10 +37,6 @@
 		{ icon: 'mdi:palette', label: 'Color Theme', shortcut: '⌘⇧T' },
 		{ icon: 'meteor-icons:language', label: 'Language', shortcut: '⌘K' }
 	];
-
-	$effect(() => {
-		console.log('mode', $mode);
-	});
 </script>
 
 <header class="bg-background sticky top-0 flex h-[5vh] items-center gap-4 border-b px-2 md:h-[4vh]">

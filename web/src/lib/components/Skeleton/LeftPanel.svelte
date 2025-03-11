@@ -28,7 +28,7 @@
 				{
 					label: node,
 					icon: 'mdi:dns',
-					href: `/${node}/summary`,
+					href: `/${node}`,
 					children: [
 						{
 							label: '100 (Firewall)',

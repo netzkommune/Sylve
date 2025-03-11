@@ -21,7 +21,7 @@
 	<Tabs.Content value="cluster" class="flex h-full flex-col border">
 		<div class="flex h-full flex-col overflow-hidden">
 			<Table.Root class="w-full table-fixed border-collapse">
-				<Table.Header class="bg-background sticky top-0 z-[100]">
+				<Table.Header class="bg-background sticky top-0 z-[50]">
 					<Table.Row>
 						<Table.Head class="h-10 px-4 py-2">Start Time</Table.Head>
 						<Table.Head class="h-10 px-4 py-2">End Time</Table.Head>

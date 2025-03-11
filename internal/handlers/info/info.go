@@ -7,7 +7,3 @@
 // under sponsorship from the FreeBSD Foundation.
 
 package infoHandlers
-
-import "github.com/go-playground/validator/v10"
-
-var Validate = validator.New()

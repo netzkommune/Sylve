@@ -10,3 +10,4 @@ export const NotesSchema = z.array(
 );
 
 export type Notes = z.infer<typeof NotesSchema>;
+export type Note = z.infer<typeof NotesSchema>['0'];

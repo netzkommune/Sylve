@@ -9,29 +9,72 @@
 package infoHandlers
 
 import (
+	"net/http"
+	"sylve/internal"
 	"sylve/internal/services/info"
 
 	"github.com/gin-gonic/gin"
+
+	_ "sylve/internal/db/models/info"
+	_ "sylve/internal/interfaces/services/info"
 )
 
-func CPUInfo(infoService *info.Service) gin.HandlerFunc {
+// @Summary Get Current CPU information
+// @Description Retrieves real-time CPU info
+// @Tags system
+// @Accept json
+// @Produce json
+// @Success 200 {object} internal.APIResponse[infoServiceInterfaces.CPUInfo]
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /info/cpu [get]
+func RealTimeCPUInfoHandler(infoService *info.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var (
-			info interface{}
-			err  error
-		)
-
-		if c.Query("historical") == "1" {
-			info, err = infoService.GetCPUUsageHistorical()
-		} else {
-			info, err = infoService.GetCPUInfo(false)
-		}
-
+		info, err := infoService.GetCPUInfo(false)
 		if err != nil {
-			c.JSON(400, gin.H{"status": "error", "message": "invalid_request", "error": err.Error()})
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    nil,
+			})
 			return
 		}
 
-		c.JSON(200, gin.H{"status": "success", "data": info})
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "cpu_info",
+			Error:   "",
+			Data:    info,
+		})
+	}
+}
+
+// @Summary Get Historical CPU information
+// @Description Retrieves historical CPU info
+// @Tags system
+// @Accept json
+// @Produce json
+// @Success 200 {object} internal.APIResponse[[]infoModels.CPU]
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /info/cpu/historical [get]
+func HistoricalCPUInfoHandler(infoService *info.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		info, err := infoService.GetCPUUsageHistorical()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "cpu_info",
+			Error:   "",
+			Data:    info,
+		})
 	}
 }

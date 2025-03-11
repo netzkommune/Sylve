@@ -10,65 +10,125 @@ package handlers
 
 import (
 	"net/http"
+	"sylve/internal"
 	"sylve/internal/services/auth"
 	"sylve/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )
 
+type LoginRequest struct {
+	Username string `json:"username" binding:"required,min=3,max=128"`
+	Password string `json:"password" binding:"required,min=3,max=128"`
+	AuthType string `json:"authType"`
+	Remember bool   `json:"remember"`
+}
+
+type SuccessfulLogin struct {
+	Token    string `json:"token"`
+	Hostname string `json:"hostname"`
+}
+
+// @Summary Login
+// @Description Create a new JWT token
+// @Tags Authentication
+// @Param request body LoginRequest true "Login request body"
+// @Accept json
+// @Produce json
+// @Success 200 {object} SuccessfulLogin "Success"
+// @Failure 400 {object} internal.APIResponse[any] "Bad Request"
+// @Failure 401 {object} internal.APIResponse[any] "Unauthorized"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /auth/login [post]
 func LoginHandler(authService *auth.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		type Request struct {
-			Username string `json:"username" validate:"required"`
-			Password string `json:"password" validate:"required"`
-			AuthType string `json:"authType"`
-			Remember bool   `json:"remember"`
-		}
 
-		var r Request
+		var r LoginRequest
 
 		if err := c.ShouldBindJSON(&r); err != nil {
-			utils.SendJSONResponse(c, http.StatusBadRequest, gin.H{"status": "error", "message": "invalid_request", "error": err.Error()})
-			return
-		}
+			validationErrors := utils.MapValidationErrors(err, LoginRequest{})
 
-		if err := Validate.Struct(r); err != nil {
-			utils.SendJSONResponse(c, http.StatusBadRequest, gin.H{"status": "error", "message": "invalid_request", "error": err.Error()})
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request_payload",
+				Error:   "validation_error",
+				Data:    validationErrors,
+			})
 			return
 		}
 
 		token, err := authService.CreateJWT(r.Username, r.Password, r.AuthType, r.Remember)
 
 		if err != nil {
-			utils.SendJSONResponse(c, http.StatusUnauthorized, gin.H{"status": "error", "message": "invalid_credentials", "error": err.Error()})
+			c.JSON(http.StatusUnauthorized, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_credentials",
+				Error:   err.Error(),
+				Data:    nil,
+			})
 			return
 		}
 
 		hostname, err := utils.GetSystemHostname()
 
 		if err != nil {
-			utils.SendJSONResponse(c, http.StatusInternalServerError, gin.H{"status": "error", "message": "internal_server_error", "error": err.Error()})
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    nil,
+			})
 			return
 		}
 
-		utils.SendJSONResponse(c, http.StatusOK, gin.H{"status": "success", "token": token, "hostname": hostname})
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "login_successful",
+			Error:   "",
+			Data:    SuccessfulLogin{Token: token, Hostname: hostname},
+		})
 	}
 }
 
+// @Summary Logout
+// @Description Revoke a JWT token
+// @Tags Authentication
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Failure 401 {object} internal.APIResponse[any] "Unauthorized"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /auth/logout [post]
 func LogoutHandler(authService *auth.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token, err := utils.GetTokenFromHeader(c.Request.Header)
 
 		if err != nil {
-			utils.SendJSONResponse(c, http.StatusUnauthorized, gin.H{"status": "error", "message": "no_token_provided"})
+			c.JSON(http.StatusUnauthorized, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "no_token_provided",
+				Error:   err.Error(),
+				Data:    nil,
+			})
 			return
 		}
 
 		if err := authService.RevokeJWT(token); err != nil {
-			utils.SendJSONResponse(c, http.StatusInternalServerError, gin.H{"status": "error", "message": "internal_server_error", "error": err.Error()})
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    nil,
+			})
 			return
 		}
 
-		utils.SendJSONResponse(c, http.StatusOK, gin.H{"status": "success"})
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "logout_successful",
+			Error:   "",
+			Data:    nil,
+		})
 	}
 }

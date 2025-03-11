@@ -9,19 +9,42 @@
 package infoHandlers
 
 import (
+	"net/http"
+	"sylve/internal"
 	"sylve/internal/services/info"
+
+	infoServiceInterfaces "sylve/internal/interfaces/services/info"
 
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary Get Basic Info
+// @Description Get the basic information about the system
+// @Tags Info
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} internal.APIResponse[infoServiceInterfaces.BasicInfo] "Success"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /info/basic [get]
 func BasicInfo(infoService *info.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		info, err := infoService.GetBasicInfo()
 
 		if err != nil {
-			c.JSON(400, gin.H{"status": "error", "message": "invalid_request", "error": err.Error()})
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    nil,
+			})
 		}
 
-		c.JSON(200, gin.H{"status": "success", "data": info})
+		c.JSON(http.StatusOK, internal.APIResponse[infoServiceInterfaces.BasicInfo]{
+			Status:  "success",
+			Message: "basic_info",
+			Error:   "",
+			Data:    info,
+		})
 	}
 }

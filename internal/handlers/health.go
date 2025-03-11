@@ -11,21 +11,44 @@ package handlers
 import (
 	"net/http"
 
+	"sylve/internal"
 	"sylve/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary Basic health check
+// @Description Overall basic health check of the system
+// @Tags Health
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /health/basic [get]
 func BasicHealthCheckHandler(c *gin.Context) {
 	h, err := utils.GetSystemHostname()
 	if err != nil {
-		utils.SendJSONResponse(c, http.StatusInternalServerError, gin.H{"status": "error", "message": "internal_server_error"})
+		c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+			Status:  "error",
+			Message: "internal_server_error",
+			Error:   "unable_to_get_hostname",
+			Data:    nil,
+		})
 		return
 	}
 
-	utils.SendJSONResponse(c, http.StatusOK, gin.H{"hostanme": h, "message": "Basic health is OK"})
+	c.JSON(http.StatusOK, internal.APIResponse[any]{
+		Status:  "success",
+		Message: "Basic health is OK",
+		Data:    gin.H{"hostname": h},
+	})
 }
 
 func HTTPHealthCheckHandler(c *gin.Context) {
-	utils.SendJSONResponse(c, http.StatusOK, gin.H{"message": "HTTP health is OK"})
+	c.JSON(http.StatusOK, internal.APIResponse[any]{
+		Status:  "success",
+		Message: "HTTP health is OK",
+		Data:    nil,
+	})
 }

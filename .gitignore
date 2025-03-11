@@ -5,3 +5,8 @@ internal/assets/web-files/*
 config.json
 bin/
 tmp/
+node_modules/
+package-lock.json
+package.json
+!web/package.json
+!web/package-lock.json

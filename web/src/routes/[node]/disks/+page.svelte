@@ -31,28 +31,24 @@
 
 	let activeDisk: Disk | null = $derived.by(() => {
 		if (activeRow !== null) {
-			let activeDevice = activeRow.split('-');
-			if (activeDevice.length === 1) {
-				return disks[parseInt(activeDevice[0])];
-			}
+			return disks.find((disk) => disk.Device === activeRow) || null;
 		}
-
 		return null;
 	});
 
 	let activePartition: Partition | null = $derived.by(() => {
 		if (activeRow !== null) {
-			let activeDevice = activeRow.split('-');
-			if (activeDevice.length === 2) {
-				return disks[parseInt(activeDevice[0])].Partitions[parseInt(activeDevice[1])];
+			let [device, partitionIndex] = activeRow.split('-');
+			let disk = disks.find((d) => d.Device === device);
+			if (disk && partitionIndex !== undefined) {
+				return disk.Partitions[parseInt(partitionIndex)] || null;
 			}
 		}
-
 		return null;
 	});
 
-	function handleRowClick(index: string) {
-		activeRow = activeRow === index.toString() ? null : index.toString();
+	function handleRowClick(device: string) {
+		activeRow = activeRow === device ? null : device;
 	}
 
 	function toggleChildren(index: number) {
@@ -187,10 +183,10 @@
 					<tbody>
 						{#each table.rows as row, index}
 							<tr
-								class={activeRow === index.toString() ? 'bg-muted-foreground/40 dark:bg-muted' : ''}
+								class={activeRow === row.Device ? 'bg-muted-foreground/40 dark:bg-muted' : ''}
 								onclick={(event: MouseEvent) => {
 									if (!(event.target as HTMLElement).closest('.toggle-icon')) {
-										handleRowClick(index.toString());
+										handleRowClick(row.Device);
 									}
 								}}
 							>
@@ -202,7 +198,7 @@
 													icon={isToggled(index) ? 'lucide:minus-square' : 'lucide:plus-square'}
 													class="toggle-icon mr-1.5 h-4 w-4 cursor-pointer"
 													onclick={(event: MouseEvent) => {
-														event.stopPropagation(); // Prevents row click event from firing
+														event.stopPropagation();
 														toggleChildren(index);
 													}}
 												/>
@@ -222,10 +218,10 @@
 							{#if expandedRows[index] && row.Partitions}
 								{#each row.Partitions as child, childIndex}
 									<tr
-										class={activeRow === `${index}-${childIndex}`
+										class={activeRow === `${row.Device}-${childIndex}`
 											? 'bg-muted-foreground/40 dark:bg-muted'
 											: ''}
-										onclick={() => handleRowClick(`${index}-${childIndex}`)}
+										onclick={() => handleRowClick(`${row.Device}-${childIndex}`)}
 									>
 										{#each keys as key, _}
 											{#if key === 'Device'}

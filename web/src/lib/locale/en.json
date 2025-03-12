@@ -25,6 +25,11 @@
 		"note_l": "note",
 		"title": "Title"
 	},
+	"disk": {
+		"smart": "S.M.A.R.T.",
+		"attribute": "Attribute",
+		"value": "Value"
+	},
 	"common": {
 		"example": "Example",
 		"are_you_sure": "Are you sure?",

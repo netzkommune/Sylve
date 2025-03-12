@@ -117,7 +117,12 @@ export const DiskInfoSchema = z.array(
 	})
 );
 
+export type SmartAttribute = Record<
+	string,
+	string | number | boolean | Record<string, string | number | boolean>
+>;
 export type SmartNVME = z.infer<typeof SmartNVMESchema>;
+export type SmartCtl = z.infer<typeof SmartCtlSchema>;
 export type DiskInfo = z.infer<typeof DiskInfoSchema>;
 export type Partition = z.infer<typeof PartitionSchema>;
 
@@ -132,4 +137,5 @@ export interface Disk {
 	'S.M.A.R.T.': string;
 	Wearout: string | number | undefined;
 	Partitions: Partition[];
+	SmartData: SmartNVME | SmartCtl | null;
 }

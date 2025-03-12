@@ -1,7 +1,9 @@
-import { listDisks, simplifyDisks } from '$lib/api/disk/disk';
+import { listDisks } from '$lib/api/disk/disk';
+import { simplifyDisks } from '$lib/utils/disk';
 
 export async function load() {
-	const disks = await simplifyDisks(await listDisks());
+	let disks = await simplifyDisks(await listDisks());
+	disks = disks.filter((disk) => disk.Device !== '/dev/nda0');
 	return {
 		disks
 	};

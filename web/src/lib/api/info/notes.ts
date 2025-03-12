@@ -1,20 +1,36 @@
 import { APIResponseSchema, type APIResponse } from '$lib/types/common';
-import { NotesSchema, type Notes } from '$lib/types/info/notes';
+import { NoteSchema, NotesSchema, type Note, type Notes } from '$lib/types/info/notes';
 import { apiRequest } from '$lib/utils/http';
 
 async function notesRequest(
 	endpoint: string,
 	method: 'GET' | 'POST' | 'PUT' | 'DELETE',
 	body?: object
-): Promise<Notes | APIResponse> {
-	const schema = method === 'GET' ? NotesSchema : APIResponseSchema;
-	const data = await apiRequest(endpoint, schema, method, body);
-	return schema.parse(data);
+): Promise<Notes | Note | APIResponse> {
+	let schema;
+
+	if (method === 'GET') {
+		schema = NotesSchema;
+	} else if (method === 'POST') {
+		schema = NoteSchema;
+	} else {
+		schema = APIResponseSchema;
+	}
+
+	return await apiRequest(endpoint, schema, method, body);
 }
 
 export const getNotes = () => notesRequest('/info/notes', 'GET');
-export const createNote = (title: string, content: string) =>
-	notesRequest('/info/notes', 'POST', { title, content });
 export const deleteNote = (id: number) => notesRequest(`/info/notes/${id}`, 'DELETE');
-export const updateNote = (id: number, title: string, content: string) =>
-	notesRequest(`/info/notes/${id}`, 'PUT', { title, content });
+
+export const createNote = async (title: string, content: string): Promise<Note | APIResponse> => {
+	return (await notesRequest('/info/notes', 'POST', { title, content })) as Note | APIResponse;
+};
+
+export const updateNote = async (
+	id: number,
+	title: string,
+	content: string
+): Promise<APIResponse> => {
+	return (await notesRequest(`/info/notes/${id}`, 'PUT', { title, content })) as APIResponse;
+};

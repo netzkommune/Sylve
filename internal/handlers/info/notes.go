@@ -81,7 +81,7 @@ func handleGetNotes(c *gin.Context, infoService *info.Service) {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Success 200 {object} internal.APIResponse[infoModels.Note] "Success"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
 // @Router /info/notes [post]
 func handlePostNotes(c *gin.Context, infoService *info.Service) {
@@ -99,7 +99,7 @@ func handlePostNotes(c *gin.Context, infoService *info.Service) {
 		return
 	}
 
-	err := infoService.AddNote(req.Title, req.Content)
+	note, err := infoService.AddNote(req.Title, req.Content)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
@@ -111,11 +111,11 @@ func handlePostNotes(c *gin.Context, infoService *info.Service) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, internal.APIResponse[any]{
+	c.JSON(http.StatusCreated, internal.APIResponse[infoModels.Note]{
 		Status:  "success",
 		Message: "note_created",
 		Error:   "",
-		Data:    nil,
+		Data:    note,
 	})
 }
 

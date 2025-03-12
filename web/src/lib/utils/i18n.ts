@@ -27,3 +27,23 @@ export function getTranslation(key: string, fallback: string) {
 	const translation = get(_)(key);
 	return translation !== key ? translation : fallback;
 }
+
+export function getValidationError(s: string, section: string) {
+	const split = s.split(' ');
+	const keyF = split[0];
+	const msgF = split.slice(1).join(' ');
+	const faulted = getTranslation(`${section}.${keyF}`, keyF);
+	let message = getTranslation(`validation_errors.${msgF}`, msgF);
+
+	if (message === msgF) {
+		const rawValidationErrors = get(_)('validation_errors');
+		const validationErrors =
+			typeof rawValidationErrors === 'object' && rawValidationErrors !== null
+				? (rawValidationErrors as Record<string, string>)
+				: {};
+
+		message = validationErrors[msgF] || msgF;
+	}
+
+	return `${faulted} ${message}`;
+}

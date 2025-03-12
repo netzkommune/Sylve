@@ -6,7 +6,7 @@ import { cachedFetch } from '$lib/utils/http';
 import { getTotalDiskUsage } from '$lib/utils/zfs';
 
 export async function load() {
-	const cacheDuration = 360 * 1000;
+	const cacheDuration = 3600 * 1000;
 	const [
 		basicInfo,
 		cpuInfo,
@@ -30,7 +30,11 @@ export async function load() {
 		),
 		cachedFetch('ramInfo', getRAMInfo, cacheDuration),
 		cachedFetch('swapInfo', getSwapInfo, cacheDuration),
-		cachedFetch('ioDelay', getIODelay, cacheDuration),
+		cachedFetch(
+			'ioDelay',
+			() => getIODelay({ queryKey: ['ioDelay'], meta: undefined }),
+			cacheDuration
+		),
 		cachedFetch(
 			'ioDelayHistorical',
 			() => getIODelay({ queryKey: ['ioDelayHistorical'], meta: undefined }),

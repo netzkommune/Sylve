@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { createNote, deleteNote, updateNote } from '$lib/api/info/notes';
+	import AlertDialog from '$lib/components/custom/AlertDialog.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
@@ -6,77 +8,97 @@
 	import ScrollArea from '$lib/components/ui/scroll-area/scroll-area.svelte';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
+	import type { APIResponse } from '$lib/types/common';
+	import type { Note, Notes } from '$lib/types/info/notes';
+	import { handleValidationErrors, isAPIResponse } from '$lib/utils/http';
 	import Icon from '@iconify/svelte';
+	import { marked } from 'marked';
+	import toast from 'svelte-french-toast';
 
-	let isOpen = $state(false);
-	let isEditMode = $state(false);
-	let selectedId = $state<number | null>(null);
-	let title = $state('');
-	let content = $state('');
-	let tableData = $state([]);
-
-	// Save a new note or edit an existing one
-	// function saveNote() {
-	// 	if (title.trim() !== '' && content.trim() !== '') {
-	// 		if (isEditMode && selectedId !== null) {
-	// 			// Edit existing note
-	// 			tableData = tableData.map((note) =>
-	// 				note.id === selectedId ? { ...note, title, content } : note
-	// 			);
-	// 		} else {
-	// 			// Add new note
-	// 			tableData = [...tableData, { id: tableData.length + 1, title, content }];
-	// 		}
-	// 		resetDialog();
-	// 	}
-	// }
-
-	// Open dialog for adding a new note
-	function newNote() {
-		title = '';
-		content = '';
-		selectedId = null;
-		isEditMode = true;
-		isOpen = true;
+	interface Data {
+		notes: Notes;
 	}
 
-	// Open dialog for viewing a note
-	function viewNote(note) {
-		title = note.title;
-		content = note.content;
-		selectedId = note.id;
-		isEditMode = false;
-		isOpen = true;
+	let { data }: { data: Data } = $props();
+
+	let tableData = $state(data.notes);
+	let modalState = $state({
+		title: '',
+		content: '',
+		isOpen: false,
+		isEditMode: false,
+		isDeleteOpen: false
+	});
+
+	let selectedId: number | null = $state(null);
+	let toRemove: Note | null = $state(null);
+
+	function handleNote(note?: Note, editMode: boolean = true, reset: boolean = false) {
+		if (reset) {
+			modalState.title = '';
+			modalState.content = '';
+			selectedId = null;
+			modalState.isEditMode = false;
+			modalState.isOpen = false;
+		} else {
+			modalState.title = note?.title || '';
+			modalState.content = note?.content || '';
+			selectedId = note?.id || null;
+			modalState.isEditMode = editMode;
+			modalState.isOpen = true;
+		}
 	}
 
-	// Open dialog for editing a note
-	function editNote(note) {
-		title = note.title;
-		content = note.content;
-		selectedId = note.id;
-		isEditMode = true;
-		isOpen = true;
+	async function saveNote() {
+		if (!modalState.title.trim() || !modalState.content.trim()) return;
+
+		const noteData = { title: modalState.title, content: modalState.content };
+		let result: APIResponse | Note;
+
+		if (modalState.isEditMode && selectedId !== null) {
+			result = await updateNote(selectedId, noteData.title, noteData.content);
+			if (!isAPIResponse(result)) {
+				tableData = [
+					...tableData.map((note) => (note.id === selectedId ? { ...note, ...noteData } : note))
+				];
+			}
+		} else {
+			result = await createNote(noteData.title, noteData.content);
+			if (!isAPIResponse(result)) {
+				tableData = [...tableData, result];
+			}
+		}
+
+		if (isAPIResponse(result)) {
+			handleValidationErrors(result, 'notes');
+		} else {
+			handleNote(undefined, false, true);
+		}
 	}
 
-	// Delete a note
-	function deleteNote(id) {
-		tableData = tableData.filter((note) => note.id !== id);
-	}
-
-	// Reset the dialog state
-	function resetDialog() {
-		title = '';
-		content = '';
-		selectedId = null;
-		isEditMode = false;
-		isOpen = false;
+	async function handleRemoveNote(id?: number, confirm: boolean = false) {
+		if (!confirm) {
+			selectedId = id as number;
+			toRemove = tableData.find((note) => note.id === id) || null;
+			modalState.isDeleteOpen = true;
+		} else {
+			const response = (await deleteNote(selectedId as number)) as APIResponse;
+			if (response.status === 'success') {
+				tableData = tableData.filter((note) => note.id !== selectedId);
+			} else {
+				toast.error(response.message || 'Failed to delete note', {
+					position: 'bottom-center'
+				});
+			}
+			modalState.isDeleteOpen = false;
+		}
 	}
 </script>
 
 <div class="flex h-full w-full flex-col">
 	<div class="flex h-10 w-full items-center border p-2">
 		<Button
-			onclick={newNote}
+			onclick={() => handleNote()}
 			size="sm"
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black dark:text-white"
 		>
@@ -84,12 +106,12 @@
 		</Button>
 	</div>
 
-	<Dialog.Root bind:open={isOpen} let:close>
+	<Dialog.Root bind:open={modalState.isOpen}>
 		<Dialog.Content class="w-[80%] gap-0 overflow-hidden p-3 lg:max-w-3xl">
 			<div class="flex items-center justify-between py-2">
 				<Dialog.Header class="flex-1">
 					<Dialog.Title>
-						{isEditMode ? (selectedId ? 'Edit Note' : 'New Note') : 'View Note'}
+						{modalState.isEditMode ? (selectedId ? 'Edit Note' : 'New Note') : 'View Note'}
 					</Dialog.Title>
 				</Dialog.Header>
 				<div class="flex items-center gap-0.5">
@@ -98,8 +120,8 @@
 						variant="ghost"
 						class="h-8"
 						on:click={() => {
-							title = '';
-							content = '';
+							modalState.title = '';
+							modalState.content = '';
 						}}
 					>
 						<Icon icon="radix-icons:reset" class="h-4 w-4" />
@@ -119,10 +141,10 @@
 					<Input
 						type="text"
 						id="title"
-						bind:value={title}
+						bind:value={modalState.title}
 						class="mt-2"
 						placeholder="Enter title"
-						disabled={!isEditMode}
+						disabled={!modalState.isEditMode}
 					/>
 				</div>
 			</div>
@@ -130,17 +152,19 @@
 			<div class="mt-2">
 				<Label for="content">Content</Label>
 				<ScrollArea orientation="vertical" class="h-96">
-					{#if isEditMode}
+					{#if modalState.isEditMode}
 						<div class="p-1">
 							<Textarea
-								bind:value={content}
+								bind:value={modalState.content}
 								class="mt-2 h-[360px] w-full"
 								placeholder="Write in Markdown format"
 							/>
 						</div>
 					{:else}
 						<div class="p-1">
-							<Textarea value={content} class="h-[360px] w-full" disabled />
+							<article class="prose lg:prose-xl">
+								{@html marked(modalState.content)}
+							</article>
 						</div>
 					{/if}
 				</ScrollArea>
@@ -158,9 +182,13 @@
 
 					<div class="flex gap-2">
 						<Dialog.Close>
-							<Button variant="outline" class="h-8" on:click={resetDialog}>Cancel</Button>
+							<Button
+								variant="outline"
+								class="h-8"
+								on:click={() => handleNote(undefined, false, true)}>Cancel</Button
+							>
 						</Dialog.Close>
-						{#if isEditMode}
+						{#if modalState.isEditMode}
 							<Button
 								onclick={saveNote}
 								type="submit"
@@ -176,14 +204,13 @@
 		</Dialog.Content>
 	</Dialog.Root>
 
-	<!-- Table -->
 	<div class="flex h-full flex-col overflow-hidden">
 		<Table.Root class="w-full table-fixed border-collapse">
 			<Table.Header class="bg-background sticky top-0 z-[50]">
 				<Table.Row>
 					<Table.Head class="h-10 px-4 py-2">Title</Table.Head>
 					<Table.Head class="h-10 px-4 py-2">Content</Table.Head>
-					<Table.Head class="h-10 px-4 py-2">Actions</Table.Head>
+					<Table.Head class="h-10 px-4 py-2"></Table.Head>
 				</Table.Row>
 			</Table.Header>
 
@@ -195,13 +222,23 @@
 							{data.content}
 						</Table.Cell>
 						<Table.Cell class="flex h-10 gap-2 px-4 py-2">
-							<Button size="sm" variant="ghost" class="h-8" on:click={() => viewNote(data)}>
+							<Button
+								size="sm"
+								variant="ghost"
+								class="h-8"
+								on:click={() => handleNote(data, false)}
+							>
 								<Icon icon="mdi-light:eye" class="h-4 w-4" />
 							</Button>
-							<Button size="sm" variant="ghost" class="h-8" on:click={() => editNote(data)}>
+							<Button size="sm" variant="ghost" class="h-8" on:click={() => handleNote(data, true)}>
 								<Icon icon="mingcute:edit-line" class="h-4 w-4" />
 							</Button>
-							<Button size="sm" variant="ghost" class="h-8" on:click={() => deleteNote(data.id)}>
+							<Button
+								size="sm"
+								variant="ghost"
+								class="h-8"
+								on:click={() => handleRemoveNote(data.id)}
+							>
 								<Icon icon="gg:trash" class="h-4 w-4" />
 							</Button>
 						</Table.Cell>
@@ -210,4 +247,17 @@
 			</Table.Body>
 		</Table.Root>
 	</div>
+
+	<AlertDialog
+		open={modalState.isDeleteOpen}
+		names={{ parent: 'note', element: toRemove?.title || '' }}
+		actions={{
+			onConfirm: () => {
+				handleRemoveNote(undefined, true);
+			},
+			onCancel: () => {
+				modalState.isDeleteOpen = false;
+			}
+		}}
+	></AlertDialog>
 </div>

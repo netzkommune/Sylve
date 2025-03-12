@@ -20,7 +20,17 @@
 		"disks": "Disks",
 		"notifications": "Notifications"
 	},
+	"notes": {
+		"note": "Note",
+		"note_l": "note",
+		"title": "Title"
+	},
 	"common": {
-		"example": "Example"
+		"example": "Example",
+		"are_you_sure": "Are you sure?",
+		"permanent_delete_msg": "This action cannot be undone. This will permanently delete"
+	},
+	"validation_errors": {
+		"failed validation: min": "too small"
 	}
 }

@@ -2,8 +2,7 @@ import { DiskInfoSchema, type Disk, type DiskInfo, type Partition } from '$lib/t
 import { apiRequest } from '$lib/utils/http';
 
 export async function listDisks(): Promise<DiskInfo> {
-	const data = await apiRequest('/disk/list', DiskInfoSchema, 'GET');
-	return DiskInfoSchema.parse(data);
+	return await apiRequest('/disk/list', DiskInfoSchema, 'GET');
 }
 
 export async function simplifyDisks(disks: DiskInfo): Promise<Disk[]> {

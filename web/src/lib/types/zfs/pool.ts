@@ -1,6 +1,8 @@
 import { z } from 'zod';
 
-export const IODelaySchema = z.number();
+export const IODelaySchema = z.object({
+	delay: z.number().default(0)
+});
 
 export const IODelayHistoricalSchema = z.array(
 	z.object({

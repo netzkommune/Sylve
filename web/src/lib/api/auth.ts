@@ -39,10 +39,14 @@ export async function login(
 				store.set(response.data.data.token);
 				return true;
 			} else {
-				toast.error('Error logging in');
+				toast.error('Error logging in', {
+					position: 'bottom-center'
+				});
 			}
 		} else {
-			toast.error('Error logging in');
+			toast.error('Error logging in', {
+				position: 'bottom-center'
+			});
 			return false;
 		}
 
@@ -52,17 +56,27 @@ export async function login(
 			const axiosError = error as AxiosError;
 			if (axiosError.response) {
 				if (axiosError.response.status === 401) {
-					toast.error('Invalid credentials');
+					toast.error('Invalid credentials', {
+						position: 'bottom-center'
+					});
 				} else {
-					toast.error('Error logging in');
+					toast.error('Error logging in', {
+						position: 'bottom-center'
+					});
 				}
 			} else if (axiosError.request) {
-				toast.error('Error logging in');
+				toast.error('Error logging in', {
+					position: 'bottom-center'
+				});
 			} else {
-				toast.error('Error logging in');
+				toast.error('Error logging in', {
+					position: 'bottom-center'
+				});
 			}
 		} else {
-			toast.error('Error logging in');
+			toast.error('Error logging in', {
+				position: 'bottom-center'
+			});
 		}
 
 		adze.withEmoji.error('Login failed', error);

@@ -133,7 +133,7 @@
 							<div>
 								<div class="flex w-full justify-between pb-1">
 									<p class="inline-flex items-center">
-										<Icon icon="solar:cpu-bold" class="mr-1 h-5 w-5" />CPU usage
+										<Icon icon="solar:cpu-bold" class="mr-1 h-5 w-5" />CPU Usage
 									</p>
 									<p>
 										{floatToNDecimals(cpuInfo.usage, 2)}% of {cpuInfo.logicalCores} CPU(s)
@@ -144,7 +144,7 @@
 							<div>
 								<div class="flex w-full justify-between pb-1">
 									<p class="inline-flex items-center">
-										<Icon icon="ri:ram-fill" class="mr-1 h-5 w-5" />Ram Usage
+										<Icon icon="ri:ram-fill" class="mr-1 h-5 w-5" />RAM Usage
 									</p>
 									<p>
 										{floatToNDecimals(ramInfo.usedPercent, 2)}% of {bytesToHumanReadable(
@@ -172,12 +172,12 @@
 							<div>
 								<div class="flex w-full justify-between pb-1">
 									<p class="inline-flex items-center">
-										<Icon icon="lets-icons:time-light" class="mr-1 h-5 w-5" />I/O delay
+										<Icon icon="lets-icons:time-light" class="mr-1 h-5 w-5" />I/O Delay
 									</p>
-									<p>{floatToNDecimals(ioDelay, 3) || 0} %</p>
+									<p>{floatToNDecimals(ioDelay.delay, 3) || 0} %</p>
 								</div>
 								<Progress
-									value={floatToNDecimals(ioDelay, 3) || 0}
+									value={floatToNDecimals(ioDelay.delay, 3) || 0}
 									max={100}
 									class="h-2 w-[100%]"
 								/>
@@ -230,7 +230,7 @@
 					<Card.Header>
 						<Card.Title>
 							<div class="flex items-center justify-between space-x-2">
-								<p>CPU usage</p>
+								<p>CPU Usage</p>
 							</div>
 						</Card.Title>
 					</Card.Header>

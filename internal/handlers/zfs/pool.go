@@ -18,23 +18,27 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type AvgIODelayResponse struct {
+	Delay float64 `json:"delay"`
+}
+
 // @Summary Get Average IO Delay
 // @Description Get the average IO delay of all pools
 // @Tags ZFS
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Success 200 {object} internal.APIResponse[float64] "Success"
+// @Success 200 {object} internal.APIResponse[AvgIODelayResponse] "Success"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
 // @Router /zfs/avg-io-delay [get]
 func AvgIODelay(zfsSerice *zfs.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		info := zfsSerice.GetTotalIODelay()
-		c.JSON(http.StatusOK, internal.APIResponse[float64]{
+		c.JSON(http.StatusOK, internal.APIResponse[AvgIODelayResponse]{
 			Status:  "success",
 			Message: "avg_io_delay",
 			Error:   "",
-			Data:    info,
+			Data:    AvgIODelayResponse{Delay: info},
 		})
 	}
 }

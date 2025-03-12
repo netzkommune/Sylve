@@ -34,8 +34,11 @@ func (s *Service) GetNotes() ([]infoModels.Note, error) {
 	return notes, err
 }
 
-func (s *Service) AddNote(title, note string) error {
-	return s.DB.Create(&infoModels.Note{Title: title, Content: note}).Error
+func (s *Service) AddNote(title, note string) (infoModels.Note, error) {
+	n := infoModels.Note{Title: title, Content: note}
+	err := s.DB.Create(&n).Error
+
+	return n, err
 }
 
 func (s *Service) DeleteNoteByID(id int) error {

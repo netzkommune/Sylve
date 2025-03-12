@@ -2,8 +2,7 @@ import { AuditLogSchema, type AuditLog } from '$lib/types/info/audit';
 import { apiRequest } from '$lib/utils/http';
 
 export async function getAuditLogs(): Promise<AuditLog> {
-	const data = await apiRequest('/info/audit-logs', AuditLogSchema, 'GET');
-	return AuditLogSchema.parse(data);
+	return await apiRequest('/info/audit-logs', AuditLogSchema, 'GET');
 }
 
 export function formatAction(action: string): string {

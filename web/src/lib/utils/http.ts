@@ -9,10 +9,12 @@
  */
 
 import { api } from '$lib/api/common';
-import { APIResponseSchema } from '$lib/types/common';
+import { APIResponseSchema, type APIResponse } from '$lib/types/common';
 import type { QueryFunctionContext } from '@sveltestack/svelte-query';
 import adze from 'adze';
+import toast from 'svelte-french-toast';
 import { z } from 'zod';
+import { getValidationError } from './i18n';
 
 export async function apiRequest<T extends z.ZodType>(
 	endpoint: string,
@@ -30,41 +32,38 @@ export async function apiRequest<T extends z.ZodType>(
 		const response = await api.request({ ...config, validateStatus: () => true });
 		const apiResponse = APIResponseSchema.safeParse(response.data);
 
+		/* Couldn't parse response data into APIResponse so we'll just return the data? */
 		if (!apiResponse.success) {
-			return getDefaultValue(schema);
-		}
-
-		if (apiResponse.data.status !== 'success') {
 			return apiResponse.data;
 		}
 
-		const responseData = apiResponse.data.data;
-		const parsedResult = schema.safeParse(responseData);
-
-		if (parsedResult.success) {
-			return parsedResult.data;
+		/* Caller asked for a raw response */
+		if (schema._def.description === 'APIResponseSchema') {
+			return apiResponse.data as z.infer<T>;
 		}
 
-		if (responseData && typeof responseData === 'object') {
-			const nestedResult = schema.safeParse((responseData as any).data);
-			if (nestedResult.success) {
-				return nestedResult.data;
+		if (apiResponse.data.data) {
+			const parsedResult = schema.safeParse(apiResponse.data.data);
+			if (parsedResult.success) {
+				return parsedResult.data;
+			} else {
+				return getDefaultValue(schema, apiResponse.data);
 			}
 		}
 
-		return getDefaultValue(schema);
+		return getDefaultValue(schema, apiResponse.data);
 	} catch (error) {
-		return getDefaultValue(schema);
+		return getDefaultValue(schema, { status: 'error' });
 	}
 }
 
-function getDefaultValue<T extends z.ZodType>(schema: T): z.infer<T> {
+function getDefaultValue<T extends z.ZodType>(schema: T, response: APIResponse): z.infer<T> {
 	if (schema instanceof z.ZodArray) {
 		return [] as z.infer<T>;
 	}
 
 	if (schema instanceof z.ZodObject) {
-		return {} as z.infer<T>;
+		return response as z.infer<T>;
 	}
 
 	return undefined as z.infer<T>;
@@ -98,4 +97,25 @@ export async function cachedFetch<T>(
 	const entry: CacheEntry<T> = { timestamp: now, data };
 	localStorage.setItem(key, JSON.stringify(entry));
 	return data;
+}
+
+export function isAPIResponse(obj: any): obj is APIResponse {
+	return (
+		obj &&
+		typeof obj.status === 'string' &&
+		(typeof obj.message === 'string' || typeof obj.error === 'string')
+	);
+}
+
+export function handleValidationErrors(result: APIResponse, section: string): void {
+	adze.withEmoji.error('Validation Error', result);
+	if (result.error === 'validation_error') {
+		if (Array.isArray(result.data)) {
+			if (result.data.length > 0) {
+				toast.error(getValidationError(result.data[0], section), {
+					position: 'bottom-center'
+				});
+			}
+		}
+	}
 }

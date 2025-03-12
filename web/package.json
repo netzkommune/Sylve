@@ -66,6 +66,7 @@
 		"date-fns-tz": "^3.2.0",
 		"human-format": "^1.2.1",
 		"layerchart": "^1.0.5",
+		"marked": "^15.0.7",
 		"mode-watcher": "^0.5.1",
 		"svelte-exmarkdown": "^4.0.3",
 		"svelte-french-toast": "^2.0.0-alpha.0",

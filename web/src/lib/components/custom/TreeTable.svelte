@@ -54,9 +54,6 @@
 			options: { numeric: true, sensitivity: 'base' }
 		});
 	});
-	onMount(() => {
-		console.log('data', data);
-	});
 </script>
 
 <div class="relative flex h-full w-full flex-col">

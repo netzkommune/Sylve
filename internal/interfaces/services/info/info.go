@@ -17,7 +17,7 @@ type InfoServiceInterface interface {
 	GetSwapInfo() (swapInfo SwapInfo, err error)
 
 	GetNotes() ([]infoModels.Note, error)
-	AddNote(title, note string) error
+	AddNote(title, note string) (infoModels.Note, error)
 	DeleteNoteByID(id int) error
 	UpdateNoteByID(id int, title, note string) error
 

@@ -23,11 +23,9 @@ export async function getIODelay(
 		}
 	}
 
-	const data = await apiRequest('/zfs/pool/io-delay', IODelaySchema, 'GET');
-	return IODelaySchema.parse(data);
+	return await apiRequest('/zfs/pool/io-delay', IODelaySchema, 'GET');
 }
 
 export async function getPools(): Promise<Zpool[]> {
-	const data = await apiRequest('/zfs/pool/list', ZpoolSchema.array(), 'GET');
-	return ZpoolSchema.array().parse(data);
+	return await apiRequest('/zfs/pool/list', ZpoolSchema.array(), 'GET');
 }

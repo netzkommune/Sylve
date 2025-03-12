@@ -8,15 +8,13 @@ import { apiRequest } from '$lib/utils/http';
 import type { QueryFunctionContext } from '@sveltestack/svelte-query';
 
 export async function getCPUInfo(
-	queryObj: QueryFunctionContext | undefined
+	queryObj?: QueryFunctionContext
 ): Promise<CPUInfo | CPUInfoHistorical> {
 	if (queryObj) {
 		if (queryObj.queryKey.includes('cpuInfoHistorical')) {
-			const data = await apiRequest('/info/cpu/historical', CPUInfoHistoricalSchema, 'GET');
-			return CPUInfoHistoricalSchema.parse(data);
+			return await apiRequest('/info/cpu/historical', CPUInfoHistoricalSchema, 'GET');
 		}
 	}
 
-	const data = await apiRequest('/info/cpu', CPUInfoSchema, 'GET');
-	return CPUInfoSchema.parse(data);
+	return await apiRequest('/info/cpu', CPUInfoSchema, 'GET');
 }

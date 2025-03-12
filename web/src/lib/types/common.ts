@@ -10,12 +10,14 @@
 
 import { z } from 'zod';
 
-export const APIResponseSchema = z.object({
-	status: z.string(),
-	message: z.string().optional(),
-	error: z.string().optional(),
-	data: z.unknown().optional()
-});
+export const APIResponseSchema = z
+	.object({
+		status: z.string(),
+		message: z.string().optional(),
+		error: z.string().optional(),
+		data: z.unknown().optional()
+	})
+	.describe('APIResponseSchema');
 
 export interface HistoricalBase {
 	id?: number | string;

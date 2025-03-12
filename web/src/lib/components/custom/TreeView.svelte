@@ -1,9 +1,11 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { getTranslation } from '$lib/utils/i18n';
 	import Icon from '@iconify/svelte';
+	import { _ } from 'svelte-i18n';
 	import { slide } from 'svelte/transition';
 	import SidebarElement from './TreeView.svelte';
-	import { goto } from '$app/navigation';
 
 	interface SidebarProps {
 		label: string;
@@ -70,13 +72,15 @@
 
 <li class={`w-full`}>
 	<a
-		class={`my-0.5 flex w-full items-center justify-between px-1.5 py-0.5 ${isActive ? sidebarActive : ' rounded-md hover:bg-muted-foreground/40  dark:hover:bg-muted'}${lastActiveUrl === item.label ? '!text-primary' : ' '}`}
+		class={`my-0.5 flex w-full items-center justify-between px-1.5 py-0.5 ${isActive ? sidebarActive : ' hover:bg-muted-foreground/40 dark:hover:bg-muted  rounded-md'}${lastActiveUrl === item.label ? '!text-primary' : ' '}`}
 		href={item.href}
 		onclick={toggle}
 	>
 		<div class="flex items-center space-x-1 text-sm">
 			<Icon icon={item.icon} width="18" />
-			<p class=" font-inter cursor-pointer whitespace-nowrap">{item.label}</p>
+			<p class=" font-inter cursor-pointer whitespace-nowrap">
+				{getTranslation(`node.${item.label}`, item.label)}
+			</p>
 		</div>
 		{#if item.children}
 			<Icon

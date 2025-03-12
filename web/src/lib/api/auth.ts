@@ -11,7 +11,7 @@
 import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
 import { oldStore, store } from '$lib/stores/auth';
-import { hostname } from '$lib/stores/basic';
+import { hostname, language as langStore } from '$lib/stores/basic';
 import adze from 'adze';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'svelte-french-toast';
@@ -21,7 +21,8 @@ export async function login(
 	username: string,
 	password: string,
 	authType: string,
-	remember: boolean
+	remember: boolean,
+	language: string
 ) {
 	try {
 		const response = await axios.post('/api/auth/login', {
@@ -33,6 +34,7 @@ export async function login(
 
 		if (response.status === 200 && response.data) {
 			if (response.data.data?.hostname && response.data.data?.token) {
+				langStore.set(language);
 				hostname.set(response.data.data.hostname);
 				store.set(response.data.data.token);
 				return true;

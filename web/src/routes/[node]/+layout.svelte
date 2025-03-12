@@ -22,26 +22,26 @@
 
 	const nodeItems = $state([
 		{
-			label: 'Summary',
+			label: 'summary',
 			icon: 'basil:document-outline',
 			href: `/${node}/summary`
 		},
 		{
-			label: 'Search',
+			label: 'search',
 			icon: 'mdi:magnify',
 			href: `/${node}/search`
 		},
 		{
-			label: 'Notes',
+			label: 'notes',
 			icon: 'arcticons:notes',
 			href: `/${node}/notes`
 		},
 		{
-			label: 'Certificates',
+			label: 'certificates',
 			icon: 'mdi:certificate'
 		},
 		{
-			label: 'Firewall',
+			label: 'firewall',
 			icon: 'mdi:firewall',
 			children: [
 				{
@@ -67,7 +67,7 @@
 			]
 		},
 		{
-			label: 'Disks',
+			label: 'disks',
 			icon: 'mdi:storage',
 			href: `/${node}/disks`,
 			children: [
@@ -84,7 +84,7 @@
 			]
 		},
 		{
-			label: 'Notifications',
+			label: 'notifications',
 			icon: 'mdi:notifications'
 		}
 	]);

@@ -1,0 +1,26 @@
+{
+	"auth": {
+		"username": "Username",
+		"password": "Password",
+		"realm": "Realm",
+		"select_authentication": "Select Authentication",
+		"pam_standard_authentication": "PAM Standard Authentication",
+		"sylve_authentication": "Sylve Authentication",
+		"language": "Language",
+		"select_language": "Select Language",
+		"remember_me": "Remember Me",
+		"login": "Login"
+	},
+	"node": {
+		"summary": "Summary",
+		"search": "Search",
+		"notes": "Notes",
+		"certificates": "Certificates",
+		"firewall": "Firewall",
+		"disks": "Disks",
+		"notifications": "Notifications"
+	},
+	"common": {
+		"example": "Example"
+	}
+}

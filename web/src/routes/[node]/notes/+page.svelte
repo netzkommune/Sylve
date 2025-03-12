@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import ScrollArea from '$lib/components/ui/scroll-area/scroll-area.svelte';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
+	import ScrollArea from '$lib/components/ui/scroll-area/scroll-area.svelte';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import Icon from '@iconify/svelte';
@@ -13,30 +13,23 @@
 	let selectedId = $state<number | null>(null);
 	let title = $state('');
 	let content = $state('');
-
-	let tableData = $state([
-		{
-			id: 1,
-			title: 'Example',
-			content: '## Markdown Example\n\nThis is **bold** and *italic* text.'
-		}
-	]);
+	let tableData = $state([]);
 
 	// Save a new note or edit an existing one
-	function saveNote() {
-		if (title.trim() !== '' && content.trim() !== '') {
-			if (isEditMode && selectedId !== null) {
-				// Edit existing note
-				tableData = tableData.map((note) =>
-					note.id === selectedId ? { ...note, title, content } : note
-				);
-			} else {
-				// Add new note
-				tableData = [...tableData, { id: tableData.length + 1, title, content }];
-			}
-			resetDialog();
-		}
-	}
+	// function saveNote() {
+	// 	if (title.trim() !== '' && content.trim() !== '') {
+	// 		if (isEditMode && selectedId !== null) {
+	// 			// Edit existing note
+	// 			tableData = tableData.map((note) =>
+	// 				note.id === selectedId ? { ...note, title, content } : note
+	// 			);
+	// 		} else {
+	// 			// Add new note
+	// 			tableData = [...tableData, { id: tableData.length + 1, title, content }];
+	// 		}
+	// 		resetDialog();
+	// 	}
+	// }
 
 	// Open dialog for adding a new note
 	function newNote() {
@@ -85,7 +78,7 @@
 		<Button
 			onclick={newNote}
 			size="sm"
-			class="h-6 bg-muted-foreground/40 text-black dark:bg-muted dark:text-white"
+			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black dark:text-white"
 		>
 			<Icon icon="gg:add" class="mr-1 h-4 w-4" /> New
 		</Button>
@@ -158,7 +151,7 @@
 					<Button
 						type="submit"
 						size="sm"
-						class="h-8 bg-muted text-white hover:bg-muted-foreground/50"
+						class="bg-muted hover:bg-muted-foreground/50 h-8 text-white"
 					>
 						Help
 					</Button>
@@ -186,7 +179,7 @@
 	<!-- Table -->
 	<div class="flex h-full flex-col overflow-hidden">
 		<Table.Root class="w-full table-fixed border-collapse">
-			<Table.Header class="sticky top-0 z-[50] bg-background">
+			<Table.Header class="bg-background sticky top-0 z-[50]">
 				<Table.Row>
 					<Table.Head class="h-10 px-4 py-2">Title</Table.Head>
 					<Table.Head class="h-10 px-4 py-2">Content</Table.Head>

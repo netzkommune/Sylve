@@ -1,0 +1,26 @@
+{
+	"auth": {
+		"username": "പേര്",
+		"password": "പാസ്സ്‌വേഡ്",
+		"realm": "സാമ്രാജ്യം",
+		"select_authentication": "പ്രവേശനം തിരഞ്ഞെടുക്കുക",
+		"pam_standard_authentication": "(പി.എ.എം) സ്റ്റാൻഡേർഡ് പ്രാമാണീകരണം",
+		"sylve_authentication": "സൈൽവ് പ്രവേശനം",
+		"language": "ഭാഷ",
+		"select_language": "ഭാഷ തിരഞ്ഞെടുക്കുക",
+		"remember_me": "എന്നെ ഓർമ്മിക്കുക",
+		"login": "ലോഗിൻ"
+	},
+	"node": {
+		"summary": "സാരാംശം",
+		"search": "തിരയൽ",
+		"notes": "കുറിപ്പുകൾ",
+		"certificates": "സർട്ടിഫിക്കറ്റുകൾ",
+		"firewall": "ഫയർവാൾ",
+		"disks": "ഡിസ്കുകൾ",
+		"notifications": "അറിയിപ്പുകൾ"
+	},
+	"common": {
+		"example": "ഉദാഹരണം"
+	}
+}

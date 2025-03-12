@@ -14,3 +14,7 @@ import { addDays } from 'date-fns';
 export const hostname = localStore('hostname', '', {
 	expiry: addDays(new Date(), 1)
 });
+
+export const language = localStore('language', 'en', {
+	expiry: addDays(new Date(), 720)
+});

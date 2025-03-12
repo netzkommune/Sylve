@@ -9,6 +9,7 @@
 	import Shell from '$lib/components/Skeleton/Shell.svelte';
 	import { store as token } from '$lib/stores/auth';
 	import { hostname } from '$lib/stores/basic';
+	import '$lib/utils/i18n';
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
 	import { ModeWatcher } from 'mode-watcher';
 	import { onMount, tick } from 'svelte';
@@ -61,7 +62,7 @@
 	) {
 		isLoading = true;
 		try {
-			if (await login(username, password, type, remember)) {
+			if (await login(username, password, type, remember, language)) {
 				isLoggedIn = true;
 				const path = window.location.pathname;
 

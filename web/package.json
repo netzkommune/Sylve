@@ -58,7 +58,7 @@
 		"@svelte-put/shortcut": "^4.1.0",
 		"@sveltestack/svelte-query": "^1.6.0",
 		"adze": "^2.2.1",
-		"axios": "^1.8.1",
+		"axios": "^1.8.2",
 		"d3-array": "^3.2.4",
 		"d3-scale": "^4.0.2",
 		"d3-shape": "^3.2.0",

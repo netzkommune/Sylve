@@ -33,6 +33,11 @@ definitions:
     required:
     - device
     type: object
+  internal_handlers_zfs.AvgIODelayResponse:
+    properties:
+      delay:
+        type: number
+    type: object
   sylve_internal.APIResponse-any:
     properties:
       data: {}
@@ -121,10 +126,21 @@ definitions:
       status:
         type: string
     type: object
-  sylve_internal.APIResponse-float64:
+  sylve_internal.APIResponse-internal_handlers_zfs_AvgIODelayResponse:
     properties:
       data:
-        type: number
+        $ref: '#/definitions/internal_handlers_zfs.AvgIODelayResponse'
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-sylve_internal_db_models_info_Note:
+    properties:
+      data:
+        $ref: '#/definitions/sylve_internal_db_models_info.Note'
       error:
         type: string
       message:
@@ -638,7 +654,7 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/sylve_internal.APIResponse-any'
+            $ref: '#/definitions/sylve_internal.APIResponse-sylve_internal_db_models_info_Note'
         "500":
           description: Internal Server Error
           schema:
@@ -754,7 +770,7 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/sylve_internal.APIResponse-float64'
+            $ref: '#/definitions/sylve_internal.APIResponse-internal_handlers_zfs_AvgIODelayResponse'
         "500":
           description: Internal Server Error
           schema:

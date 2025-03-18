@@ -3,9 +3,10 @@
 	import '@fontsource/noto-sans/700.css';
 
 	import { goto } from '$app/navigation';
-	import { navigating } from '$app/stores';
+	import { navigating } from '$app/state';
 	import { isTokenValid, login } from '$lib/api/auth';
 	import Login from '$lib/components/custom/Login.svelte';
+	import Throbber from '$lib/components/custom/Throbber.svelte';
 	import Shell from '$lib/components/Skeleton/Shell.svelte';
 	import { store as token } from '$lib/stores/auth';
 	import { hostname } from '$lib/stores/basic';
@@ -22,7 +23,7 @@
 	let isLoading = $state(true);
 
 	$effect(() => {
-		if (isLoggedIn && $hostname && !$navigating) {
+		if (isLoggedIn && $hostname && !navigating) {
 			const path = window.location.pathname;
 			if (path === '/' || !path.startsWith(`/${$hostname}`)) {
 				goto(`/${$hostname}/summary`, { replaceState: true });
@@ -32,7 +33,7 @@
 
 	onMount(async () => {
 		if ($token) {
-			await sleep(800);
+			await sleep(4000);
 			try {
 				if (await isTokenValid()) {
 					isLoggedIn = true;
@@ -86,11 +87,7 @@
 <ModeWatcher />
 
 {#if isLoading}
-	<div class="flex h-screen w-full items-center justify-center">
-		<div
-			class="apply h-10 w-10 animate-spin rounded-[50%] border-4 border-solid border-[rgba(0,0,0,0.1)] border-t-[#3498db]"
-		></div>
-	</div>
+	<Throbber />
 {:else if isLoggedIn && $hostname}
 	<QueryClientProvider client={queryClient}>
 		<Shell>
@@ -100,14 +97,3 @@
 {:else}
 	<Login onLogin={handleLogin} />
 {/if}
-
-<style>
-	@keyframes spin {
-		0% {
-			transform: rotate(0deg);
-		}
-		100% {
-			transform: rotate(360deg);
-		}
-	}
-</style>

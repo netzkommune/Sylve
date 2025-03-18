@@ -14,10 +14,6 @@
 </script>
 
 <Tabs.Root value="cluster" class="flex h-full w-full flex-col">
-	<Tabs.List class="flex w-full items-center justify-start">
-		<Tabs.Trigger value="cluster">Cluster</Tabs.Trigger>
-	</Tabs.List>
-
 	<Tabs.Content value="cluster" class="flex h-full flex-col border">
 		<div class="flex h-full flex-col overflow-hidden">
 			<Table.Root class="w-full table-fixed border-collapse">

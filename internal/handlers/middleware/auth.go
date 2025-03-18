@@ -37,6 +37,7 @@ func EnsureAuthenticated(authService *authService.Service) gin.HandlerFunc {
 			return
 		}
 
+		c.Set("Token", token)
 		c.Next()
 	}
 }

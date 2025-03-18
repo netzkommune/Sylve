@@ -96,8 +96,8 @@ func RegisterRoutes(r *gin.Engine,
 	disk.Use(middleware.EnsureAuthenticated(authService))
 	{
 		disk.GET("/list", diskHandlers.List(diskService))
-		disk.POST("/wipe", diskHandlers.WipeDisk(diskService))
-		disk.POST("/initialize-gpt", diskHandlers.InitializeGPT(diskService))
+		disk.POST("/wipe", diskHandlers.WipeDisk(diskService, infoService))
+		disk.POST("/initialize-gpt", diskHandlers.InitializeGPT(diskService, infoService))
 	}
 
 	auth := api.Group("/auth")

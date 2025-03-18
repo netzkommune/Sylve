@@ -9,10 +9,12 @@
 package diskHandlers
 
 import (
+	"fmt"
 	"net/http"
 	"sylve/internal"
 	diskServiceInterfaces "sylve/internal/interfaces/services/disk"
 	"sylve/internal/services/disk"
+	"sylve/internal/services/info"
 	diskUtils "sylve/pkg/disk"
 	"sylve/pkg/utils"
 
@@ -65,9 +67,11 @@ func List(diskService *disk.Service) gin.HandlerFunc {
 // @Success 200 {object} internal.APIResponse[any] "Success"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
 // @Router /disk/wipe [post]
-func WipeDisk(diskService *disk.Service) gin.HandlerFunc {
+func WipeDisk(diskService *disk.Service, infoService *info.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var r DiskActionRequest
+
+		fmt.Println("WipeDisk")
 
 		if err := c.ShouldBindJSON(&r); err != nil {
 			validationErrors := utils.MapValidationErrors(err, DiskActionRequest{})
@@ -81,7 +85,10 @@ func WipeDisk(diskService *disk.Service) gin.HandlerFunc {
 			return
 		}
 
+		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("wipe_disk|-|%s", r.Device), "started")
 		err := diskUtils.DestroyDisk(r.Device)
+
+		fmt.Println("WipeDisk", r.Device, id)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
@@ -90,6 +97,11 @@ func WipeDisk(diskService *disk.Service) gin.HandlerFunc {
 				Error:   err.Error(),
 				Data:    nil,
 			})
+
+			if id != 0 {
+				infoService.EndAuditLog(id, "failed")
+			}
+
 			return
 		}
 
@@ -99,6 +111,10 @@ func WipeDisk(diskService *disk.Service) gin.HandlerFunc {
 			Error:   "",
 			Data:    nil,
 		})
+
+		if id != 0 {
+			infoService.EndAuditLog(id, "success")
+		}
 	}
 }
 
@@ -112,7 +128,7 @@ func WipeDisk(diskService *disk.Service) gin.HandlerFunc {
 // @Success 200 {object} internal.APIResponse[any] "Success"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
 // @Router /disk/initialize-gpt [post]
-func InitializeGPT(diskService *disk.Service) gin.HandlerFunc {
+func InitializeGPT(diskService *disk.Service, infoService *info.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var r DiskActionRequest
 
@@ -128,6 +144,7 @@ func InitializeGPT(diskService *disk.Service) gin.HandlerFunc {
 			return
 		}
 
+		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("initialize_gpt_disk|-|%s", r.Device), "started")
 		err := diskService.InitializeGPT(r.Device)
 
 		if err != nil {
@@ -137,6 +154,10 @@ func InitializeGPT(diskService *disk.Service) gin.HandlerFunc {
 				Error:   err.Error(),
 				Data:    nil,
 			})
+
+			if id != 0 {
+				infoService.EndAuditLog(id, "failed")
+			}
 			return
 		}
 
@@ -146,5 +167,9 @@ func InitializeGPT(diskService *disk.Service) gin.HandlerFunc {
 			Error:   "",
 			Data:    nil,
 		})
+
+		if id != 0 {
+			infoService.EndAuditLog(id, "success")
+		}
 	}
 }

@@ -18,3 +18,17 @@ export const hostname = localStore('hostname', '', {
 export const language = localStore('language', 'en', {
 	expiry: addDays(new Date(), 720)
 });
+
+export const paneSizes = localStore(
+	'paneSizes',
+	{
+		main: 70,
+		left: 13,
+		middle: 87,
+		bottom: 30,
+		right: 87
+	},
+	{
+		expiry: addDays(new Date(), 720)
+	}
+);

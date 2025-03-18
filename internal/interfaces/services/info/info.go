@@ -22,6 +22,8 @@ type InfoServiceInterface interface {
 	UpdateNoteByID(id int, title, note string) error
 
 	GetAuditLogs(limit int) ([]infoModels.AuditLog, error)
+	StartAuditLog(token string, action string, status string) uint
+	EndAuditLog(logID uint, status string) error
 
 	StoreStats()
 	Cron()

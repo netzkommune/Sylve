@@ -9,11 +9,13 @@
  */
 
 import { logOut } from '$lib/api/auth';
+import { toggleMode } from 'mode-watcher';
 
 export interface KeyboardTrigger {
 	key: string;
 	modifier: string[][];
 	callback: () => void;
+	onshortcut?: () => void;
 }
 
 export const triggers: KeyboardTrigger[] = [
@@ -24,5 +26,15 @@ export const triggers: KeyboardTrigger[] = [
 			['meta', 'shift']
 		],
 		callback: logOut
+	},
+	{
+		key: 't',
+		modifier: [
+			['ctrl', 'alt'],
+			['meta', 'alt']
+		],
+		callback: () => {
+			toggleMode();
+		}
 	}
 ];

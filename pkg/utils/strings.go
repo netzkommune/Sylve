@@ -11,11 +11,13 @@ package utils
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"hash/fnv"
 	"regexp"
 	"strconv"
 	"strings"
 
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -86,4 +88,30 @@ func StringToFloat64(s string) float64 {
 func RemoveEmptyLines(s string) string {
 	re := regexp.MustCompile(`(?m)^\s*\n`)
 	return re.ReplaceAllString(s, "")
+}
+
+func ParseJWT(tokenString string) (any, error) {
+	parts := strings.Split(tokenString, ".")
+	if len(parts) != 3 {
+		return nil, fmt.Errorf("invalid JWT token format")
+	}
+
+	token, _, err := jwt.NewParser().ParseUnverified(tokenString, jwt.MapClaims{})
+	if err != nil {
+		return nil, fmt.Errorf("error parsing token: %v", err)
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return nil, fmt.Errorf("error extracting claims")
+	}
+
+	customClaims := make(map[string]interface{})
+	for k, v := range claims {
+		if k != "exp" && k != "jti" {
+			customClaims[k] = v
+		}
+	}
+
+	return customClaims, nil
 }

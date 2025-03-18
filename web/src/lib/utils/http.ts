@@ -119,3 +119,7 @@ export function handleValidationErrors(result: APIResponse, section: string): vo
 		}
 	}
 }
+
+export function handleAPIError(result: APIResponse): void {
+	adze.withEmoji.error('API Error', result);
+}

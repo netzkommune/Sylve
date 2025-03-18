@@ -12,9 +12,10 @@
 			onConfirm: () => void;
 			onCancel: () => void;
 		};
+		customTitle?: string;
 	}
 
-	let { open, names, actions }: Props = $props();
+	let { open, names, actions, customTitle }: Props = $props();
 </script>
 
 <AlertDialog.Root bind:open>
@@ -22,11 +23,15 @@
 		<AlertDialog.Header>
 			<AlertDialog.Title>{getTranslation('are_you_sure', 'Are you sure?')}</AlertDialog.Title>
 			<AlertDialog.Description>
-				{getTranslation(
-					'common.permanent_delete_msg',
-					'This action cannot be undone. This will permanently delete'
-				)}
-				{names.parent} <span class="font-semibold">{names.element}</span>.
+				{#if customTitle}
+					{@html customTitle}
+				{:else}
+					{getTranslation(
+						'common.permanent_delete_msg',
+						'This action cannot be undone. This will permanently delete'
+					)}
+					{names.parent} <span class="font-semibold">{names.element}</span>.
+				{/if}
 			</AlertDialog.Description>
 		</AlertDialog.Header>
 		<AlertDialog.Footer>

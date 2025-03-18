@@ -28,12 +28,19 @@
 	"disk": {
 		"smart": "S.M.A.R.T.",
 		"attribute": "Attribute",
-		"value": "Value"
+		"value": "Value",
+		"wipe": "wipe",
+		"disk": "disk",
+		"partition": "partition",
+		"gpt_initialized": "initialized with GPT"
 	},
 	"common": {
 		"example": "Example",
 		"are_you_sure": "Are you sure?",
-		"permanent_delete_msg": "This action cannot be undone. This will permanently delete"
+		"this_action_cannot_be_undone": "This action cannot be undone",
+		"this_will_permanently": "This will permanently",
+		"permanent_delete_msg": "This action cannot be undone. This will permanently delete",
+		"completely": "completely"
 	},
 	"validation_errors": {
 		"failed validation: min": "too small"

@@ -41,7 +41,7 @@
 			}
 		}
 		if ($token) {
-			await sleep(4000);
+			await sleep(500);
 			try {
 				if (await isTokenValid()) {
 					isLoggedIn = true;

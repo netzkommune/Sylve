@@ -1,15 +1,23 @@
 <script lang="ts">
+	import { invalidate, invalidateAll } from '$app/navigation';
+	import { destroyDiskOrPartition, initializeGPT, listDisks } from '$lib/api/disk/disk';
+	import AlertDialog from '$lib/components/custom/AlertDialog.svelte';
 	import KvTableModal from '$lib/components/custom/KVTableModal.svelte';
+	import CreatePartition from '$lib/components/disk/CreatePartition.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as ContextMenu from '$lib/components/ui/context-menu';
 	import { localStore } from '$lib/stores/localStore.svelte';
 	import { type Disk, type Partition } from '$lib/types/disk/disk';
-	import { parseSMART } from '$lib/utils/disk';
+	import { parseSMART, simplifyDisks } from '$lib/utils/disk';
+	import { handleAPIError } from '$lib/utils/http';
 	import { getTranslation } from '$lib/utils/i18n';
+	import { capitalizeFirstLetter } from '$lib/utils/string';
 	import Icon from '@iconify/svelte';
+	import { useQueries } from '@sveltestack/svelte-query';
 	import { TableHandler } from '@vincjo/datatables';
 	import humanFormat from 'human-format';
 	import { onMount } from 'svelte';
+	import toast from 'svelte-french-toast';
 
 	interface Data {
 		disks: Disk[];
@@ -18,9 +26,42 @@
 	type ExpandedRows = Record<number, boolean>;
 
 	let { data }: { data: Data } = $props();
-	let disks = $state(data.disks);
+
+	const results = useQueries([
+		{
+			queryKey: ['diskList'],
+			queryFn: async () => {
+				return await simplifyDisks(await listDisks());
+			},
+			refetchInterval: 1000,
+			keepPreviousData: true,
+			initialData: data.disks
+		}
+	]);
+
+	const table = new TableHandler(data.disks);
+
+	let disks = $derived($results[0].data as Disk[]);
+
+	$effect(() => {
+		table.setRows($results[0].data as Disk[]);
+	});
+
 	let sortHandlers: Record<string, any> = {};
 	let activeRow: string | null = $state(null);
+
+	let wipeModal = $state({
+		open: false,
+		title: ''
+	});
+
+	let partitionModal: {
+		open: boolean;
+		disk: Disk | null;
+	} = $state({
+		open: false,
+		disk: null
+	});
 
 	let smartModal = $state({
 		open: false,
@@ -90,8 +131,6 @@
 		return expandedRows[index] ?? false;
 	}
 
-	const table = new TableHandler(data.disks);
-
 	keys.forEach((key) => {
 		sortHandlers[key] = table.createSort(key as keyof Disk, {
 			locales: 'en',
@@ -107,7 +146,7 @@
 		}
 	});
 
-	function diskAction(action: string) {
+	async function diskAction(action: string) {
 		if (action === 'smart') {
 			if (activeDisk) {
 				smartModal.title = `${getTranslation('disk.smart', 'S.M.A.R.T')} Values (${activeDisk.Device})`;
@@ -121,6 +160,43 @@
 					smartModal.type = 'array';
 				}
 			}
+		}
+
+		if (action === 'wipe') {
+			wipeModal.open = true;
+
+			if (activePartition !== null) {
+				wipeModal.title = `${getTranslation('common.this_action_cannot_be_undone', 'This action cannot be undone')}. ${getTranslation(
+					'common.this_will_permanently',
+					'This will permanently'
+				)} <b>${getTranslation('disk.wipe', 'wipe')}</b> ${getTranslation('disk.partition', 'disk')} <b>${activePartition.name}</b>.`;
+			} else if (activeDisk !== null) {
+				wipeModal.title = `${getTranslation('common.this_action_cannot_be_undone', 'This action cannot be undone')}. ${getTranslation(
+					'common.this_will_permanently',
+					'This will permanently'
+				)} <b>${getTranslation('disk.wipe', 'wipe')}</b> ${getTranslation('disk.disk', 'disk')} <b>${activeDisk.Device}</b>.`;
+			}
+		}
+
+		if (action === 'gpt') {
+			if (activeDisk) {
+				const response = await initializeGPT(activeDisk.Device);
+				if (response.status === 'success') {
+					toast.success(
+						`${capitalizeFirstLetter(getTranslation('disk.disk', 'Disk'))} ${activeDisk.Device} ${getTranslation(
+							'disk.gpt_initialized',
+							'initialized with GPT'
+						)}`
+					);
+				} else {
+					handleAPIError(response);
+				}
+			}
+		}
+
+		if (action === 'partition') {
+			partitionModal.open = true;
+			partitionModal.disk = activeDisk;
 		}
 	}
 
@@ -141,7 +217,6 @@
 
 <div class="flex h-full flex-col overflow-hidden">
 	<div class="inline-flex w-full gap-2 border-b px-3 py-2">
-		<Button size="sm" class="h-8 bg-neutral-600 text-white hover:bg-neutral-700">Reload</Button>
 		<Button
 			size="sm"
 			class="h-8 bg-neutral-600 text-white hover:bg-neutral-700"
@@ -163,10 +238,19 @@
 		<Button
 			size="sm"
 			class="h-8 bg-neutral-600 text-white hover:bg-neutral-700"
-			disabled={activeDisk === null && activePartition === null}
+			disabled={(activeDisk === null || activeDisk.Usage === 'Unused') && activePartition === null}
 			onclick={() => diskAction('wipe')}
 		>
 			Wipe {activePartition !== null ? 'Partition' : activeDisk !== null ? 'Disk' : ''}
+		</Button>
+		<Button
+			size="sm"
+			class="{activeDisk === null
+				? 'hidden'
+				: ''} h-8 bg-neutral-600 text-white hover:bg-neutral-700"
+			onclick={() => diskAction('partition')}
+		>
+			Create Partition
 		</Button>
 	</div>
 
@@ -336,3 +420,34 @@
 		</div>
 	</div>
 </div>
+
+<AlertDialog
+	open={wipeModal.open}
+	names={{ parent: 'disks', element: wipeModal.title || '' }}
+	actions={{
+		onConfirm: async () => {
+			if (activeDisk) {
+				const result = await destroyDiskOrPartition(activeDisk.Device);
+				if (result.status === 'success') {
+					toast.success(getTranslation('disk.wipe_success', 'Disk wiped successfully'));
+				}
+			}
+			wipeModal.title = '';
+			wipeModal.open = false;
+		},
+		onCancel: () => {
+			wipeModal.title = '';
+			wipeModal.open = false;
+		}
+	}}
+	customTitle={wipeModal.title}
+></AlertDialog>
+
+<CreatePartition
+	open={partitionModal.open}
+	disk={partitionModal.disk}
+	onCancel={() => {
+		partitionModal.open = false;
+		partitionModal.disk = null;
+	}}
+/>

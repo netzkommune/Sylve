@@ -117,6 +117,10 @@ export const DiskInfoSchema = z.array(
 	})
 );
 
+export const DiskActionSchema = z.object({
+	device: z.string()
+});
+
 export type SmartAttribute = Record<
 	string,
 	string | number | boolean | Record<string, string | number | boolean>

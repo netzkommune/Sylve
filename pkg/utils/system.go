@@ -13,7 +13,7 @@ import (
 	"os"
 	"runtime"
 	"strings"
-	"sylve/internal/utils/sysctl"
+	"sylve/pkg/utils/sysctl"
 
 	"github.com/mackerelio/go-osstat/loadavg"
 	"github.com/mackerelio/go-osstat/uptime"

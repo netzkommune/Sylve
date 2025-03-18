@@ -57,7 +57,7 @@
 
 		if (modalState.isEditMode && selectedId !== null) {
 			result = await updateNote(selectedId, noteData.title, noteData.content);
-			if (!isAPIResponse(result)) {
+			if (isAPIResponse(result) && result.status === 'success') {
 				tableData = [
 					...tableData.map((note) => (note.id === selectedId ? { ...note, ...noteData } : note))
 				];
@@ -69,7 +69,7 @@
 			}
 		}
 
-		if (isAPIResponse(result)) {
+		if (isAPIResponse(result) && result.status === 'error') {
 			handleValidationErrors(result, 'notes');
 		} else {
 			handleNote(undefined, false, true);

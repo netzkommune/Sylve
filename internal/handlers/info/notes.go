@@ -13,7 +13,7 @@ import (
 	"sylve/internal"
 	infoModels "sylve/internal/db/models/info"
 	"sylve/internal/services/info"
-	"sylve/internal/utils"
+	"sylve/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"

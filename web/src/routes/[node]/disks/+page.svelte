@@ -145,7 +145,7 @@
 		<Button
 			size="sm"
 			class="h-8 bg-neutral-600 text-white hover:bg-neutral-700"
-			disabled={activeDisk === null}
+			disabled={activeDisk === null || activeDisk['S.M.A.R.T.'] === null}
 			onclick={() => diskAction('smart')}
 		>
 			Show S.M.A.R.T values

@@ -11,7 +11,7 @@ package info
 import (
 	"sylve/internal/cmd"
 	infoServiceInterfaces "sylve/internal/interfaces/services/info"
-	"sylve/internal/utils"
+	"sylve/pkg/utils"
 )
 
 func (s *Service) GetBasicInfo() (basicInfo infoServiceInterfaces.BasicInfo, err error) {

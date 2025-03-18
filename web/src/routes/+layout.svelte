@@ -3,7 +3,6 @@
 	import '@fontsource/noto-sans/700.css';
 
 	import { goto } from '$app/navigation';
-	import { navigating } from '$app/state';
 	import { isTokenValid, login } from '$lib/api/auth';
 	import Login from '$lib/components/custom/Login.svelte';
 	import Throbber from '$lib/components/custom/Throbber.svelte';
@@ -23,7 +22,7 @@
 	let isLoading = $state(true);
 
 	$effect(() => {
-		if (isLoggedIn && $hostname && !navigating) {
+		if (isLoggedIn && $hostname) {
 			const path = window.location.pathname;
 			if (path === '/' || !path.startsWith(`/${$hostname}`)) {
 				goto(`/${$hostname}/summary`, { replaceState: true });
@@ -32,6 +31,15 @@
 	});
 
 	onMount(async () => {
+		const faviconEl = document.getElementById('favicon');
+		if (faviconEl) {
+			const darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+			if (darkMode) {
+				faviconEl.setAttribute('href', '/logo/white.svg');
+			} else {
+				faviconEl.setAttribute('href', '/logo/black.svg');
+			}
+		}
 		if ($token) {
 			await sleep(4000);
 			try {
@@ -82,6 +90,10 @@
 		return;
 	}
 </script>
+
+<svelte:head>
+	<title>Sylve</title>
+</svelte:head>
 
 <Toaster />
 <ModeWatcher />

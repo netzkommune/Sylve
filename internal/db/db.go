@@ -13,7 +13,7 @@ import (
 	"sylve/internal/db/models"
 	infoModels "sylve/internal/db/models/info"
 	"sylve/internal/logger"
-	"sylve/internal/utils"
+	"sylve/pkg/utils"
 
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"

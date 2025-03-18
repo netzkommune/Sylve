@@ -15,7 +15,7 @@ import (
 	"strings"
 	diskServiceInterfaces "sylve/internal/interfaces/services/disk"
 	"sylve/internal/logger"
-	"sylve/internal/utils"
+	"sylve/pkg/utils"
 	"sync"
 	"syscall"
 

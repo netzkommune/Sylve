@@ -15,7 +15,7 @@ import (
 	infoModels "sylve/internal/db/models/info"
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
 	"sylve/internal/logger"
-	"sylve/internal/utils"
+	"sylve/pkg/utils"
 )
 
 func (s *Service) GetPoolNames() ([]string, error) {

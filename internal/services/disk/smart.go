@@ -17,7 +17,7 @@ import (
 	"strconv"
 	"strings"
 	diskServiceInterfaces "sylve/internal/interfaces/services/disk"
-	"sylve/internal/utils"
+	"sylve/pkg/utils"
 )
 
 func getSmartCtlData(device string) (diskServiceInterfaces.SmartData, error) {

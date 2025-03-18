@@ -16,7 +16,7 @@ import (
 	infoModels "sylve/internal/db/models/info"
 	serviceInterfaces "sylve/internal/interfaces/services"
 	"sylve/internal/logger"
-	"sylve/internal/utils"
+	"sylve/pkg/utils"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"

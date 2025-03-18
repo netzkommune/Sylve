@@ -12,7 +12,7 @@ import (
 	"net/http"
 	"sylve/internal"
 	"sylve/internal/services/auth"
-	"sylve/internal/utils"
+	"sylve/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 )

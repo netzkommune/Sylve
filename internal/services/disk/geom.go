@@ -11,7 +11,7 @@ package disk
 import (
 	"encoding/xml"
 	diskServiceInterfaces "sylve/internal/interfaces/services/disk"
-	"sylve/internal/utils"
+	"sylve/pkg/utils"
 )
 
 func (s *Service) ParseGeomOutput() (diskServiceInterfaces.Mesh, error) {

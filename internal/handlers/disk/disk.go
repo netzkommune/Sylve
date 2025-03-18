@@ -13,7 +13,8 @@ import (
 	"sylve/internal"
 	diskServiceInterfaces "sylve/internal/interfaces/services/disk"
 	"sylve/internal/services/disk"
-	"sylve/internal/utils"
+	diskUtils "sylve/pkg/disk"
+	"sylve/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -80,7 +81,7 @@ func WipeDisk(diskService *disk.Service) gin.HandlerFunc {
 			return
 		}
 
-		err := diskService.DestroyPartitionTable(r.Device)
+		err := diskUtils.DestroyDisk(r.Device)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{

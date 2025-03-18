@@ -10,7 +10,7 @@ package utils
 
 import (
 	"strings"
-	"sylve/internal/utils/sysctl"
+	"sylve/pkg/utils/sysctl"
 )
 
 func GetGeomXML() []byte {

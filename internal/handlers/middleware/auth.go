@@ -14,7 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	authService "sylve/internal/services/auth"
-	"sylve/internal/utils"
+	"sylve/pkg/utils"
 )
 
 func EnsureAuthenticated(authService *authService.Service) gin.HandlerFunc {

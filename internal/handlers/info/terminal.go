@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"sylve/internal/logger"
 	"syscall"
 	"unsafe"
 
@@ -40,8 +41,11 @@ func HandleTerminalWebsocket(c *gin.Context) {
 	w := c.Writer
 	r := c.Request
 
-	conn, err := WSUpgrader.Upgrade(w, r, nil)
+	subprotocols := websocket.Subprotocols(r)
+	conn, err := WSUpgrader.Upgrade(w, r, http.Header{"Sec-WebSocket-Protocol": {subprotocols[0]}})
+
 	if err != nil {
+		logger.L.Error().Msgf("WebSocket upgrade failed: %v", err)
 		return
 	}
 
@@ -97,9 +101,9 @@ func HandleTerminalWebsocket(c *gin.Context) {
 
 		switch dataTypeBuf[0] {
 		case 0:
-			_, err := io.Copy(tty, reader)
+			copied, err := io.Copy(tty, reader)
 			if err != nil {
-				continue
+				logger.L.Error().Msgf("Error after copying %d bytes", copied)
 			}
 		case 1:
 			decoder := json.NewDecoder(reader)

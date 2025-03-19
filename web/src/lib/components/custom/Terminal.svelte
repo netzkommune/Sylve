@@ -37,6 +37,12 @@
 
 		ws.onopen = () => {
 			adze.info('Terminal WebSocket connected');
+			const dimensions = fitAddon.proposeDimensions();
+			ws?.send(
+				new TextEncoder().encode(
+					'\x01' + JSON.stringify({ rows: dimensions?.rows, cols: dimensions?.cols })
+				)
+			);
 		};
 
 		ws.onmessage = (event) => {

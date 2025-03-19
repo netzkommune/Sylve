@@ -15,7 +15,6 @@ type BaseConfigAdmin struct {
 }
 
 type TLSConfig struct {
-	Enabled  bool   `json:"enabled"`
 	CertFile string `json:"certFile"`
 	KeyFile  string `json:"keyFile"`
 }

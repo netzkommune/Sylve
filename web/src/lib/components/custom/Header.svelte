@@ -4,6 +4,7 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import * as Sheet from '$lib/components/ui/sheet/index.js';
+	import { openTerminal } from '$lib/stores/terminal.svelte';
 	import Icon from '@iconify/svelte';
 	import { mode, toggleMode } from 'mode-watcher';
 	import CreateDialog from './CreateDialog.svelte';
@@ -116,6 +117,15 @@
 
 		<!-- desktop view -->
 		<div class="hidden items-center gap-2 lg:inline-flex">
+			<Button
+				size="sm"
+				variant="ghost"
+				class="dark:hover-bg-muted hover:bg-muted-foreground/40 relative z-[9999] flex h-6 items-center justify-center px-0"
+				onclick={() => openTerminal()}
+			>
+				<Icon icon="garden:terminal-cli-stroke-16" class="h-5 w-5" />
+			</Button>
+
 			<Button size="sm" class="h-6 bg-neutral-600 text-white hover:bg-neutral-700 ">
 				<Icon icon="material-symbols-light:mail-outline-sharp" class="mr-2 h-5 w-5" />
 				Documentation

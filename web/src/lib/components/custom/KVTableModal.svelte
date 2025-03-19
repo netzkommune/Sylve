@@ -80,7 +80,7 @@
 									<Table.Cell class="h-10 px-1 py-2 font-medium">
 										<button
 											class="flex w-full items-center gap-1 text-left"
-											on:click={() => toggleObjectExpansion(key)}
+											onclick={() => toggleObjectExpansion(key)}
 										>
 											<Icon
 												icon={expandedObjects[key]

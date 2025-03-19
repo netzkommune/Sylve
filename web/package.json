@@ -53,6 +53,7 @@
 		"zod": "^3.24.2"
 	},
 	"dependencies": {
+		"@battlefieldduck/xterm-svelte": "^2.1.0",
 		"@fontsource/noto-sans": "^5.2.5",
 		"@layerstack/svelte-stores": "^1.0.0",
 		"@svelte-put/shortcut": "^4.1.0",

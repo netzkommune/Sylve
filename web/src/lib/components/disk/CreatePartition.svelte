@@ -1,12 +1,17 @@
 <script lang="ts">
+	import { createPartitions } from '$lib/api/disk/disk';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { Slider } from '$lib/components/ui/slider/index.js';
 	import * as Table from '$lib/components/ui/table';
 	import type { Disk } from '$lib/types/disk/disk';
+	import { handleAPIError } from '$lib/utils/http';
+	import { getTranslation } from '$lib/utils/i18n';
+	import { capitalizeFirstLetter } from '$lib/utils/string';
 	import Icon from '@iconify/svelte';
 	import humanFormat from 'human-format';
 	import { tick } from 'svelte';
+	import toast from 'svelte-french-toast';
 
 	interface Data {
 		open: boolean;
@@ -31,7 +36,36 @@
 		remainingSpace += removedPartition.size;
 	}
 
-	function savePartitions() {
+	async function savePartitions() {
+		if (disk) {
+			const sizes = newPartitions.map((partition) => Math.floor(partition.size));
+			const result = await createPartitions(disk.Device, sizes);
+			if (result.status === 'success1') {
+				let successMessage = '';
+				if (sizes.length === 1) {
+					successMessage = `${capitalizeFirstLetter(getTranslation('disk.partition', 'Partition'))}`;
+				} else {
+					successMessage = `${capitalizeFirstLetter(getTranslation('disk.partitions', 'Partitions'))}`;
+				}
+
+				successMessage += ` ${getTranslation('common.created', 'created')}`;
+
+				toast.success(successMessage);
+			} else {
+				handleAPIError(result);
+				let errorMessage =
+					capitalizeFirstLetter(getTranslation('common.error', 'Error')) +
+					getTranslation('common.creating', 'creating');
+
+				if (sizes.length === 1) {
+					errorMessage = `${capitalizeFirstLetter(getTranslation('disk.partition', 'Partition'))}`;
+				} else {
+					errorMessage = `${capitalizeFirstLetter(getTranslation('disk.partitions', 'Partitions'))}`;
+				}
+			}
+
+			newPartitions = [];
+		}
 		onCancel();
 	}
 
@@ -70,7 +104,13 @@
 				? disk.Partitions.reduce((total, partition) => total + partition.size, 0)
 				: 0;
 
-		return disk.Size - usedSpace;
+		let actual = disk.Size - usedSpace;
+
+		if (actual > 500 * 1024 * 1024) {
+			actual = actual - 500 * 1024 * 1024;
+		}
+
+		return actual;
 	}
 </script>
 
@@ -148,7 +188,7 @@
 					<Slider
 						value={[currentPartition]}
 						max={remainingSpace}
-						step={1}
+						step={0.1}
 						onValueChange={(e) => {
 							currentPartition = e[0];
 						}}

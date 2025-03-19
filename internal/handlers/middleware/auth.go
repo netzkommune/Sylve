@@ -31,7 +31,6 @@ func EnsureAuthenticated(authService *authService.Service) gin.HandlerFunc {
 		}
 
 		_, err = authService.ValidateToken(token)
-
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"status": "error", "error": err.Error()})
 			return

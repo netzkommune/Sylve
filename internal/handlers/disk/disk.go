@@ -25,6 +25,11 @@ type DiskActionRequest struct {
 	Device string `json:"device" binding:"required,min=2"`
 }
 
+type DiskPartitionRequest struct {
+	Device string   `json:"device" binding:"required,min=2"`
+	Sizes  []uint64 `json:"sizes" binding:"required"`
+}
+
 // @Summary List disk devices
 // @Description List all disk devices on the system
 // @Tags Disk
@@ -164,6 +169,62 @@ func InitializeGPT(diskService *disk.Service, infoService *info.Service) gin.Han
 		c.JSON(http.StatusOK, internal.APIResponse[any]{
 			Status:  "success",
 			Message: "gpt_initialized",
+			Error:   "",
+			Data:    nil,
+		})
+
+		if id != 0 {
+			infoService.EndAuditLog(id, "success")
+		}
+	}
+}
+
+// @Summary Create partition
+// @Description Create a partition on a disk device
+// @Tags Disk
+// @Accept json
+// @Produce json
+// @Param request body DiskPartitionRequest true "Create partition request body"
+// @Security BearerAuth
+// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /disk/create-partitions [post]
+func CreatePartition(infoService *info.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var r DiskPartitionRequest
+
+		if err := c.ShouldBindJSON(&r); err != nil {
+			validationErrors := utils.MapValidationErrors(err, DiskPartitionRequest{})
+
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request_payload",
+				Error:   "validation_error",
+				Data:    validationErrors,
+			})
+			return
+		}
+
+		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("create_partition|-|%s", r.Device), "started")
+		err := diskUtils.CreatePartitions(r.Device, r.Sizes)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "error_creating_partition",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+
+			if id != 0 {
+				infoService.EndAuditLog(id, "failed")
+			}
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "partition_created",
 			Error:   "",
 			Data:    nil,
 		})

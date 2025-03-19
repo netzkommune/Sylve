@@ -33,6 +33,7 @@
 		"wipe": "wipe",
 		"disk": "disk",
 		"partition": "partition",
+		"partitions": "partitions",
 		"gpt_initialized": "initialized with GPT",
 		"initialize": "Initialize"
 	},
@@ -42,7 +43,11 @@
 		"this_action_cannot_be_undone": "This action cannot be undone",
 		"this_will_permanently": "This will permanently",
 		"permanent_delete_msg": "This action cannot be undone. This will permanently delete",
-		"completely": "completely"
+		"completely": "completely",
+		"created": "created",
+		"creating": "creating",
+		"created_successfully": "created successfully",
+		"error": "error"
 	},
 	"validation_errors": {
 		"failed validation: min": "too small"

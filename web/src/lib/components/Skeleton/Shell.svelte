@@ -1,7 +1,8 @@
 <script lang="ts">
+	import Header from '$lib/components/custom/Header.svelte';
 	import * as Resizable from '$lib/components/ui/resizable';
-	import Header from '../custom/Header.svelte';
 
+	import Terminal from '$lib/components/custom/Terminal.svelte';
 	import BottomPanel from '$lib/components/Skeleton/BottomPanel.svelte';
 	import LeftPanel from '$lib/components/Skeleton/LeftPanel.svelte';
 	import { paneSizes } from '$lib/stores/basic';
@@ -46,5 +47,7 @@
 				</Resizable.Pane>
 			</Resizable.PaneGroup>
 		</div>
+
+		<Terminal />
 	</main>
 </div>

@@ -23,3 +23,10 @@ export async function initializeGPT(disk: string): Promise<APIResponse> {
 		device: disk
 	});
 }
+
+export async function createPartitions(disk: string, sizes: number[]): Promise<APIResponse> {
+	return await apiRequest(`/disk/create-partitions`, APIResponseSchema, 'POST', {
+		device: disk,
+		sizes
+	});
+}

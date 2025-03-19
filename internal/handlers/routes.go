@@ -81,6 +81,7 @@ func RegisterRoutes(r *gin.Engine,
 		}
 
 		info.GET("/audit-logs", infoHandlers.AuditLogs(infoService))
+		info.GET("/terminal", infoHandlers.HandleTerminalWebsocket)
 	}
 
 	zfs := api.Group("/zfs")
@@ -98,6 +99,7 @@ func RegisterRoutes(r *gin.Engine,
 		disk.GET("/list", diskHandlers.List(diskService))
 		disk.POST("/wipe", diskHandlers.WipeDisk(diskService, infoService))
 		disk.POST("/initialize-gpt", diskHandlers.InitializeGPT(diskService, infoService))
+		disk.POST("/create-partitions", diskHandlers.CreatePartition(infoService))
 	}
 
 	auth := api.Group("/auth")

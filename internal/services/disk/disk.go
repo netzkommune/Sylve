@@ -10,11 +10,11 @@ package disk
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"strings"
 	diskServiceInterfaces "sylve/internal/interfaces/services/disk"
 	"sylve/internal/logger"
+	diskUtils "sylve/pkg/disk"
 	"sylve/pkg/utils"
 	"sync"
 	"syscall"
@@ -215,14 +215,9 @@ func (s *Service) GetDiskDevices() ([]diskServiceInterfaces.Disk, error) {
 	return disks, nil
 }
 
-func (s *Service) GetDiskSize(device string) (int64, error) {
-	file, err := os.Open(device)
-	if err != nil {
-		return 0, fmt.Errorf("failed to open disk: %v", err)
-	}
-	defer file.Close()
+func (s *Service) GetDiskSize(device string) (uint64, error) {
+	size, err := diskUtils.GetDiskSize(device)
 
-	size, err := file.Seek(0, io.SeekEnd)
 	if err != nil {
 		return 0, fmt.Errorf("failed to determine disk size: %v", err)
 	}
@@ -259,7 +254,7 @@ func (s *Service) DestroyPartitionTable(device string) error {
 	}
 
 	if diskSize > wipeSize {
-		_, err = file.WriteAt(buffer, diskSize-int64(wipeSize))
+		_, err = file.WriteAt(buffer, int64(diskSize)-int64(wipeSize))
 		if err != nil {
 			return fmt.Errorf("error wiping backup GPT: %v", err)
 		}

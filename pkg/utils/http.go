@@ -9,22 +9,34 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
 func GetTokenFromHeader(r http.Header) (string, error) {
 	token := r.Get("Authorization")
-	if token == "" {
-		return "", fmt.Errorf("no token provided")
+	if token != "" {
+		if len(token) < 8 || !strings.HasPrefix(token, "Bearer ") {
+			return "", fmt.Errorf("invalid authorization header format")
+		}
+		return RemoveSpaces(token[7:]), nil
 	}
 
-	token = RemoveSpaces(token[7:])
+	wsProtocol := r.Get("Sec-WebSocket-Protocol")
+	if wsProtocol != "" {
+		parts := strings.Split(wsProtocol, ", ")
+		if len(parts) == 2 && parts[0] == "Bearer" {
+			return RemoveSpaces(parts[1]), nil
+		}
+		return "", errors.New("invalid websocket protocol header format")
+	}
 
-	return token, nil
+	return "", errors.New("no token provided")
 }
 
 func SendJSONResponse(c *gin.Context, httpCode int, data interface{}) {

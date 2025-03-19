@@ -115,3 +115,18 @@ func ParseJWT(tokenString string) (any, error) {
 
 	return customClaims, nil
 }
+
+func BytesToSize(toType string, bytes float64) float64 {
+	switch toType {
+	case "KB":
+		return bytes / 1024
+	case "MB":
+		return bytes / 1024 / 1024
+	case "GB":
+		return bytes / 1024 / 1024 / 1024
+	case "TB":
+		return bytes / 1024 / 1024 / 1024 / 1024
+	default:
+		return bytes
+	}
+}

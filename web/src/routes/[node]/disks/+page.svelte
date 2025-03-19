@@ -8,11 +8,11 @@
 	import * as ContextMenu from '$lib/components/ui/context-menu';
 	import { localStore } from '$lib/stores/localStore.svelte';
 	import { type Disk, type Partition } from '$lib/types/disk/disk';
-	import { parseSMART, simplifyDisks } from '$lib/utils/disk';
+	import { diskSpaceAvailable, parseSMART, simplifyDisks } from '$lib/utils/disk';
 	import { handleAPIError } from '$lib/utils/http';
 	import { getTranslation } from '$lib/utils/i18n';
 	import { capitalizeFirstLetter } from '$lib/utils/string';
-	import Icon from '@iconify/svelte';
+	import Icon, { disableCache } from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
 	import { TableHandler } from '@vincjo/datatables';
 	import humanFormat from 'human-format';
@@ -213,6 +213,22 @@
 	function resetColumns() {
 		visibleColumns.value = Object.fromEntries(keys.map((key) => [key, true]));
 	}
+
+	function generateTitle(t: string, disk?: Disk | null, partition?: Partition | null) {
+		if (t === 'create-partition') {
+			if (disk) {
+				if (disk.GPT) {
+					if (disk.Partitions.length > 0) {
+						const usedSizes = disk.Partitions.map((p) => p.size);
+						const remainingSpace = disk.Size - usedSizes.reduce((a, b) => a + b, 0);
+						if (remainingSpace < 128 * 1024 * 1024) {
+							return 'No space available';
+						}
+					}
+				}
+			}
+		}
+	}
 </script>
 
 <div class="flex h-full flex-col overflow-hidden">
@@ -241,17 +257,26 @@
 			disabled={(activeDisk === null || activeDisk.Usage === 'Unused') && activePartition === null}
 			onclick={() => diskAction('wipe')}
 		>
-			Wipe {activePartition !== null ? 'Partition' : activeDisk !== null ? 'Disk' : ''}
+			{activeDisk === null ? 'Delete' : 'Wipe'}
+			{activePartition !== null ? 'Partition' : activeDisk !== null ? 'Disk' : ''}
 		</Button>
-		<Button
-			size="sm"
-			class="{activeDisk === null
-				? 'hidden'
-				: ''} h-8 bg-neutral-600 text-white hover:bg-neutral-700"
-			onclick={() => diskAction('partition')}
+		<div
+			title={generateTitle('create-partition', activeDisk, activePartition)}
+			class="inline-block"
 		>
-			Create Partition
-		</Button>
+			<Button
+				size="sm"
+				class="{activeDisk === null
+					? 'hidden'
+					: ''} h-8 bg-neutral-600 text-white hover:bg-neutral-700"
+				onclick={() => diskAction('partition')}
+				disabled={activeDisk === null ||
+					activeDisk.GPT === false ||
+					diskSpaceAvailable(activeDisk, 128 * 1024 * 1024)}
+			>
+				Create Partition
+			</Button>
+		</div>
 	</div>
 
 	<KvTableModal
@@ -288,7 +313,7 @@
 												open ? handleContextMenuOpen(key) : handleContextMenuClose()}
 										>
 											<ContextMenu.Trigger class="flex h-full w-full">
-												<div
+												<button
 													class="relative flex w-full items-center"
 													onclick={() => sortHandlers[key].set()}
 												>
@@ -299,7 +324,7 @@
 															: 'lucide:sort-desc'}
 														class="ml-2 mt-1 h-4 w-4 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
 													/>
-												</div>
+												</button>
 											</ContextMenu.Trigger>
 											<ContextMenu.Content>
 												<ContextMenu.Label>Toggle Columns</ContextMenu.Label>

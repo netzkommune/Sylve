@@ -73,9 +73,21 @@ func main() {
 		dS.(*disk.Service),
 	)
 
+	tlsConfig, err := aS.GetSylveCertificate()
+
+	if err != nil {
+		logger.L.Fatal().Err(err).Msg("Failed to get TLS config")
+	}
+
 	server := &http.Server{
-		Addr:    fmt.Sprintf(":%d", cfg.Port),
-		Handler: r,
+		Addr:      fmt.Sprintf(":%d", cfg.Port),
+		Handler:   r,
+		TLSConfig: tlsConfig,
+	}
+
+	err = server.ListenAndServeTLS("", "")
+	if err != nil {
+		logger.L.Fatal().Err(err).Msg("Failed to start HTTPS server")
 	}
 
 	var wg sync.WaitGroup

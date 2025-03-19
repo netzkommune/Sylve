@@ -154,7 +154,7 @@ type DiskServiceInterface interface {
 	GetDiskDevices() ([]Disk, error)
 	GetSmartData(disk DiskInfo) (any, error)
 	GetWearOut(disk any) (float64, error)
-	GetDiskSize(device string) (int64, error)
+	GetDiskSize(device string) (uint64, error)
 	DestroyPartitionTable(device string) error
 	IsDiskGPT(device string) bool
 }

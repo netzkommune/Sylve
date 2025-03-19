@@ -8,6 +8,8 @@
 
 package serviceInterfaces
 
+import "crypto/tls"
+
 type CustomClaims struct {
 	UserID   uint   `json:"userId"`
 	Username string `json:"username"`
@@ -24,4 +26,6 @@ type AuthServiceInterface interface {
 	InitSecret(name string, shaRounds int) error
 
 	AuthenticatePAM(username, password string) (bool, error)
+
+	GetSylveCertificate() (*tls.Config, error)
 }

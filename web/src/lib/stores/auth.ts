@@ -8,8 +8,10 @@
  * under sponsorship from the FreeBSD Foundation.
  */
 
+import { parseJwt } from '$lib/utils/string';
 import { localStore } from '@layerstack/svelte-stores';
 import { addDays } from 'date-fns';
+import { get } from 'svelte/store';
 
 export const store = localStore('token', '', {
 	expiry: addDays(new Date(), 1)
@@ -18,3 +20,15 @@ export const store = localStore('token', '', {
 export const oldStore = localStore('oldToken', '', {
 	expiry: addDays(new Date(), 1)
 });
+
+export function getUsername(): string {
+	try {
+		const token = get(store);
+		if (!token) return 'unknown';
+
+		const decoded = parseJwt(token);
+		return decoded.custom_claims.username;
+	} catch (e) {
+		return 'unknown';
+	}
+}

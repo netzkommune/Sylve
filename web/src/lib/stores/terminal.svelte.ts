@@ -1,6 +1,8 @@
-import { localStore } from '@layerstack/svelte-stores';
-import { addDays } from 'date-fns';
+import { hostname } from '$lib/stores/basic';
+import type { Terminal as Xterm } from '@battlefieldduck/xterm-svelte';
 import { nanoid } from 'nanoid';
+import { get } from 'svelte/store';
+import { getUsername } from './auth';
 
 interface Tab {
 	id: string;
@@ -15,31 +17,38 @@ interface Terminal {
 	title: string;
 	tabs: Tab[];
 	activeTabId: string;
+	xterm: Xterm | null;
 }
 
-export let terminals: {
-	value: Terminal[];
+export let terminalStore: {
+	value: Terminal;
 } = $state({
-	value: []
+	value: {
+		id: '',
+		isOpen: false,
+		isMinimized: false,
+		position: { x: 0, y: 0 },
+		title: '',
+		tabs: [],
+		activeTabId: '',
+		xterm: null
+	}
 });
 
-//test
-export function openTerminal() {
-	const existingTerminal = terminals.value.find((terminal) => terminal.isOpen);
+export function getDefaultTitle() {
+	return `${getUsername()}@${get(hostname)}:~`;
+}
 
-	if (existingTerminal) {
-		terminals.value = terminals.value.map((terminal) =>
-			terminal.id === existingTerminal.id ? { ...terminal, isMinimized: false } : terminal
-		);
-		return terminals.value.map((terminal) =>
-			terminal.id === existingTerminal.id ? { ...terminal, isMinimized: false } : terminal
-		);
-	}
+export function openTerminal() {
+	terminalStore.value = {
+		...terminalStore.value,
+		isMinimized: false
+	};
 
 	const id = nanoid(6);
 	const tabId = nanoid(6);
-	const xOffset = terminals.value.length * 30;
-	const yOffset = terminals.value.length * 30;
+	const xOffset = 30;
+	const yOffset = 30;
 
 	const newTerminal: Terminal = {
 		id,
@@ -49,18 +58,17 @@ export function openTerminal() {
 			x: window.innerWidth / 2 - 400 + xOffset,
 			y: window.innerHeight / 2 - 300 + yOffset
 		},
-
-		title: `Terminal ${terminals.value.length + 1}`,
+		title: 'Terminal',
 		tabs: [
 			{
 				id: tabId,
-				title: `Tab 1`
+				title: getDefaultTitle()
 			}
 		],
 
-		activeTabId: tabId
+		activeTabId: tabId,
+		xterm: null
 	};
 
-	terminals.value = [...terminals.value, newTerminal];
-	return [...terminals.value, newTerminal];
+	terminalStore.value = newTerminal;
 }

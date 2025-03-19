@@ -26,8 +26,6 @@
 		try {
 			ws = new WebSocket(`/api/info/terminal`, ['Bearer', $store]);
 			ws.binaryType = 'arraybuffer';
-
-			console.log(ws);
 		} catch (error) {
 			adze.error('Failed to connect to terminal WebSocket', { error });
 		}
@@ -184,7 +182,7 @@
 					class="border-muted-foreground bg-muted-foreground/10 relative flex h-[70%] w-[60%] flex-col rounded-lg border shadow-lg"
 				>
 					<div
-						class="border-muted-foreground bg-primary-foreground flex items-center justify-between rounded-t-lg border-b p-2"
+						class="border-muted-foreground bg-primary-foreground flex items-center justify-between rounded-t-lg border-b p-1"
 					>
 						<div class="flex items-center gap-2">
 							<button
@@ -234,10 +232,18 @@
 						{/each}
 					</div>
 
-					<div class="bg-muted flex-grow overflow-auto p-4">
+					<div class="bg-muted relative h-full w-full flex-grow overflow-hidden">
 						{#each terminal.tabs as tab}
 							{#if tab.id === terminal.activeTabId}
-								<Xterm terminal={xtremTerminal} {options} {onLoad} {onData} />
+								<div class="absolute inset-0">
+									<Xterm
+										terminal={xtremTerminal}
+										{options}
+										{onLoad}
+										{onData}
+										class="h-full w-full"
+									/>
+								</div>
 							{/if}
 						{/each}
 					</div>

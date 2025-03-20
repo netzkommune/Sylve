@@ -35,6 +35,14 @@ else
     exit 1
 fi
 
+if command -v tmux >/dev/null 2>&1; then
+    TMUX_VERSION=$(tmux -V)
+    echo "✅ tmux found: $TMUX_VERSION"
+else
+    echo "❌ Error: tmux is required but not found. Install using 'pkg install tmux'"
+    exit 1
+fi
+
 RC_CONF="/etc/rc.conf"
 
 if grep -q '^smartd_enable="YES"' "$RC_CONF"; then

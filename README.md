@@ -20,9 +20,10 @@ These only apply to the development version of Sylve, the production version wil
 
 Running Sylve is pretty easy, but sylve depends on some packages that you can install using `pkg` or the corresponding port to that package. Here's a list of what you'd need:
 
-| Dep           | Min. version | Vendored | Optional | Purpose                |
-| ------------- | ------------ | -------- | -------- | ---------------------- |
-| smartmontools | 7.4_2        | No       | No       | Disk health monitoring |
+| Dep           | Min. version | Vendored | Optional | Purpose                                          |
+| ------------- | ------------ | -------- | -------- | ------------------------------------------------ |
+| smartmontools | 7.4_2        | No       | No       | Disk health monitoring                           |
+| tmux          | 3.2          | No       | No       | Terminal multiplexer, used for the (web) console |
 
 We also need to enable some services in order to run Sylve, you can drop these into `/etc/rc.conf` if you don't have it already:
 

@@ -19,6 +19,7 @@ import (
 	"sync"
 	"syscall"
 
+	"github.com/rs/zerolog"
 	"gorm.io/gorm"
 )
 
@@ -296,7 +297,7 @@ func (s *Service) InitializeGPT(device string) error {
 func (s *Service) IsDiskGPT(device string) bool {
 	gptSector, err := utils.ReadDiskSector(device, 1)
 	if err != nil {
-		logger.L.Debug().Msgf("failed to read sector 1: %v", err)
+		logger.LogWithDeduplication(zerolog.DebugLevel, fmt.Sprintf("failed to read sector 1: %v", err))
 		return false
 	}
 

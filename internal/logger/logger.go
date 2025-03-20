@@ -1,24 +1,21 @@
-// SPDX-License-Identifier: BSD-2-Clause
-//
-// Copyright (c) 2025 The FreeBSD Foundation.
-//
-// This software was developed by Hayzam Sherif <hayzam@alchemilla.io>
-// of Alchemilla Ventures Pvt. Ltd. <hello@alchemilla.io>,
-// under sponsorship from the FreeBSD Foundation.
-
 package logger
 
 import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
+	"time"
 
 	"github.com/natefinch/lumberjack"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
-var L zerolog.Logger
+var (
+	L        zerolog.Logger
+	logCache sync.Map
+)
 
 func InitLogger(dataDir string, level int8) {
 	zerolog.TimeFieldFormat = "2006/01/02 15:04:05"
@@ -66,4 +63,36 @@ func InitLogger(dataDir string, level int8) {
 
 	fmt.Println("")
 	L.Info().Msg("Logger initialized")
+}
+
+func LogWithDeduplication(level zerolog.Level, message string) {
+	const dedupTime = 60 * time.Second
+
+	now := time.Now()
+	lastTime, exists := logCache.Load(message)
+
+	if exists {
+		if t, ok := lastTime.(time.Time); ok && now.Sub(t) < dedupTime {
+			return
+		}
+	}
+
+	logCache.Store(message, now)
+
+	switch level {
+	case zerolog.DebugLevel:
+		L.Debug().Msg(message)
+	case zerolog.InfoLevel:
+		L.Info().Msg(message)
+	case zerolog.WarnLevel:
+		L.Warn().Msg(message)
+	case zerolog.ErrorLevel:
+		L.Error().Msg(message)
+	case zerolog.FatalLevel:
+		L.Fatal().Msg(message)
+	case zerolog.PanicLevel:
+		L.Panic().Msg(message)
+	default:
+		L.Info().Msg(message)
+	}
 }

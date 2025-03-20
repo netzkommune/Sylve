@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"sylve/internal/logger"
+	"sync"
 	"syscall"
 	"unsafe"
 
@@ -32,29 +33,49 @@ var WSUpgrader = websocket.Upgrader{
 
 func HandleTerminalWebsocket(c *gin.Context) {
 	_, exists := c.Get("Token")
-
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 
+	id := c.Query("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
+		return
+	}
+
+	checkSession := exec.Command("tmux", "has-session", "-t", id)
+	if err := checkSession.Run(); err != nil {
+		createSession := exec.Command("tmux", "new-session", "-s", id, "-d")
+		if err := createSession.Run(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "unable to create tmux session"})
+			return
+		}
+	}
+
 	w := c.Writer
 	r := c.Request
-
-	subprotocols := websocket.Subprotocols(r)
-	conn, err := WSUpgrader.Upgrade(w, r, http.Header{"Sec-WebSocket-Protocol": {subprotocols[0]}})
-
+	conn, err := WSUpgrader.Upgrade(w, r, nil)
 	if err != nil {
 		logger.L.Error().Msgf("WebSocket upgrade failed: %v", err)
 		return
 	}
+	defer conn.Close()
 
-	cmd := exec.Command("/usr/local/bin/zsh", "-l")
+	var wsWriteMu sync.Mutex
+
+	safeWrite := func(messageType int, data []byte) error {
+		wsWriteMu.Lock()
+		defer wsWriteMu.Unlock()
+		return conn.WriteMessage(messageType, data)
+	}
+
+	cmd := exec.Command("tmux", "attach-session", "-t", id)
 	cmd.Env = append(os.Environ(), "TERM=xterm")
 
 	tty, err := pty.Start(cmd)
 	if err != nil {
-		conn.WriteMessage(websocket.TextMessage, []byte(err.Error()))
+		safeWrite(websocket.TextMessage, []byte(err.Error()))
 		return
 	}
 
@@ -62,18 +83,27 @@ func HandleTerminalWebsocket(c *gin.Context) {
 		cmd.Process.Kill()
 		cmd.Process.Wait()
 		tty.Close()
-		conn.Close()
 	}()
 
+	done := make(chan struct{})
+	defer close(done)
+
 	go func() {
+		buf := make([]byte, 1024)
 		for {
-			buf := make([]byte, 1024)
-			read, err := tty.Read(buf)
-			if err != nil {
-				conn.WriteMessage(websocket.TextMessage, []byte(err.Error()))
+			select {
+			case <-done:
 				return
+			default:
+				n, err := tty.Read(buf)
+				if err != nil {
+					safeWrite(websocket.TextMessage, []byte("Terminal session closed."))
+					return
+				}
+				if err := safeWrite(websocket.BinaryMessage, buf[:n]); err != nil {
+					return
+				}
 			}
-			conn.WriteMessage(websocket.BinaryMessage, buf[:read])
 		}
 	}()
 
@@ -84,35 +114,28 @@ func HandleTerminalWebsocket(c *gin.Context) {
 		}
 
 		if messageType == websocket.TextMessage {
-			conn.WriteMessage(websocket.TextMessage, []byte("Unexpected text message"))
+			safeWrite(websocket.TextMessage, []byte("Unexpected text message"))
 			continue
 		}
 
 		dataTypeBuf := make([]byte, 1)
 		read, err := reader.Read(dataTypeBuf)
-		if err != nil {
-			conn.WriteMessage(websocket.TextMessage, []byte("Unable to read message type from reader"))
+		if err != nil || read != 1 {
 			return
 		}
-
-		if read != 1 {
-			return
-		}
-
 		switch dataTypeBuf[0] {
 		case 0:
-			copied, err := io.Copy(tty, reader)
+			_, err := io.Copy(tty, reader)
 			if err != nil {
-				logger.L.Error().Msgf("Error after copying %d bytes", copied)
+				logger.L.Error().Msg("Error writing to terminal")
 			}
 		case 1:
-			decoder := json.NewDecoder(reader)
-			resizeMessage := WindowSize{}
-			err := decoder.Decode(&resizeMessage)
-			if err != nil {
-				conn.WriteMessage(websocket.TextMessage, []byte("Error decoding resize message: "+err.Error()))
+			var resizeMessage WindowSize
+			if err := json.NewDecoder(reader).Decode(&resizeMessage); err != nil {
+				safeWrite(websocket.TextMessage, []byte("Error decoding resize message: "+err.Error()))
 				continue
 			}
+
 			_, _, errno := syscall.Syscall(
 				syscall.SYS_IOCTL,
 				tty.Fd(),
@@ -120,10 +143,35 @@ func HandleTerminalWebsocket(c *gin.Context) {
 				uintptr(unsafe.Pointer(&resizeMessage)),
 			)
 			if errno != 0 {
-				conn.WriteMessage(websocket.TextMessage, []byte("Error resizing terminal: "+errno.Error()))
+				safeWrite(websocket.TextMessage, []byte("Error resizing terminal: "+errno.Error()))
+			}
+		case 2:
+			var killMessage struct {
+				Kill string `json:"kill"`
+			}
+			if err := json.NewDecoder(reader).Decode(&killMessage); err != nil {
+				logger.L.Error().Msgf("Error decoding kill message: %v", err)
+				continue
+			}
+
+			sessionID := killMessage.Kill
+			if sessionID == "" {
+				sessionID = id
+			}
+
+			cmd := exec.Command("tmux", "kill-session", "-t", sessionID)
+			if err := cmd.Run(); err != nil {
+				logger.L.Error().Msgf("Error killing tmux session %s: %v", sessionID, err)
+				safeWrite(websocket.TextMessage, []byte("Error killing session: "+err.Error()))
+			} else {
+				safeWrite(websocket.TextMessage, []byte("Session killed: "+sessionID))
+			}
+
+			if sessionID == id {
+				return
 			}
 		default:
-			conn.WriteMessage(websocket.TextMessage, []byte("Unknown message type"))
+			safeWrite(websocket.TextMessage, []byte("Unknown message type"))
 		}
 	}
 }

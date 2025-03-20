@@ -1,268 +1,264 @@
 <script lang="ts">
 	import { store } from '$lib/stores/auth';
 	import { getDefaultTitle, terminalStore } from '$lib/stores/terminal.svelte';
-	import type {
-		ITerminalInitOnlyOptions,
-		ITerminalOptions,
-		Terminal
+	import {
+		Xterm,
+		XtermAddon,
+		type FitAddon,
+		type ITerminalInitOnlyOptions,
+		type ITerminalOptions,
+		type Terminal
 	} from '@battlefieldduck/xterm-svelte';
-	import { Xterm, XtermAddon } from '@battlefieldduck/xterm-svelte';
 	import Icon from '@iconify/svelte';
 	import adze from 'adze';
 	import { nanoid } from 'nanoid';
-	import { fly, scale } from 'svelte/transition';
+	import { untrack } from 'svelte';
+	import { fade, scale } from 'svelte/transition';
 
-	let wsConnections: Record<string, WebSocket> = $state({});
-	let terminalInstances: Record<string, Terminal> = $state({});
-	let currentActiveTabId: string = $state('');
-	let terminalHistories: Record<string, string> = $state({});
-
+	let terminal = $state<Terminal>();
+	let ws = $state<WebSocket>();
+	let fitAddonGlobal = $state<FitAddon>();
 	let options: ITerminalOptions & ITerminalInitOnlyOptions = {
 		cursorBlink: true
 	};
 
-	function saveTerminalHistory(tabId: string, serializeAddon: any) {
-		if (terminalInstances[tabId]) {
-			const history = serializeAddon.serialize();
-			terminalHistories[tabId] = history;
-		}
+	let tabsCount = $derived.by(() => {
+		return terminalStore.value.tabs.length;
+	});
+
+	let currentTab = $derived.by(() => {
+		return terminalStore.value.tabs.find((tab) => tab.id === terminalStore.value.activeTabId);
+	});
+
+	async function killSession(sessionId: string): Promise<boolean> {
+		return new Promise((resolve) => {
+			if (!ws || ws.readyState !== WebSocket.OPEN) {
+				resolve(false);
+				return;
+			}
+
+			const onMessage = (event: MessageEvent) => {
+				if (event.data.includes(`Session killed: ${sessionId}`)) {
+					ws?.removeEventListener('message', onMessage);
+					resolve(true);
+				}
+			};
+
+			ws.addEventListener('message', onMessage);
+			ws.send(new TextEncoder().encode('\x02' + JSON.stringify({ kill: sessionId })));
+
+			// Timeout after 2 seconds
+			setTimeout(() => {
+				ws?.removeEventListener('message', onMessage);
+				resolve(false);
+			}, 2000);
+		});
 	}
 
-	async function onLoad(terminal: Terminal) {
-		const tabId = terminal.element?.parentElement?.getAttribute('data-id');
-		if (!tabId) return;
+	async function onLoad() {
+		try {
+			if (!currentTab) return;
 
-		terminalInstances[tabId] = terminal;
-		currentActiveTabId = tabId;
+			ws?.close();
+			terminal?.clear();
+			terminal?.reset();
 
-		const fitAddon = new (await XtermAddon.FitAddon()).FitAddon();
-		const serializeAddon = new (await XtermAddon.SerializeAddon()).SerializeAddon();
-		terminal.loadAddon(fitAddon);
-		terminal.loadAddon(serializeAddon);
-		fitAddon.fit();
+			const fitAddon = new (await XtermAddon.FitAddon()).FitAddon();
+			terminal?.loadAddon(fitAddon);
+			fitAddon.fit();
 
-		if (terminalHistories[tabId]) {
-			terminal.write(terminalHistories[tabId]);
-		}
-
-		if (!wsConnections[tabId]) {
-			try {
-				const newWs = new WebSocket(`/api/info/terminal`, ['Bearer', $store]);
-				newWs.binaryType = 'arraybuffer';
-				wsConnections[tabId] = newWs;
-
-				newWs.onopen = () => {
-					adze.info(`Terminal WebSocket connected for tab ${tabId}`);
+			ws = new WebSocket(`/api/info/terminal?id=${currentTab?.id}`, ['Bearer', $store]);
+			ws.binaryType = 'arraybuffer';
+			ws.onopen = () => {
+				adze.info(`Terminal WebSocket connected for tab ${currentTab?.id}`);
+				if (terminal) {
 					const dimensions = fitAddon.proposeDimensions();
-					newWs.send(
+					(ws as WebSocket).send(
 						new TextEncoder().encode(
 							'\x01' + JSON.stringify({ rows: dimensions?.rows, cols: dimensions?.cols })
 						)
 					);
-				};
 
-				newWs.onmessage = (event) => {
-					if (event.data instanceof ArrayBuffer) {
-						const terminal = terminalInstances[tabId];
-						if (terminal) {
-							terminal.write(new Uint8Array(event.data));
-							saveTerminalHistory(tabId, serializeAddon);
-						}
-					}
-				};
+					fitAddonGlobal = fitAddon;
+				}
+			};
 
-				newWs.onclose = () => {
-					adze.info(`Terminal WebSocket disconnected for tab ${tabId}`);
-					const terminal = terminalInstances[tabId];
+			ws.onmessage = (event) => {
+				if (event.data instanceof ArrayBuffer) {
 					if (terminal) {
-						terminal.write('\x1b[31mDisconnected from server.\x1b[0m\r\n');
+						terminal.write(new Uint8Array(event.data));
 					}
-					delete wsConnections[tabId];
-				};
-			} catch (error) {
-				adze.error('Failed to connect to terminal WebSocket', { error });
-			}
+				}
+			};
+
+			ws.onclose = () => {
+				adze.info(`Terminal WebSocket disconnected for tab ${currentTab?.id}`);
+				if (terminal) {
+					terminal.write('\x1b[31mDisconnected from server.\x1b[0m\r\n');
+				}
+			};
+		} catch (e) {
+			adze.error('Failed to connect to terminal WebSocket', { error: e });
 		}
 	}
 
 	function onData(data: string) {
-		if (currentActiveTabId && wsConnections[currentActiveTabId]) {
-			wsConnections[currentActiveTabId].send(new TextEncoder().encode('\x00' + data));
+		ws?.send(new TextEncoder().encode('\x00' + data));
+	}
+
+	async function visiblityAction(t: string, e?: MouseEvent | string) {
+		if (t === 'window-minimize') {
+			terminalStore.value.isMinimized = true;
+			return;
+		}
+
+		if (t === 'window-close') {
+			const tabsToKill = [...terminalStore.value.tabs];
+			for (const tab of tabsToKill) {
+				await killSession(tab.id);
+			}
+
+			terminalStore.value.tabs = [];
+			terminalStore.value.isOpen = false;
+			ws?.close();
+		}
+
+		if (t === 'tab-close') {
+			const event = e as MouseEvent;
+			if (event) {
+				const target = event.target as HTMLElement;
+				const parent = target.closest('button');
+				if (parent) {
+					const tabId = parent.getAttribute('data-id');
+					if (tabId) {
+						await killSession(tabId);
+						terminalStore.value.tabs = terminalStore.value.tabs.filter((tab) => tab.id !== tabId);
+						if (terminalStore.value.tabs.length > 0) {
+							terminalStore.value.activeTabId = terminalStore.value.tabs[0].id;
+						}
+					}
+				}
+			}
+		}
+
+		if (t === 'tab-select') {
+			const tabId = e as string;
+			terminalStore.value.activeTabId = tabId;
 		}
 	}
 
 	function addTab() {
-		terminalStore.value.tabs = [
-			...terminalStore.value.tabs,
-			{
-				id: nanoid(6),
-				title: getDefaultTitle()
-			}
-		];
+		const newTab = {
+			id: nanoid(5),
+			title: getDefaultTitle()
+		};
+
+		terminalStore.value.tabs = [...terminalStore.value.tabs, newTab];
+		terminalStore.value.activeTabId = newTab.id;
 	}
 
-	function removeTab(terminalId: string, tabId: string) {
-		console.log(terminalId, tabId);
-		if (wsConnections[tabId]) {
-			wsConnections[tabId].close();
-			delete wsConnections[tabId];
-			delete terminalInstances[tabId];
+	let innerWidth = $state(0);
+
+	$effect(() => {
+		if (innerWidth) {
+			untrack(() => {
+				fitAddonGlobal?.fit();
+				const dimensions = fitAddonGlobal?.proposeDimensions();
+				ws?.send(
+					new TextEncoder().encode(
+						'\x01' + JSON.stringify({ rows: dimensions?.rows, cols: dimensions?.cols })
+					)
+				);
+			});
 		}
-
-		terminalStore.value.tabs = terminalStore.value.tabs.filter((tab) => tab.id !== tabId);
-
-		if (terminalStore.value.activeTabId === tabId) {
-			if (terminalStore.value.tabs.length > 0) {
-				const newActiveTab = terminalStore.value.tabs[terminalStore.value.tabs.length - 1];
-				terminalStore.value.activeTabId = newActiveTab.id;
-			} else {
-				terminalStore.value.isOpen = false;
-			}
-		}
-	}
-
-	async function setActiveTab(tabId: string) {
-		currentActiveTabId = tabId;
-		terminalStore.value.activeTabId = tabId;
-
-		setTimeout(async () => {
-			const termInstance = terminalInstances[tabId];
-			if (termInstance) {
-				const fitAddon = new (await XtermAddon.FitAddon()).FitAddon();
-				termInstance.loadAddon(fitAddon);
-				fitAddon.fit();
-				termInstance.focus();
-			}
-		}, 50);
-	}
-
-	function closeDialog() {
-		terminalStore.value.tabs.forEach((tab) => {
-			if (wsConnections[tab.id]) {
-				wsConnections[tab.id].close();
-				delete wsConnections[tab.id];
-				delete terminalInstances[tab.id];
-			}
-		});
-
-		terminalStore.value.isOpen = false;
-	}
-
-	function minimizeDialog() {
-		terminalStore.value.isMinimized = true;
-	}
-
-	function restoreDialog() {
-		terminalStore.value.isMinimized = false;
-		currentActiveTabId = terminalStore.value.activeTabId;
-
-		const activeTerminal = terminalInstances[terminalStore.value.activeTabId];
-		if (activeTerminal) {
-			activeTerminal.focus();
-		}
-	}
+	});
 </script>
+
+<svelte:window bind:innerWidth />
 
 {#if terminalStore.value.isOpen && !terminalStore.value.isMinimized}
 	<div
-		class="fixed inset-0 z-[9998] bg-black/30 backdrop-blur-sm transition-all duration-300"
+		class="fixed inset-0 z-[9998] bg-black/30 backdrop-blur-sm transition-all duration-150"
 	></div>
-{/if}
-
-{#if terminalStore.value.isOpen}
-	{#if terminalStore.value.isMinimized}
+	<div
+		class="fixed inset-0 z-[9999] flex items-center justify-center transition-all duration-150"
+		in:scale={{ start: 0.9, duration: 150 }}
+		out:scale={{ start: 0.9, duration: 150 }}
+	>
 		<div
-			class="bg-muted fixed bottom-0 z-[9999] flex h-10 w-40 items-center justify-between rounded-t-lg px-3 text-white shadow-lg transition-all duration-300"
-			ondblclick={() => restoreDialog()}
-			in:fly={{ y: 50, duration: 300 }}
-			out:fly={{ y: 50, duration: 300 }}
+			class="bg-muted-foreground/10 border-muted relative flex w-[60%] flex-col rounded-lg border-4"
 		>
-			<span class="truncate text-sm">{terminalStore.value.title}</span>
-			<div class="flex gap-2">
-				<button class="text-white hover:text-gray-300" onclick={() => restoreDialog()}>
-					<Icon icon="mdi:window-restore" class="h-4 w-4" />
-				</button>
-				<button class="text-white hover:text-red-300" onclick={() => closeDialog()} title="Close">
-					<Icon icon="mdi:close" class="h-4 w-4" />
-				</button>
+			<div class="bg-primary-foreground flex items-center justify-between p-2">
+				<!-- Add Tab Button -->
+				<div class="flex items-center gap-2">
+					<button
+						class="dark:hover-bg-muted hover:bg-muted-foreground/30 flex h-6 w-6 items-center justify-center rounded"
+						onclick={() => addTab()}
+						title="Add new tab"
+					>
+						<Icon icon="material-symbols:shadow-add" class="h-5 w-5" />
+					</button>
+					<span>{terminalStore.value.title}</span>
+				</div>
+				<!-- Minimize / Close -->
+				<div class="flex space-x-3">
+					<button
+						class="rounded-full transition-colors duration-300 ease-in-out hover:bg-yellow-600 hover:text-white"
+						onclick={() => visiblityAction('window-minimize')}
+						title="Minimize"
+					>
+						<Icon icon="mdi:window-minimize" class="h-5 w-5" />
+					</button>
+					<button
+						class="rounded-full transition-colors duration-300 ease-in-out hover:bg-red-500 hover:text-white"
+						onclick={() => visiblityAction('window-close')}
+						title="Close"
+					>
+						<Icon icon="mdi:close" class="h-5 w-5" />
+					</button>
+				</div>
 			</div>
-		</div>
-	{:else}
-		<div
-			class="fixed inset-0 z-[9999] flex items-center justify-center transition-all duration-300"
-			in:scale={{ start: 0.8, duration: 300 }}
-			out:scale={{ start: 0.8, duration: 300 }}
-		>
+
+			<!-- Available Tabs -->
+			<div class="dark:bg-muted/30 flex overflow-x-auto bg-white">
+				{#each terminalStore.value.tabs as tab}
+					<div
+						class="border-muted-foreground/40 flex cursor-pointer items-center rounded-t-lg px-3.5 py-2 {tab.id ===
+						terminalStore.value.activeTabId
+							? 'bg-muted-foreground/40 dark:bg-muted-foreground/25 '
+							: 'hover:bg-muted-foreground/25 border-muted-foreground/25 border-x border-t'}"
+						onclick={() => visiblityAction('tab-select', tab.id)}
+					>
+						<span class="mr-2 whitespace-nowrap text-sm">{tab.title}</span>
+						{#if tabsCount > 1}
+							<button
+								class="rounded-full transition-colors duration-300 ease-in-out hover:bg-red-500 hover:text-white"
+								data-id={tab.id}
+								onclick={(e) => {
+									e.stopPropagation();
+									visiblityAction('tab-close', e);
+								}}
+							>
+								<Icon icon="mdi:close" class="h-4 w-4" />
+							</button>
+						{/if}
+					</div>
+				{/each}
+			</div>
+
+			<!-- Terminal Body -->
 			<div
-				class="border-muted-foreground bg-muted-foreground/10 relative flex h-[70%] w-[60%] flex-col rounded-lg border shadow-lg"
+				id="terminal-container"
+				class="relative min-h-[456px] w-full flex-grow overflow-hidden bg-black"
 			>
-				<div
-					class="border-muted-foreground bg-primary-foreground flex items-center justify-between rounded-t-lg border-b p-1"
-				>
-					<div class="flex items-center gap-2">
-						<button
-							class="dark:hover-bg-muted hover:bg-muted-foreground/40 flex h-6 w-6 items-center justify-center rounded"
-							onclick={() => addTab()}
-							title="Add new tab"
-						>
-							<Icon icon="mdi:plus" class="h-4 w-4" />
-						</button>
-						<span>{terminalStore.value.title}</span>
-					</div>
-					<div class="flex space-x-2">
-						<button
-							class="rounded-full bg-yellow-400 p-1"
-							onclick={() => minimizeDialog()}
-							title="Minimize"
-						>
-							<Icon icon="mdi:window-minimize" class="h-3 w-3 text-gray-800" />
-						</button>
-						<button class="rounded-full bg-red-500 p-1" onclick={() => closeDialog()} title="Close">
-							<Icon icon="mdi:close" class="h-3 w-3 text-gray-800" />
-						</button>
-					</div>
-				</div>
-
-				<div class="border-muted-foreground bg-muted/30 flex overflow-x-auto border-b">
-					{#each terminalStore.value.tabs as tab}
-						<div
-							class="border-muted-foreground flex cursor-pointer items-center border-r px-3 py-1 {tab.id ===
-							terminalStore.value.activeTabId
-								? 'bg-muted-foreground/40 dark:bg-muted-foreground/40'
-								: 'hover:bg-muted/50'}"
-							onclick={() => setActiveTab(tab.id)}
-						>
-							<span class="mr-2 whitespace-nowrap text-sm">{tab.title}</span>
-							{#if terminalStore.value.tabs.length > 1}
-								<button
-									class="hover:text-red-400"
-									onclick={() => removeTab(terminalStore.value.id, tab.id)}
-								>
-									<Icon icon="mdi:close" class="h-3 w-3" />
-								</button>
-							{/if}
+				{#each terminalStore.value.tabs as tab}
+					{#if tab.id === terminalStore.value.activeTabId}
+						<div in:fade={{ duration: 150 }}>
+							<Xterm bind:terminal {options} {onLoad} {onData} />
 						</div>
-					{/each}
-				</div>
-
-				<div class="bg-muted relative h-full w-full flex-grow overflow-hidden">
-					{#each terminalStore.value.tabs as tab}
-						<Xterm
-							terminal={terminalInstances[tab.id]}
-							{options}
-							{onLoad}
-							{onData}
-							class="h-full w-full"
-							hidden={tab.id !== terminalStore.value.activeTabId}
-							data-id={tab.id}
-							onclick={() => {
-								currentActiveTabId = tab.id;
-								setTimeout(() => terminalInstances[tab.id]?.focus(), 0);
-							}}
-						/>
-					{/each}
-				</div>
+					{/if}
+				{/each}
 			</div>
 		</div>
-	{/if}
+	</div>
 {/if}

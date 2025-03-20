@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { getAuditLogs } from '$lib/api/info/audit';
 	import TreeView from '$lib/components/custom/TreeView.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Resizable from '$lib/components/ui/resizable';
@@ -171,6 +170,12 @@
 		const pathname = page.url.pathname;
 		const shouldShowHundredItems = /1|local/.test(pathname);
 		return shouldShowHundredItems ? hundredItems : nodeItems;
+	});
+
+	$effect(() => {
+		if (page.url.pathname === `/${$hostname}`) {
+			goto(`/${node}/summary`);
+		}
 	});
 </script>
 

@@ -3,14 +3,11 @@ import type { Terminal as Xterm } from '@battlefieldduck/xterm-svelte';
 import { nanoid } from 'nanoid';
 import { get } from 'svelte/store';
 import { getUsername } from './auth';
-
 interface Tab {
 	id: string;
 	title: string;
 }
-
 interface Terminal {
-	id: string;
 	isOpen: boolean;
 	isMinimized: boolean;
 	position: { x: number; y: number };
@@ -20,11 +17,10 @@ interface Terminal {
 	xterm: Xterm | null;
 }
 
-export let terminalStore: {
+export const terminalStore: {
 	value: Terminal;
 } = $state({
 	value: {
-		id: '',
 		isOpen: false,
 		isMinimized: false,
 		position: { x: 0, y: 0 },
@@ -42,16 +38,19 @@ export function getDefaultTitle() {
 export function openTerminal() {
 	terminalStore.value = {
 		...terminalStore.value,
-		isMinimized: false
+		isMinimized: false,
+		isOpen: true
 	};
 
-	const id = nanoid(6);
-	const tabId = nanoid(6);
+	if (terminalStore.value.tabs.length > 0) {
+		return;
+	}
+
+	const tabId = nanoid(9);
 	const xOffset = 30;
 	const yOffset = 30;
 
 	const newTerminal: Terminal = {
-		id,
 		isOpen: true,
 		isMinimized: false,
 		position: {

@@ -4,7 +4,7 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import * as Sheet from '$lib/components/ui/sheet/index.js';
-	import { openTerminal } from '$lib/stores/terminal.svelte';
+	import { openTerminal, terminalStore } from '$lib/stores/terminal.svelte';
 	import Icon from '@iconify/svelte';
 	import { mode, toggleMode } from 'mode-watcher';
 	import CreateDialog from './CreateDialog.svelte';
@@ -81,7 +81,7 @@
 					<p class="font-normal tracking-[.45em]">SYLVE</p>
 				</div>
 				<p class="mt-4 whitespace-nowrap">Virtual Environment 8.2.7</p>
-				<Button size="sm" class="mt-4 h-8  bg-neutral-600 text-white hover:bg-neutral-700">
+				<Button size="sm" class="mt-4 h-8 bg-neutral-600 text-white hover:bg-neutral-700">
 					<Icon icon="material-symbols-light:mail-outline-sharp" class="mr-2 h-4 w-4" />
 					Documentation
 				</Button>
@@ -124,9 +124,16 @@
 				onclick={() => openTerminal()}
 			>
 				<Icon icon="garden:terminal-cli-stroke-16" class="h-5 w-5" />
+				{#if terminalStore.value.tabs.length > 0}
+					<span
+						class="absolute -right-1 -top-1 flex h-4 min-w-[8px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white"
+					>
+						{terminalStore.value.tabs.length}
+					</span>
+				{/if}
 			</Button>
 
-			<Button size="sm" class="h-6 bg-neutral-600 text-white hover:bg-neutral-700 ">
+			<Button size="sm" class="h-6 bg-neutral-600 text-white hover:bg-neutral-700">
 				<Icon icon="material-symbols-light:mail-outline-sharp" class="mr-2 h-5 w-5" />
 				Documentation
 			</Button>

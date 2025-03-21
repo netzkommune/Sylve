@@ -35,7 +35,9 @@
 		"partition": "partition",
 		"partitions": "partitions",
 		"gpt_initialized": "initialized with GPT",
-		"initialize": "Initialize"
+		"initialize": "Initialize",
+		"full_wipe_success": "Disk wiped",
+		"partition_wipe_success": "Partition deleted"
 	},
 	"common": {
 		"example": "Example",
@@ -47,7 +49,8 @@
 		"created": "created",
 		"creating": "creating",
 		"created_successfully": "created successfully",
-		"error": "error"
+		"error": "error",
+		"delete": "delete"
 	},
 	"validation_errors": {
 		"failed validation: min": "too small"

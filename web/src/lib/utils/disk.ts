@@ -107,8 +107,9 @@ export function parseSMART(disk: Disk): SmartAttribute | SmartAttribute[] {
 
 export function diskSpaceAvailable(disk: Disk, required: number): boolean {
 	if (disk.Usage === 'Partitions') {
-		const freeSpace = disk.Partitions.reduce((acc, cur) => acc + cur.size, 0);
-		return freeSpace >= required;
+		const total = disk.Size;
+		const used = disk.Partitions.reduce((acc, cur) => acc + cur.size, 0);
+		return total - used >= required;
 	}
 
 	return disk.Size >= required;

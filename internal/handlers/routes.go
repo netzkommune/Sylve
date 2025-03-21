@@ -100,6 +100,7 @@ func RegisterRoutes(r *gin.Engine,
 		disk.POST("/wipe", diskHandlers.WipeDisk(diskService, infoService))
 		disk.POST("/initialize-gpt", diskHandlers.InitializeGPT(diskService, infoService))
 		disk.POST("/create-partitions", diskHandlers.CreatePartition(infoService))
+		disk.POST("/delete-partition", diskHandlers.DeletePartition(infoService))
 	}
 
 	auth := api.Group("/auth")

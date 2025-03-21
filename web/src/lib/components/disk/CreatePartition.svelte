@@ -2,6 +2,7 @@
 	import { createPartitions } from '$lib/api/disk/disk';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import { Input } from '$lib/components/ui/input/index.js';
 	import { Slider } from '$lib/components/ui/slider/index.js';
 	import * as Table from '$lib/components/ui/table';
 	import type { Disk } from '$lib/types/disk/disk';
@@ -9,8 +10,8 @@
 	import { getTranslation } from '$lib/utils/i18n';
 	import { capitalizeFirstLetter } from '$lib/utils/string';
 	import Icon from '@iconify/svelte';
-	import humanFormat from 'human-format';
-	import { tick } from 'svelte';
+	import humanFormat, { type ParsedInfo, type ScaleLike } from 'human-format';
+	import { tick, untrack } from 'svelte';
 	import toast from 'svelte-french-toast';
 
 	interface Data {
@@ -24,10 +25,42 @@
 	let newPartitions: { name: string; size: number }[] = $state([]);
 	let remainingSpace = $state(0);
 	let currentPartition = $state(0);
+	let currentPartitionInput = $state('');
 
 	$effect(() => {
 		if (disk) {
 			remainingSpace = calculateRemainingSpace(disk);
+		}
+	});
+
+	$effect(() => {
+		if (currentPartitionInput === '') {
+			currentPartition = 0;
+		} else {
+			let parsed: ParsedInfo<ScaleLike> | null = null;
+
+			try {
+				parsed = humanFormat.parse.raw(currentPartitionInput);
+			} catch (e) {
+				parsed = { factor: 1, value: 0, prefix: 'B' };
+				currentPartitionInput = '1B';
+			}
+
+			if (parsed) {
+				untrack(() => {
+					currentPartition = parsed.factor * parsed.value;
+					if (currentPartition > remainingSpace) {
+						currentPartition = remainingSpace;
+						currentPartitionInput = humanFormat(remainingSpace);
+					}
+				});
+			}
+		}
+	});
+
+	$effect(() => {
+		if (currentPartition > 0) {
+			currentPartitionInput = humanFormat(currentPartition);
 		}
 	});
 
@@ -40,7 +73,7 @@
 		if (disk) {
 			const sizes = newPartitions.map((partition) => Math.floor(partition.size));
 			const result = await createPartitions(disk.Device, sizes);
-			if (result.status === 'success1') {
+			if (result.status === 'success') {
 				let successMessage = '';
 				if (sizes.length === 1) {
 					successMessage = `${capitalizeFirstLetter(getTranslation('disk.partition', 'Partition'))}`;
@@ -77,6 +110,7 @@
 			});
 			remainingSpace -= currentPartition;
 			currentPartition = 0;
+			currentPartitionInput = '0B';
 
 			await tick();
 
@@ -106,8 +140,8 @@
 
 		let actual = disk.Size - usedSpace;
 
-		if (actual > 500 * 1024 * 1024) {
-			actual = actual - 500 * 1024 * 1024;
+		if (actual > 128 * 1024 * 1024) {
+			actual = actual - 128 * 1024 * 1024;
 		}
 
 		return actual;
@@ -195,6 +229,14 @@
 					/>
 				</div>
 
+				<Input
+					type="text"
+					class="h-8 w-24 text-right"
+					min="0"
+					max={remainingSpace}
+					bind:value={currentPartitionInput}
+				/>
+
 				<div class={remainingSpace > 0 ? '' : 'cursor-not-allowed'}>
 					<Button
 						variant="outline"
@@ -210,6 +252,7 @@
 					</Button>
 				</div>
 			</div>
+
 			<div class="flex justify-end">
 				<span class="text-muted-foreground text-sm">
 					Size: {humanFormat(currentPartition)}

@@ -12,9 +12,15 @@ export async function listDisks(): Promise<DiskInfo> {
 	return await apiRequest('/disk/list', DiskInfoSchema, 'GET');
 }
 
-export async function destroyDiskOrPartition(disk: string): Promise<APIResponse> {
+export async function destroyDisk(disk: string): Promise<APIResponse> {
 	return await apiRequest(`/disk/wipe`, APIResponseSchema, 'POST', {
 		device: disk
+	});
+}
+
+export async function destroyPartition(partition: string): Promise<APIResponse> {
+	return await apiRequest(`/disk/delete-partition`, APIResponseSchema, 'POST', {
+		device: partition
 	});
 }
 

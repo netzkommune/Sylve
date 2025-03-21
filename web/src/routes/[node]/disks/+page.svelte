@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { invalidate, invalidateAll } from '$app/navigation';
-	import { destroyDiskOrPartition, initializeGPT, listDisks } from '$lib/api/disk/disk';
+	import { destroyDisk, destroyPartition, initializeGPT, listDisks } from '$lib/api/disk/disk';
 	import AlertDialog from '$lib/components/custom/AlertDialog.svelte';
 	import KvTableModal from '$lib/components/custom/KVTableModal.svelte';
 	import CreatePartition from '$lib/components/disk/CreatePartition.svelte';
@@ -169,7 +169,7 @@
 				wipeModal.title = `${getTranslation('common.this_action_cannot_be_undone', 'This action cannot be undone')}. ${getTranslation(
 					'common.this_will_permanently',
 					'This will permanently'
-				)} <b>${getTranslation('disk.wipe', 'wipe')}</b> ${getTranslation('disk.partition', 'disk')} <b>${activePartition.name}</b>.`;
+				)} <b>${getTranslation('common.delete', 'delete')}</b> ${getTranslation('disk.partition', 'disk')} <b>${activePartition.name}</b>.`;
 			} else if (activeDisk !== null) {
 				wipeModal.title = `${getTranslation('common.this_action_cannot_be_undone', 'This action cannot be undone')}. ${getTranslation(
 					'common.this_will_permanently',
@@ -272,7 +272,7 @@
 				onclick={() => diskAction('partition')}
 				disabled={activeDisk === null ||
 					activeDisk.GPT === false ||
-					diskSpaceAvailable(activeDisk, 128 * 1024 * 1024)}
+					!diskSpaceAvailable(activeDisk, 128 * 1024 * 1024)}
 			>
 				Create Partition
 			</Button>
@@ -451,10 +451,17 @@
 	names={{ parent: 'disks', element: wipeModal.title || '' }}
 	actions={{
 		onConfirm: async () => {
-			if (activeDisk) {
-				const result = await destroyDiskOrPartition(activeDisk.Device);
-				if (result.status === 'success') {
-					toast.success(getTranslation('disk.wipe_success', 'Disk wiped successfully'));
+			if (activeDisk || activePartition) {
+				if (activeDisk) {
+					const result = await destroyDisk(activeDisk.Device);
+					if (result.status === 'success') {
+						toast.success(getTranslation('disk.full_wipe_success', 'Disk wiped successfully'));
+					}
+				} else if (activePartition) {
+					const result = await destroyPartition(`/dev/${activePartition.name}`);
+					if (result.status === 'success') {
+						toast.success(getTranslation('disk.partition_wipe_success', 'Disk wiped successfully'));
+					}
 				}
 			}
 			wipeModal.title = '';

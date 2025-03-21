@@ -3,6 +3,8 @@ package disk
 import (
 	"fmt"
 	"os"
+	"regexp"
+	"strconv"
 	"sylve/pkg/utils"
 )
 
@@ -43,8 +45,6 @@ func CreatePartition(device string, size uint64) error {
 	if err != nil {
 		return err
 	}
-
-	fmt.Println("Creating partition on disk", device, "with size", size)
 
 	mbytes := uint64(utils.BytesToSize("MB", float64(size)))
 	if mbytes < 1 {
@@ -93,16 +93,39 @@ func CreatePartitions(device string, sizes []uint64) error {
 	return nil
 }
 
-func DeletePartition(device string, partition int) error {
-	err := CheckDevice(device)
+func ParsePartition(device string) (string, int, error) {
+	re := regexp.MustCompile(`^(/dev/[a-z0-9]+)p([0-9]+)$`)
+	matches := re.FindStringSubmatch(device)
 
+	if len(matches) != 3 {
+		return "", 0, fmt.Errorf("invalid device format: %s", device)
+	}
+
+	disk := matches[1]
+	partNum, err := strconv.Atoi(matches[2])
+	if err != nil {
+		return "", 0, fmt.Errorf("invalid partition number in %s: %v", device, err)
+	}
+
+	return disk, partNum, nil
+}
+
+func DeletePartition(device string) error {
+	err := CheckDevice(device)
 	if err != nil {
 		return err
 	}
 
-	output, err := utils.RunCommand("gpart", "delete", "-i", fmt.Sprintf("%d", partition), device)
+	disk, partition, err := ParsePartition(device)
 	if err != nil {
-		return fmt.Errorf("error deleting partition %d from disk %s: %v, output: %s", partition, device, err, output)
+		return err
+	}
+
+	fmt.Println("gpart", "delete", "-i", fmt.Sprintf("%d", partition), disk)
+
+	output, err := utils.RunCommand("gpart", "delete", "-i", fmt.Sprintf("%d", partition), disk)
+	if err != nil {
+		return fmt.Errorf("error deleting partition %d from disk %s: %v, output: %s", partition, disk, err, output)
 	}
 
 	return nil

@@ -234,3 +234,59 @@ func CreatePartition(infoService *info.Service) gin.HandlerFunc {
 		}
 	}
 }
+
+// @Summary Delete partition
+// @Description Delete a partition on a disk device
+// @Tags Disk
+// @Accept json
+// @Produce json
+// @Param request body DiskActionRequest true "Delete partition request body"
+// @Security BearerAuth
+// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /disk/delete-partition [post]
+func DeletePartition(infoService *info.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var r DiskActionRequest
+
+		if err := c.ShouldBindJSON(&r); err != nil {
+			validationErrors := utils.MapValidationErrors(err, DiskActionRequest{})
+
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request_payload",
+				Error:   "validation_error",
+				Data:    validationErrors,
+			})
+			return
+		}
+
+		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("create_partition|-|%s", r.Device), "started")
+		err := diskUtils.DeletePartition(r.Device)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "error_deleting_partition",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+
+			if id != 0 {
+				infoService.EndAuditLog(id, "failed")
+			}
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "partition_deleted",
+			Error:   "",
+			Data:    nil,
+		})
+
+		if id != 0 {
+			infoService.EndAuditLog(id, "success")
+		}
+	}
+}

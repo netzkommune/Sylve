@@ -186,18 +186,11 @@
 		out:scale={{ start: 0.9, duration: 150 }}
 	>
 		<div
-			class="bg-muted-foreground/10 border-muted relative flex w-[60%] flex-col rounded-lg border-4"
+			class="relative flex w-[60%] flex-col rounded-lg border-4 border-muted bg-muted-foreground/10"
 		>
-			<div class="bg-primary-foreground flex items-center justify-between p-2">
+			<div class="flex items-center justify-between bg-primary-foreground p-2">
 				<!-- Add Tab Button -->
 				<div class="flex items-center gap-2">
-					<button
-						class="dark:hover-bg-muted hover:bg-muted-foreground/30 flex h-6 w-6 items-center justify-center rounded"
-						onclick={() => addTab()}
-						title="Add new tab"
-					>
-						<Icon icon="material-symbols:shadow-add" class="h-5 w-5" />
-					</button>
 					<span>{terminalStore.value.title}</span>
 				</div>
 				<!-- Minimize / Close -->
@@ -220,13 +213,13 @@
 			</div>
 
 			<!-- Available Tabs -->
-			<div class="dark:bg-muted/30 flex overflow-x-auto bg-white">
+			<div class="flex overflow-x-auto bg-white dark:bg-muted/30">
 				{#each terminalStore.value.tabs as tab}
 					<div
-						class="border-muted-foreground/40 flex cursor-pointer items-center rounded-t-lg px-3.5 py-2 {tab.id ===
+						class="flex cursor-pointer items-center border-muted-foreground/40 px-3.5 py-2 {tab.id ===
 						terminalStore.value.activeTabId
 							? 'bg-muted-foreground/40 dark:bg-muted-foreground/25 '
-							: 'hover:bg-muted-foreground/25 border-muted-foreground/25 border-x border-t'}"
+							: 'border-x border-t border-muted-foreground/25 hover:bg-muted-foreground/25'}"
 						onclick={() => visiblityAction('tab-select', tab.id)}
 					>
 						<span class="mr-2 whitespace-nowrap text-sm">{tab.title}</span>
@@ -244,6 +237,17 @@
 						{/if}
 					</div>
 				{/each}
+				<div
+					class="flex items-center justify-center border px-1 hover:border-muted-foreground/30 hover:bg-muted-foreground/30"
+				>
+					<button
+						class="dark:hover-bg-muted flex h-6 w-6 items-center justify-center rounded"
+						onclick={() => addTab()}
+						title="Add new tab"
+					>
+						<Icon icon="ic:sharp-plus" class="h-5 w-5" />
+					</button>
+				</div>
 			</div>
 
 			<!-- Terminal Body -->

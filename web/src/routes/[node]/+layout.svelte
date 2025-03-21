@@ -66,19 +66,18 @@
 			]
 		},
 		{
-			label: 'disks',
+			label: 'Storage',
 			icon: 'mdi:storage',
-			href: `/${node}/disks`,
 			children: [
 				{
-					label: 'Devices',
+					label: 'Disks',
 					icon: 'mdi:harddisk',
-					href: '/dashboard/telephony'
+					href: `/${node}/storage/disks`
 				},
 				{
 					label: 'ZFS',
 					icon: 'file-icons:openzfs',
-					href: '/dashboard/telephony'
+					href: `/${node}/storage/zfs`
 				}
 			]
 		},

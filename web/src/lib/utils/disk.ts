@@ -9,6 +9,7 @@
  */
 
 import type { Disk, DiskInfo, SmartAttribute, SmartCtl, SmartNVME } from '$lib/types/disk/disk';
+import type { Zpool } from '$lib/types/zfs/pool';
 
 export async function simplifyDisks(disks: DiskInfo): Promise<Disk[]> {
 	const transformed: Disk[] = [];
@@ -113,4 +114,20 @@ export function diskSpaceAvailable(disk: Disk, required: number): boolean {
 	}
 
 	return disk.Size >= required;
+}
+
+export function getGPTLabel(disk: Disk, pools: Zpool[]): string {
+	if (disk.GPT) {
+		return 'Yes';
+	}
+
+	if (disk.GPT === false) {
+		if (pools.length > 0) {
+			if (pools.some((pool) => pool.vdevs.some((vdev) => vdev.name === disk.Device))) {
+				return '-';
+			}
+		}
+	}
+
+	return 'No';
 }

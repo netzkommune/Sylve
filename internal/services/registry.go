@@ -43,7 +43,7 @@ func NewService[T any](db *gorm.DB, dependencies ...interface{}) interface{} {
 	case *zfs.Service:
 		return zfs.NewZfsService(db)
 	case *disk.Service:
-		return disk.NewDiskService(db)
+		return disk.NewDiskService(db, dependencies[0].(zfsServiceInterfaces.ZfsServiceInterface))
 	default:
 		return nil
 	}
@@ -59,6 +59,6 @@ func NewServiceRegistry(db *gorm.DB) *ServiceRegistry {
 		StartupService: NewService[startup.Service](db, infoService, zfsService).(*startup.Service),
 		InfoService:    infoService.(infoServiceInterfaces.InfoServiceInterface),
 		ZfsService:     zfsService.(zfsServiceInterfaces.ZfsServiceInterface),
-		DiskService:    NewService[disk.Service](db).(*disk.Service),
+		DiskService:    NewService[disk.Service](db, zfsService).(*disk.Service),
 	}
 }

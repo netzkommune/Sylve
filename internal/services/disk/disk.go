@@ -13,6 +13,7 @@ import (
 	"os"
 	"strings"
 	diskServiceInterfaces "sylve/internal/interfaces/services/disk"
+	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
 	"sylve/internal/logger"
 	diskUtils "sylve/pkg/disk"
 	"sylve/pkg/utils"
@@ -28,11 +29,13 @@ var _ diskServiceInterfaces.DiskServiceInterface = (*Service)(nil)
 type Service struct {
 	DB                 *gorm.DB
 	DiskOperationMutex sync.Mutex
+	ZFS                zfsServiceInterfaces.ZfsServiceInterface
 }
 
-func NewDiskService(db *gorm.DB) diskServiceInterfaces.DiskServiceInterface {
+func NewDiskService(db *gorm.DB, zfsService zfsServiceInterfaces.ZfsServiceInterface) diskServiceInterfaces.DiskServiceInterface {
 	return &Service{
-		DB: db,
+		DB:  db,
+		ZFS: zfsService,
 	}
 }
 
@@ -205,7 +208,27 @@ func (s *Service) GetDiskDevices() ([]diskServiceInterfaces.Disk, error) {
 		}
 
 		if len(disk.Partitions) == 0 {
-			disk.Usage = "Unused"
+			found := false
+			pools, err := s.ZFS.GetPools()
+
+			if err == nil {
+				for _, pool := range pools {
+					for _, vdev := range pool.Vdevs {
+						if vdev.Name == "/dev/"+d.Name {
+							disk.Usage = "ZFS Vdev"
+							found = true
+							break
+						}
+					}
+					if found {
+						break
+					}
+				}
+			}
+
+			if !found {
+				disk.Usage = "Unused"
+			}
 		} else {
 			disk.Usage = "Partitions"
 		}

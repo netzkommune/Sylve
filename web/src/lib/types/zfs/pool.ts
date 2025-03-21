@@ -12,6 +12,19 @@ export const IODelayHistoricalSchema = z.array(
 	})
 );
 
+export const RWSchema = z.object({
+	read: z.number(),
+	write: z.number()
+});
+
+export const VdevSchema = z.object({
+	name: z.string(),
+	alloc: z.number(),
+	free: z.number(),
+	operations: RWSchema,
+	bandwidth: RWSchema
+});
+
 export const ZpoolSchema = z.object({
 	name: z.string(),
 	health: z.string(),
@@ -21,7 +34,8 @@ export const ZpoolSchema = z.object({
 	readOnly: z.boolean(),
 	freeing: z.number(),
 	leaked: z.number(),
-	dedupRatio: z.number()
+	dedupRatio: z.number(),
+	vdevs: z.array(VdevSchema)
 });
 
 export type IODelay = z.infer<typeof IODelaySchema>;

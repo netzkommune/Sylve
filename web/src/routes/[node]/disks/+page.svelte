@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { invalidate, invalidateAll } from '$app/navigation';
 	import { destroyDisk, destroyPartition, initializeGPT, listDisks } from '$lib/api/disk/disk';
+	import { getPools } from '$lib/api/zfs/pool';
 	import AlertDialog from '$lib/components/custom/AlertDialog.svelte';
 	import KvTableModal from '$lib/components/custom/KVTableModal.svelte';
 	import CreatePartition from '$lib/components/disk/CreatePartition.svelte';
@@ -8,19 +8,21 @@
 	import * as ContextMenu from '$lib/components/ui/context-menu';
 	import { localStore } from '$lib/stores/localStore.svelte';
 	import { type Disk, type Partition } from '$lib/types/disk/disk';
-	import { diskSpaceAvailable, parseSMART, simplifyDisks } from '$lib/utils/disk';
+	import type { Zpool } from '$lib/types/zfs/pool';
+	import { diskSpaceAvailable, getGPTLabel, parseSMART, simplifyDisks } from '$lib/utils/disk';
 	import { handleAPIError } from '$lib/utils/http';
 	import { getTranslation } from '$lib/utils/i18n';
 	import { capitalizeFirstLetter } from '$lib/utils/string';
-	import Icon, { disableCache } from '@iconify/svelte';
+	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
 	import { TableHandler } from '@vincjo/datatables';
 	import humanFormat from 'human-format';
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import toast from 'svelte-french-toast';
 
 	interface Data {
 		disks: Disk[];
+		pools: Zpool[];
 	}
 
 	type ExpandedRows = Record<number, boolean>;
@@ -36,15 +38,33 @@
 			refetchInterval: 1000,
 			keepPreviousData: true,
 			initialData: data.disks
+		},
+		{
+			queryKey: ['poolList'],
+			queryFn: async () => {
+				return await getPools();
+			},
+			refetchInterval: 1000,
+			keepPreviousData: true,
+			initialData: data.pools
 		}
 	]);
 
 	const table = new TableHandler(data.disks);
 
 	let disks = $derived($results[0].data as Disk[]);
+	let pools = $results[1].data as Zpool[];
 
 	$effect(() => {
 		table.setRows($results[0].data as Disk[]);
+	});
+
+	onMount(() => {
+		if (disks.length) {
+			disks.forEach((_, index) => {
+				expandedRows[index] = true;
+			});
+		}
 	});
 
 	let sortHandlers: Record<string, any> = {};
@@ -138,14 +158,6 @@
 		});
 	});
 
-	onMount(() => {
-		if (disks.length) {
-			disks.forEach((_, index) => {
-				expandedRows[index] = true;
-			});
-		}
-	});
-
 	async function diskAction(action: string) {
 		if (action === 'smart') {
 			if (activeDisk) {
@@ -229,54 +241,166 @@
 			}
 		}
 	}
+
+	let buttonAbilities = $state({
+		smart: {
+			ability: false,
+			reason: ''
+		},
+		gpt: {
+			ability: false,
+			reason: ''
+		},
+		wipe: {
+			ability: false,
+			reason: ''
+		},
+		createPartition: {
+			ability: false,
+			reason: ''
+		}
+	});
+
+	$effect(() => {
+		if (activeDisk) {
+			untrack(() => {
+				buttonAbilities.smart.ability = activeDisk['S.M.A.R.T.'] !== null;
+
+				if (!buttonAbilities.smart.ability) {
+					buttonAbilities.smart.reason = getTranslation(
+						'disk.no_smart_data',
+						'No S.M.A.R.T data available'
+					);
+				}
+
+				buttonAbilities.gpt.ability = !activeDisk.GPT;
+				if (!buttonAbilities.gpt.ability) {
+					buttonAbilities.gpt.reason = getTranslation(
+						'disk.gpt_already_initialized',
+						'GPT already initialized'
+					);
+				}
+
+				if (activeDisk.Usage === 'ZFS Vdev') {
+					buttonAbilities.gpt.ability = false;
+					buttonAbilities.gpt.reason = getTranslation(
+						'disk.zfs_vdev',
+						'ZFS Vdev does not require GPT'
+					);
+				}
+
+				if (activeDisk.Usage === 'ZFS Vdev' || activeDisk.Usage === 'Unused') {
+					buttonAbilities.wipe.ability = false;
+					if (activeDisk.Usage === 'ZFS Vdev') {
+						buttonAbilities.wipe.reason = getTranslation(
+							'disk.zfs_vdev',
+							'ZFS Vdev cannot be wiped'
+						);
+					} else if (activeDisk.Usage === 'Unused' && activeDisk.GPT) {
+						buttonAbilities.wipe.ability = true;
+					} else if (activeDisk.Usage === 'Unused' && !activeDisk.GPT) {
+						buttonAbilities.wipe.reason = getTranslation('disk.no_gpt', 'GPT not initialized');
+					}
+				} else {
+					buttonAbilities.wipe.ability = true;
+				}
+
+				buttonAbilities.createPartition.ability =
+					activeDisk.GPT &&
+					diskSpaceAvailable(activeDisk, 128 * 1024 * 1024) &&
+					activeDisk.Usage !== 'ZFS Vdev';
+
+				if (!buttonAbilities.createPartition.ability) {
+					if (activeDisk.Usage === 'ZFS Vdev') {
+						buttonAbilities.createPartition.reason = getTranslation(
+							'disk.zfs_vdev',
+							'ZFS Vdev cannot be partitioned'
+						);
+					} else if (!diskSpaceAvailable(activeDisk, 128 * 1024 * 1024)) {
+						buttonAbilities.createPartition.reason = getTranslation(
+							'disk.no_space',
+							'No space available for partitioning'
+						);
+					} else if (!activeDisk.GPT) {
+						buttonAbilities.createPartition.reason = getTranslation(
+							'disk.no_gpt',
+							'GPT not initialized'
+						);
+					}
+				}
+			});
+		} else if (activePartition) {
+			untrack(() => {
+				buttonAbilities.gpt.ability = false;
+				buttonAbilities.wipe.ability = true;
+				buttonAbilities.createPartition.ability = false;
+				buttonAbilities.smart.ability = false;
+			});
+		} else {
+			untrack(() => {
+				buttonAbilities.gpt.ability = false;
+				buttonAbilities.wipe.ability = false;
+				buttonAbilities.createPartition.ability = false;
+				buttonAbilities.smart.ability = false;
+			});
+		}
+	});
 </script>
 
 <div class="flex h-full flex-col overflow-hidden">
 	<div class="inline-flex w-full gap-2 border-b px-3 py-2">
 		<Button
 			size="sm"
-			class="h-8 bg-neutral-600 text-white hover:bg-neutral-700"
-			disabled={activeDisk === null || activeDisk['S.M.A.R.T.'] === null}
+			class="h-8 bg-neutral-600 text-white hover:bg-neutral-700 disabled:!pointer-events-auto disabled:hover:bg-neutral-600"
+			disabled={!buttonAbilities.smart.ability}
 			onclick={() => diskAction('smart')}
 		>
 			Show S.M.A.R.T values
 		</Button>
 		<Button
 			size="sm"
-			class="h-8 bg-neutral-600 text-white hover:bg-neutral-700"
-			disabled={activeDisk === null ||
-				!(activeDisk && activeDisk.Partitions.length < 1) ||
-				(activeDisk && activeDisk.GPT)}
+			class="h-8 bg-neutral-600 text-white hover:bg-neutral-700 disabled:!pointer-events-auto disabled:hover:bg-neutral-600"
+			title={buttonAbilities.gpt.reason}
+			disabled={!buttonAbilities.gpt.ability}
 			onclick={() => diskAction('gpt')}
 		>
 			Initialize Disk with GPT
 		</Button>
-		<Button
-			size="sm"
-			class="h-8 bg-neutral-600 text-white hover:bg-neutral-700"
-			disabled={(activeDisk === null || activeDisk.Usage === 'Unused') && activePartition === null}
-			onclick={() => diskAction('wipe')}
-		>
-			{activeDisk === null ? 'Delete' : 'Wipe'}
-			{activePartition !== null ? 'Partition' : activeDisk !== null ? 'Disk' : ''}
-		</Button>
-		<div
-			title={generateTitle('create-partition', activeDisk, activePartition)}
-			class="inline-block"
-		>
+
+		{#if activeDisk}
 			<Button
 				size="sm"
-				class="{activeDisk === null
-					? 'hidden'
-					: ''} h-8 bg-neutral-600 text-white hover:bg-neutral-700"
-				onclick={() => diskAction('partition')}
-				disabled={activeDisk === null ||
-					activeDisk.GPT === false ||
-					!diskSpaceAvailable(activeDisk, 128 * 1024 * 1024)}
+				class="h-8 bg-neutral-600 text-white hover:bg-neutral-700 disabled:!pointer-events-auto disabled:hover:bg-neutral-600"
+				title={buttonAbilities.wipe.reason}
+				disabled={!buttonAbilities.wipe.ability}
+				onclick={() => diskAction('wipe')}
 			>
-				Create Partition
+				Wipe Disk
 			</Button>
-		</div>
+		{/if}
+
+		{#if activePartition}
+			<Button
+				size="sm"
+				class="h-8 bg-neutral-600 text-white hover:bg-neutral-700"
+				disabled={!buttonAbilities.wipe.ability}
+				onclick={() => diskAction('wipe')}
+			>
+				Delete Partition
+			</Button>
+		{/if}
+
+		<Button
+			size="sm"
+			class="{activeDisk === null
+				? 'hidden'
+				: ''} h-8 bg-neutral-600 text-white hover:bg-neutral-700 disabled:!pointer-events-auto disabled:hover:bg-neutral-600"
+			title={buttonAbilities.createPartition.reason}
+			onclick={() => diskAction('partition')}
+			disabled={!buttonAbilities.createPartition.ability}
+		>
+			Create Partition
+		</Button>
 	</div>
 
 	<KvTableModal
@@ -377,7 +501,9 @@
 												</div>
 											</td>
 										{:else if key === 'GPT'}
-											<td class="whitespace-nowrap px-3 py-1.5">{row.GPT ? 'Yes' : 'No'}</td>
+											<td class="whitespace-nowrap px-3 py-1.5">
+												{getGPTLabel(disks.filter((d) => d.Device === row.Device)[0], pools)}
+											</td>
 										{:else if key === 'Size'}
 											<td class="whitespace-nowrap px-3 py-1.5">{humanFormat(row.Size)}</td>
 										{:else}

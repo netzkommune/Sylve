@@ -82,7 +82,7 @@ func AvgIODelayHistorical(zfsSerice *zfs.Service) gin.HandlerFunc {
 // @Security BearerAuth
 // @Success 200 {object} internal.APIResponse[[]zfsServiceInterfaces.Zpool] "Success"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
-// @Router /zfs/pools [get]
+// @Router /zfs/pool/list [get]
 func GetPools(zfsSerice *zfs.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		pools, err := zfsSerice.GetPools()

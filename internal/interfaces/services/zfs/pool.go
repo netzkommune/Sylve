@@ -8,6 +8,19 @@
 
 package zfsServiceInterfaces
 
+type RW struct {
+	Read  uint64 `json:"read"`
+	Write uint64 `json:"write"`
+}
+
+type Vdev struct {
+	Name       string `json:"name"`
+	Alloc      uint64 `json:"alloc"`
+	Free       uint64 `json:"free"`
+	Operations RW     `json:"operations"`
+	Bandwidth  RW     `json:"bandwidth"`
+}
+
 type Zpool struct {
 	Name       string  `json:"name"`
 	Health     string  `json:"health"`
@@ -18,4 +31,5 @@ type Zpool struct {
 	Freeing    uint64  `json:"freeing"`
 	Leaked     uint64  `json:"leaked"`
 	DedupRatio float64 `json:"dedupRatio"`
+	Vdevs      []Vdev  `json:"vdevs"`
 }

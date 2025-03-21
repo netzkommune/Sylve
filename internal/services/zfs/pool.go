@@ -30,12 +30,17 @@ func (s *Service) GetPoolNames() ([]string, error) {
 }
 
 func (s *Service) GetPool(name string) (zfsServiceInterfaces.Zpool, error) {
-	output, err := utils.RunCommand("zpool", "list", "-H", "-p", "-o", "name,health,alloc,size,free,readonly,freeing,leaked,dedupratio", name)
+	pools, err := utils.RunCommand("zpool", "list", "-H", "-p", "-o", "name,health,alloc,size,free,readonly,freeing,leaked,dedupratio", name)
 	if err != nil {
 		return zfsServiceInterfaces.Zpool{}, err
 	}
 
-	zpool, err := utils.ParseZpoolListOutput(output)
+	vdevs, err := utils.RunCommand("zpool", "iostat", "-v", "-H", "-P", "-p", name)
+	if err != nil {
+		return zfsServiceInterfaces.Zpool{}, err
+	}
+
+	zpool, err := utils.ParseZpoolListOutput(pools, vdevs)
 
 	return *zpool, err
 }

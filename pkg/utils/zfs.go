@@ -13,17 +13,19 @@ import (
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
 )
 
-func ParseZpoolListOutput(output string) (*zfsServiceInterfaces.Zpool, error) {
-	lines := strings.Split(strings.TrimSpace(output), "\n")
+func ParseZpoolListOutput(pools string, vdevs string) (*zfsServiceInterfaces.Zpool, error) {
+	poolSlice := strings.Split(strings.TrimSpace(pools), "\n")
+	vdevSlice := strings.Split(strings.TrimSpace(vdevs), "\n")
+
 	zpool := &zfsServiceInterfaces.Zpool{}
 
-	for _, line := range lines {
-		if line == "" {
+	for _, pool := range poolSlice {
+		if pool == "" {
 			continue
 		}
 
-		parts := strings.Fields(line)
-		if len(parts) < 7 {
+		parts := strings.Fields(pool)
+		if len(parts) < 9 {
 			continue
 		}
 
@@ -36,6 +38,30 @@ func ParseZpoolListOutput(output string) (*zfsServiceInterfaces.Zpool, error) {
 		zpool.Freeing = StringToUint64(parts[6])
 		zpool.Leaked = StringToUint64(parts[7])
 		zpool.DedupRatio = StringToFloat64(parts[8])
+
+		for _, vdev := range vdevSlice {
+			if strings.HasPrefix(vdev, zpool.Name) {
+				continue
+			}
+
+			vdevParts := strings.Fields(vdev)
+
+			if len(vdevParts) < 7 {
+				continue
+			}
+
+			vdev := zfsServiceInterfaces.Vdev{}
+
+			vdev.Name = vdevParts[0]
+			vdev.Alloc = StringToUint64(vdevParts[1])
+			vdev.Free = StringToUint64(vdevParts[2])
+			vdev.Operations.Read = StringToUint64(vdevParts[3])
+			vdev.Operations.Write = StringToUint64(vdevParts[4])
+			vdev.Bandwidth.Read = StringToUint64(vdevParts[5])
+			vdev.Bandwidth.Write = StringToUint64(vdevParts[6])
+
+			zpool.Vdevs = append(zpool.Vdevs, vdev)
+		}
 	}
 
 	return zpool, nil

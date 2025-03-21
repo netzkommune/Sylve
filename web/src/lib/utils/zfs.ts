@@ -9,6 +9,7 @@
  */
 
 import { getPools } from '$lib/api/zfs/pool';
+import type { Zpool } from '$lib/types/zfs/pool';
 
 export async function getTotalDiskUsage(): Promise<number> {
 	try {
@@ -24,4 +25,20 @@ export async function getTotalDiskUsage(): Promise<number> {
 	} catch (e) {
 		return 0.0;
 	}
+}
+
+export function isDeviceVdev(device: string, pools: Zpool[]): boolean {
+	if (pools.length === 0) {
+		return false;
+	}
+
+	for (const pool of pools) {
+		for (const vdev of pool.vdevs) {
+			if (vdev.name === device || vdev.name === `/dev/${device}`) {
+				return true;
+			}
+		}
+	}
+
+	return false;
 }

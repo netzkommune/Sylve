@@ -22,6 +22,17 @@ type AvgIODelayResponse struct {
 	Delay float64 `json:"delay"`
 }
 
+type CreatePoolRequest struct {
+	Name    string            `json:"name" binding:"required,min=3,max=128"`
+	Vdevs   []string          `json:"vdevs" binding:"required"`
+	Raid    string            `json:"raid"`
+	Options map[string]string `json:"options" binding:"required"`
+}
+
+type DeletePoolRequest struct {
+	Name string `json:"name"`
+}
+
 // @Summary Get Average IO Delay
 // @Description Get the average IO delay of all pools
 // @Tags ZFS
@@ -82,7 +93,7 @@ func AvgIODelayHistorical(zfsSerice *zfs.Service) gin.HandlerFunc {
 // @Security BearerAuth
 // @Success 200 {object} internal.APIResponse[[]zfsServiceInterfaces.Zpool] "Success"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
-// @Router /zfs/pool/list [get]
+// @Router /zfs/pools [get]
 func GetPools(zfsSerice *zfs.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		pools, err := zfsSerice.GetPools()
@@ -101,6 +112,92 @@ func GetPools(zfsSerice *zfs.Service) gin.HandlerFunc {
 			Message: "pools",
 			Error:   "",
 			Data:    pools,
+		})
+	}
+}
+
+// @Summary Create Pool
+// @Description Create a new ZFS pool
+// @Tags ZFS
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body CreatePoolRequest true "Request"
+// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /zfs/pools [post]
+func CreatePool(zfsSerice *zfs.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var request CreatePoolRequest
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		err := zfsSerice.CreatePool(request.Name, request.Vdevs, request.Raid, request.Options)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "pool_create_failed",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "pool_created",
+			Error:   "",
+			Data:    nil,
+		})
+	}
+}
+
+// @Summary Delete Pool
+// @Description Delete a ZFS pool
+// @Tags ZFS
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body DeletePoolRequest true "Request"
+// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /zfs/pools/{name} [delete]
+func DeletePool(zfsSerice *zfs.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var request DeletePoolRequest
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		err := zfsSerice.DestroyPool(request.Name)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "pool_delete_failed",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "pool_deleted",
+			Error:   "",
+			Data:    nil,
 		})
 	}
 }

@@ -9,12 +9,14 @@
 package zfs
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"sylve/internal/db"
 	infoModels "sylve/internal/db/models/info"
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
 	"sylve/internal/logger"
+	diskUtils "sylve/pkg/disk"
 	"sylve/pkg/utils"
 )
 
@@ -181,4 +183,79 @@ func (s *Service) GetTotalIODelayHisorical() ([]infoModels.IODelay, error) {
 	}
 
 	return historicalData, nil
+}
+
+func (s *Service) CreatePool(poolName string, vdevs []string, raidType string, options map[string]string) error {
+	if poolName == "" {
+		return fmt.Errorf("no pool name specified")
+	}
+
+	if len(vdevs) == 0 {
+		return fmt.Errorf("no vdevs specified")
+	}
+
+	pools, err := s.GetPools()
+
+	if err != nil {
+		return fmt.Errorf("error getting existing pools: %v", err)
+	}
+
+	for _, pool := range pools {
+		if pool.Name == poolName {
+			return fmt.Errorf("pool %s already exists", poolName)
+		}
+
+		for _, vdev := range pool.Vdevs {
+			for _, newVdev := range vdevs {
+				if vdev.Name == newVdev {
+					return fmt.Errorf("vdev %s already in use by pool %s", newVdev, pool.Name)
+				}
+			}
+		}
+	}
+
+	var args []string
+
+	for k, v := range options {
+		args = append(args, "-O", fmt.Sprintf("%s=%s", k, v))
+	}
+
+	args = append(args, "-f")
+	args = append(args, poolName)
+
+	if raidType != "" {
+		args = append(args, raidType)
+	}
+
+	args = append(args, vdevs...)
+
+	_, err = utils.RunCommand("zpool", append([]string{"create"}, args...)...)
+	if err != nil {
+		return fmt.Errorf("failed to create pool: %w", err)
+	}
+
+	return nil
+}
+
+func (s *Service) DestroyPool(poolName string) error {
+	pool, err := s.GetPool(poolName)
+
+	if err != nil {
+		return fmt.Errorf("error getting pool: %v", err)
+	}
+
+	_, err = utils.RunCommand("zpool", "destroy", "-f", pool.Name)
+
+	if err != nil {
+		return err
+	}
+
+	for _, vdev := range pool.Vdevs {
+		err = diskUtils.DestroyDisk(vdev.Name)
+		if err != nil {
+			return fmt.Errorf("error destroying disk %s: %v", vdev.Name, err)
+		}
+	}
+
+	return nil
 }

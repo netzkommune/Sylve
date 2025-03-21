@@ -28,5 +28,19 @@ export async function getIODelay(
 }
 
 export async function getPools(): Promise<Zpool[]> {
-	return await apiRequest('/zfs/pool/list', ZpoolSchema.array(), 'GET');
+	return await apiRequest('/zfs/pools', ZpoolSchema.array(), 'GET');
+}
+
+export async function createPool(
+	name: string,
+	vdevs: string[],
+	raid: string,
+	options: Record<string, string>
+) {
+	return await apiRequest('/zfs/pool', APIResponseSchema, 'POST', {
+		name,
+		vdevs,
+		raid,
+		options
+	});
 }

@@ -51,7 +51,7 @@ func AvgIODelay(zfsSerice *zfs.Service) gin.HandlerFunc {
 // @Security BearerAuth
 // @Success 200 {object} internal.APIResponse[[]infoModels.IODelay] "Success"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
-// @Router /zfs/avg-io-delay-historical [get]
+// @Router /zfs/pool/io-delay/historical [get]
 func AvgIODelayHistorical(zfsSerice *zfs.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		info, err := zfsSerice.GetTotalIODelayHisorical()

@@ -12,6 +12,7 @@ import (
 	"sylve/internal/db"
 	infoModels "sylve/internal/db/models/info"
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
+	"sylve/pkg/zfs"
 	"time"
 
 	"gorm.io/gorm"
@@ -30,7 +31,7 @@ func NewZfsService(db *gorm.DB) zfsServiceInterfaces.ZfsServiceInterface {
 }
 
 func (s *Service) StoreStats() {
-	d := s.GetTotalIODelay()
+	d := zfs.GetTotalIODelay()
 	db.StoreAndTrimRecords(s.DB, &infoModels.IODelay{Delay: d}, 128)
 }
 

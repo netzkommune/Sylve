@@ -90,8 +90,8 @@ func RegisterRoutes(r *gin.Engine,
 		pools := zfs.Group("/pools")
 		{
 			pools.GET("", zfsHandlers.GetPools(zfsService))
-			pools.POST("", zfsHandlers.GetPools(zfsService))
-			pools.DELETE("/:name", zfsHandlers.GetPools(zfsService))
+			pools.POST("", zfsHandlers.CreatePool(zfsService))
+			pools.DELETE("/:name", zfsHandlers.DeletePool(zfsService))
 		}
 
 		zfs.GET("/pool/io-delay", zfsHandlers.AvgIODelay(zfsService))

@@ -58,6 +58,7 @@
 		"@layerstack/svelte-stores": "^1.0.0",
 		"@svelte-put/shortcut": "^4.1.0",
 		"@sveltestack/svelte-query": "^1.6.0",
+		"@thisux/sveltednd": "^0.0.20",
 		"adze": "^2.2.1",
 		"axios": "^1.8.2",
 		"d3-array": "^3.2.4",

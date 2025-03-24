@@ -166,8 +166,9 @@
 					smartModal.KV = parseSMART($state.snapshot(activeDisk));
 					smartModal.open = true;
 					smartModal.type = 'kv';
-				} else if (activeDisk.Type === 'HDD') {
+				} else if (activeDisk.Type === 'HDD' || activeDisk.Type === 'SSD') {
 					smartModal.KV = parseSMART($state.snapshot(activeDisk));
+					console.log(smartModal.KV);
 					smartModal.open = true;
 					smartModal.type = 'array';
 				}
@@ -226,22 +227,6 @@
 		visibleColumns.value = Object.fromEntries(keys.map((key) => [key, true]));
 	}
 
-	function generateTitle(t: string, disk?: Disk | null, partition?: Partition | null) {
-		if (t === 'create-partition') {
-			if (disk) {
-				if (disk.GPT) {
-					if (disk.Partitions.length > 0) {
-						const usedSizes = disk.Partitions.map((p) => p.size);
-						const remainingSpace = disk.Size - usedSizes.reduce((a, b) => a + b, 0);
-						if (remainingSpace < 128 * 1024 * 1024) {
-							return 'No space available';
-						}
-					}
-				}
-			}
-		}
-	}
-
 	let buttonAbilities = $state({
 		smart: {
 			ability: false,
@@ -281,7 +266,7 @@
 					);
 				}
 
-				if (activeDisk.Usage === 'ZFS Vdev') {
+				if (activeDisk.Usage === 'ZFS') {
 					buttonAbilities.gpt.ability = false;
 					buttonAbilities.gpt.reason = getTranslation(
 						'disk.zfs_vdev',
@@ -289,9 +274,9 @@
 					);
 				}
 
-				if (activeDisk.Usage === 'ZFS Vdev' || activeDisk.Usage === 'Unused') {
+				if (activeDisk.Usage === 'ZFS' || activeDisk.Usage === 'Unused') {
 					buttonAbilities.wipe.ability = false;
-					if (activeDisk.Usage === 'ZFS Vdev') {
+					if (activeDisk.Usage === 'ZFS') {
 						buttonAbilities.wipe.reason = getTranslation(
 							'disk.zfs_vdev',
 							'ZFS Vdev cannot be wiped'
@@ -308,10 +293,10 @@
 				buttonAbilities.createPartition.ability =
 					activeDisk.GPT &&
 					diskSpaceAvailable(activeDisk, 128 * 1024 * 1024) &&
-					activeDisk.Usage !== 'ZFS Vdev';
+					activeDisk.Usage !== 'ZFS';
 
 				if (!buttonAbilities.createPartition.ability) {
-					if (activeDisk.Usage === 'ZFS Vdev') {
+					if (activeDisk.Usage === 'ZFS') {
 						buttonAbilities.createPartition.reason = getTranslation(
 							'disk.zfs_vdev',
 							'ZFS Vdev cannot be partitioned'

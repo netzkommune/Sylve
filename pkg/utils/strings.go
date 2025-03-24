@@ -76,7 +76,12 @@ func StringInSlice(a string, list []string) bool {
 }
 
 func StringToUint64(s string) uint64 {
-	r, _ := strconv.ParseUint(s, 10, 64)
+	r, error := strconv.ParseUint(s, 10, 64)
+
+	if error != nil {
+		return 0
+	}
+
 	return r
 }
 
@@ -129,4 +134,38 @@ func BytesToSize(toType string, bytes float64) float64 {
 	default:
 		return bytes
 	}
+}
+
+/*
+ * from zfs diff`s escape function:
+ *
+ * Prints a file name out a character at a time.  If the character is
+ * not in the range of what we consider "printable" ASCII, display it
+ * as an escaped 3-digit octal value.  ASCII values less than a space
+ * are all control characters and we declare the upper end as the
+ * DELete character.  This also is the last 7-bit ASCII character.
+ * We choose to treat all 8-bit ASCII as not printable for this
+ * application.
+ */
+func UnescapeFilepath(path string) (string, error) {
+	buf := make([]byte, 0, len(path))
+	llen := len(path)
+	for i := 0; i < llen; {
+		if path[i] == '\\' {
+			if llen < i+4 {
+				return "", fmt.Errorf("invalid octal code: too short")
+			}
+			octalCode := path[(i + 1):(i + 4)]
+			val, err := strconv.ParseUint(octalCode, 8, 8)
+			if err != nil {
+				return "", fmt.Errorf("invalid octal code: %w", err)
+			}
+			buf = append(buf, byte(val))
+			i += 4
+		} else {
+			buf = append(buf, path[i])
+			i++
+		}
+	}
+	return string(buf), nil
 }

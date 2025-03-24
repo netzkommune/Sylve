@@ -37,10 +37,14 @@ export async function createPool(
 	raid: string,
 	options: Record<string, string>
 ) {
-	return await apiRequest('/zfs/pool', APIResponseSchema, 'POST', {
+	return await apiRequest('/zfs/pools', APIResponseSchema, 'POST', {
 		name,
 		vdevs,
 		raid,
 		options
 	});
+}
+
+export async function deletePool(name: string) {
+	return await apiRequest(`/zfs/pools/${name}`, APIResponseSchema, 'DELETE');
 }

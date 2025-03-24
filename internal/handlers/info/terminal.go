@@ -63,11 +63,14 @@ func HandleTerminalWebsocket(c *gin.Context) {
 
 	w := c.Writer
 	r := c.Request
-	conn, err := WSUpgrader.Upgrade(w, r, nil)
+	subprotocols := websocket.Subprotocols(r)
+	conn, err := WSUpgrader.Upgrade(w, r, http.Header{"Sec-WebSocket-Protocol": {subprotocols[0]}})
+
 	if err != nil {
 		logger.L.Error().Msgf("WebSocket upgrade failed: %v", err)
 		return
 	}
+
 	defer conn.Close()
 
 	var wsWriteMu sync.Mutex

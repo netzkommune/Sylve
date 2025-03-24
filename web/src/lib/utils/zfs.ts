@@ -42,3 +42,50 @@ export function isDeviceVdev(device: string, pools: Zpool[]): boolean {
 
 	return false;
 }
+
+export function getHealthHelpers(health: string): { icon: string; color: string; text: string } {
+	switch (health) {
+		case 'ONLINE':
+			return {
+				icon: 'carbon:checkmark-filled',
+				color: 'text-green-600 dark:text-green-500',
+				text: 'Online'
+			};
+		case 'DEGRADED':
+			return {
+				icon: 'carbon:warning-filled',
+				color: 'text-yellow-600 dark:text-yellow-500',
+				text: 'Degraded'
+			};
+		case 'FAULTED':
+			return {
+				icon: 'carbon:close-filled',
+				color: 'text-red-600 dark:text-red-500',
+				text: 'Faulted'
+			};
+		case 'OFFLINE':
+			return {
+				icon: 'material-symbols:offline-pin-off',
+				color: 'text-red-600 dark:text-red-500',
+				text: 'Offline'
+			};
+		case 'UNAVAIL':
+			return {
+				icon: 'carbon:warning-alt-filled',
+				color: 'text-yellow-600 dark:text-yellow-500',
+				text: 'Unavailable'
+			};
+		case 'REMOVED':
+			return {
+				icon: 'carbon:warning-alt-filled',
+				color: 'text-yellow-600 dark:text-yellow-500',
+				text: 'Removed'
+			};
+		default:
+			return {
+				icon: 'carbon:warning-alt-filled',
+				color: 'text-yellow-600 dark:text-yellow-500',
+				text: 'Unknown'
+			};
+	}
+}

@@ -93,7 +93,7 @@
 					buttonClass="h-8 mt-4"
 				/>
 				<CreateDialog
-					title="Create: LXC Container"
+					title="Create: Jail"
 					tabs={ctTabs}
 					icon="ph:cube-fill"
 					buttonText="Create Jail"
@@ -147,7 +147,7 @@
 			/>
 
 			<CreateDialog
-				title="Create: LXC Container"
+				title="Create: Jail"
 				tabs={ctTabs}
 				icon="tabler:prison"
 				buttonText="Create Jail"

@@ -26,44 +26,9 @@
 			href: `/${node}/summary`
 		},
 		{
-			label: 'search',
-			icon: 'mdi:magnify',
-			href: `/${node}/search`
-		},
-		{
 			label: 'notes',
 			icon: 'arcticons:notes',
 			href: `/${node}/notes`
-		},
-		{
-			label: 'certificates',
-			icon: 'mdi:certificate'
-		},
-		{
-			label: 'firewall',
-			icon: 'mdi:firewall',
-			children: [
-				{
-					label: 'Options',
-					icon: 'mdi:phone',
-					href: '/dashboard/telephony'
-				},
-				{
-					label: 'Security Group',
-					icon: 'mdi:phone',
-					href: '/dashboard/telephony'
-				},
-				{
-					label: 'Alias',
-					icon: 'mdi:phone',
-					href: '/dashboard/telephony'
-				},
-				{
-					label: 'IPSet',
-					icon: 'mdi:phone',
-					href: '/dashboard/telephony'
-				}
-			]
 		},
 		{
 			label: 'Storage',

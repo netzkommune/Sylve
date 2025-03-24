@@ -10,27 +10,19 @@ package zfsHandlers
 
 import (
 	"net/http"
+	"strings"
 	"sylve/internal"
 	infoModels "sylve/internal/db/models/info"
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
 	"sylve/internal/services/zfs"
 
 	"github.com/gin-gonic/gin"
+
+	zfsUtils "sylve/pkg/zfs"
 )
 
 type AvgIODelayResponse struct {
 	Delay float64 `json:"delay"`
-}
-
-type CreatePoolRequest struct {
-	Name    string            `json:"name" binding:"required,min=3,max=128"`
-	Vdevs   []string          `json:"vdevs" binding:"required"`
-	Raid    string            `json:"raid"`
-	Options map[string]string `json:"options" binding:"required"`
-}
-
-type DeletePoolRequest struct {
-	Name string `json:"name"`
 }
 
 // @Summary Get Average IO Delay
@@ -44,7 +36,7 @@ type DeletePoolRequest struct {
 // @Router /zfs/avg-io-delay [get]
 func AvgIODelay(zfsSerice *zfs.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		info := zfsSerice.GetTotalIODelay()
+		info := zfsUtils.GetTotalIODelay()
 		c.JSON(http.StatusOK, internal.APIResponse[AvgIODelayResponse]{
 			Status:  "success",
 			Message: "avg_io_delay",
@@ -91,12 +83,12 @@ func AvgIODelayHistorical(zfsSerice *zfs.Service) gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Success 200 {object} internal.APIResponse[[]zfsServiceInterfaces.Zpool] "Success"
+// @Success 200 {object} internal.APIResponse[[]*zfsUtils.Zpool] "Success"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
 // @Router /zfs/pools [get]
 func GetPools(zfsSerice *zfs.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		pools, err := zfsSerice.GetPools()
+		pools, err := zfsUtils.ListZpools()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 				Status:  "error",
@@ -107,7 +99,7 @@ func GetPools(zfsSerice *zfs.Service) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, internal.APIResponse[[]zfsServiceInterfaces.Zpool]{
+		c.JSON(http.StatusOK, internal.APIResponse[[]*zfsUtils.Zpool]{
 			Status:  "success",
 			Message: "pools",
 			Error:   "",
@@ -122,13 +114,13 @@ func GetPools(zfsSerice *zfs.Service) gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param request body CreatePoolRequest true "Request"
+// @Param request body zfsServiceInterfaces.Zpool true "Request"
 // @Success 200 {object} internal.APIResponse[any] "Success"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
 // @Router /zfs/pools [post]
 func CreatePool(zfsSerice *zfs.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var request CreatePoolRequest
+		var request zfsServiceInterfaces.Zpool
 		if err := c.ShouldBindJSON(&request); err != nil {
 			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
 				Status:  "error",
@@ -139,7 +131,7 @@ func CreatePool(zfsSerice *zfs.Service) gin.HandlerFunc {
 			return
 		}
 
-		err := zfsSerice.CreatePool(request.Name, request.Vdevs, request.Raid, request.Options)
+		err := zfsSerice.CreatePool(request)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 				Status:  "error",
@@ -165,25 +157,25 @@ func CreatePool(zfsSerice *zfs.Service) gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param request body DeletePoolRequest true "Request"
 // @Success 200 {object} internal.APIResponse[any] "Success"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
 // @Router /zfs/pools/{name} [delete]
 func DeletePool(zfsSerice *zfs.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var request DeletePoolRequest
-		if err := c.ShouldBindJSON(&request); err != nil {
-			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
-				Status:  "error",
-				Message: "invalid_request",
-				Error:   err.Error(),
-				Data:    nil,
-			})
-			return
-		}
+		name := c.Param("name")
 
-		err := zfsSerice.DestroyPool(request.Name)
+		err := zfsUtils.DestroyPool(name)
 		if err != nil {
+			if strings.HasPrefix(err.Error(), "error_getting_pool") {
+				c.JSON(http.StatusNotFound, internal.APIResponse[any]{
+					Status:  "error",
+					Message: "pool_not_found",
+					Error:   err.Error(),
+					Data:    nil,
+				})
+				return
+			}
+
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 				Status:  "error",
 				Message: "pool_delete_failed",

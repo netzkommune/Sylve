@@ -11,12 +11,8 @@ package zfsServiceInterfaces
 import infoModels "sylve/internal/db/models/info"
 
 type ZfsServiceInterface interface {
-	GetPoolNames() ([]string, error)
-	GetPool(name string) (Zpool, error)
-	GetPools() ([]Zpool, error)
-	GetPoolIODelay(poolName string) float64
-	GetTotalIODelay() float64
 	GetTotalIODelayHisorical() ([]infoModels.IODelay, error)
+	CreatePool(Zpool) error
 
 	Cron()
 }

@@ -17,6 +17,7 @@ import (
 	"sylve/internal/logger"
 	diskUtils "sylve/pkg/disk"
 	"sylve/pkg/utils"
+	"sylve/pkg/zfs"
 	"sync"
 	"syscall"
 
@@ -209,13 +210,13 @@ func (s *Service) GetDiskDevices() ([]diskServiceInterfaces.Disk, error) {
 
 		if len(disk.Partitions) == 0 {
 			found := false
-			pools, err := s.ZFS.GetPools()
+			pools, err := zfs.ListZpools()
 
 			if err == nil {
 				for _, pool := range pools {
 					for _, vdev := range pool.Vdevs {
 						if vdev.Name == "/dev/"+d.Name {
-							disk.Usage = "ZFS Vdev"
+							disk.Usage = "ZFS"
 							found = true
 							break
 						}

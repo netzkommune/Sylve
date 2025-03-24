@@ -76,8 +76,6 @@ func WipeDisk(diskService *disk.Service, infoService *info.Service) gin.HandlerF
 	return func(c *gin.Context) {
 		var r DiskActionRequest
 
-		fmt.Println("WipeDisk")
-
 		if err := c.ShouldBindJSON(&r); err != nil {
 			validationErrors := utils.MapValidationErrors(err, DiskActionRequest{})
 
@@ -92,8 +90,6 @@ func WipeDisk(diskService *disk.Service, infoService *info.Service) gin.HandlerF
 
 		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("wipe_disk|-|%s", r.Device), "started")
 		err := diskUtils.DestroyDisk(r.Device)
-
-		fmt.Println("WipeDisk", r.Device, id)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{

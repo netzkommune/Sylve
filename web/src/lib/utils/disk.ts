@@ -80,7 +80,7 @@ export function parseSMART(disk: Disk): SmartAttribute | SmartAttribute[] {
 			'Unsafe Shutdowns': (disk.SmartData as SmartNVME).unsafeShutdowns,
 			'Warning Composite Temp Time': (disk.SmartData as SmartNVME).warningCompositeTempTime
 		};
-	} else if (disk.Type === 'HDD') {
+	} else if (disk.Type === 'HDD' || disk.Type === 'SSD') {
 		const data = disk.SmartData as SmartCtl;
 		const attributes: SmartAttribute[] = [];
 

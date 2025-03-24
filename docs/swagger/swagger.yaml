@@ -51,6 +51,19 @@ definitions:
       delay:
         type: number
     type: object
+  internal_handlers_zfs.ZpoolListResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_pkg_zfs.Zpool'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
   sylve_internal.APIResponse-any:
     properties:
       data: {}
@@ -118,19 +131,6 @@ definitions:
       data:
         items:
           $ref: '#/definitions/sylve_internal_interfaces_services_disk.Disk'
-        type: array
-      error:
-        type: string
-      message:
-        type: string
-      status:
-        type: string
-    type: object
-  sylve_internal.APIResponse-array_sylve_internal_interfaces_services_zfs_Zpool:
-    properties:
-      data:
-        items:
-          $ref: '#/definitions/sylve_internal_interfaces_services_zfs.Zpool'
         type: array
       error:
         type: string
@@ -363,12 +363,78 @@ definitions:
       usedPercent:
         type: number
     type: object
+  sylve_internal_interfaces_services_zfs.Vdev:
+    properties:
+      devices:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+    type: object
   sylve_internal_interfaces_services_zfs.Zpool:
+    properties:
+      name:
+        maxLength: 24
+        minLength: 1
+        type: string
+      properties:
+        additionalProperties:
+          type: string
+        type: object
+      raidType:
+        enum:
+        - mirror
+        - raidz
+        - raidz2
+        - raidz3
+        type: string
+      vdevs:
+        items:
+          $ref: '#/definitions/sylve_internal_interfaces_services_zfs.Vdev'
+        type: array
+    required:
+    - name
+    type: object
+  sylve_pkg_zfs.RW:
+    properties:
+      read:
+        type: integer
+      write:
+        type: integer
+    type: object
+  sylve_pkg_zfs.Vdev:
+    properties:
+      alloc:
+        type: integer
+      bandwidth:
+        $ref: '#/definitions/sylve_pkg_zfs.RW'
+      devices:
+        items:
+          $ref: '#/definitions/sylve_pkg_zfs.VdevDevice'
+        type: array
+      free:
+        type: integer
+      name:
+        type: string
+      operations:
+        $ref: '#/definitions/sylve_pkg_zfs.RW'
+    type: object
+  sylve_pkg_zfs.VdevDevice:
+    properties:
+      name:
+        type: string
+      size:
+        type: integer
+    type: object
+  sylve_pkg_zfs.Zpool:
     properties:
       allocated:
         type: integer
       dedupRatio:
         type: number
+      fragmentation:
+        type: integer
       free:
         type: integer
       freeing:
@@ -383,6 +449,10 @@ definitions:
         type: boolean
       size:
         type: integer
+      vdevs:
+        items:
+          $ref: '#/definitions/sylve_pkg_zfs.Vdev'
+        type: array
     type: object
 host: sylve.lan:8181
 info:
@@ -484,6 +554,34 @@ paths:
       security:
       - BearerAuth: []
       summary: Create partition
+      tags:
+      - Disk
+  /disk/delete-partition:
+    post:
+      consumes:
+      - application/json
+      description: Delete a partition on a disk device
+      parameters:
+      - description: Delete partition request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_disk.DiskActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Delete partition
       tags:
       - Disk
   /disk/initialize-gpt:
@@ -800,7 +898,7 @@ paths:
       summary: Get Swap Info
       tags:
       - Info
-  /zfs/avg-io-delay:
+  /zfs/pool/avg-io-delay:
     get:
       consumes:
       - application/json
@@ -821,7 +919,7 @@ paths:
       summary: Get Average IO Delay
       tags:
       - ZFS
-  /zfs/avg-io-delay-historical:
+  /zfs/pool/io-delay/historical:
     get:
       consumes:
       - application/json
@@ -853,7 +951,7 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_internal_interfaces_services_zfs_Zpool'
+            $ref: '#/definitions/internal_handlers_zfs.ZpoolListResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -861,6 +959,60 @@ paths:
       security:
       - BearerAuth: []
       summary: Get Pools
+      tags:
+      - ZFS
+    post:
+      consumes:
+      - application/json
+      description: Create a new ZFS pool
+      parameters:
+      - description: Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/sylve_internal_interfaces_services_zfs.Zpool'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Create Pool
+      tags:
+      - ZFS
+  /zfs/pools/{name}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a ZFS pool
+      parameters:
+      - description: Pool Name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Delete Pool
       tags:
       - ZFS
 securityDefinitions:

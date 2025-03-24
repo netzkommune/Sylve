@@ -7,6 +7,7 @@
 	import { openTerminal, terminalStore } from '$lib/stores/terminal.svelte';
 	import Icon from '@iconify/svelte';
 	import { mode, toggleMode } from 'mode-watcher';
+	import { onMount } from 'svelte';
 	import CreateDialog from './CreateDialog.svelte';
 
 	const vmTabs = [
@@ -124,11 +125,11 @@
 				onclick={() => openTerminal()}
 			>
 				<Icon icon="garden:terminal-cli-stroke-16" class="h-5 w-5" />
-				{#if terminalStore.value.tabs.length > 0}
+				{#if $terminalStore.tabs.length > 0}
 					<span
 						class="absolute -right-1 -top-1 flex h-4 min-w-[8px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white"
 					>
-						{terminalStore.value.tabs.length}
+						{$terminalStore.tabs.length}
 					</span>
 				{/if}
 			</Button>

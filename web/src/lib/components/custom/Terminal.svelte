@@ -12,7 +12,7 @@
 	import Icon from '@iconify/svelte';
 	import adze from 'adze';
 	import { nanoid } from 'nanoid';
-	import { untrack } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import { fade, scale } from 'svelte/transition';
 
 	let terminal = $state<Terminal>();
@@ -23,11 +23,11 @@
 	};
 
 	let tabsCount = $derived.by(() => {
-		return terminalStore.value.tabs.length;
+		return $terminalStore.tabs.length;
 	});
 
 	let currentTab = $derived.by(() => {
-		return terminalStore.value.tabs.find((tab) => tab.id === terminalStore.value.activeTabId);
+		return $terminalStore.tabs.find((tab) => tab.id === $terminalStore.activeTabId);
 	});
 
 	async function killSession(sessionId: string): Promise<boolean> {
@@ -38,9 +38,13 @@
 			}
 
 			const onMessage = (event: MessageEvent) => {
-				if (event.data.includes(`Session killed: ${sessionId}`)) {
-					ws?.removeEventListener('message', onMessage);
-					resolve(true);
+				if (event.data) {
+					if (typeof event.data === 'string') {
+						if (event.data.includes(`Session killed: ${sessionId}`)) {
+							ws?.removeEventListener('message', onMessage);
+							resolve(true);
+						}
+					}
 				}
 			};
 
@@ -70,6 +74,7 @@
 			ws = new WebSocket(`/api/info/terminal?id=${currentTab?.id}`, ['Bearer', $store]);
 			ws.binaryType = 'arraybuffer';
 			ws.onopen = () => {
+				if (!currentTab) return;
 				adze.info(`Terminal WebSocket connected for tab ${currentTab?.id}`);
 				if (terminal) {
 					const dimensions = fitAddon.proposeDimensions();
@@ -92,6 +97,7 @@
 			};
 
 			ws.onclose = () => {
+				if (!currentTab) return;
 				adze.info(`Terminal WebSocket disconnected for tab ${currentTab?.id}`);
 				if (terminal) {
 					terminal.write('\x1b[31mDisconnected from server.\x1b[0m\r\n');
@@ -108,18 +114,18 @@
 
 	async function visiblityAction(t: string, e?: MouseEvent | string) {
 		if (t === 'window-minimize') {
-			terminalStore.value.isMinimized = true;
+			$terminalStore.isMinimized = true;
 			return;
 		}
 
 		if (t === 'window-close') {
-			const tabsToKill = [...terminalStore.value.tabs];
+			const tabsToKill = [...$terminalStore.tabs];
 			for (const tab of tabsToKill) {
 				await killSession(tab.id);
 			}
 
-			terminalStore.value.tabs = [];
-			terminalStore.value.isOpen = false;
+			$terminalStore.tabs = [];
+			$terminalStore.isOpen = false;
 			ws?.close();
 		}
 
@@ -132,9 +138,9 @@
 					const tabId = parent.getAttribute('data-id');
 					if (tabId) {
 						await killSession(tabId);
-						terminalStore.value.tabs = terminalStore.value.tabs.filter((tab) => tab.id !== tabId);
-						if (terminalStore.value.tabs.length > 0) {
-							terminalStore.value.activeTabId = terminalStore.value.tabs[0].id;
+						$terminalStore.tabs = $terminalStore.tabs.filter((tab) => tab.id !== tabId);
+						if ($terminalStore.tabs.length > 0) {
+							$terminalStore.activeTabId = $terminalStore.tabs[0].id;
 						}
 					}
 				}
@@ -143,7 +149,7 @@
 
 		if (t === 'tab-select') {
 			const tabId = e as string;
-			terminalStore.value.activeTabId = tabId;
+			$terminalStore.activeTabId = tabId;
 		}
 	}
 
@@ -153,8 +159,8 @@
 			title: getDefaultTitle()
 		};
 
-		terminalStore.value.tabs = [...terminalStore.value.tabs, newTab];
-		terminalStore.value.activeTabId = newTab.id;
+		$terminalStore.tabs = [...$terminalStore.tabs, newTab];
+		$terminalStore.activeTabId = newTab.id;
 	}
 
 	let innerWidth = $state(0);
@@ -176,7 +182,7 @@
 
 <svelte:window bind:innerWidth />
 
-{#if terminalStore.value.isOpen && !terminalStore.value.isMinimized}
+{#if $terminalStore.isOpen && !$terminalStore.isMinimized}
 	<div
 		class="fixed inset-0 z-[9998] bg-black/30 backdrop-blur-sm transition-all duration-150"
 	></div>
@@ -186,12 +192,12 @@
 		out:scale={{ start: 0.9, duration: 150 }}
 	>
 		<div
-			class="relative flex w-[60%] flex-col rounded-lg border-4 border-muted bg-muted-foreground/10"
+			class="border-muted bg-muted-foreground/10 relative flex w-[60%] flex-col rounded-lg border-4"
 		>
-			<div class="flex items-center justify-between bg-primary-foreground p-2">
+			<div class="bg-primary-foreground flex items-center justify-between p-2">
 				<!-- Add Tab Button -->
 				<div class="flex items-center gap-2">
-					<span>{terminalStore.value.title}</span>
+					<span>{$terminalStore.title}</span>
 				</div>
 				<!-- Minimize / Close -->
 				<div class="flex space-x-3">
@@ -213,13 +219,13 @@
 			</div>
 
 			<!-- Available Tabs -->
-			<div class="flex overflow-x-auto bg-white dark:bg-muted/30">
-				{#each terminalStore.value.tabs as tab}
+			<div class="dark:bg-muted/30 flex overflow-x-auto bg-white">
+				{#each $terminalStore.tabs as tab}
 					<div
-						class="flex cursor-pointer items-center border-muted-foreground/40 px-3.5 py-2 {tab.id ===
-						terminalStore.value.activeTabId
+						class="border-muted-foreground/40 flex cursor-pointer items-center px-3.5 py-2 {tab.id ===
+						$terminalStore.activeTabId
 							? 'bg-muted-foreground/40 dark:bg-muted-foreground/25 '
-							: 'border-x border-t border-muted-foreground/25 hover:bg-muted-foreground/25'}"
+							: 'border-muted-foreground/25 hover:bg-muted-foreground/25 border-x border-t'}"
 						onclick={() => visiblityAction('tab-select', tab.id)}
 					>
 						<span class="mr-2 whitespace-nowrap text-sm">{tab.title}</span>
@@ -238,7 +244,7 @@
 					</div>
 				{/each}
 				<div
-					class="flex items-center justify-center border px-1 hover:border-muted-foreground/30 hover:bg-muted-foreground/30"
+					class="hover:border-muted-foreground/30 hover:bg-muted-foreground/30 flex items-center justify-center border px-1"
 				>
 					<button
 						class="dark:hover-bg-muted flex h-6 w-6 items-center justify-center rounded"
@@ -255,8 +261,8 @@
 				id="terminal-container"
 				class="relative min-h-[456px] w-full flex-grow overflow-hidden bg-black"
 			>
-				{#each terminalStore.value.tabs as tab}
-					{#if tab.id === terminalStore.value.activeTabId}
+				{#each $terminalStore.tabs as tab}
+					{#if tab.id === $terminalStore.activeTabId}
 						<div in:fade={{ duration: 150 }}>
 							<Xterm bind:terminal {options} {onLoad} {onData} />
 						</div>

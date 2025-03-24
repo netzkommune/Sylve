@@ -25,6 +25,13 @@ type AvgIODelayResponse struct {
 	Delay float64 `json:"delay"`
 }
 
+type ZpoolListResponse struct {
+	Status  string            `json:"status"`
+	Message string            `json:"message"`
+	Error   string            `json:"error"`
+	Data    []*zfsUtils.Zpool `json:"data"`
+}
+
 // @Summary Get Average IO Delay
 // @Description Get the average IO delay of all pools
 // @Tags ZFS
@@ -33,7 +40,7 @@ type AvgIODelayResponse struct {
 // @Security BearerAuth
 // @Success 200 {object} internal.APIResponse[AvgIODelayResponse] "Success"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
-// @Router /zfs/avg-io-delay [get]
+// @Router /zfs/pool/avg-io-delay [get]
 func AvgIODelay(zfsSerice *zfs.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		info := zfsUtils.GetTotalIODelay()
@@ -83,7 +90,7 @@ func AvgIODelayHistorical(zfsSerice *zfs.Service) gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Success 200 {object} internal.APIResponse[[]*zfsUtils.Zpool] "Success"
+// @Success 200 {object} zfsHandlers.ZpoolListResponse "Success"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
 // @Router /zfs/pools [get]
 func GetPools(zfsSerice *zfs.Service) gin.HandlerFunc {
@@ -157,6 +164,7 @@ func CreatePool(zfsSerice *zfs.Service) gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
+// @Param name path string true "Pool Name"
 // @Success 200 {object} internal.APIResponse[any] "Success"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
 // @Router /zfs/pools/{name} [delete]

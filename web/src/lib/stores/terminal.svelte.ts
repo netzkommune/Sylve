@@ -10,9 +10,11 @@
 
 import { hostname } from '$lib/stores/basic';
 import type { Terminal as Xterm } from '@battlefieldduck/xterm-svelte';
+import { localStore } from '@layerstack/svelte-stores';
 import { nanoid } from 'nanoid';
 import { get } from 'svelte/store';
 import { getUsername } from './auth';
+
 interface Tab {
 	id: string;
 	title: string;
@@ -20,25 +22,17 @@ interface Tab {
 interface Terminal {
 	isOpen: boolean;
 	isMinimized: boolean;
-	position: { x: number; y: number };
 	title: string;
 	tabs: Tab[];
 	activeTabId: string;
-	xterm: Xterm | null;
 }
 
-export const terminalStore: {
-	value: Terminal;
-} = $state({
-	value: {
-		isOpen: false,
-		isMinimized: false,
-		position: { x: 0, y: 0 },
-		title: '',
-		tabs: [],
-		activeTabId: '',
-		xterm: null
-	}
+export const terminalStore = localStore<Terminal>('terminal', {
+	isOpen: false,
+	isMinimized: false,
+	title: '',
+	tabs: [],
+	activeTabId: ''
 });
 
 export function getDefaultTitle() {
@@ -46,27 +40,21 @@ export function getDefaultTitle() {
 }
 
 export function openTerminal() {
-	terminalStore.value = {
-		...terminalStore.value,
-		isMinimized: false,
-		isOpen: true
-	};
+	terminalStore.set({
+		...get(terminalStore),
+		isOpen: true,
+		isMinimized: false
+	});
 
-	if (terminalStore.value.tabs.length > 0) {
+	let store = get(terminalStore);
+	if (store.tabs.length > 0) {
 		return;
 	}
 
 	const tabId = nanoid(9);
-	const xOffset = 30;
-	const yOffset = 30;
-
 	const newTerminal: Terminal = {
 		isOpen: true,
 		isMinimized: false,
-		position: {
-			x: window.innerWidth / 2 - 400 + xOffset,
-			y: window.innerHeight / 2 - 300 + yOffset
-		},
 		title: 'Terminal',
 		tabs: [
 			{
@@ -75,9 +63,8 @@ export function openTerminal() {
 			}
 		],
 
-		activeTabId: tabId,
-		xterm: null
+		activeTabId: tabId
 	};
 
-	terminalStore.value = newTerminal;
+	terminalStore.set(newTerminal);
 }

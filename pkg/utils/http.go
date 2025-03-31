@@ -29,22 +29,14 @@ func GetTokenFromHeader(r http.Header) (string, error) {
 
 	wsProtocol := r.Get("Sec-WebSocket-Protocol")
 	if wsProtocol != "" {
-		parts := strings.Split(wsProtocol, ", ")
-		if len(parts) == 2 && parts[0] == "Bearer" {
-			return RemoveSpaces(parts[1]), nil
+		parts := strings.Split(wsProtocol, ",")
+		if len(parts) == 2 && strings.TrimSpace(parts[0]) == "Bearer" {
+			return RemoveSpaces(strings.TrimSpace(parts[1])), nil
 		}
 		return "", errors.New("invalid websocket protocol header format")
 	}
 
 	return "", errors.New("no token provided")
-}
-
-func SendJSONResponse(c *gin.Context, httpCode int, data interface{}) {
-	if data == nil {
-		data = gin.H{}
-	}
-
-	c.JSON(httpCode, data)
 }
 
 func GetIdFromParam(c *gin.Context) (int, error) {

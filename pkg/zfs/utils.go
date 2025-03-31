@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"io"
+	"regexp"
 	"runtime"
 	"strings"
 )
@@ -141,4 +142,44 @@ func (z *zfs) run(in io.Reader, out io.Writer, cmd string, args ...string) ([][]
 	}
 
 	return output, nil
+}
+
+// https://docs.oracle.com/cd/E26505_01/html/E37384/gbcpt.html
+func IsValidPoolName(name string) bool {
+	// Must start with a letter and contain only alphanumeric characters, '_', '-', or '.'
+	validNamePattern := regexp.MustCompile(`^[A-Za-z][A-Za-z0-9_.-]*$`)
+	if !validNamePattern.MatchString(name) {
+		return false
+	}
+
+	if len(name) >= 2 && name[0] == 'c' && name[1] >= '0' && name[1] <= '9' {
+		return false
+	}
+
+	reservedNames := map[string]bool{
+		"log":    true,
+		"mirror": true,
+		"raidz":  true,
+		"raidz1": true,
+		"raidz2": true,
+		"raidz3": true,
+		"spare":  true,
+	}
+
+	lowerName := strings.ToLower(name)
+	if reservedNames[lowerName] {
+		return false
+	}
+
+	for reserved := range reservedNames {
+		if strings.HasPrefix(lowerName, reserved) {
+			return false
+		}
+	}
+
+	if strings.Contains(name, "%") {
+		return false
+	}
+
+	return true
 }

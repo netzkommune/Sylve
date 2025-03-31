@@ -9,9 +9,11 @@
 package zfs
 
 import (
+	"fmt"
 	"sylve/internal/db"
 	infoModels "sylve/internal/db/models/info"
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
+	"sylve/pkg/zfs"
 )
 
 func (s *Service) GetTotalIODelayHisorical() ([]infoModels.IODelay, error) {
@@ -24,6 +26,53 @@ func (s *Service) GetTotalIODelayHisorical() ([]infoModels.IODelay, error) {
 	return historicalData, nil
 }
 
-func (s *Service) CreatePool(zfsServiceInterfaces.Zpool) error {
+func (s *Service) CreatePool(pool zfsServiceInterfaces.Zpool) error {
+	if !zfs.IsValidPoolName(pool.Name) {
+		return fmt.Errorf("invalid_pool_name")
+	}
+
+	_, err := zfs.GetZpool(pool.Name)
+	if err == nil {
+		return fmt.Errorf("pool_name_taken")
+	}
+
+	if pool.RaidType != "" {
+		validRaidTypes := map[string]int{
+			"mirror": 2,
+			"raidz":  3,
+			"raidz2": 4,
+			"raidz3": 5,
+		}
+		minDevices, ok := validRaidTypes[pool.RaidType]
+		if !ok {
+			return fmt.Errorf("invalid_raidz_type")
+		}
+
+		for _, vdev := range pool.Vdevs {
+			if len(vdev.VdevDevices) < minDevices {
+				return fmt.Errorf("vdev %s has insufficient devices for %s (minimum %d)", vdev.Name, pool.RaidType, minDevices)
+			}
+		}
+	} else {
+		for _, vdev := range pool.Vdevs {
+			if len(vdev.VdevDevices) == 0 {
+				return fmt.Errorf("vdev %s has no devices", vdev.Name)
+			}
+		}
+	}
+
+	var args []string
+	for _, vdev := range pool.Vdevs {
+		if pool.RaidType != "" {
+			args = append(args, pool.RaidType)
+		}
+		args = append(args, vdev.VdevDevices...)
+	}
+
+	_, err = zfs.CreateZpool(pool.Name, pool.Properties, args...)
+	if err != nil {
+		return fmt.Errorf("zpool_create_failed: %v", err)
+	}
+
 	return nil
 }

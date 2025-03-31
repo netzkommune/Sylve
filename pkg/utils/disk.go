@@ -13,8 +13,10 @@ import (
 	"sylve/pkg/utils/sysctl"
 )
 
+var getSysctlBytes = sysctl.GetBytes
+
 func GetGeomXML() []byte {
-	output, err := sysctl.GetBytes("kern.geom.confxml")
+	output, err := getSysctlBytes("kern.geom.confxml")
 	if err != nil {
 		return []byte{}
 	}

@@ -25,6 +25,10 @@ func GetZpool(name string) (*Zpool, error) {
 	return z.GetZpool(name)
 }
 
+func CreateZpool(name string, properties map[string]string, args ...string) (*Zpool, error) {
+	return z.CreateZpool(name, properties, args...)
+}
+
 func ListZpools() ([]*Zpool, error) {
 	return z.ListZpools()
 }

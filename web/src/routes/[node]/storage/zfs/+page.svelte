@@ -1,24 +1,25 @@
 <script lang="ts">
 	import { listDisks } from '$lib/api/disk/disk';
 	import { getPools } from '$lib/api/zfs/pool';
-	import * as Tabs from '$lib/components/ui/tabs/index.js';
-	import * as Card from '$lib/components/ui/card/index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import * as Card from '$lib/components/ui/card/index.js';
+	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
+	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
+	import * as Select from '$lib/components/ui/select/index.js';
+	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import type { Disk } from '$lib/types/disk/disk';
 	import type { Zpool } from '$lib/types/zfs/pool';
 	import { simplifyDisks } from '$lib/utils/disk';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
 	import { flip } from 'svelte/animate';
-	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
-	import * as Select from '$lib/components/ui/select/index.js';
 	import { slide } from 'svelte/transition';
-	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 
-	import { dropzone, draggable } from '$lib/utils/dnd';
+	import { draggable, dropzone } from '$lib/utils/dnd';
+	import { untrack } from 'svelte';
 
 	interface Data {
 		disks: Disk[];
@@ -225,15 +226,16 @@
 		}
 	}
 
-	// Update containers when vdevCount changes
-	$effect(() => {
-		const oldContainers = [...diskContainers];
-		diskContainers = Array(vdevCount)
-			.fill(null)
-			.map((_, i) => {
-				return oldContainers[i] || [];
-			});
-	});
+	// $effect(() => {
+	// 	const oldContainers = [...diskContainers];
+	// 	untrack(() => {
+	// 		diskContainers = Array(vdevCount)
+	// 			.fill(null)
+	// 			.map((_, i) => {
+	// 				return oldContainers[i] || [];
+	// 			});
+	// 	});
+	// });
 
 	const raid = [
 		{ value: 'mirror', label: 'Mirror' },
@@ -272,7 +274,7 @@
 		<Button
 			on:click={() => (open = !open)}
 			size="sm"
-			class="h-6 bg-muted-foreground/40 text-black dark:bg-muted dark:text-white"
+			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black dark:text-white"
 		>
 			<Icon icon="gg:add" class="mr-1 h-4 w-4" /> New
 		</Button>
@@ -317,7 +319,7 @@
 
 						<!-- Disk Containers Section -->
 						<div
-							class="w-full overflow-hidden border-y border-primary-foreground bg-primary-foreground p-4"
+							class="border-primary-foreground bg-primary-foreground w-full overflow-hidden border-y p-4"
 						>
 							<ScrollArea class="w-full whitespace-nowrap rounded-md " orientation="horizontal">
 								<div class="flex justify-center gap-7 pr-4">
@@ -372,7 +374,7 @@
 
 						<Label for="vdev_count" class="">Disks</Label>
 						<div
-							class="grid grid-cols-3 gap-6 overflow-hidden border-y border-primary-foreground bg-primary-foreground p-4"
+							class="border-primary-foreground bg-primary-foreground grid grid-cols-3 gap-6 overflow-hidden border-y p-4"
 						>
 							<div class="">
 								<label class="">HDD</label>
@@ -566,7 +568,7 @@
 										{#if pairs.length > 1}
 											<button
 												onclick={() => removePair(index)}
-												class="rounded px-2 py-1 text-white hover:bg-muted"
+												class="hover:bg-muted rounded px-2 py-1 text-white"
 											>
 												<Icon icon="ic:twotone-remove" class="h-5 w-5" />
 											</button>
@@ -575,7 +577,7 @@
 								{/each}
 							</div>
 							<div transition:slide class="flex justify-end">
-								<button onclick={addPair} class=" rounded px-3 py-1 text-white hover:bg-muted">
+								<button onclick={addPair} class=" hover:bg-muted rounded px-3 py-1 text-white">
 									<Icon icon="icons8:plus" class="h-6 w-6" />
 								</button>
 							</div>

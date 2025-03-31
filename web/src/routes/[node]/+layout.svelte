@@ -158,6 +158,8 @@
 		</Button>
 	</div>
 
+	<!-- onResize={(e) => ($paneSizes.middle = e)} -->
+
 	<Resizable.PaneGroup direction="horizontal" class="h-full w-full">
 		<Resizable.Pane
 			defaultSize={$paneSizes.middle}

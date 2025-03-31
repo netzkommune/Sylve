@@ -14,8 +14,10 @@ import (
 	"os/exec"
 )
 
+var execCommand = exec.Command
+
 func RunCommand(command string, args ...string) (string, error) {
-	cmd := exec.Command(command, args...)
+	cmd := execCommand(command, args...)
 
 	var out bytes.Buffer
 	cmd.Stdout = &out

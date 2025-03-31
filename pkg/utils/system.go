@@ -19,14 +19,15 @@ import (
 	"github.com/mackerelio/go-osstat/uptime"
 )
 
-func GetSystemUUID() (string, error) {
-	if runtime.GOOS != "freebsd" {
-		return GenerateRandomUUID(), nil
-	}
+var getSysctlString = sysctl.GetString
+var getHostname = os.Hostname
+var getUptime = uptime.Get
+var getLoadAvg = loadavg.Get
 
+func GetSystemUUID() (string, error) {
 	const kenvKey = "kern.hostuuid"
 
-	uuid, err := sysctl.GetString(kenvKey)
+	uuid, err := getSysctlString(kenvKey)
 	if err != nil {
 		return "", err
 	}
@@ -34,13 +35,13 @@ func GetSystemUUID() (string, error) {
 }
 
 func GetSystemHostname() (string, error) {
-	return os.Hostname()
+	return getHostname()
 }
 
 func GetOS() string {
 	switch runtime.GOOS {
 	case "freebsd":
-		v, err := sysctl.GetString("kern.version")
+		v, err := getSysctlString("kern.version")
 		if err != nil {
 			return "FreeBSD"
 		}
@@ -51,17 +52,15 @@ func GetOS() string {
 }
 
 func GetUptime() (int64, error) {
-	u, err := uptime.Get()
+	u, err := getUptime()
 	if err != nil {
 		return 0, err
 	}
-
 	return int64(u.Seconds()), nil
 }
 
 func GetLoadAvg() (string, error) {
-	l, err := loadavg.Get()
-
+	l, err := getLoadAvg()
 	if err != nil {
 		return "", err
 	}
@@ -74,21 +73,16 @@ func GetLoadAvg() (string, error) {
 }
 
 func BootMode() string {
-	switch runtime.GOOS {
-	case "freebsd":
-		v, err := sysctl.GetString("machdep.bootmethod")
-		if err != nil {
-			return "Unknown"
-		}
+	v, err := getSysctlString("machdep.bootmethod")
+	if err != nil {
+		return "Unknown"
+	}
 
-		if strings.Contains(v, "BIOS") {
-			return "BIOS"
-		} else if strings.Contains(v, "UEFI") {
-			return "UEFI"
-		} else {
-			return "Unknown"
-		}
-	default:
+	if strings.Contains(v, "BIOS") {
+		return "BIOS"
+	} else if strings.Contains(v, "UEFI") {
+		return "UEFI"
+	} else {
 		return "Unknown"
 	}
 }
@@ -112,6 +106,10 @@ func ReadDiskSector(disk string, sector int64) ([]byte, error) {
 }
 
 func IsGPT(sector []byte) bool {
+	if len(sector) < 8 {
+		return false
+	}
+
 	gptSignature := []byte{0x45, 0x46, 0x49, 0x20, 0x50, 0x41, 0x52, 0x54}
 	for i := 0; i < 8; i++ {
 		if sector[i] != gptSignature[i] {

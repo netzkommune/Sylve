@@ -3,6 +3,7 @@ import {
 	IODelayHistoricalSchema,
 	IODelaySchema,
 	ZpoolSchema,
+	type CreateZpool,
 	type IODelay,
 	type IODelayHistorical,
 	type Zpool
@@ -31,17 +32,9 @@ export async function getPools(): Promise<Zpool[]> {
 	return await apiRequest('/zfs/pools', ZpoolSchema.array(), 'GET');
 }
 
-export async function createPool(
-	name: string,
-	vdevs: string[],
-	raid: string,
-	options: Record<string, string>
-) {
+export async function createPool(data: CreateZpool) {
 	return await apiRequest('/zfs/pools', APIResponseSchema, 'POST', {
-		name,
-		vdevs,
-		raid,
-		options
+		...data
 	});
 }
 

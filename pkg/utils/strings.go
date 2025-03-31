@@ -9,10 +9,12 @@
 package utils
 
 import (
+	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 	"hash/fnv"
+	"math/big"
 	"regexp"
 	"strconv"
 	"strings"
@@ -21,6 +23,12 @@ import (
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
+
+func FNVHash(s string) uint64 {
+	hasher := fnv.New64a()
+	hasher.Write([]byte(s))
+	return hasher.Sum64()
+}
 
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
@@ -34,6 +42,10 @@ func CheckPasswordHash(password, hash string) bool {
 
 func SHA256(input string, count int) string {
 	sum := []byte(input)
+
+	if count <= 0 {
+		return input
+	}
 
 	for i := 0; i < count; i++ {
 		hash := sha256.Sum256(sum)
@@ -59,11 +71,12 @@ func GenerateRandomUUID() string {
 
 func GenerateRandomString(length int) string {
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	b := make([]byte, length)
-	for i := range b {
-		b[i] = charset[uuid.New().String()[i]%byte(len(charset))]
+	result := make([]byte, length)
+	for i := range result {
+		num, _ := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
+		result[i] = charset[num.Int64()]
 	}
-	return string(b)
+	return string(result)
 }
 
 func StringInSlice(a string, list []string) bool {
@@ -91,7 +104,7 @@ func StringToFloat64(s string) float64 {
 }
 
 func RemoveEmptyLines(s string) string {
-	re := regexp.MustCompile(`(?m)^\s*\n`)
+	re := regexp.MustCompile(`(?m)^\n`)
 	return re.ReplaceAllString(s, "")
 }
 

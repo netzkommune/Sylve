@@ -38,6 +38,23 @@ export const ZpoolSchema = z.object({
 	vdevs: z.array(VdevSchema)
 });
 
+export const CreateVdevSchema = z.object({
+	name: z.string(),
+	devices: z.array(z.string())
+});
+
+export const CreateZpoolSchema = z.object({
+	name: z
+		.string()
+		.min(1, 'Name must be at least 1 character long')
+		.max(24, 'Name must be at most 24 characters long')
+		.regex(/^[a-zA-Z0-9]+$/, 'Name must be alphanumeric'),
+	raidType: z.enum(['mirror', 'raidz', 'raidz2', 'raidz3']).optional(),
+	vdevs: z.array(CreateVdevSchema),
+	properties: z.record(z.string()).optional()
+});
+
 export type IODelay = z.infer<typeof IODelaySchema>;
 export type IODelayHistorical = z.infer<typeof IODelayHistoricalSchema>;
 export type Zpool = z.infer<typeof ZpoolSchema>;
+export type CreateZpool = z.infer<typeof CreateZpoolSchema>;

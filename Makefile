@@ -18,5 +18,8 @@ clean:
 run: build
 	./$(BIN_DIR)/$(BINARY_NAME)
 
+test:
+	go test ./...
+
 depcheck:
 	@./scripts/check_deps.sh

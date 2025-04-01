@@ -10,6 +10,7 @@
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
+	import * as Tooltip from '$lib/components/ui/tooltip';
 	import type { Disk } from '$lib/types/disk/disk';
 	import type { Zpool } from '$lib/types/zfs/pool';
 	import { simplifyDisks } from '$lib/utils/disk';
@@ -68,6 +69,8 @@
 	let pools = $results[1].data as Zpool[];
 	let advancedChecked: boolean = $state(false);
 
+	$inspect('advancedChecked', advancedChecked);
+
 	let useableDisks = $derived.by(() => {
 		const unusedDisks: UnusedDisk[] = [];
 		for (const disk of disks) {
@@ -76,7 +79,7 @@
 					name: disk.Device,
 					size: disk.Size,
 					gpt: disk.GPT,
-					type: disk.Type
+					type: disk.Type === 'Unknown' ? 'HDD' : disk.Type
 				});
 			}
 
@@ -254,9 +257,9 @@
 
 <Dialog.Root bind:open onOutsideClick={() => close()}>
 	<Dialog.Content
-		class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-y-auto p-0 transition-all duration-300 ease-in-out lg:max-w-[70%]"
+		class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-visible overflow-y-auto p-0 transition-all duration-300 ease-in-out lg:max-w-[70%]"
 	>
-		<div class="flex items-center justify-between p-4">
+		<div class="flex items-center justify-between px-4 py-3">
 			<Dialog.Header class="p-0">
 				<Dialog.Title>Create ZFS Pool</Dialog.Title>
 			</Dialog.Header>
@@ -269,13 +272,13 @@
 			</Dialog.Close>
 		</div>
 		<Tabs.Root value="tab-1" class="w-full overflow-hidden">
-			<Tabs.List class="grid w-full grid-cols-2">
-				<Tabs.Trigger value="tab-1">Devices</Tabs.Trigger>
-				<Tabs.Trigger value="tab-2">Options</Tabs.Trigger>
+			<Tabs.List class="grid w-full grid-cols-2 p-0 px-4">
+				<Tabs.Trigger value="tab-1" class="border-b">Devices</Tabs.Trigger>
+				<Tabs.Trigger value="tab-2" class="border-b">Options</Tabs.Trigger>
 			</Tabs.List>
-			<Tabs.Content value="tab-1">
-				<Card.Root class="pb-6">
-					<Card.Content class="flex gap-6 !pb-0">
+			<Tabs.Content class="mt-0" value="tab-1">
+				<Card.Root class="border-none pb-4">
+					<Card.Content class="flex gap-4 p-4 !pb-0">
 						<div class="flex-1 space-y-1">
 							<Label for="name">Name</Label>
 							<Input type="text" id="name" placeholder="name" bind:value={name} />
@@ -285,33 +288,60 @@
 							<Input type="number" id="vdev_count" placeholder="1" min={1} bind:value={vdevCount} />
 						</div>
 					</Card.Content>
-					<Card.Content class="flex flex-col gap-6 !pb-0">
-						<Label for="vdev_count" class="">VDEV</Label>
-						<div
-							class="border-primary-foreground bg-primary-foreground w-full overflow-hidden rounded-lg border-y p-4"
-						>
-							<ScrollArea class="w-full whitespace-nowrap rounded-md" orientation="horizontal">
-								<div class="flex justify-center gap-7 pr-4">
-									{#each Array(vdevCount) as _, i}
-										{#if diskContainers}
-											{#if diskContainers[i]}
-												<div class="flex flex-col">
-													<div
-														class="h-28 w-48 flex-shrink-0 overflow-auto rounded-lg border border-neutral-300 bg-neutral-200 p-2 dark:border-neutral-800 dark:bg-neutral-950"
-														use:dropzone={{
-															on_dropzone: (_: unknown, event: DragEvent) =>
-																handleDiskDrop(i, event)
-														}}
-													>
-														{#if diskContainers[i].length === 0}
-															<div class="flex h-full items-center justify-center text-neutral-500">
-																Drop disks here
+					<Card.Content class="flex flex-col gap-4 p-4 !pb-0">
+						<div>
+							<Label for="vdev_count" class="">VDEV</Label>
+							<div
+								class="border-primary-foreground bg-primary-foreground mt-1 w-full overflow-hidden rounded-lg border-y p-4"
+							>
+								<ScrollArea class="w-full whitespace-nowrap rounded-md" orientation="horizontal">
+									<div class="flex items-center justify-center gap-7 pr-4">
+										{#each Array(vdevCount) as _, i}
+											{#if diskContainers}
+												{#if diskContainers[i]}
+													<div class="relative flex flex-col">
+														{#if diskContainers[i].length > 0}
+															<div
+																class="absolute right-1 top-1 z-50 cursor-pointer text-yellow-700 hover:text-yellow-600"
+															>
+																<Tooltip.Root>
+																	<Tooltip.Trigger
+																		><Icon
+																			icon="carbon:warning-filled"
+																			class="h-5 w-5"
+																		/></Tooltip.Trigger
+																	>
+																	<Tooltip.Content>
+																		<p>
+																			Lorem Ipsum is simply dummy text of the printing and
+																			typesetting industry. Lorem Ipsum has been the industry's
+																		</p>
+																	</Tooltip.Content>
+																</Tooltip.Root>
 															</div>
-														{:else}
-															<div class="flex flex-wrap items-center justify-center gap-2">
-																{#each diskContainers[i] as disk (disk.id)}
-																	<div animate:flip={{ duration: 300 }} class="relative">
-																		<!-- {#if disk.type === 'NVMe'}
+														{/if}
+														<div
+															class={`relative h-28 w-48 flex-shrink-0 overflow-auto rounded-lg bg-neutral-200 p-2 dark:bg-neutral-950
+                                                            ${diskContainers[i].length > 0 ? 'border border-yellow-700 ' : ''}`}
+															use:dropzone={{
+																on_dropzone: (_: unknown, event: DragEvent) =>
+																	handleDiskDrop(i, event),
+																dragover_class: 'droppable'
+															}}
+														>
+															{#if diskContainers[i].length === 0}
+																<div
+																	class="flex h-full items-center justify-center text-neutral-500"
+																>
+																	Drop disks here
+																</div>
+															{:else}
+																<div
+																	class="flex h-full flex-wrap items-center justify-center gap-2"
+																>
+																	{#each diskContainers[i] as disk (disk.id)}
+																		<div animate:flip={{ duration: 300 }} class="relative">
+																			<!-- {#if disk.type === 'NVMe'}
 																			<Icon
 																				icon="bi:nvme"
 																				class="h-11 w-11 rotate-90 text-blue-500"
@@ -326,183 +356,197 @@
 																					: 'text-green-500'}"
 																			/>
 																		{/if} -->
-																		{#if disk.type === 'SSD'}
-																			<Icon
-																				icon="icon-park-outline:ssd"
-																				class="h-11 w-11 text-blue-500"
-																			/>
-																		{:else if disk.type === 'NVMe'}
-																			<Icon
-																				icon="bi:nvme"
-																				class="h-11 w-11 rotate-90 text-blue-500"
-																			/>
-																		{:else if disk.type === 'HDD'}
-																			<Icon icon="mdi:harddisk" class="h-11 w-11 text-green-500" />
-																		{:else if disk.type === 'Partition'}
-																			<Icon
-																				icon="ant-design:partition-outlined"
-																				class="h-11 w-11 rotate-90 text-blue-500"
-																			/>
-																		{/if}
-																		<div class="max-w-[48px] truncate text-center text-xs">
-																			{disk.name.split('/').pop()}
+																			{#if disk.type === 'SSD'}
+																				<Icon
+																					icon="icon-park-outline:ssd"
+																					class="h-11 w-11 text-blue-500"
+																				/>
+																			{:else if disk.type === 'NVMe'}
+																				<Icon
+																					icon="bi:nvme"
+																					class="h-11 w-11 rotate-90 text-blue-500"
+																				/>
+																			{:else if disk.type === 'HDD'}
+																				<Icon
+																					icon="mdi:harddisk"
+																					class="h-11 w-11 text-green-500"
+																				/>
+																			{:else if disk.type === 'Partition'}
+																				<Icon
+																					icon="ant-design:partition-outlined"
+																					class="h-11 w-11 rotate-90 text-blue-500"
+																				/>
+																			{/if}
+																			<div class="max-w-[48px] truncate text-center text-xs">
+																				{disk.name.split('/').pop()}
+																			</div>
+																			<button
+																				class="absolute -right-1 -top-1 rounded-full bg-red-500 p-0.5 text-white hover:bg-red-600"
+																				onclick={() => returnDiskToPool(i, disk.id)}
+																			>
+																				<Icon icon="mdi:close" class="h-3 w-3" />
+																			</button>
 																		</div>
-																		<button
-																			class="absolute -right-1 -top-1 rounded-full bg-red-500 p-0.5 text-white hover:bg-red-600"
-																			onclick={() => returnDiskToPool(i, disk.id)}
-																		>
-																			<Icon icon="mdi:close" class="h-3 w-3" />
-																		</button>
-																	</div>
-																{/each}
-															</div>
-														{/if}
+																	{/each}
+																</div>
+															{/if}
+														</div>
+														<p
+															class="mt-2 text-center text-xs text-neutral-800 dark:text-neutral-300"
+														>
+															VDEV {i + 1}
+														</p>
 													</div>
-													<p
-														class="mt-2 text-center text-xs text-neutral-800 dark:text-neutral-300"
-													>
-														VDEV {i + 1}
-													</p>
-												</div>
+												{/if}
 											{/if}
-										{/if}
-									{/each}
-								</div>
-							</ScrollArea>
+										{/each}
+									</div>
+								</ScrollArea>
+							</div>
 						</div>
 
-						<Label for="vdev_count" class="">Disks</Label>
-						<div
-							class="border-primary-foreground bg-primary-foreground grid grid-cols-4 gap-6 overflow-hidden border-y p-4"
-						>
-							<div class="">
-								<label class="">HDD</label>
-								<div class="mt-1 rounded-lg bg-neutral-200 p-4 dark:bg-neutral-950">
-									<ScrollArea
-										class="mt-1 w-full whitespace-nowrap rounded-md"
-										orientation="horizontal"
-									>
-										<div class="flex min-h-[80px] justify-center gap-4 pr-4">
-											{#each availableDisks.filter((disk) => disk.type === 'HDD') as disk (disk.id)}
-												<div class="text-center" animate:flip={{ duration: 300 }}>
-													<div class="cursor-move" use:draggable={disk.id}>
-														<Icon icon="mdi:harddisk" class="h-11 w-11 text-green-500" />
+						<div>
+							<Label for="vdev_count" class="">Disks</Label>
+							<div
+								class="border-primary-foreground bg-primary-foreground mt-1 grid grid-cols-4 gap-6 overflow-hidden border-y p-4"
+							>
+								<div class="">
+									<Label class="">HDD</Label>
+									<div class="mt-1 rounded-lg bg-neutral-200 p-4 dark:bg-neutral-950">
+										<ScrollArea
+											class="w-full whitespace-nowrap rounded-md"
+											orientation="horizontal"
+										>
+											<div class="flex min-h-[80px] items-center justify-center gap-4">
+												{#each availableDisks.filter((disk) => disk.type === 'HDD') as disk (disk.id)}
+													<div class="text-center" animate:flip={{ duration: 300 }}>
+														<div class="cursor-move" use:draggable={disk.id}>
+															<Icon icon="mdi:harddisk" class="h-11 w-11 text-green-500" />
+														</div>
+														<div class="max-w-[64px] truncate text-xs">
+															{disk.name.split('/').pop()}
+														</div>
+														<div class="text-xs text-neutral-400">
+															{Math.round(disk.size / (1024 * 1024 * 1024))} GB
+														</div>
 													</div>
-													<div class="max-w-[64px] truncate text-xs">
-														{disk.name.split('/').pop()}
-													</div>
-													<div class="text-xs text-neutral-400">
-														{Math.round(disk.size / (1024 * 1024 * 1024))} GB
-													</div>
-												</div>
-											{/each}
+												{/each}
 
-											{#if availableDisks.filter((disk) => disk.type === 'HDD').length === 0}
-												<div class="flex h-16 w-full items-center justify-center text-neutral-400">
-													No available disks
-												</div>
-											{/if}
-										</div>
-									</ScrollArea>
+												{#if availableDisks.filter((disk) => disk.type === 'HDD').length === 0}
+													<div
+														class="flex h-16 w-full items-center justify-center text-neutral-400"
+													>
+														No available disks
+													</div>
+												{/if}
+											</div>
+										</ScrollArea>
+									</div>
 								</div>
-							</div>
 
-							<div class="">
-								<label class="">SSD</label>
-								<div class="mt-1 rounded-lg bg-neutral-200 p-4 dark:bg-neutral-950">
-									<ScrollArea
-										class="mt-1 w-full whitespace-nowrap rounded-md "
-										orientation="horizontal"
-									>
-										<div class="flex min-h-[80px] justify-center gap-4 pr-4">
-											{#each availableDisks.filter((disk) => disk.type === 'SSD') as disk (disk.id)}
-												<div class="text-center" animate:flip={{ duration: 300 }}>
-													<div class="cursor-move" use:draggable={disk.id}>
-														<Icon icon="icon-park-outline:ssd" class="h-11 w-11 text-blue-500" />
+								<div class="">
+									<Label class="">SSD</Label>
+									<div class="mt-1 rounded-lg bg-neutral-200 p-4 dark:bg-neutral-950">
+										<ScrollArea
+											class="w-full whitespace-nowrap rounded-md "
+											orientation="horizontal"
+										>
+											<div class="flex min-h-[80px] items-center justify-center gap-4">
+												{#each availableDisks.filter((disk) => disk.type === 'SSD') as disk (disk.id)}
+													<div class="text-center" animate:flip={{ duration: 300 }}>
+														<div class="cursor-move" use:draggable={disk.id}>
+															<Icon icon="icon-park-outline:ssd" class="h-11 w-11 text-blue-500" />
+														</div>
+														<div class="max-w-[64px] truncate text-xs">
+															{disk.name.split('/').pop()}
+														</div>
+														<div class="text-xs text-neutral-400">
+															{Math.round(disk.size / (1024 * 1024 * 1024))} GB
+														</div>
 													</div>
-													<div class="max-w-[64px] truncate text-xs">
-														{disk.name.split('/').pop()}
-													</div>
-													<div class="text-xs text-neutral-400">
-														{Math.round(disk.size / (1024 * 1024 * 1024))} GB
-													</div>
-												</div>
-											{/each}
+												{/each}
 
-											{#if availableDisks.filter((disk) => disk.type === 'SSD').length === 0}
-												<div class="flex h-16 w-full items-center justify-center text-neutral-400">
-													No available disks
-												</div>
-											{/if}
-										</div>
-									</ScrollArea>
+												{#if availableDisks.filter((disk) => disk.type === 'SSD').length === 0}
+													<div
+														class="flex h-16 w-full items-center justify-center text-neutral-400"
+													>
+														No available disks
+													</div>
+												{/if}
+											</div>
+										</ScrollArea>
+									</div>
 								</div>
-							</div>
 
-							<div class="">
-								<label class="">NVME</label>
-								<div class="mt-1 rounded-lg bg-neutral-200 p-4 dark:bg-neutral-950">
-									<ScrollArea
-										class="mt-1 w-full whitespace-nowrap rounded-md "
-										orientation="horizontal"
-									>
-										<div class="flex min-h-[80px] justify-center gap-4 pr-4">
-											{#each availableDisks.filter((disk) => disk.type === 'NVMe') as disk (disk.id)}
-												<div class="text-center" animate:flip={{ duration: 300 }}>
-													<div class="cursor-move" use:draggable={disk.id}>
-														<Icon icon="bi:nvme" class="h-11 w-11 rotate-90 text-blue-500" />
+								<div class="">
+									<Label class="">NVME</Label>
+									<div class="mt-1 rounded-lg bg-neutral-200 p-4 dark:bg-neutral-950">
+										<ScrollArea
+											class="w-full whitespace-nowrap rounded-md "
+											orientation="horizontal"
+										>
+											<div class="flex min-h-[80px] items-center justify-center gap-4">
+												{#each availableDisks.filter((disk) => disk.type === 'NVMe') as disk (disk.id)}
+													<div class="text-center" animate:flip={{ duration: 300 }}>
+														<div class="cursor-move" use:draggable={disk.id}>
+															<Icon icon="bi:nvme" class="h-11 w-11 rotate-90 text-blue-500" />
+														</div>
+														<div class="max-w-[64px] truncate text-xs">
+															{disk.name.split('/').pop()}
+														</div>
+														<div class="text-xs text-neutral-400">
+															{Math.round(disk.size / (1024 * 1024 * 1024))} GB
+														</div>
 													</div>
-													<div class="max-w-[64px] truncate text-xs">
-														{disk.name.split('/').pop()}
-													</div>
-													<div class="text-xs text-neutral-400">
-														{Math.round(disk.size / (1024 * 1024 * 1024))} GB
-													</div>
-												</div>
-											{/each}
+												{/each}
 
-											{#if availableDisks.filter((disk) => disk.type === 'NVMe').length === 0}
-												<div class="flex h-16 w-full items-center justify-center text-neutral-400">
-													No available disks
-												</div>
-											{/if}
-										</div>
-									</ScrollArea>
+												{#if availableDisks.filter((disk) => disk.type === 'NVMe').length === 0}
+													<div
+														class="flex h-16 w-full items-center justify-center text-neutral-400"
+													>
+														No available disks
+													</div>
+												{/if}
+											</div>
+										</ScrollArea>
+									</div>
 								</div>
-							</div>
 
-							<div class="">
-								<label class="">Partition</label>
-								<div class="mt-1 rounded-lg bg-neutral-200 p-4 dark:bg-neutral-950">
-									<ScrollArea
-										class="mt-1 w-full whitespace-nowrap rounded-md "
-										orientation="horizontal"
-									>
-										<div class="flex min-h-[80px] justify-center gap-4 pr-4">
-											{#each availableDisks.filter((disk) => disk.type === 'Partition') as disk (disk.id)}
-												<div class="text-center" animate:flip={{ duration: 300 }}>
-													<div class="cursor-move" use:draggable={disk.id}>
-														<Icon
-															icon="ant-design:partition-outlined"
-															class="h-11 w-11 rotate-90 text-blue-500"
-														/>
+								<div class="">
+									<Label class="">Partition</Label>
+									<div class="mt-1 rounded-lg bg-neutral-200 p-4 dark:bg-neutral-950">
+										<ScrollArea
+											class="w-full whitespace-nowrap rounded-md "
+											orientation="horizontal"
+										>
+											<div class="flex min-h-[80px] items-center justify-center gap-4">
+												{#each availableDisks.filter((disk) => disk.type === 'Partition') as disk (disk.id)}
+													<div class="text-center" animate:flip={{ duration: 300 }}>
+														<div class="cursor-move" use:draggable={disk.id}>
+															<Icon
+																icon="ant-design:partition-outlined"
+																class="h-11 w-11 rotate-90 text-blue-500"
+															/>
+														</div>
+														<div class="max-w-[64px] truncate text-xs">
+															{disk.name.split('/').pop()}
+														</div>
+														<div class="text-xs text-neutral-400">
+															{Math.round(disk.size / (1024 * 1024 * 1024))} GB
+														</div>
 													</div>
-													<div class="max-w-[64px] truncate text-xs">
-														{disk.name.split('/').pop()}
-													</div>
-													<div class="text-xs text-neutral-400">
-														{Math.round(disk.size / (1024 * 1024 * 1024))} GB
-													</div>
-												</div>
-											{/each}
+												{/each}
 
-											{#if availableDisks.filter((disk) => disk.type === 'Partition').length === 0}
-												<div class="flex h-16 w-full items-center justify-center text-neutral-400">
-													No available partitions
-												</div>
-											{/if}
-										</div>
-									</ScrollArea>
+												{#if availableDisks.filter((disk) => disk.type === 'Partition').length === 0}
+													<div
+														class="flex h-16 w-full items-center justify-center text-neutral-400"
+													>
+														No available partitions
+													</div>
+												{/if}
+											</div>
+										</ScrollArea>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -510,17 +554,17 @@
 				</Card.Root>
 			</Tabs.Content>
 
-			<Tabs.Content value="tab-2">
-				<Card.Root>
-					<Card.Content>
+			<Tabs.Content class="mt-0" value="tab-2">
+				<Card.Root class="min-h-[20vh] border-none pb-6">
+					<Card.Content class="flex flex-col gap-4 p-4 !pb-0">
 						<div transition:slide class="grid grid-cols-1 gap-4 md:grid-cols-3">
-							<div>
-								<Label class="w-24 whitespace-nowrap text-sm" for="terms">RAID:</Label>
-								<Select.Root portal={null}>
+							<div class="h-full space-y-1">
+								<Label class="w-24 whitespace-nowrap text-sm" for="raid">RAID:</Label>
+								<Select.Root>
 									<Select.Trigger class="w-full">
 										<Select.Value placeholder="Select a RAID" />
 									</Select.Trigger>
-									<Select.Content>
+									<Select.Content class="max-h-36 overflow-y-auto">
 										<Select.Group>
 											{#each raid as fruit}
 												<Select.Item value={fruit.value} label={fruit.label}
@@ -529,12 +573,13 @@
 											{/each}
 										</Select.Group>
 									</Select.Content>
-									<Select.Input name="favoriteFruit" />
+									<Select.Input name="raid" />
 								</Select.Root>
 							</div>
-							<div>
-								<Label class="w-24 whitespace-nowrap text-sm" for="terms">Compression:</Label>
-								<Select.Root portal={null}>
+
+							<div class="space-y-1">
+								<Label class="w-24 whitespace-nowrap text-sm" for="compression">Compression:</Label>
+								<Select.Root>
 									<Select.Trigger class="w-full">
 										<Select.Value placeholder="Select a Compression" />
 									</Select.Trigger>
@@ -547,12 +592,13 @@
 											{/each}
 										</Select.Group>
 									</Select.Content>
-									<Select.Input name="favoriteFruit" />
+									<Select.Input name="compression" />
 								</Select.Root>
 							</div>
-							<div>
-								<Label class="w-24 whitespace-nowrap text-sm" for="terms">ASHIFT:</Label>
-								<Select.Root portal={null}>
+
+							<div class="space-y-1">
+								<Label class="w-24 whitespace-nowrap text-sm" for="ashift">ASHIFT:</Label>
+								<Select.Root>
 									<Select.Trigger class="w-full">
 										<Select.Value placeholder="Select a ASHIFT" />
 									</Select.Trigger>
@@ -565,19 +611,24 @@
 											{/each}
 										</Select.Group>
 									</Select.Content>
-									<Select.Input name="favoriteFruit" />
+									<Select.Input name="ashift" />
 								</Select.Root>
 							</div>
 						</div>
-						<div transition:slide class="mt-2 flex items-center space-x-2 md:mt-0">
+
+						<div transition:slide class="mt-2 flex items-center space-x-2 md:mt-3">
 							<Label
-								id="terms-label"
-								for="terms"
+								id="advanced-label"
+								for="advanced-checkbox"
 								class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
 							>
 								Advanced
 							</Label>
-							<Checkbox id="terms" bind:checked={advancedChecked} aria-labelledby="terms-label" />
+							<Checkbox
+								id="advanced-checkbox"
+								bind:checked={advancedChecked}
+								aria-labelledby="advanced-label"
+							/>
 						</div>
 
 						{#if advancedChecked}
@@ -605,14 +656,14 @@
 												onclick={() => removePair(index)}
 												class="hover:bg-muted rounded px-2 py-1 text-white"
 											>
-												<Icon icon="ic:twotone-remove" class="h-5 w-5" />
+												<Icon icon="ic:twotone-remove" class="h-6 w-6" />
 											</button>
 										{/if}
 									</div>
 								{/each}
 							</div>
 							<div transition:slide class="flex justify-end">
-								<button onclick={addPair} class=" hover:bg-muted rounded px-3 py-1 text-white">
+								<button onclick={addPair} class=" hover:bg-muted rounded px-2 py-1 text-white">
 									<Icon icon="icons8:plus" class="h-6 w-6" />
 								</button>
 							</div>
@@ -622,7 +673,7 @@
 			</Tabs.Content>
 		</Tabs.Root>
 
-		<Dialog.Footer class="flex justify-between gap-2 border-t px-6 py-4">
+		<Dialog.Footer class="flex justify-between gap-2 border-t px-4 py-3">
 			<div class="flex gap-2">
 				<Button variant="outline" class="h-8 disabled:!pointer-events-auto" onclick={() => close()}
 					>Cancel</Button

@@ -7,6 +7,8 @@
 > [!WARNING]
 > This project is still in development so expect breaking changes!
 
+https://github.com/user-attachments/assets/bf727ef4-4316-4084-a61f-cb8ec978e43d
+
 Sylve aims to be a lightweight, open-source virtualization platform for FreeBSD, leveraging Bhyve for VMs and Jails for containerization, with deep ZFS integration. It seeks to provide a streamlined, Proxmox-like experience tailored for FreeBSD environments. It's backend is written in Go and the frontend is written in Svelte (with Kit).
 
 # Requirements

@@ -5,7 +5,7 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Resizable from '$lib/components/ui/resizable';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
-	import { hostname, paneSizes } from '$lib/stores/basic';
+	import { hostname } from '$lib/stores/basic';
 	import { triggers } from '$lib/utils/keyboard-shortcuts';
 	import { shortcut, type ShortcutTrigger } from '@svelte-put/shortcut';
 	import CircleHelp from 'lucide-svelte/icons/circle-help';
@@ -158,14 +158,13 @@
 		</Button>
 	</div>
 
-	<!-- onResize={(e) => ($paneSizes.middle = e)} -->
-
-	<Resizable.PaneGroup direction="horizontal" class="h-full w-full">
-		<Resizable.Pane
-			defaultSize={$paneSizes.middle}
-			minSize={5}
-			onResize={(e) => ($paneSizes.middle = e)}
-		>
+	<Resizable.PaneGroup
+		direction="horizontal"
+		class="h-full w-full"
+		id="main-pane-auto"
+		autoSaveId="main-pane-auto-save"
+	>
+		<Resizable.Pane>
 			<div class="h-full px-1">
 				<div class="h-full overflow-y-auto">
 					<nav aria-label="Difuse-sidebar" class="menu thin-scrollbar w-full">
@@ -181,7 +180,7 @@
 			</div>
 		</Resizable.Pane>
 		<Resizable.Handle withHandle />
-		<Resizable.Pane defaultSize={$paneSizes.right} onResize={(e) => ($paneSizes.right = e)}>
+		<Resizable.Pane>
 			<div class="h-full">
 				{@render children?.()}
 			</div>

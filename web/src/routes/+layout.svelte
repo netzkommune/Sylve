@@ -41,7 +41,6 @@
 			}
 		}
 		if ($token) {
-			await sleep(500);
 			try {
 				if (await isTokenValid()) {
 					isLoggedIn = true;
@@ -85,6 +84,7 @@
 			console.error('Login error:', error);
 			alert('Login failed: An error occurred');
 		} finally {
+			await sleep(2500);
 			isLoading = false;
 		}
 		return;

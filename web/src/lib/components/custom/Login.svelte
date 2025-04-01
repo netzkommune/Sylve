@@ -31,9 +31,6 @@
 	$effect(() => {
 		if ($page.url.search.includes('loggedOut')) {
 			revokeJWT();
-			const url = new URL($page.url);
-			url.search = '';
-			window.history.replaceState({}, document.title, url.toString());
 		}
 	});
 </script>

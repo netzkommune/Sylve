@@ -5,7 +5,6 @@
 	import Terminal from '$lib/components/custom/Terminal.svelte';
 	import BottomPanel from '$lib/components/Skeleton/BottomPanel.svelte';
 	import LeftPanel from '$lib/components/Skeleton/LeftPanel.svelte';
-	import { paneSizes } from '$lib/stores/basic';
 	interface Props {
 		children?: import('svelte').Snippet;
 	}
@@ -17,14 +16,18 @@
 	<Header />
 	<main class="flex flex-1 flex-col">
 		<div class="h-[95vh] w-full md:h-[96vh]">
-			<Resizable.PaneGroup direction="vertical">
-				<Resizable.Pane defaultSize={$paneSizes.main} onResize={(e) => ($paneSizes.main = e)}>
-					<Resizable.PaneGroup direction="horizontal">
-						<Resizable.Pane
-							defaultSize={$paneSizes.left}
-							minSize={5}
-							onResize={(e) => ($paneSizes.left = e)}
-						>
+			<Resizable.PaneGroup
+				direction="vertical"
+				id="child-pane-auto"
+				autoSaveId="child-pane-auto-save"
+			>
+				<Resizable.Pane>
+					<Resizable.PaneGroup
+						direction="horizontal"
+						id="child-left-pane-auto"
+						autoSaveId="child-left-pane-auto-save"
+					>
+						<Resizable.Pane>
 							<LeftPanel />
 						</Resizable.Pane>
 
@@ -38,11 +41,7 @@
 
 				<Resizable.Handle withHandle />
 
-				<Resizable.Pane
-					defaultSize={$paneSizes.bottom}
-					class="h-full min-h-20"
-					onResize={(e) => ($paneSizes.bottom = e)}
-				>
+				<Resizable.Pane class="h-full min-h-20">
 					<BottomPanel />
 				</Resizable.Pane>
 			</Resizable.PaneGroup>

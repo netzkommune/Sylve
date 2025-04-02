@@ -47,7 +47,7 @@ func DestroyDisk(device string) error {
 	return nil
 }
 
-func CreatePartition(device string, size uint64) error {
+func CreatePartition(device string, size uint64, ptype string) error {
 	err := CheckDevice(device)
 
 	if err != nil {
@@ -59,7 +59,11 @@ func CreatePartition(device string, size uint64) error {
 		return fmt.Errorf("size must be at least 1MB")
 	}
 
-	output, err := utils.RunCommand("gpart", "add", "-t", "freebsd-zfs", "-s", fmt.Sprintf("%dMB", mbytes), device)
+	if ptype == "" {
+		ptype = "freebsd-zfs"
+	}
+
+	output, err := utils.RunCommand("gpart", "add", "-t", ptype, "-s", fmt.Sprintf("%dMB", mbytes), device)
 	if err != nil {
 		return fmt.Errorf("error creating partition on disk %s: %v, output: %s", device, err, output)
 	}
@@ -91,7 +95,7 @@ func CreatePartitions(device string, sizes []uint64) error {
 	}
 
 	for _, size := range sizes {
-		err = CreatePartition(device, size)
+		err = CreatePartition(device, size, "")
 
 		if err != nil {
 			return err

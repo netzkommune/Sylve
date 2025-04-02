@@ -18,6 +18,7 @@
 	import { flip } from 'svelte/animate';
 	import { slide } from 'svelte/transition';
 
+	import { createEmptyArrayOfArrays } from '$lib/utils/arr';
 	import { draggable, dropzone } from '$lib/utils/dnd';
 	import { untrack } from 'svelte';
 
@@ -30,6 +31,13 @@
 		name: string;
 		size: number;
 		gpt: boolean;
+		type: string;
+	}
+
+	interface DiskContainer {
+		id: string;
+		name: string;
+		size: number;
 		type: string;
 	}
 
@@ -75,19 +83,22 @@
 			if (disk.Usage === 'Partitions') {
 				for (const partition of disk.Partitions) {
 					for (const pool of pools) {
+						let skip = false;
+
 						for (const vdev of pool.vdevs) {
-							if (
-								vdev.name !== `/dev/${partition.name}` &&
-								vdev.name !== partition.name &&
-								partition.usage === 'ZFS'
-							) {
-								unusedDisks.push({
-									name: `/dev/${partition.name}`,
-									size: partition.size,
-									gpt: disk.GPT,
-									type: 'Partition'
-								});
+							if (vdev.name.includes(partition.name)) {
+								skip = true;
+								continue;
 							}
+						}
+
+						if (partition.usage === 'ZFS' && !skip) {
+							unusedDisks.push({
+								name: `/dev/${partition.name}`,
+								size: partition.size,
+								gpt: disk.GPT,
+								type: 'Partition'
+							});
 						}
 					}
 				}
@@ -99,12 +110,17 @@
 
 	let open: boolean = $state(false);
 	let name: string = $state('');
-	let vdevCount: number = $state(21);
+	let vdevCount: number = $state(1);
 	let createEnabled: boolean = $state(false);
 
-	$effect(() => {
-		vdevCount = Math.max(1, Math.min(128, vdevCount));
-	});
+	function mapAvailable(): DiskContainer[] {
+		return useableDisks.map((disk) => ({
+			id: disk.name,
+			name: disk.name,
+			size: disk.size,
+			type: disk.type
+		}));
+	}
 
 	function close() {
 		open = false;
@@ -112,130 +128,85 @@
 		vdevCount = 1;
 	}
 
-	// Convert useable disks to a format with IDs for drag and drop
-	let availableDisks = $state(
-		useableDisks.map((disk) => ({
-			id: disk.name,
-			name: disk.name,
-			size: disk.size,
-			type: disk.type
-		}))
-	);
+	let availableDisks: DiskContainer[] = $state(mapAvailable());
+	let diskContainers: DiskContainer[][] | null = $state(null);
 
-	// Add dummy disks for testing if needed
-	if (availableDisks.length === 0) {
-		availableDisks = [
-			// HDD disks
-			{ id: 'disk1', name: '/dev/sda', size: 500 * 1024 * 1024 * 1024, type: 'HDD' },
-			{ id: 'disk2', name: '/dev/sdb', size: 1000 * 1024 * 1024 * 1024, type: 'HDD' },
-			{ id: 'disk3', name: '/dev/sdc', size: 2000 * 1024 * 1024 * 1024, type: 'HDD' },
-			{ id: 'disk4', name: '/dev/sdd', size: 4000 * 1024 * 1024 * 1024, type: 'HDD' },
-			{ id: 'disk5', name: '/dev/sde', size: 8000 * 1024 * 1024 * 1024, type: 'HDD' },
-			{ id: 'disk6', name: '/dev/sdf', size: 10000 * 1024 * 1024 * 1024, type: 'HDD' },
-			{ id: 'disk7', name: '/dev/sdg', size: 12000 * 1024 * 1024 * 1024, type: 'HDD' },
-			{ id: 'disk8', name: '/dev/sdh', size: 14000 * 1024 * 1024 * 1024, type: 'HDD' },
-			{ id: 'disk9', name: '/dev/sdi', size: 16000 * 1024 * 1024 * 1024, type: 'HDD' },
-			{ id: 'disk10', name: '/dev/sdj', size: 18000 * 1024 * 1024 * 1024, type: 'HDD' },
-			// SSD disks
-			{ id: 'ssd1', name: '/dev/ssd0n1', size: 250 * 1024 * 1024 * 1024, type: 'SSD' },
-			{ id: 'ssd2', name: '/dev/ssd1n1', size: 500 * 1024 * 1024 * 1024, type: 'SSD' },
-			{ id: 'ssd3', name: '/dev/ssd2n1', size: 1000 * 1024 * 1024 * 1024, type: 'SSD' },
-			{ id: 'ssd4', name: '/dev/ssd3n1', size: 2000 * 1024 * 1024 * 1024, type: 'SSD' },
-			{ id: 'ssd5', name: '/dev/ssd4n1', size: 4000 * 1024 * 1024 * 1024, type: 'SSD' },
-			{ id: 'ssd6', name: '/dev/ssd5n1', size: 8000 * 1024 * 1024 * 1024, type: 'SSD' },
-			{ id: 'ssd7', name: '/dev/ssd6n1', size: 10000 * 1024 * 1024 * 1024, type: 'SSD' },
-			{ id: 'ssd8', name: '/dev/ssd7n1', size: 12000 * 1024 * 1024 * 1024, type: 'SSD' },
-			{ id: 'ssd9', name: '/dev/ssd8n1', size: 14000 * 1024 * 1024 * 1024, type: 'SSD' },
-			{ id: 'ssd10', name: '/dev/ssd9n1', size: 16000 * 1024 * 1024 * 1024, type: 'SSD' },
+	$effect(() => {
+		vdevCount = Math.max(1, Math.min(128, vdevCount));
+		untrack(() => {
+			console.log(useableDisks);
+			if (diskContainers === null) {
+				diskContainers = createEmptyArrayOfArrays(vdevCount);
+			} else {
+				// Create a new array with the new length first
+				const newContainers = Array(vdevCount).fill([]);
 
-			{ id: 'nvm1', name: '/dev/nvme0n1', size: 250 * 1024 * 1024 * 1024, type: 'NVMe' },
-			{ id: 'nvm2', name: '/dev/nvme1n1', size: 500 * 1024 * 1024 * 1024, type: 'NVMe' },
-			{ id: 'nvm3', name: '/dev/nvme2n1', size: 1000 * 1024 * 1024 * 1024, type: 'NVMe' },
-			{ id: 'nvm4', name: '/dev/nvme3n1', size: 2000 * 1024 * 1024 * 1024, type: 'NVMe' },
-			{ id: 'nvm5', name: '/dev/nvme4n1', size: 4000 * 1024 * 1024 * 1024, type: 'NVMe' },
-			{ id: 'nvm6', name: '/dev/nvme5n1', size: 8000 * 1024 * 1024 * 1024, type: 'NVMe' },
-			{ id: 'nvm7', name: '/dev/nvme6n1', size: 10000 * 1024 * 1024 * 1024, type: 'NVMe' },
-			{ id: 'nvm8', name: '/dev/nvme7n1', size: 12000 * 1024 * 1024 * 1024, type: 'NVMe' },
-			{ id: 'nvm9', name: '/dev/nvme8n1', size: 14000 * 1024 * 1024 * 1024, type: 'NVMe' },
-			{ id: 'nvm10', name: '/dev/nvme9n1', size: 16000 * 1024 * 1024 * 1024, type: 'NVMe' }
-		];
-	}
+				// Then copy over existing containers up to the minimum of old and new length
+				const copyLength = Math.min(diskContainers.length, vdevCount);
+				for (let i = 0; i < copyLength; i++) {
+					newContainers[i] = [...diskContainers[i]]; // Create a new array reference
+				}
 
-	// Create containers for the disks
-	let diskContainers: { id: string; name: string; size: number; type: string }[][] = $state(
-		Array(vdevCount)
-			.fill(null)
-			.map((_, i) => [])
-	);
+				diskContainers = newContainers;
+			}
+		});
+	});
 
 	function handleDiskDrop(containerId: number, event: DragEvent) {
-		// event.preventDefault();
-		console.log('Dropped disk in container', containerId);
+		event.preventDefault();
 
-		const diskId = event.dataTransfer ? event.dataTransfer.getData('application/disk') : null;
+		const diskId = event.dataTransfer?.getData('application/disk');
+		if (!diskId) return;
 
-		// Check if the disk is already in a container
-		let foundInContainer = -1;
-		let diskToMove = null;
+		let diskToMove: any = null;
 
-		// Look in containers first
-		for (let i = 0; i < diskContainers.length; i++) {
-			const diskIndex = diskContainers[i].findIndex((d) => d.id === diskId);
-			if (diskIndex !== -1) {
-				diskToMove = diskContainers[i][diskIndex];
-				foundInContainer = i;
-				break;
-			}
-		}
-
-		// Look in available disks if not found in containers
-		if (foundInContainer === -1) {
-			const diskIndex = availableDisks.findIndex((d) => d.id === diskId);
-			if (diskIndex !== -1) {
-				diskToMove = availableDisks[diskIndex];
-				availableDisks = availableDisks.filter((d) => d.id !== diskId);
-			}
-		} else if (foundInContainer !== containerId) {
-			// Remove from original container if it's a different one
-			diskContainers[foundInContainer] = diskContainers[foundInContainer].filter(
-				(d) => d.id !== diskId
+		if (diskContainers) {
+			// Try to find and remove the disk from a container
+			const sourceContainerIndex = diskContainers.findIndex((container) =>
+				container.some((disk) => disk.id === diskId)
 			);
-		}
 
-		// Add to target container if we found the disk
-		if (diskToMove && foundInContainer !== containerId) {
-			diskContainers[containerId] = [...diskContainers[containerId], diskToMove];
-		}
+			if (sourceContainerIndex !== -1) {
+				const container = diskContainers[sourceContainerIndex];
+				diskToMove = container.find((disk) => disk.id === diskId) || null;
 
-		// Enable create button if any disks are assigned
-		createEnabled = diskContainers.some((container) => container.length > 0);
-	}
+				// Remove it only if moving to a different container
+				if (sourceContainerIndex !== containerId) {
+					diskContainers[sourceContainerIndex] = container.filter((disk) => disk.id !== diskId);
+				}
+			} else {
+				// Try to find and remove from available disks
+				const diskIndex = availableDisks.findIndex((disk) => disk.id === diskId);
+				if (diskIndex !== -1) {
+					diskToMove = availableDisks[diskIndex];
+					availableDisks.splice(diskIndex, 1); // Remove from availableDisks
+				}
+			}
 
-	// Function to handle removing a disk from a container
-	function returnDiskToPool(containerId: number, diskId: string) {
-		const container = diskContainers[containerId];
-		const diskIndex = container.findIndex((d) => d.id === diskId);
+			// Add to target container if found and it's not already there
+			if (diskToMove && sourceContainerIndex !== containerId) {
+				diskContainers[containerId].push(diskToMove);
+				console.log(diskContainers);
+			}
 
-		if (diskIndex !== -1) {
-			const disk = container[diskIndex];
-			diskContainers[containerId] = container.filter((d) => d.id !== diskId);
-			availableDisks = [...availableDisks, disk];
-
-			// Update create button state
+			// Enable create button if any container has disks
 			createEnabled = diskContainers.some((container) => container.length > 0);
 		}
 	}
 
-	// $effect(() => {
-	// 	const oldContainers = [...diskContainers];
-	// 	untrack(() => {
-	// 		diskContainers = Array(vdevCount)
-	// 			.fill(null)
-	// 			.map((_, i) => {
-	// 				return oldContainers[i] || [];
-	// 			});
-	// 	});
-	// });
+	// Function to handle removing a disk from a container
+	function returnDiskToPool(containerId: number, diskId: string) {
+		if (diskContainers) {
+			const container = diskContainers[containerId];
+			const diskIndex = container.findIndex((d) => d.id === diskId);
+			if (diskIndex !== -1) {
+				const disk = container[diskIndex];
+				diskContainers[containerId] = container.filter((d) => d.id !== diskId);
+				availableDisks = [...availableDisks, disk];
+				createEnabled = diskContainers.some((container) => container.length > 0);
+			}
+		}
+	}
 
 	const raid = [
 		{ value: 'mirror', label: 'Mirror' },
@@ -299,8 +270,8 @@
 		</div>
 		<Tabs.Root value="tab-1" class="w-full overflow-hidden">
 			<Tabs.List class="grid w-full grid-cols-2">
-				<Tabs.Trigger value="tab-1">Tab 1</Tabs.Trigger>
-				<Tabs.Trigger value="tab-2">Tab 2</Tabs.Trigger>
+				<Tabs.Trigger value="tab-1">Devices</Tabs.Trigger>
+				<Tabs.Trigger value="tab-2">Options</Tabs.Trigger>
 			</Tabs.List>
 			<Tabs.Content value="tab-1">
 				<Card.Root class="pb-6">
@@ -316,57 +287,85 @@
 					</Card.Content>
 					<Card.Content class="flex flex-col gap-6 !pb-0">
 						<Label for="vdev_count" class="">VDEV</Label>
-
-						<!-- Disk Containers Section -->
 						<div
-							class="border-primary-foreground bg-primary-foreground w-full overflow-hidden border-y p-4"
+							class="border-primary-foreground bg-primary-foreground w-full overflow-hidden rounded-lg border-y p-4"
 						>
-							<ScrollArea class="w-full whitespace-nowrap rounded-md " orientation="horizontal">
+							<ScrollArea class="w-full whitespace-nowrap rounded-md" orientation="horizontal">
 								<div class="flex justify-center gap-7 pr-4">
 									{#each Array(vdevCount) as _, i}
-										<div class="flex flex-col">
-											<div
-												class="h-28 w-48 flex-shrink-0 overflow-auto rounded-lg border border-neutral-300 bg-neutral-200 p-2 dark:border-neutral-800 dark:bg-neutral-950"
-												use:dropzone={{
-													on_dropzone: (_: unknown, event: DragEvent) => handleDiskDrop(i, event)
-												}}
-											>
-												{#if diskContainers[i].length === 0}
-													<div class="flex h-full items-center justify-center text-neutral-500">
-														Drop disks here
-													</div>
-												{:else}
-													<div class="flex flex-wrap items-center justify-center gap-2">
-														{#each diskContainers[i] as disk (disk.id)}
-															<div animate:flip={{ duration: 300 }} class="relative">
-																{#if disk.type === 'NVMe'}
-																	<Icon icon="bi:nvme" class="h-11 w-11 rotate-90 text-blue-500" />
-																{:else}
-																	<Icon
-																		icon={disk.type === 'SSD'
-																			? 'icon-park-outline:ssd'
-																			: 'mdi:harddisk'}
-																		class="h-12 w-12 {disk.type === 'SSD'
-																			? 'text-blue-500'
-																			: 'text-green-500'}"
-																	/>
-																{/if}
-																<div class="max-w-[48px] truncate text-center text-xs">
-																	{disk.name.split('/').pop()}
-																</div>
-																<button
-																	class="absolute -right-1 -top-1 rounded-full bg-red-500 p-0.5 text-white hover:bg-red-600"
-																	onclick={() => returnDiskToPool(i, disk.id)}
-																>
-																	<Icon icon="mdi:close" class="h-3 w-3" />
-																</button>
+										{#if diskContainers}
+											{#if diskContainers[i]}
+												<div class="flex flex-col">
+													<div
+														class="h-28 w-48 flex-shrink-0 overflow-auto rounded-lg border border-neutral-300 bg-neutral-200 p-2 dark:border-neutral-800 dark:bg-neutral-950"
+														use:dropzone={{
+															on_dropzone: (_: unknown, event: DragEvent) =>
+																handleDiskDrop(i, event)
+														}}
+													>
+														{#if diskContainers[i].length === 0}
+															<div class="flex h-full items-center justify-center text-neutral-500">
+																Drop disks here
 															</div>
-														{/each}
+														{:else}
+															<div class="flex flex-wrap items-center justify-center gap-2">
+																{#each diskContainers[i] as disk (disk.id)}
+																	<div animate:flip={{ duration: 300 }} class="relative">
+																		<!-- {#if disk.type === 'NVMe'}
+																			<Icon
+																				icon="bi:nvme"
+																				class="h-11 w-11 rotate-90 text-blue-500"
+																			/>
+																		{:else}
+																			<Icon
+																				icon={disk.type === 'SSD'
+																					? 'icon-park-outline:ssd'
+																					: 'mdi:harddisk'}
+																				class="h-12 w-12 {disk.type === 'SSD'
+																					? 'text-blue-500'
+																					: 'text-green-500'}"
+																			/>
+																		{/if} -->
+																		{#if disk.type === 'SSD'}
+																			<Icon
+																				icon="icon-park-outline:ssd"
+																				class="h-11 w-11 text-blue-500"
+																			/>
+																		{:else if disk.type === 'NVMe'}
+																			<Icon
+																				icon="bi:nvme"
+																				class="h-11 w-11 rotate-90 text-blue-500"
+																			/>
+																		{:else if disk.type === 'HDD'}
+																			<Icon icon="mdi:harddisk" class="h-11 w-11 text-green-500" />
+																		{:else if disk.type === 'Partition'}
+																			<Icon
+																				icon="ant-design:partition-outlined"
+																				class="h-11 w-11 rotate-90 text-blue-500"
+																			/>
+																		{/if}
+																		<div class="max-w-[48px] truncate text-center text-xs">
+																			{disk.name.split('/').pop()}
+																		</div>
+																		<button
+																			class="absolute -right-1 -top-1 rounded-full bg-red-500 p-0.5 text-white hover:bg-red-600"
+																			onclick={() => returnDiskToPool(i, disk.id)}
+																		>
+																			<Icon icon="mdi:close" class="h-3 w-3" />
+																		</button>
+																	</div>
+																{/each}
+															</div>
+														{/if}
 													</div>
-												{/if}
-											</div>
-											<p class="mt-2 text-center text-xs text-neutral-100">VDEV {i + 1}</p>
-										</div>
+													<p
+														class="mt-2 text-center text-xs text-neutral-800 dark:text-neutral-300"
+													>
+														VDEV {i + 1}
+													</p>
+												</div>
+											{/if}
+										{/if}
 									{/each}
 								</div>
 							</ScrollArea>
@@ -374,7 +373,7 @@
 
 						<Label for="vdev_count" class="">Disks</Label>
 						<div
-							class="border-primary-foreground bg-primary-foreground grid grid-cols-3 gap-6 overflow-hidden border-y p-4"
+							class="border-primary-foreground bg-primary-foreground grid grid-cols-4 gap-6 overflow-hidden border-y p-4"
 						>
 							<div class="">
 								<label class="">HDD</label>
@@ -383,7 +382,7 @@
 										class="mt-1 w-full whitespace-nowrap rounded-md"
 										orientation="horizontal"
 									>
-										<div class="flex justify-center gap-4 pr-4">
+										<div class="flex min-h-[80px] justify-center gap-4 pr-4">
 											{#each availableDisks.filter((disk) => disk.type === 'HDD') as disk (disk.id)}
 												<div class="text-center" animate:flip={{ duration: 300 }}>
 													<div class="cursor-move" use:draggable={disk.id}>
@@ -398,7 +397,7 @@
 												</div>
 											{/each}
 
-											{#if availableDisks.length === 0}
+											{#if availableDisks.filter((disk) => disk.type === 'HDD').length === 0}
 												<div class="flex h-16 w-full items-center justify-center text-neutral-400">
 													No available disks
 												</div>
@@ -415,7 +414,7 @@
 										class="mt-1 w-full whitespace-nowrap rounded-md "
 										orientation="horizontal"
 									>
-										<div class="flex justify-center gap-4 pr-4">
+										<div class="flex min-h-[80px] justify-center gap-4 pr-4">
 											{#each availableDisks.filter((disk) => disk.type === 'SSD') as disk (disk.id)}
 												<div class="text-center" animate:flip={{ duration: 300 }}>
 													<div class="cursor-move" use:draggable={disk.id}>
@@ -447,7 +446,7 @@
 										class="mt-1 w-full whitespace-nowrap rounded-md "
 										orientation="horizontal"
 									>
-										<div class="flex justify-center gap-4 pr-4">
+										<div class="flex min-h-[80px] justify-center gap-4 pr-4">
 											{#each availableDisks.filter((disk) => disk.type === 'NVMe') as disk (disk.id)}
 												<div class="text-center" animate:flip={{ duration: 300 }}>
 													<div class="cursor-move" use:draggable={disk.id}>
@@ -471,10 +470,46 @@
 									</ScrollArea>
 								</div>
 							</div>
+
+							<div class="">
+								<label class="">Partition</label>
+								<div class="mt-1 rounded-lg bg-neutral-200 p-4 dark:bg-neutral-950">
+									<ScrollArea
+										class="mt-1 w-full whitespace-nowrap rounded-md "
+										orientation="horizontal"
+									>
+										<div class="flex min-h-[80px] justify-center gap-4 pr-4">
+											{#each availableDisks.filter((disk) => disk.type === 'Partition') as disk (disk.id)}
+												<div class="text-center" animate:flip={{ duration: 300 }}>
+													<div class="cursor-move" use:draggable={disk.id}>
+														<Icon
+															icon="ant-design:partition-outlined"
+															class="h-11 w-11 rotate-90 text-blue-500"
+														/>
+													</div>
+													<div class="max-w-[64px] truncate text-xs">
+														{disk.name.split('/').pop()}
+													</div>
+													<div class="text-xs text-neutral-400">
+														{Math.round(disk.size / (1024 * 1024 * 1024))} GB
+													</div>
+												</div>
+											{/each}
+
+											{#if availableDisks.filter((disk) => disk.type === 'Partition').length === 0}
+												<div class="flex h-16 w-full items-center justify-center text-neutral-400">
+													No available partitions
+												</div>
+											{/if}
+										</div>
+									</ScrollArea>
+								</div>
+							</div>
 						</div>
 					</Card.Content>
 				</Card.Root>
 			</Tabs.Content>
+
 			<Tabs.Content value="tab-2">
 				<Card.Root>
 					<Card.Content>

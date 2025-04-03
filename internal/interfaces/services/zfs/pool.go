@@ -14,8 +14,9 @@ type Vdev struct {
 }
 
 type Zpool struct {
-	Name       string            `json:"name" binding:"required,alphanum,min=1,max=24"`
-	RaidType   string            `json:"raidType" binding:"omitempty,oneof= mirror raidz raidz2 raidz3"`
-	Vdevs      []Vdev            `json:"vdevs"`
-	Properties map[string]string `json:"properties"`
+	Name        string            `json:"name" binding:"required,alphanum,min=1,max=24"`
+	RaidType    string            `json:"raidType" binding:"omitempty,oneof= mirror raidz raidz2 raidz3"`
+	Vdevs       []Vdev            `json:"vdevs"`
+	Properties  map[string]string `json:"properties"`
+	CreateForce bool              `json:"createForce"`
 }

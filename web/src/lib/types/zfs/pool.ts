@@ -51,7 +51,8 @@ export const CreateZpoolSchema = z.object({
 		.regex(/^[a-zA-Z0-9]+$/, 'Name must be alphanumeric'),
 	raidType: z.enum(['mirror', 'raidz', 'raidz2', 'raidz3']).optional(),
 	vdevs: z.array(CreateVdevSchema),
-	properties: z.record(z.string()).optional()
+	properties: z.record(z.string()).optional(),
+	createForce: z.boolean().default(false)
 });
 
 export type IODelay = z.infer<typeof IODelaySchema>;

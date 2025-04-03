@@ -159,6 +159,7 @@ func (s *Service) GetDiskDevices() ([]diskServiceInterfaces.Disk, error) {
 
 	for _, d := range dinfo {
 		var disk diskServiceInterfaces.Disk
+		disk.UUID = utils.GenerateDeterministicUUID(fmt.Sprintf("%s-%s", d.LunID, d.Serial))
 		disk.Device = d.Name
 		disk.Type = d.Type
 		disk.Size = uint64(d.MediaSize)
@@ -200,6 +201,7 @@ func (s *Service) GetDiskDevices() ([]diskServiceInterfaces.Disk, error) {
 		for _, p := range d.Partitions {
 			if strings.HasPrefix(p.Name, d.Name) {
 				var partition diskServiceInterfaces.Partition
+				partition.UUID = p.UUID
 				partition.Name = p.Name
 				partition.Usage = p.Filesystem
 				partition.Size = uint64(p.Size)
@@ -219,6 +221,14 @@ func (s *Service) GetDiskDevices() ([]diskServiceInterfaces.Disk, error) {
 							disk.Usage = "ZFS"
 							found = true
 							break
+						}
+
+						for _, device := range vdev.VdevDevices {
+							if device.Name == "/dev/"+d.Name {
+								disk.Usage = "ZFS"
+								found = true
+								break
+							}
 						}
 					}
 					if found {

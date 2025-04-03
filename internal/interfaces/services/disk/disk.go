@@ -9,12 +9,14 @@
 package diskServiceInterfaces
 
 type Partition struct {
+	UUID  string `json:"uuid"`
 	Name  string `json:"name"`
 	Usage string `json:"usage"`
 	Size  uint64 `json:"size"`
 }
 
 type Disk struct {
+	UUID       string      `json:"uuid"`
 	Device     string      `json:"device"`
 	Type       string      `json:"type"`
 	Usage      string      `json:"usage"`

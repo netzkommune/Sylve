@@ -97,13 +97,16 @@ export const SmartCtlSchema = z.object({
 });
 
 export const PartitionSchema = z.object({
+	uuid: z.string(),
 	name: z.string(),
 	usage: z.string(),
-	size: z.number()
+	size: z.number(),
+	id: z.string().optional()
 });
 
 export const DiskInfoSchema = z.array(
 	z.object({
+		uuid: z.string(),
 		device: z.string(),
 		type: z.string(),
 		usage: z.string(),
@@ -131,6 +134,7 @@ export type DiskInfo = z.infer<typeof DiskInfoSchema>;
 export type Partition = z.infer<typeof PartitionSchema>;
 
 export interface Disk {
+	UUID: string;
 	Device: string;
 	Type: string;
 	Usage: string;

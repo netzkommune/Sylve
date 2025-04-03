@@ -62,12 +62,20 @@ func (s *Service) CreatePool(pool zfsServiceInterfaces.Zpool) error {
 	}
 
 	var args []string
+	if pool.CreateForce {
+		args = append(args, "-f")
+	}
+
+	var vdevArgs []string
 	for _, vdev := range pool.Vdevs {
 		if pool.RaidType != "" {
-			args = append(args, pool.RaidType)
+			vdevArgs = append(vdevArgs, pool.RaidType)
 		}
-		args = append(args, vdev.VdevDevices...)
+		vdevArgs = append(vdevArgs, vdev.VdevDevices...)
 	}
+	args = append(args, vdevArgs...)
+
+	fmt.Println("Creating ZFS pool with args:", args, pool.RaidType)
 
 	_, err = zfs.CreateZpool(pool.Name, pool.Properties, args...)
 	if err != nil {

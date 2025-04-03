@@ -172,11 +172,26 @@ func (z *Zpool) Snapshots() ([]*Dataset, error) {
 func (z *zfs) CreateZpool(name string, properties map[string]string, args ...string) (*Zpool, error) {
 	cli := make([]string, 1, 4)
 	cli[0] = "create"
+
+	var forceFlag bool
+	var otherArgs []string
+	for _, arg := range args {
+		if arg == "-f" {
+			forceFlag = true
+		} else {
+			otherArgs = append(otherArgs, arg)
+		}
+	}
+	if forceFlag {
+		cli = append(cli, "-f")
+	}
+
 	if properties != nil {
 		cli = append(cli, propsSlice(properties)...)
 	}
 	cli = append(cli, name)
-	cli = append(cli, args...)
+	cli = append(cli, otherArgs...)
+
 	if err := z.zpool(cli...); err != nil {
 		return nil, err
 	}

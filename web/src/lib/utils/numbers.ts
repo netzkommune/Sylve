@@ -19,3 +19,8 @@ export function bytesToHumanReadable(value: number | undefined): string {
 	if (!value) return '0 B';
 	return humanFormat(value, { unit: 'B' });
 }
+
+export function getDeterministicIdFromString(str: string): string {
+	const hash = Array.from(str).reduce((acc, char) => acc + char.charCodeAt(0), 0);
+	return `id-${hash}`;
+}

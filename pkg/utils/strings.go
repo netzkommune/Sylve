@@ -69,6 +69,13 @@ func GenerateRandomUUID() string {
 	return uuid.New().String()
 }
 
+func GenerateDeterministicUUID(input string) string {
+	hasher := sha256.New()
+	hasher.Write([]byte(input))
+	hash := hasher.Sum(nil)
+	return uuid.NewSHA1(uuid.NameSpaceURL, hash).String()
+}
+
 func GenerateRandomString(length int) string {
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	result := make([]byte, length)

@@ -4,7 +4,7 @@ import { simplifyDisks } from '$lib/utils/disk';
 import { cachedFetch } from '$lib/utils/http';
 
 export async function load() {
-	const cacheDuration = 1000;
+	const cacheDuration = 1000 * 3600;
 	const [disks, pools] = await Promise.all([
 		cachedFetch('disks', async () => simplifyDisks(await listDisks()), cacheDuration),
 		cachedFetch('pools', getPools, cacheDuration)

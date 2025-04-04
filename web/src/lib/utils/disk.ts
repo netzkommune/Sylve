@@ -156,7 +156,6 @@ export function zpoolUseableDisks(disks: Disk[], pools: Zpool[]): Disk[] {
 				});
 
 				if (partitions.some((partition) => poolVdevDevices.includes(partition))) {
-					console.log('Skipping disk:', disk.Device);
 					continue;
 				}
 			}

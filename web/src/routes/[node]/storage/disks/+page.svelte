@@ -169,7 +169,6 @@
 					smartModal.type = 'kv';
 				} else if (activeDisk.Type === 'HDD' || activeDisk.Type === 'SSD') {
 					smartModal.KV = parseSMART($state.snapshot(activeDisk));
-					console.log(smartModal.KV);
 					smartModal.open = true;
 					smartModal.type = 'array';
 				}

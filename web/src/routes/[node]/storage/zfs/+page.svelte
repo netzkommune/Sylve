@@ -19,9 +19,12 @@
 	import { flip } from 'svelte/animate';
 	import { fade, slide } from 'svelte/transition';
 
+	import { Textarea } from '$lib/components/ui/textarea';
 	import { draggable, dropzone } from '$lib/utils/dnd';
+	import { isValidPoolName } from '$lib/utils/zfs';
 	import humanFormat from 'human-format';
 	import { untrack } from 'svelte';
+	import toast from 'svelte-french-toast';
 
 	interface Data {
 		disks: Disk[];
@@ -67,14 +70,38 @@
 
 	let modal = $state({
 		open: false,
-		name: 'test',
+		name: '',
 		vdevCount: 1,
 		vdevContainers: [] as VdevContainer[],
 		raidType: 'stripe',
+		mountPoint: '',
+		advanced: false,
+		properties: {
+			comment: '',
+			ashift: 12,
+			autoexpand: 'off',
+			autotrim: 'off',
+			delegation: 'off',
+			failmode: 'wait'
+		},
+		useable: 0,
 		close: () => {
+			modal.name = '';
 			modal.open = false;
 			modal.vdevCount = 1;
 			modal.vdevContainers = [];
+			modal.advanced = false;
+			modal.properties = {
+				comment: '',
+				ashift: 12,
+				autoexpand: 'off',
+				autotrim: 'off',
+				delegation: 'off',
+				failmode: 'wait'
+			};
+			modal.raidType = 'stripe';
+			modal.mountPoint = '';
+			modal.useable = 0;
 		}
 	});
 
@@ -95,6 +122,7 @@
 		modal.vdevCount = Math.max(1, Math.min(128, modal.vdevCount));
 		untrack(() => {
 			setRedundancyAvailability();
+			setUsableSpace();
 		});
 	});
 
@@ -160,6 +188,53 @@
 		if (!raidTypes.find((rt) => rt.value === modal.raidType)?.available) {
 			modal.raidType = raidTypes.find((rt) => rt.available)?.value || 'stripe';
 		}
+
+		setUsableSpace();
+	}
+
+	function setUsableSpace() {
+		let totalUsable = 0;
+
+		for (const vdev of modal.vdevContainers) {
+			const sizes = [
+				...(vdev.disks ?? []).map((d) => d.Size),
+				...(vdev.partitions ?? []).map((p) => p.size)
+			].filter((size) => typeof size === 'number');
+
+			if (sizes.length === 0) continue;
+
+			sizes.sort((a, b) => a - b);
+
+			const total = sizes.reduce((sum, s) => sum + s, 0);
+
+			switch (modal.raidType) {
+				case 'stripe':
+					totalUsable += total;
+					break;
+				case 'mirror':
+					totalUsable += sizes[0];
+					break;
+				case 'raidz1':
+					if (sizes.length > 1) {
+						totalUsable += total - sizes[sizes.length - 1];
+					}
+					break;
+				case 'raidz2':
+					if (sizes.length > 2) {
+						totalUsable += total - sizes.slice(-2).reduce((a, b) => a + b, 0);
+					}
+					break;
+				case 'raidz3':
+					if (sizes.length > 3) {
+						totalUsable += total - sizes.slice(-3).reduce((a, b) => a + b, 0);
+					}
+					break;
+				default:
+					console.warn(`Unknown RAID type: ${modal.raidType}`);
+			}
+		}
+
+		modal.useable = totalUsable;
 	}
 
 	function isDiskInVdev(diskId: string | undefined | string[]): boolean {
@@ -225,6 +300,7 @@
 		}
 
 		setRedundancyAvailability();
+		setUsableSpace();
 		// console.log(modal.vdevContainers);
 	}
 
@@ -262,6 +338,7 @@
 		}
 
 		setRedundancyAvailability();
+		setUsableSpace();
 	}
 
 	function getVdevErrors(id: number): string {
@@ -306,28 +383,26 @@
 	}
 
 	async function makePool() {
-		const create = {
-			name: modal.name,
-			vdevs: modal.vdevContainers.map((vdev) => ({
-				name: vdev.id,
-				devices: [
-					...vdev.disks.map((disk) => disk.Device),
-					...vdev.partitions.map((partition) => `/dev/${partition.name}`)
-				]
-			})),
-			raidType:
-				modal.raidType === 'stripe'
-					? undefined
-					: (modal.raidType as 'mirror' | 'raidz2' | 'raidz3' | 'raidz' | undefined),
-			properties: {
-				ashift: '12'
-			},
-			createForce: true
-		};
+		if (useableDisks.length === 0 && useablePartitions.length === 0) {
+			toast.error('No available disks or partitions', {
+				position: 'bottom-center'
+			});
+			return;
+		}
 
-		console.log(create);
+		if (!isValidPoolName(modal.name)) {
+			toast.error('Invalid pool name', {
+				position: 'bottom-center'
+			});
+			return;
+		}
 
-		console.log(await createPool(create));
+		if (modal.vdevContainers.length === 0) {
+			toast.error('Please add at least one disk', {
+				position: 'bottom-center'
+			});
+			return;
+		}
 	}
 </script>
 
@@ -473,6 +548,12 @@
 			<Icon icon="gg:add" class="mr-1 h-4 w-4" /> New
 		</Button>
 	</div>
+
+	<div class="relative flex h-full w-full cursor-pointer flex-col">
+		<div class="flex-1">
+			<h1 class="p-3">Table TBD</h1>
+		</div>
+	</div>
 </div>
 
 <Dialog.Root bind:open={modal.open} onOutsideClick={() => modal.close()}>
@@ -501,7 +582,13 @@
 					<Card.Content class="flex gap-4 p-4 !pb-0">
 						<div class="flex-1 space-y-1">
 							<Label for="name">Name</Label>
-							<Input type="text" id="name" placeholder="name" bind:value={modal.name} />
+							<Input
+								type="text"
+								id="name"
+								placeholder="tank"
+								bind:value={modal.name}
+								autocomplete="off"
+							/>
 						</div>
 						<div class="flex-1 space-y-1">
 							<Label for="vdev_count">Virtual Devices</Label>
@@ -535,10 +622,10 @@
 											>
 												{#if !vdevContains(i)}
 													<div
-														class="flex h-full flex-col items-center justify-center gap-2 text-neutral-500"
+														class="flex h-full flex-col items-center justify-center gap-1 text-neutral-500"
 													>
-														<span>Drop disks here</span>
 														<span class="dark:text-muted text-neutral-500">{i + 1}</span>
+														<span>Drop disks here</span>
 													</div>
 												{:else}
 													<div class="flex h-full flex-wrap items-center justify-center gap-2">
@@ -573,8 +660,12 @@
 				<Card.Root class="min-h-[20vh] border-none pb-6">
 					<Card.Content class="flex flex-col gap-4 p-4 !pb-0">
 						<div transition:slide class="grid grid-cols-1 gap-4 md:grid-cols-2">
-							<div class="h-full space-y-1">
-								<Label class="w-24 whitespace-nowrap text-sm" for="raid">Redundancy</Label>
+							<div class="flex-1 space-y-1">
+								<Label class="w-24 whitespace-nowrap text-sm" for="raid"
+									>Redundancy <span class="text-neutral-500 {modal.useable ? '' : 'hidden'}"
+										>({humanFormat(modal.useable)})</span
+									></Label
+								>
 								<Select.Root
 									selected={{
 										label: raidTypes.find((rt) => rt.value === modal.raidType)?.label,
@@ -582,6 +673,7 @@
 									}}
 									onSelectedChange={(value) => {
 										modal.raidType = value?.value as string;
+										setRedundancyAvailability();
 									}}
 								>
 									<Select.Trigger class="w-full">
@@ -600,7 +692,204 @@
 									</Select.Content>
 								</Select.Root>
 							</div>
+
+							<div class="flex-1 space-y-1">
+								<Label for="mountPoint">Mount Point</Label>
+								<Input
+									type="text"
+									id="mountPoint"
+									placeholder="/tank"
+									bind:value={modal.mountPoint}
+								/>
+							</div>
 						</div>
+
+						<div transition:slide class="grid grid-cols-1 gap-4">
+							<div class="flex-1 space-y-1">
+								<Label for="comment">Comment</Label>
+								<Textarea
+									id="comment"
+									placeholder="Comments about the pool"
+									bind:value={modal.properties.comment}
+								/>
+							</div>
+
+							<div class="flex gap-2 space-y-1">
+								<Checkbox
+									id="advanced"
+									bind:checked={modal.advanced}
+									aria-labelledby="advanced-label"
+								/>
+								<Label
+									id="advanced-label"
+									for="advanced"
+									class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+								>
+									Advanced
+								</Label>
+							</div>
+						</div>
+
+						{#if modal.advanced}
+							<div transition:slide class="grid grid-cols-1 gap-4 md:grid-cols-3">
+								<!-- Ashift -->
+								<div class="h-full space-y-1">
+									<Label class="w-24 whitespace-nowrap text-sm" for="ashift">Ashift</Label>
+									<Select.Root
+										selected={{
+											label: [
+												{ value: 0, label: '0 (auto)' },
+												...Array.from({ length: 8 }, (_, i) => {
+													const val = i + 9;
+													return { value: val, label: `${val}` };
+												})
+											].find((opt) => opt.value === modal.properties.ashift)?.label,
+											value: [
+												{ value: 0, label: '0 (auto)' },
+												...Array.from({ length: 8 }, (_, i) => {
+													const val = i + 9;
+													return { value: val, label: `${val}` };
+												})
+											].find((opt) => opt.value === modal.properties.ashift)?.value
+										}}
+										onSelectedChange={(value) => {
+											modal.properties.ashift = value?.value || 0;
+										}}
+									>
+										<Select.Trigger class="w-full">
+											<Select.Value placeholder="Select Ashift" />
+										</Select.Trigger>
+										<Select.Content class="max-h-36 overflow-y-auto">
+											<Select.Group>
+												<Select.Item value={0} label="0 (auto)">0 (auto)</Select.Item>
+												{#each Array.from({ length: 8 }, (_, i) => i + 9) as val}
+													<Select.Item value={val} label={`${val}`}>{val}</Select.Item>
+												{/each}
+											</Select.Group>
+										</Select.Content>
+									</Select.Root>
+								</div>
+
+								<!-- Auto Expand -->
+								<div class="h-full space-y-1">
+									<Label class="w-24 whitespace-nowrap text-sm" for="autoexpand">Auto Expand</Label>
+									<Select.Root
+										selected={{
+											label:
+												modal.properties.autoexpand === 'on'
+													? 'Yes'
+													: modal.properties.autoexpand === 'off'
+														? 'No'
+														: undefined,
+											value: modal.properties.autoexpand
+										}}
+										onSelectedChange={(value) => {
+											modal.properties.autoexpand = value?.value || 'off';
+										}}
+									>
+										<Select.Trigger class="w-full">
+											<Select.Value placeholder="Select Autoexpand" />
+										</Select.Trigger>
+										<Select.Content class="max-h-36 overflow-y-auto">
+											<Select.Group>
+												<Select.Item value="on" label="Yes">Yes</Select.Item>
+												<Select.Item value="off" label="No">No</Select.Item>
+											</Select.Group>
+										</Select.Content>
+									</Select.Root>
+								</div>
+
+								<!-- Auto Trim -->
+								<div class="h-full space-y-1">
+									<Label class="w-24 whitespace-nowrap text-sm" for="autotrim">Auto Trim</Label>
+									<Select.Root
+										selected={{
+											label:
+												modal.properties.autotrim === 'on'
+													? 'Yes'
+													: modal.properties.autotrim === 'off'
+														? 'No'
+														: undefined,
+											value: modal.properties.autotrim
+										}}
+										onSelectedChange={(value) => {
+											modal.properties.autotrim = value?.value || 'off';
+										}}
+									>
+										<Select.Trigger class="w-full">
+											<Select.Value placeholder="Select Auto Trim" />
+										</Select.Trigger>
+										<Select.Content class="max-h-36 overflow-y-auto">
+											<Select.Group>
+												<Select.Item value="on" label="Yes">Yes</Select.Item>
+												<Select.Item value="off" label="No">No</Select.Item>
+											</Select.Group>
+										</Select.Content>
+									</Select.Root>
+								</div>
+
+								<!-- Delegation -->
+								<div class="h-full space-y-1">
+									<Label class="w-24 whitespace-nowrap text-sm" for="delegation">Delegation</Label>
+									<Select.Root
+										selected={{
+											label:
+												modal.properties.delegation === 'on'
+													? 'Yes'
+													: modal.properties.delegation === 'off'
+														? 'No'
+														: undefined,
+											value: modal.properties.delegation
+										}}
+										onSelectedChange={(value) => {
+											modal.properties.delegation = value?.value || 'off';
+										}}
+									>
+										<Select.Trigger class="w-full">
+											<Select.Value placeholder="Select Delegation" />
+										</Select.Trigger>
+										<Select.Content class="max-h-36 overflow-y-auto">
+											<Select.Group>
+												<Select.Item value="on" label="Yes">Yes</Select.Item>
+												<Select.Item value="off" label="No">No</Select.Item>
+											</Select.Group>
+										</Select.Content>
+									</Select.Root>
+								</div>
+
+								<!-- Fail Mode -->
+								<div class="h-full space-y-1">
+									<Label class="w-24 whitespace-nowrap text-sm" for="failmode">Fail Mode</Label>
+									<Select.Root
+										selected={{
+											label:
+												modal.properties.failmode === 'wait'
+													? 'Wait'
+													: modal.properties.failmode === 'continue'
+														? 'Continue'
+														: modal.properties.failmode === 'panic'
+															? 'Panic'
+															: undefined,
+											value: modal.properties.failmode
+										}}
+										onSelectedChange={(value) => {
+											modal.properties.failmode = value?.value || 'wait';
+										}}
+									>
+										<Select.Trigger class="w-full">
+											<Select.Value placeholder="Select Delegation" />
+										</Select.Trigger>
+										<Select.Content class="max-h-36 overflow-y-auto">
+											<Select.Group>
+												<Select.Item value="wait" label="Wait">Wait</Select.Item>
+												<Select.Item value="continue" label="Continue">Continue</Select.Item>
+												<Select.Item value="panic" label="Panic">Panic</Select.Item>
+											</Select.Group>
+										</Select.Content>
+									</Select.Root>
+								</div>
+							</div>
+						{/if}
 					</Card.Content>
 				</Card.Root>
 			</Tabs.Content>

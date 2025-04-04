@@ -89,3 +89,16 @@ export function getHealthHelpers(health: string): { icon: string; color: string;
 			};
 	}
 }
+
+export function isValidPoolName(name: string): boolean {
+	const reserved = ['log', 'mirror', 'raidz', 'raidz1', 'raidz2', 'raidz3', 'spare'];
+
+	if (!name) return false;
+	if (reserved.some((r) => name.startsWith(r))) return false;
+	if (!/^[a-zA-Z]/.test(name)) return false;
+	if (!/^[a-zA-Z0-9_.-]+$/.test(name)) return false;
+	if (name.includes('%')) return false;
+	if (/^c[0-9]/.test(name)) return false;
+
+	return true;
+}

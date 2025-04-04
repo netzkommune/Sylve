@@ -140,24 +140,29 @@ export function zpoolUseableDisks(disks: Disk[], pools: Zpool[]): Disk[] {
 	for (const disk of disks) {
 		if (disk.Usage === 'Unused' && disk.GPT === false) {
 			useableDisks.push(disk);
-		}
+		} else {
+			const poolVdevs = pools.flatMap((pool) => pool.vdevs.map((vdev) => vdev.name));
+			const poolVdevDevices = pools.flatMap((pool) =>
+				pool.vdevs.flatMap((vdev) => vdev.devices.map((device) => device.name))
+			);
 
-		if (disk.Usage === 'Partitions') {
-			for (const partition of disk.Partitions) {
-				for (const pool of pools) {
-					let skip = false;
-
-					for (const vdev of pool.vdevs) {
-						if (vdev.name.includes(partition.name)) {
-							skip = true;
-							continue;
-						}
+			if (disk.Usage === 'Partitions') {
+				const partitions = disk.Partitions.map((partition) => {
+					if (partition.name.startsWith('/dev/')) {
+						return partition.name;
 					}
 
-					if (partition.usage === 'ZFS' && !skip) {
-						useableDisks.push(disk);
-					}
+					return `/dev/${partition.name}`;
+				});
+
+				if (partitions.some((partition) => poolVdevDevices.includes(partition))) {
+					console.log('Skipping disk:', disk.Device);
+					continue;
 				}
+			}
+
+			if (!poolVdevs.includes(disk.Device) && !poolVdevDevices.includes(disk.Device)) {
+				useableDisks.push(disk);
 			}
 		}
 	}

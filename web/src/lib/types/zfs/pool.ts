@@ -17,12 +17,18 @@ export const RWSchema = z.object({
 	write: z.number()
 });
 
+export const VdevDeviceSchema = z.object({
+	name: z.string(),
+	size: z.number()
+});
+
 export const VdevSchema = z.object({
 	name: z.string(),
 	alloc: z.number(),
 	free: z.number(),
 	operations: RWSchema,
-	bandwidth: RWSchema
+	bandwidth: RWSchema,
+	devices: z.array(VdevDeviceSchema)
 });
 
 export const ZpoolSchema = z.object({

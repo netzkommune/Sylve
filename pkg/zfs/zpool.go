@@ -111,44 +111,46 @@ func (z *zfs) GetZpool(name string) (*Zpool, error) {
 	var currentVdev *Vdev
 
 	for i, line := range vdevOut {
-		name := line[0]
+		if len(line) > 0 {
+			vdevName := line[0]
 
-		if i == 0 && name == pool.Name {
-			continue
-		}
-
-		if strings.HasPrefix(name, "mirror") || strings.HasPrefix(name, "raidz") {
-			currentVdev = &Vdev{
-				Name:       name,
-				Alloc:      utils.StringToUint64(line[1]),
-				Free:       utils.StringToUint64(line[3]),
-				Operations: RW{Read: utils.StringToUint64(line[5]), Write: utils.StringToUint64(line[6])},
-				Bandwidth:  RW{Read: utils.StringToUint64(line[7]), Write: utils.StringToUint64(line[8])},
-			}
-			vdevPtrs = append(vdevPtrs, currentVdev)
-		} else if strings.HasPrefix(name, "/dev/") {
-			device := VdevDevice{
-				Name: name,
-				Size: utils.StringToUint64(line[1]),
+			if i == 0 && vdevName == pool.Name {
+				continue
 			}
 
-			if currentVdev != nil {
-				currentVdev.VdevDevices = append(currentVdev.VdevDevices, device)
-			} else {
-				vdev := &Vdev{
-					Name:       name,
+			if strings.HasPrefix(vdevName, "mirror") || strings.HasPrefix(vdevName, "raidz") {
+				currentVdev = &Vdev{
+					Name:       vdevName,
 					Alloc:      utils.StringToUint64(line[1]),
-					Free:       utils.StringToUint64(line[2]),
+					Free:       utils.StringToUint64(line[3]),
 					Operations: RW{Read: utils.StringToUint64(line[5]), Write: utils.StringToUint64(line[6])},
 					Bandwidth:  RW{Read: utils.StringToUint64(line[7]), Write: utils.StringToUint64(line[8])},
-					VdevDevices: []VdevDevice{
-						device,
-					},
 				}
-				vdevPtrs = append(vdevPtrs, vdev)
+				vdevPtrs = append(vdevPtrs, currentVdev)
+			} else if strings.HasPrefix(vdevName, "/dev/") {
+				device := VdevDevice{
+					Name: vdevName,
+					Size: utils.StringToUint64(line[1]),
+				}
+
+				if currentVdev != nil {
+					currentVdev.VdevDevices = append(currentVdev.VdevDevices, device)
+				} else {
+					vdev := &Vdev{
+						Name:       vdevName,
+						Alloc:      utils.StringToUint64(line[1]),
+						Free:       utils.StringToUint64(line[2]),
+						Operations: RW{Read: utils.StringToUint64(line[5]), Write: utils.StringToUint64(line[6])},
+						Bandwidth:  RW{Read: utils.StringToUint64(line[7]), Write: utils.StringToUint64(line[8])},
+						VdevDevices: []VdevDevice{
+							device,
+						},
+					}
+					vdevPtrs = append(vdevPtrs, vdev)
+				}
+			} else {
+				currentVdev = nil
 			}
-		} else {
-			currentVdev = nil
 		}
 	}
 
@@ -156,6 +158,7 @@ func (z *zfs) GetZpool(name string) (*Zpool, error) {
 	for _, v := range vdevPtrs {
 		vdevs = append(vdevs, *v)
 	}
+
 	pool.Vdevs = vdevs
 
 	return pool, nil

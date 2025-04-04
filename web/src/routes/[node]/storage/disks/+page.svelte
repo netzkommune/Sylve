@@ -161,6 +161,7 @@
 	async function diskAction(action: string) {
 		if (action === 'smart') {
 			if (activeDisk) {
+				smartModal.open = false;
 				smartModal.title = `${getTranslation('disk.smart', 'S.M.A.R.T')} Values (${activeDisk.Device})`;
 				if (activeDisk.Type === 'NVMe') {
 					smartModal.KV = parseSMART($state.snapshot(activeDisk));

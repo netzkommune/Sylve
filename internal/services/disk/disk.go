@@ -331,7 +331,12 @@ func (s *Service) InitializeGPT(device string) error {
 func (s *Service) IsDiskGPT(device string) bool {
 	gptSector, err := utils.ReadDiskSector(device, 1)
 	if err != nil {
+		if strings.Contains(err.Error(), "device not configured") {
+			return false
+		}
+
 		logger.LogWithDeduplication(zerolog.DebugLevel, fmt.Sprintf("failed to read sector 1: %v", err))
+
 		return false
 	}
 

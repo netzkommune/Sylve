@@ -68,3 +68,18 @@ func DestroyPool(poolName string) error {
 
 	return nil
 }
+
+func ReplaceInPool(poolName string, oldDevice string, newDevice string) error {
+	pool, err := GetZpool(poolName)
+
+	if err != nil {
+		return err
+	}
+
+	err = pool.Replace(oldDevice, newDevice)
+	if err != nil {
+		return fmt.Errorf("failed to replace device in pool: %w", err)
+	}
+
+	return nil
+}

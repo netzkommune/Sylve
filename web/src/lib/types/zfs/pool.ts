@@ -19,16 +19,27 @@ export const RWSchema = z.object({
 
 export const VdevDeviceSchema = z.object({
 	name: z.string(),
-	size: z.number()
+	size: z.number(),
+	health: z.string()
+});
+
+export const ReplacingVdevDeviceSchema = z.object({
+	name: z.string(),
+	health: z.string(),
+	oldDrive: VdevDeviceSchema,
+	newDrive: VdevDeviceSchema
 });
 
 export const VdevSchema = z.object({
 	name: z.string(),
 	alloc: z.number(),
 	free: z.number(),
+	size: z.number(),
+	health: z.string(),
 	operations: RWSchema,
 	bandwidth: RWSchema,
-	devices: z.array(VdevDeviceSchema)
+	devices: z.array(VdevDeviceSchema),
+	replacingDevices: z.array(ReplacingVdevDeviceSchema).optional()
 });
 
 export const ZpoolSchema = z.object({
@@ -61,7 +72,14 @@ export const CreateZpoolSchema = z.object({
 	createForce: z.boolean().default(false)
 });
 
+export const ReplaceDeviceSchema = z.object({
+	name: z.string(),
+	old: z.string(),
+	new: z.string()
+});
+
 export type IODelay = z.infer<typeof IODelaySchema>;
 export type IODelayHistorical = z.infer<typeof IODelayHistoricalSchema>;
 export type Zpool = z.infer<typeof ZpoolSchema>;
+export type ReplaceDevice = z.infer<typeof ReplaceDeviceSchema>;
 export type CreateZpool = z.infer<typeof CreateZpoolSchema>;

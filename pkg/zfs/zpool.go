@@ -13,17 +13,28 @@ type RW struct {
 }
 
 type VdevDevice struct {
-	Name string `json:"name"`
-	Size uint64 `json:"size"`
+	Name   string `json:"name"`
+	Size   uint64 `json:"size"`
+	Health string `json:"health"`
+}
+
+type ReplacingDevice struct {
+	Name     string     `json:"name"`
+	Health   string     `json:"health"`
+	OldDrive VdevDevice `json:"oldDrive"`
+	NewDrive VdevDevice `json:"newDrive"`
 }
 
 type Vdev struct {
-	Name        string       `json:"name"`
-	Alloc       uint64       `json:"alloc"`
-	Free        uint64       `json:"free"`
-	Operations  RW           `json:"operations"`
-	Bandwidth   RW           `json:"bandwidth"`
-	VdevDevices []VdevDevice `json:"devices"`
+	Name             string            `json:"name"`
+	Alloc            uint64            `json:"alloc"`
+	Free             uint64            `json:"free"`
+	Size             uint64            `json:"size"`
+	Health           string            `json:"health"`
+	Operations       RW                `json:"operations"`
+	Bandwidth        RW                `json:"bandwidth"`
+	VdevDevices      []VdevDevice      `json:"devices"`
+	ReplacingDevices []ReplacingDevice `json:"replacingDevices,omitempty"`
 }
 
 type Zpool struct {
@@ -109,46 +120,126 @@ func (z *zfs) GetZpool(name string) (*Zpool, error) {
 
 	var vdevPtrs []*Vdev
 	var currentVdev *Vdev
+	var currentReplacing *ReplacingDevice
 
 	for i, line := range vdevOut {
-		if len(line) > 0 {
-			vdevName := line[0]
+		if len(line) < 10 {
+			continue
+		}
 
-			if i == 0 && vdevName == pool.Name {
-				continue
+		vdevName := line[0]
+
+		if i == 0 && vdevName == pool.Name {
+			continue
+		}
+
+		if strings.HasPrefix(vdevName, "mirror") || strings.HasPrefix(vdevName, "raidz") {
+			// This is a mirror or raidz vdev
+			currentVdev = &Vdev{
+				Name:   vdevName,
+				Alloc:  pool.Allocated,
+				Free:   pool.Free,
+				Size:   utils.StringToUint64(line[1]),
+				Health: line[9],
+				Operations: RW{
+					Read:  utils.StringToUint64(line[5]),
+					Write: utils.StringToUint64(line[6]),
+				},
+				Bandwidth: RW{
+					Read:  utils.StringToUint64(line[7]),
+					Write: utils.StringToUint64(line[8]),
+				},
+				VdevDevices:      []VdevDevice{},
+				ReplacingDevices: []ReplacingDevice{},
+			}
+			vdevPtrs = append(vdevPtrs, currentVdev)
+			currentReplacing = nil
+		} else if strings.HasPrefix(vdevName, "replacing") {
+			// This is a replacing vdev
+			if currentVdev != nil {
+				currentReplacing = &ReplacingDevice{
+					Name:   vdevName,
+					Health: line[9],
+				}
+				// We'll add it to the current vdev once we've processed its devices
+			} else {
+				// Standalone replacing vdev (unusual, but handle it)
+				vdev := &Vdev{
+					Name:   vdevName,
+					Alloc:  pool.Allocated,
+					Free:   pool.Free,
+					Size:   pool.Size,
+					Health: line[9],
+					Operations: RW{
+						Read:  utils.StringToUint64(line[5]),
+						Write: utils.StringToUint64(line[6]),
+					},
+					Bandwidth: RW{
+						Read:  utils.StringToUint64(line[7]),
+						Write: utils.StringToUint64(line[8]),
+					},
+					VdevDevices:      []VdevDevice{},
+					ReplacingDevices: []ReplacingDevice{},
+				}
+				vdevPtrs = append(vdevPtrs, vdev)
+				currentVdev = vdev
+				currentReplacing = nil
+			}
+		} else if strings.HasPrefix(vdevName, "/dev/") {
+			// This is a device
+			device := VdevDevice{
+				Name:   vdevName,
+				Size:   utils.StringToUint64(line[1]),
+				Health: line[9],
 			}
 
-			if strings.HasPrefix(vdevName, "mirror") || strings.HasPrefix(vdevName, "raidz") {
-				currentVdev = &Vdev{
-					Name:       vdevName,
-					Alloc:      utils.StringToUint64(line[1]),
-					Free:       utils.StringToUint64(line[3]),
-					Operations: RW{Read: utils.StringToUint64(line[5]), Write: utils.StringToUint64(line[6])},
-					Bandwidth:  RW{Read: utils.StringToUint64(line[7]), Write: utils.StringToUint64(line[8])},
-				}
-				vdevPtrs = append(vdevPtrs, currentVdev)
-			} else if strings.HasPrefix(vdevName, "/dev/") {
-				device := VdevDevice{
-					Name: vdevName,
-					Size: utils.StringToUint64(line[1]),
-				}
-
-				if currentVdev != nil {
-					currentVdev.VdevDevices = append(currentVdev.VdevDevices, device)
+			if currentReplacing != nil {
+				// This device is part of a replacing operation
+				if currentReplacing.OldDrive.Name == "" {
+					// First device is the old one
+					currentReplacing.OldDrive = device
 				} else {
-					vdev := &Vdev{
-						Name:       vdevName,
-						Alloc:      utils.StringToUint64(line[1]),
-						Free:       utils.StringToUint64(line[2]),
-						Operations: RW{Read: utils.StringToUint64(line[5]), Write: utils.StringToUint64(line[6])},
-						Bandwidth:  RW{Read: utils.StringToUint64(line[7]), Write: utils.StringToUint64(line[8])},
-						VdevDevices: []VdevDevice{
-							device,
-						},
+					// Second device is the new one
+					currentReplacing.NewDrive = device
+
+					// Now that we have both old and new drives, add the replacing vdev to the parent
+					if currentVdev != nil {
+						currentVdev.ReplacingDevices = append(currentVdev.ReplacingDevices, *currentReplacing)
 					}
-					vdevPtrs = append(vdevPtrs, vdev)
+
+					// Reset currentReplacing to handle multiple replacing operations
+					currentReplacing = nil
 				}
+			} else if currentVdev != nil {
+				// This device is part of the current vdev (mirror/raidz)
+				currentVdev.VdevDevices = append(currentVdev.VdevDevices, device)
 			} else {
+				// This is a standalone device (not part of a mirror/raidz)
+				vdev := &Vdev{
+					Name:   vdevName,
+					Alloc:  pool.Allocated,
+					Free:   pool.Free,
+					Size:   pool.Size,
+					Health: line[9],
+					Operations: RW{
+						Read:  utils.StringToUint64(line[5]),
+						Write: utils.StringToUint64(line[6]),
+					},
+					Bandwidth: RW{
+						Read:  utils.StringToUint64(line[7]),
+						Write: utils.StringToUint64(line[8]),
+					},
+					VdevDevices: []VdevDevice{
+						device,
+					},
+					ReplacingDevices: []ReplacingDevice{},
+				}
+				vdevPtrs = append(vdevPtrs, vdev)
+			}
+		} else {
+			// Any other line that's not a vdev or device
+			// Only reset if we're not in a replacing operation
+			if currentReplacing == nil {
 				currentVdev = nil
 			}
 		}
@@ -185,6 +276,7 @@ func (z *zfs) CreateZpool(name string, properties map[string]string, args ...str
 			otherArgs = append(otherArgs, arg)
 		}
 	}
+
 	if forceFlag {
 		cli = append(cli, "-f")
 	}
@@ -204,6 +296,27 @@ func (z *zfs) CreateZpool(name string, properties map[string]string, args ...str
 
 func (z *Zpool) Destroy() error {
 	err := z.z.zpool("destroy", z.Name)
+	return err
+}
+
+func (z *Zpool) Replace(oldDevice string, newDevice string) error {
+	found := false
+
+	for _, vdev := range z.Vdevs {
+		for _, device := range vdev.VdevDevices {
+			if device.Name == oldDevice {
+				found = true
+				break
+			}
+		}
+	}
+
+	if !found {
+		return fmt.Errorf("device %s not found in pool %s", oldDevice, z.Name)
+	}
+
+	err := z.z.zpool("replace", z.Name, oldDevice, newDevice)
+
 	return err
 }
 

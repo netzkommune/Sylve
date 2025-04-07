@@ -11,6 +11,7 @@
 	import * as Select from '$lib/components/ui/select/index.js';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import * as Tooltip from '$lib/components/ui/tooltip';
+	import type { Column, Row } from '$lib/types/components/tree-table';
 	import type { Disk, Partition } from '$lib/types/disk/disk';
 	import type { Zpool } from '$lib/types/zfs/pool';
 	import { simplifyDisks, zpoolUseableDisks } from '$lib/utils/disk';
@@ -22,6 +23,7 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { draggable, dropzone } from '$lib/utils/dnd';
 	import { isValidPoolName } from '$lib/utils/zfs';
+	import { generateTableData } from '$lib/utils/zfs/pool';
 	import humanFormat from 'human-format';
 	import { untrack } from 'svelte';
 	import toast from 'svelte-french-toast';
@@ -108,7 +110,7 @@
 	});
 
 	let disks = $derived($results[0].data as Disk[]);
-	let pools = $results[1].data as Zpool[];
+	let pools = $derived($results[1].data as Zpool[]);
 	let useableDisks = $derived(zpoolUseableDisks(disks, pools));
 	let useablePartitions = $derived.by(() => {
 		return Array.from(
@@ -405,91 +407,118 @@
 			});
 			return;
 		}
+
+		await createPool({
+			name: modal.name,
+			raidType: modal.raidType as 'mirror' | 'raidz' | 'raidz2' | 'raidz3' | undefined,
+			vdevs: modal.vdevContainers.map((vdev) => ({
+				name: vdev.id,
+				devices: [
+					...vdev.disks.map((disk) => disk.Device),
+					...vdev.partitions.map((partition) => partition.name)
+				]
+			})),
+			createForce: true
+		});
 	}
 
-	interface ZFSPools {
-		Id: number;
-		Name: string;
-		Size: string;
-		Health: string;
-		Redundancy: string;
-		Children?: ZFSPools[];
-	}
+	// console.log(pools);
+	// console.log(generateTableData(pools));
 
-	const zfsPools: ZFSPools[] = [
-		{
-			Id: 1,
-			Name: 'zroot',
-			Size: '100G',
-			Health: 'ONLINE',
-			Redundancy: 'Stripe',
-			Children: [{ Id: 2, Name: 'nda0p4', Size: '100G', Health: 'ONLINE', Redundancy: '-' }]
-		},
-		{
-			Id: 3,
-			Name: 'test',
-			Size: '128G',
-			Health: 'ONLINE',
-			Redundancy: 'Mirror',
-			Children: [
-				{
-					Id: 4,
-					Name: 'mirror',
-					Size: '128G',
-					Health: 'ONLINE',
-					Redundancy: '-',
-					Children: [
-						{ Id: 5, Name: 'ada0', Size: '64G', Health: 'ONLINE', Redundancy: '-' },
-						{ Id: 6, Name: 'ada1', Size: '64G', Health: 'ONLINE', Redundancy: '-' }
-					]
-				}
-			]
-		},
-		{
-			Id: 7,
-			Name: 'test2',
-			Size: '128G',
-			Health: 'ONLINE',
-			Redundancy: 'Mirror',
-			Children: [
-				{
-					Id: 8,
-					Name: 'mirror-1',
-					Size: '64G',
-					Health: 'ONLINE',
-					Redundancy: '-',
-					Children: [
-						{ Id: 9, Name: 'ada2', Size: '64G', Health: 'ONLINE', Redundancy: '-' },
-						{ Id: 10, Name: 'ada3', Size: '64G', Health: 'ONLINE', Redundancy: '-' }
-					]
-				},
-				{
-					Id: 11,
-					Name: 'mirror-2',
-					Size: '64G',
-					Health: 'ONLINE',
-					Redundancy: '-',
-					Children: [
-						{ Id: 12, Name: 'ada4', Size: '64G', Health: 'ONLINE', Redundancy: '-' },
-						{ Id: 13, Name: 'ada5', Size: '64G', Health: 'ONLINE', Redundancy: '-' }
-					]
-				},
-				{
-					Id: 14,
-					Name: 'mirror-3',
-					Size: '64G',
-					Health: 'ONLINE',
-					Redundancy: '-',
-					Children: [
-						{ Id: 15, Name: 'ada6', Size: '64G', Health: 'ONLINE', Redundancy: '-' },
-						{ Id: 16, Name: 'ada7', Size: '64G', Health: 'ONLINE', Redundancy: '-' }
-					]
-				}
-			]
-		}
-	];
+	// const tableData: { rows: Row[]; columns: Column[] } = {
+	// 	rows: [
+	// 		{
+	// 			id: 1,
+	// 			name: 'zroot',
+	// 			size: '100G',
+	// 			health: 'ONLINE',
+	// 			redundancy: 'Stripe',
+	// 			children: [{ id: 2, name: 'nda0p4', size: '100G', health: 'ONLINE', redundancy: '-' }]
+	// 		},
+	// 		{
+	// 			id: 3,
+	// 			name: 'test',
+	// 			size: '128G',
+	// 			health: 'ONLINE',
+	// 			redundancy: 'Mirror',
+	// 			children: [
+	// 				{
+	// 					id: 4,
+	// 					name: 'mirror',
+	// 					size: '128G',
+	// 					health: 'ONLINE',
+	// 					redundancy: '-',
+	// 					children: [
+	// 						{ id: 5, name: 'ada0', size: '64G', health: 'ONLINE', redundancy: '-' },
+	// 						{ id: 6, name: 'ada1', size: '64G', health: 'ONLINE', redundancy: '-' }
+	// 					]
+	// 				}
+	// 			]
+	// 		},
+	// 		{
+	// 			id: 7,
+	// 			name: 'test2',
+	// 			size: '128G',
+	// 			health: 'ONLINE',
+	// 			redundancy: 'Mirror',
+	// 			children: [
+	// 				{
+	// 					id: 8,
+	// 					name: 'mirror-1',
+	// 					size: '64G',
+	// 					health: 'ONLINE',
+	// 					redundancy: '-',
+	// 					children: [
+	// 						{ id: 9, name: 'ada2', size: '64G', health: 'ONLINE', redundancy: '-' },
+	// 						{ id: 10, name: 'ada3', size: '64G', health: 'ONLINE', redundancy: '-' }
+	// 					]
+	// 				},
+	// 				{
+	// 					id: 11,
+	// 					name: 'mirror-2',
+	// 					size: '64G',
+	// 					health: 'ONLINE',
+	// 					redundancy: '-',
+	// 					children: [
+	// 						{ id: 12, name: 'ada4', size: '64G', health: 'ONLINE', redundancy: '-' },
+	// 						{ id: 13, name: 'ada5', size: '64G', health: 'ONLINE', redundancy: '-' }
+	// 					]
+	// 				},
+	// 				{
+	// 					id: 14,
+	// 					name: 'mirror-3',
+	// 					size: '64G',
+	// 					health: 'ONLINE',
+	// 					redundancy: '-',
+	// 					children: [
+	// 						{ id: 15, name: 'ada6', size: '64G', health: 'ONLINE', redundancy: '-' },
+	// 						{ id: 16, name: 'ada7', size: '64G', health: 'ONLINE', redundancy: '-' }
+	// 					]
+	// 				}
+	// 			]
+	// 		}
+	// 	],
+	// 	columns: [
+	// 		{
+	// 			key: 'name',
+	// 			label: 'Name'
+	// 		},
+	// 		{
+	// 			key: 'size',
+	// 			label: 'Size'
+	// 		},
+	// 		{
+	// 			key: 'health',
+	// 			label: 'Health'
+	// 		},
+	// 		{
+	// 			key: 'redundancy',
+	// 			label: 'Redundancy'
+	// 		}
+	// 	]
+	// };
 
-	const keys = ['Name', 'Size', 'Health', 'Redundancy'];
+	let tableData = $derived(generateTableData(pools));
 </script>
 
 {#snippet diskContainer(type: string)}
@@ -638,7 +667,7 @@
 	<div class="relative flex h-full w-full cursor-pointer flex-col">
 		<div class="flex-1">
 			<div class="h-full overflow-y-auto">
-				<TreeTable data={zfsPools} {keys} />
+				<TreeTable data={tableData} name="tt-zfsPool" itemIcon={'carbon:partition-collection'} />
 			</div>
 		</div>
 	</div>

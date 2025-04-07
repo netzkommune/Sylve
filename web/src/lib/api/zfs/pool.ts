@@ -6,6 +6,7 @@ import {
 	type CreateZpool,
 	type IODelay,
 	type IODelayHistorical,
+	type ReplaceDevice,
 	type Zpool
 } from '$lib/types/zfs/pool';
 import { apiRequest } from '$lib/utils/http';
@@ -34,6 +35,12 @@ export async function getPools(): Promise<Zpool[]> {
 
 export async function createPool(data: CreateZpool) {
 	return await apiRequest('/zfs/pools', APIResponseSchema, 'POST', {
+		...data
+	});
+}
+
+export async function replaceDevice(data: ReplaceDevice) {
+	return await apiRequest(`/zfs/pools/${data.name}/replace-device`, APIResponseSchema, 'POST', {
 		...data
 	});
 }

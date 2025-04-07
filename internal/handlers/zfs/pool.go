@@ -201,3 +201,51 @@ func DeletePool(zfsSerice *zfs.Service) gin.HandlerFunc {
 		})
 	}
 }
+
+// @Summary Replace Device
+// @Description Replace a device in a ZFS pool
+// @Tags ZFS
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body zfsServiceInterfaces.ReplaceDevice true "Request"
+// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /zfs/pools/{name}/replace-device [post]
+func ReplaceDevice(zfsSerice *zfs.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		name := c.Param("name")
+		var request zfsServiceInterfaces.ReplaceDevice
+
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		err := zfsUtils.ReplaceInPool(name, request.Old, request.New)
+		if err != nil {
+			if strings.HasPrefix(err.Error(), "error_getting_pool") {
+				c.JSON(http.StatusNotFound, internal.APIResponse[any]{
+					Status:  "error",
+					Message: "pool_not_found",
+					Error:   err.Error(),
+					Data:    nil,
+				})
+				return
+			}
+
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "device_replace_failed",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+	}
+}

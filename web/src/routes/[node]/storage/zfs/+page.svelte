@@ -26,6 +26,8 @@
 	import { untrack } from 'svelte';
 	import toast from 'svelte-french-toast';
 
+	import TreeTable from '$lib/components/custom/TreeTable.svelte';
+
 	interface Data {
 		disks: Disk[];
 		pools: Zpool[];
@@ -404,6 +406,90 @@
 			return;
 		}
 	}
+
+	interface ZFSPools {
+		Id: number;
+		Name: string;
+		Size: string;
+		Health: string;
+		Redundancy: string;
+		Children?: ZFSPools[];
+	}
+
+	const zfsPools: ZFSPools[] = [
+		{
+			Id: 1,
+			Name: 'zroot',
+			Size: '100G',
+			Health: 'ONLINE',
+			Redundancy: 'Stripe',
+			Children: [{ Id: 2, Name: 'nda0p4', Size: '100G', Health: 'ONLINE', Redundancy: '-' }]
+		},
+		{
+			Id: 3,
+			Name: 'test',
+			Size: '128G',
+			Health: 'ONLINE',
+			Redundancy: 'Mirror',
+			Children: [
+				{
+					Id: 4,
+					Name: 'mirror',
+					Size: '128G',
+					Health: 'ONLINE',
+					Redundancy: '-',
+					Children: [
+						{ Id: 5, Name: 'ada0', Size: '64G', Health: 'ONLINE', Redundancy: '-' },
+						{ Id: 6, Name: 'ada1', Size: '64G', Health: 'ONLINE', Redundancy: '-' }
+					]
+				}
+			]
+		},
+		{
+			Id: 7,
+			Name: 'test2',
+			Size: '128G',
+			Health: 'ONLINE',
+			Redundancy: 'Mirror',
+			Children: [
+				{
+					Id: 8,
+					Name: 'mirror-1',
+					Size: '64G',
+					Health: 'ONLINE',
+					Redundancy: '-',
+					Children: [
+						{ Id: 9, Name: 'ada2', Size: '64G', Health: 'ONLINE', Redundancy: '-' },
+						{ Id: 10, Name: 'ada3', Size: '64G', Health: 'ONLINE', Redundancy: '-' }
+					]
+				},
+				{
+					Id: 11,
+					Name: 'mirror-2',
+					Size: '64G',
+					Health: 'ONLINE',
+					Redundancy: '-',
+					Children: [
+						{ Id: 12, Name: 'ada4', Size: '64G', Health: 'ONLINE', Redundancy: '-' },
+						{ Id: 13, Name: 'ada5', Size: '64G', Health: 'ONLINE', Redundancy: '-' }
+					]
+				},
+				{
+					Id: 14,
+					Name: 'mirror-3',
+					Size: '64G',
+					Health: 'ONLINE',
+					Redundancy: '-',
+					Children: [
+						{ Id: 15, Name: 'ada6', Size: '64G', Health: 'ONLINE', Redundancy: '-' },
+						{ Id: 16, Name: 'ada7', Size: '64G', Health: 'ONLINE', Redundancy: '-' }
+					]
+				}
+			]
+		}
+	];
+
+	const keys = ['Name', 'Size', 'Health', 'Redundancy'];
 </script>
 
 {#snippet diskContainer(type: string)}
@@ -551,7 +637,9 @@
 
 	<div class="relative flex h-full w-full cursor-pointer flex-col">
 		<div class="flex-1">
-			<h1 class="p-3">Table TBD</h1>
+			<div class="h-full overflow-y-auto">
+				<TreeTable data={zfsPools} {keys} />
+			</div>
 		</div>
 	</div>
 </div>

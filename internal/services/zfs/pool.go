@@ -75,8 +75,6 @@ func (s *Service) CreatePool(pool zfsServiceInterfaces.Zpool) error {
 	}
 	args = append(args, vdevArgs...)
 
-	fmt.Println("Creating ZFS pool with args:", args, pool.RaidType)
-
 	_, err = zfs.CreateZpool(pool.Name, pool.Properties, args...)
 	if err != nil {
 		return fmt.Errorf("zpool_create_failed: %v", err)

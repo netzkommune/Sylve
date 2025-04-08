@@ -42,6 +42,28 @@ export const VdevSchema = z.object({
 	replacingDevices: z.array(ReplacingVdevDeviceSchema).optional()
 });
 
+export const ZpoolDeviceSchema: z.ZodType<any> = z.lazy(() =>
+	z.object({
+		name: z.string(),
+		state: z.string(),
+		read: z.number(),
+		write: z.number(),
+		cksum: z.number(),
+		note: z.string(),
+		children: z.array(ZpoolDeviceSchema).optional().default([])
+	})
+);
+
+export const ZpoolStatusSchema = z.object({
+	name: z.string(),
+	state: z.string(),
+	status: z.string(),
+	action: z.string(),
+	scan: z.string(),
+	devices: z.array(ZpoolDeviceSchema).optional().default([]),
+	errors: z.string()
+});
+
 export const ZpoolSchema = z.object({
 	name: z.string(),
 	health: z.string(),
@@ -52,7 +74,8 @@ export const ZpoolSchema = z.object({
 	freeing: z.number(),
 	leaked: z.number(),
 	dedupRatio: z.number(),
-	vdevs: z.array(VdevSchema)
+	vdevs: z.array(VdevSchema),
+	status: ZpoolStatusSchema
 });
 
 export const CreateVdevSchema = z.object({

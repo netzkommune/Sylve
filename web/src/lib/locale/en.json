@@ -39,6 +39,18 @@
 		"full_wipe_success": "Disk wiped",
 		"partition_wipe_success": "Partition deleted"
 	},
+	"zfs": {
+		"pool": {
+			"pool_not_found": "Pool not found",
+			"pool_deleted": "Pool deleted",
+			"pool_created": "Pool created",
+			"errors": {
+				"pool_create_failed_mirror_different_sizes": "Pool contains a mirror with devices of different sizes",
+				"pool_create_failed_raidz_different_sizes": "Pool contains a raidz vdev with devices of different sizes",
+				"pool_delete_failed_busy": "Pool is busy"
+			}
+		}
+	},
 	"common": {
 		"example": "Example",
 		"are_you_sure": "Are you sure?",
@@ -50,7 +62,8 @@
 		"creating": "creating",
 		"created_successfully": "created successfully",
 		"error": "error",
-		"delete": "delete"
+		"delete": "delete",
+		"create": "create"
 	},
 	"validation_errors": {
 		"failed validation: min": "too small"

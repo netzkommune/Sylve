@@ -10,6 +10,11 @@ const config = {
 		adapter: adapter({
 			fallback: '200.html'
 		})
+	},
+	vitePlugin: {
+		hot: {
+			preserveLocalState: true
+		}
 	}
 };
 

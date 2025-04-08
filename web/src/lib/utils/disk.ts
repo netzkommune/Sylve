@@ -8,7 +8,14 @@
  * under sponsorship from the FreeBSD Foundation.
  */
 
-import type { Disk, DiskInfo, SmartAttribute, SmartCtl, SmartNVME } from '$lib/types/disk/disk';
+import type {
+	Disk,
+	DiskInfo,
+	Partition,
+	SmartAttribute,
+	SmartCtl,
+	SmartNVME
+} from '$lib/types/disk/disk';
 import type { Zpool } from '$lib/types/zfs/pool';
 
 export async function simplifyDisks(disks: DiskInfo): Promise<Disk[]> {
@@ -138,33 +145,58 @@ export function getGPTLabel(disk: Disk, pools: Zpool[]): string {
 export function zpoolUseableDisks(disks: Disk[], pools: Zpool[]): Disk[] {
 	const useableDisks: Disk[] = [];
 	for (const disk of disks) {
+		if (disk.Usage === 'Partitions') {
+			continue;
+		}
+
 		if (disk.Usage === 'Unused' && disk.GPT === false) {
 			useableDisks.push(disk);
-		} else {
-			const poolVdevs = pools.flatMap((pool) => pool.vdevs.map((vdev) => vdev.name));
-			const poolVdevDevices = pools.flatMap((pool) =>
-				pool.vdevs.flatMap((vdev) => vdev.devices.map((device) => device.name))
-			);
-
-			if (disk.Usage === 'Partitions') {
-				const partitions = disk.Partitions.map((partition) => {
-					if (partition.name.startsWith('/dev/')) {
-						return partition.name;
-					}
-
-					return `/dev/${partition.name}`;
-				});
-
-				if (partitions.some((partition) => poolVdevDevices.includes(partition))) {
-					continue;
-				}
-			}
-
-			if (!poolVdevs.includes(disk.Device) && !poolVdevDevices.includes(disk.Device)) {
-				useableDisks.push(disk);
-			}
 		}
 	}
 
 	return useableDisks;
+}
+
+export function zpoolUseablePartitions(disks: Disk[], pools: Zpool[]): Partition[] {
+	const useablePartitions: Partition[] = [];
+	const usedPartitionNames = new Set<string>();
+	for (const pool of pools) {
+		for (const vdev of pool.vdevs) {
+			for (const device of vdev.devices) {
+				if (device.name.startsWith('/dev/')) {
+					usedPartitionNames.add(device.name.split('/').pop()!);
+				}
+			}
+		}
+	}
+
+	for (const disk of disks) {
+		if (disk.Usage === 'Partitions') {
+			const hasEFI = disk.Partitions.some((partition) => partition.usage === 'EFI');
+			if (hasEFI) {
+				continue;
+			}
+
+			for (const partition of disk.Partitions) {
+				// Check if this partition is already used in a pool
+				if (!usedPartitionNames.has(partition.name)) {
+					useablePartitions.push(partition);
+				}
+			}
+		}
+	}
+
+	return useablePartitions;
+}
+
+export function getDiskSize(disk: Disk): string {
+	if (disk.Usage === 'Partitions') {
+		return disk.Partitions.reduce((acc, cur) => acc + cur.size, 0).toString();
+	}
+
+	return disk.Size.toString();
+}
+
+export function stripDev(disk: string): string {
+	return disk.replace(/^\/dev\//, '');
 }

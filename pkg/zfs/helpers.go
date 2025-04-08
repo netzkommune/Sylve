@@ -35,7 +35,8 @@ var (
 	zpoolPropListOptions = strings.Join(zpoolPropList, ",")
 	zpoolArgs            = []string{"get", "-Hp", zpoolPropListOptions}
 
-	zpoolVdevArgs = []string{"list", "-HPpv"}
+	zpoolVdevArgs   = []string{"list", "-HPpv"}
+	zpoolStatusArgs = []string{"status", "-p", "-P", "-v"}
 )
 
 var changeTypeMap = map[string]ChangeType{

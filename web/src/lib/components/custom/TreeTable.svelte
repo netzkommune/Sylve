@@ -14,13 +14,14 @@
 		};
 		name: string;
 		itemIcon?: string;
+		parentActiveRow?: Row | null;
 	}
 
-	let { data, name, itemIcon = undefined }: Props = $props();
+	let { data, name, itemIcon = undefined, parentActiveRow = $bindable() }: Props = $props();
 
 	const table = new TableHandler(data.rows);
 
-	let activeRow: string | null = $state(null);
+	let activeRow: number | null = $state(null);
 	let expandedRows: ExpandedRows = $state({});
 	let sortHandlers: Record<string, any> = $state({});
 	let openContextMenuId = $state<string | null>(null);
@@ -53,8 +54,24 @@
 		openContextMenuId = null;
 	}
 
-	function handleRowClick(id: string) {
+	function findNestedRow(rows: Row[], id: number): Row | null {
+		for (const row of rows) {
+			if (row.id === id) return row;
+			if (row.children) {
+				const found = findNestedRow(row.children, id);
+				if (found) return found;
+			}
+		}
+		return null;
+	}
+
+	function handleRowClick(id: number) {
 		activeRow = activeRow === id ? null : id;
+		parentActiveRow = findNestedRow(data.rows, id);
+
+		if (activeRow === null) {
+			parentActiveRow = null;
+		}
 	}
 
 	function toggleChildren(id: number) {
@@ -114,127 +131,140 @@
 	});
 </script>
 
-<div class="overflow-x-auto">
-	<table class="mb-10 w-full min-w-max border-collapse">
-		<thead>
-			<tr>
-				{#each data.columns as column}
-					{#if visibleColumns.value[column.key]}
-						<th
-							class="group h-8 w-48 whitespace-nowrap border border-neutral-300 px-3 text-left text-black dark:border-neutral-800 dark:text-white"
-						>
-							<ContextMenu.Root
-								open={openContextMenuId === column.key}
-								closeOnItemClick={false}
-								onOpenChange={(open) =>
-									open ? handleContextMenuOpen(column.key) : handleContextMenuClose()}
-							>
-								<ContextMenu.Trigger class="flex h-full w-full">
-									<button
-										class="relative flex w-full items-center"
-										onclick={() => sortHandlers[column.key]?.set()}
+<div class="flex h-full flex-col overflow-hidden">
+	<div class="relative flex h-full w-full cursor-pointer flex-col">
+		<div class="flex-1">
+			<div class="h-full overflow-y-auto">
+				<table class="mb-10 w-full min-w-max border-collapse">
+					<thead>
+						<tr>
+							{#each data.columns as column}
+								{#if visibleColumns.value[column.key]}
+									<th
+										class="group h-8 w-48 whitespace-nowrap border border-neutral-300 px-3 text-left text-black dark:border-neutral-800 dark:text-white"
 									>
-										<span>{column.label}</span>
-										<Icon
-											icon={sortHandlers[column.key]?.direction === 'asc'
-												? 'lucide:sort-asc'
-												: 'lucide:sort-desc'}
-											class="ml-2 mt-1 h-4 w-4 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-										/>
-									</button>
-								</ContextMenu.Trigger>
-								<ContextMenu.Content>
-									<ContextMenu.Label>Toggle Columns</ContextMenu.Label>
-									<ContextMenu.Separator />
-									{#each data.columns as colOption}
-										<ContextMenu.CheckboxItem
-											checked={visibleColumns.value[colOption.key]}
-											onCheckedChange={() => {
-												toggleColumnVisibility(colOption.key);
-											}}
+										<ContextMenu.Root
+											open={openContextMenuId === column.key}
+											closeOnItemClick={false}
+											onOpenChange={(open) =>
+												open ? handleContextMenuOpen(column.key) : handleContextMenuClose()}
 										>
-											{colOption.label}
-										</ContextMenu.CheckboxItem>
-									{/each}
-									<ContextMenu.Separator />
-									<ContextMenu.Item onclick={resetColumns}>Reset Columns</ContextMenu.Item>
-								</ContextMenu.Content>
-							</ContextMenu.Root>
-						</th>
-					{/if}
-				{/each}
-			</tr>
-		</thead>
-		<tbody>
-			{#if flattenedRows.length === 0}
-				<tr>
-					<td
-						colspan={Object.values(visibleColumns.value).filter(Boolean).length || 1}
-						class="h-8 px-3 py-1 text-center text-neutral-500 dark:text-neutral-400"
-					>
-						No data available.
-					</td>
-				</tr>
-			{:else}
-				{#each flattenedRows as row (row.id)}
-					<tr
-						class={activeRow === row.id ? 'bg-muted-foreground/40 dark:bg-muted' : ''}
-						onclick={() => handleRowClick(row.id)}
-					>
-						{#each data.columns as column, colIndex}
-							{#if visibleColumns.value[column.key]}
-								{#if colIndex === 0}
-									<td class="whitespace-nowrap px-3 py-0">
-										<div class="flex items-center" style="padding-left: {row.__level * 1.5}rem;">
-											{#if row.__level > 0}
-												<div class="relative flex items-center">
-													{#if !row.__isLast}
-														<div
-															class="bg-muted-foreground absolute bottom-0 left-2 h-full w-0.5"
-															style="height: calc(100% + 0.8rem);"
-														></div>
-													{:else}
-														<div
-															class="bg-muted-foreground absolute bottom-0 left-2 h-3 w-0.5"
-														></div>
-													{/if}
-													<div class="relative bottom-0 left-2 w-6">
-														<div class="bg-muted-foreground h-0.5 w-6"></div>
-													</div>
-													{#if row.__isLast}
-														<div class="absolute left-2 top-0 h-1/2 w-0.5 bg-transparent"></div>
-													{/if}
-												</div>
-											{/if}
-
-											{#if row.__hasChildren}
-												<Icon
-													icon={isToggled(row.id) ? 'lucide:minus-square' : 'lucide:plus-square'}
-													class="toggle-icon mr-2 h-4 w-4 cursor-pointer"
-													onclick={(event: MouseEvent) => {
-														event.stopPropagation();
-														toggleChildren(row.id);
-													}}
-												/>
-											{:else}
-												<span class="inline-block h-4 w-4"></span>
-											{/if}
-
-											{#if itemIcon}
-												<Icon icon={itemIcon} class="mr-2 h-4 w-4" />
-											{/if}
-
-											<span>{row[column.key]}</span>
-										</div>
-									</td>
-								{:else}
-									<td class="whitespace-nowrap px-3 py-0">{row[column.key] ?? ''}</td>
+											<ContextMenu.Trigger class="flex h-full w-full">
+												<button
+													class="relative flex w-full items-center"
+													onclick={() => sortHandlers[column.key]?.set()}
+												>
+													<span>{column.label}</span>
+													<Icon
+														icon={sortHandlers[column.key]?.direction === 'asc'
+															? 'lucide:sort-asc'
+															: 'lucide:sort-desc'}
+														class="ml-2 mt-1 h-4 w-4 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+													/>
+												</button>
+											</ContextMenu.Trigger>
+											<ContextMenu.Content>
+												<ContextMenu.Label>Toggle Columns</ContextMenu.Label>
+												<ContextMenu.Separator />
+												{#each data.columns as colOption}
+													<ContextMenu.CheckboxItem
+														checked={visibleColumns.value[colOption.key]}
+														onCheckedChange={() => {
+															toggleColumnVisibility(colOption.key);
+														}}
+													>
+														{colOption.label}
+													</ContextMenu.CheckboxItem>
+												{/each}
+												<ContextMenu.Separator />
+												<ContextMenu.Item onclick={resetColumns}>Reset Columns</ContextMenu.Item>
+											</ContextMenu.Content>
+										</ContextMenu.Root>
+									</th>
 								{/if}
-							{/if}
-						{/each}
-					</tr>
-				{/each}
-			{/if}
-		</tbody>
-	</table>
+							{/each}
+						</tr>
+					</thead>
+					<tbody>
+						{#if flattenedRows.length === 0}
+							<tr>
+								<td
+									colspan={Object.values(visibleColumns.value).filter(Boolean).length || 1}
+									class="h-8 px-3 py-1 text-center text-neutral-500 dark:text-neutral-400"
+								>
+									No data available.
+								</td>
+							</tr>
+						{:else}
+							{#each flattenedRows as row (row.id)}
+								<tr
+									class={activeRow === row.id ? 'bg-muted-foreground/40 dark:bg-muted' : ''}
+									onclick={() => handleRowClick(row.id)}
+								>
+									{#each data.columns as column, colIndex}
+										{#if visibleColumns.value[column.key]}
+											{#if colIndex === 0}
+												<td class="whitespace-nowrap px-3 py-0">
+													<div
+														class="flex items-center"
+														style="padding-left: {row.__level * 1.5}rem;"
+													>
+														{#if row.__level > 0}
+															<div class="relative flex items-center">
+																{#if !row.__isLast}
+																	<div
+																		class="bg-muted-foreground absolute bottom-0 left-2 h-full w-0.5"
+																		style="height: calc(100% + 0.8rem);"
+																	></div>
+																{:else}
+																	<div
+																		class="bg-muted-foreground absolute bottom-0 left-2 h-3 w-0.5"
+																	></div>
+																{/if}
+																<div class="relative bottom-0 left-2 w-6">
+																	<div class="bg-muted-foreground h-0.5 w-6"></div>
+																</div>
+																{#if row.__isLast}
+																	<div
+																		class="absolute left-2 top-0 h-1/2 w-0.5 bg-transparent"
+																	></div>
+																{/if}
+															</div>
+														{/if}
+
+														{#if row.__hasChildren}
+															<Icon
+																icon={isToggled(row.id)
+																	? 'lucide:minus-square'
+																	: 'lucide:plus-square'}
+																class="toggle-icon mr-2 h-4 w-4 cursor-pointer"
+																onclick={(event: MouseEvent) => {
+																	event.stopPropagation();
+																	toggleChildren(row.id);
+																}}
+															/>
+														{:else}
+															<span class="inline-block h-4 w-4"></span>
+														{/if}
+
+														{#if itemIcon}
+															<Icon icon={itemIcon} class="mr-2 h-4 w-4" />
+														{/if}
+
+														<span>{row[column.key]}</span>
+													</div>
+												</td>
+											{:else}
+												<td class="whitespace-nowrap px-3 py-0">{row[column.key] ?? ''}</td>
+											{/if}
+										{/if}
+									{/each}
+								</tr>
+							{/each}
+						{/if}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
 </div>

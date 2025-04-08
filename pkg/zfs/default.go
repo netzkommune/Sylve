@@ -83,3 +83,17 @@ func ReplaceInPool(poolName string, oldDevice string, newDevice string) error {
 
 	return nil
 }
+
+func GetZpoolStatus(poolName string) (ZpoolStatus, error) {
+	pool, err := GetZpool(poolName)
+	if err != nil {
+		return ZpoolStatus{}, fmt.Errorf("failed to get pool %s: %w", poolName, err)
+	}
+
+	status, err := pool.z.GetZpoolStatus(pool.Name)
+	if err != nil {
+		return ZpoolStatus{}, fmt.Errorf("failed to get status of pool %s: %w", poolName, err)
+	}
+
+	return status, nil
+}

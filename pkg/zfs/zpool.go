@@ -38,18 +38,39 @@ type Vdev struct {
 }
 
 type Zpool struct {
-	z             *zfs    `json:"-"`
-	Name          string  `json:"name"`
-	Health        string  `json:"health"`
-	Allocated     uint64  `json:"allocated"`
-	Size          uint64  `json:"size"`
-	Free          uint64  `json:"free"`
-	Fragmentation uint64  `json:"fragmentation"`
-	ReadOnly      bool    `json:"readOnly"`
-	Freeing       uint64  `json:"freeing"`
-	Leaked        uint64  `json:"leaked"`
-	DedupRatio    float64 `json:"dedupRatio"`
-	Vdevs         []Vdev  `json:"vdevs"`
+	z             *zfs        `json:"-"`
+	Name          string      `json:"name"`
+	Health        string      `json:"health"`
+	Allocated     uint64      `json:"allocated"`
+	Size          uint64      `json:"size"`
+	Free          uint64      `json:"free"`
+	Fragmentation uint64      `json:"fragmentation"`
+	ReadOnly      bool        `json:"readOnly"`
+	Freeing       uint64      `json:"freeing"`
+	Leaked        uint64      `json:"leaked"`
+	DedupRatio    float64     `json:"dedupRatio"`
+	Vdevs         []Vdev      `json:"vdevs"`
+	Status        ZpoolStatus `json:"status"`
+}
+
+type ZpoolDevice struct {
+	Name     string         `json:"name"`
+	State    string         `json:"state"`
+	Read     int64          `json:"read"`
+	Write    int64          `json:"write"`
+	Cksum    int64          `json:"cksum"`
+	Note     string         `json:"note"`
+	Children []*ZpoolDevice `json:"children"`
+}
+
+type ZpoolStatus struct {
+	Name    string         `json:"name"`
+	State   string         `json:"state"`
+	Status  string         `json:"status"`
+	Action  string         `json:"action"`
+	Scan    string         `json:"scan"`
+	Devices []*ZpoolDevice `json:"devices"`
+	Errors  string         `json:"errors"`
 }
 
 func (z *zfs) zpool(arg ...string) error {
@@ -251,8 +272,132 @@ func (z *zfs) GetZpool(name string) (*Zpool, error) {
 	}
 
 	pool.Vdevs = vdevs
+	pool.Status, err = z.GetZpoolStatus(name)
+
+	if err != nil {
+		return nil, err
+	}
 
 	return pool, nil
+}
+
+func (z *zfs) GetZpoolStatus(name string) (ZpoolStatus, error) {
+	args := append(zpoolStatusArgs, name)
+	out, err := z.zpoolOutput(args...)
+	if err != nil {
+		return ZpoolStatus{}, err
+	}
+
+	status := ZpoolStatus{}
+	var currentSection string
+	var topDevice *ZpoolDevice
+	var currentVdev *ZpoolDevice // Generic vdev holder for mirror/raidz
+	var replacingDevice *ZpoolDevice
+
+	for _, line := range out {
+		if len(line) == 0 {
+			continue
+		}
+
+		// Join the fields with a single space
+		lineStr := strings.Join(line, " ")
+
+		switch {
+		case strings.HasPrefix(lineStr, "pool:"):
+			status.Name = strings.TrimSpace(strings.TrimPrefix(lineStr, "pool:"))
+			currentSection = ""
+		case strings.HasPrefix(lineStr, "state:"):
+			status.State = strings.TrimSpace(strings.TrimPrefix(lineStr, "state:"))
+			currentSection = ""
+		case strings.HasPrefix(lineStr, "status:"):
+			status.Status = strings.TrimSpace(strings.TrimPrefix(lineStr, "status:"))
+			currentSection = "status"
+		case strings.HasPrefix(lineStr, "action:"):
+			status.Action = strings.TrimSpace(strings.TrimPrefix(lineStr, "action:"))
+			currentSection = "action"
+		case strings.HasPrefix(lineStr, "scan:"):
+			status.Scan = strings.TrimSpace(strings.TrimPrefix(lineStr, "scan:"))
+			currentSection = "scan"
+		case strings.HasPrefix(lineStr, "config:"):
+			currentSection = "config"
+		case strings.HasPrefix(lineStr, "errors:"):
+			status.Errors = strings.TrimSpace(strings.TrimPrefix(lineStr, "errors:"))
+			currentSection = ""
+		default:
+			switch currentSection {
+			case "status":
+				if status.Status != "" {
+					status.Status += " "
+				}
+				status.Status += strings.TrimSpace(lineStr)
+			case "action":
+				if status.Action != "" {
+					status.Action += " "
+				}
+				status.Action += strings.TrimSpace(lineStr)
+			case "scan":
+				if status.Scan != "" {
+					status.Scan += " "
+				}
+				status.Scan += strings.TrimSpace(lineStr)
+			case "config":
+				if strings.HasPrefix(lineStr, "NAME") {
+					continue
+				}
+
+				fields := line
+				if len(fields) < 5 {
+					continue
+				}
+
+				dev := &ZpoolDevice{
+					Name:     fields[0],
+					State:    fields[1],
+					Read:     int64(utils.StringToUint64(fields[2])),
+					Write:    int64(utils.StringToUint64(fields[3])),
+					Cksum:    int64(utils.StringToUint64(fields[4])),
+					Children: []*ZpoolDevice{},
+				}
+
+				// Check for note in parentheses
+				if len(fields) > 5 {
+					noteFields := fields[5:]
+					note := strings.Join(noteFields, " ")
+					if strings.HasPrefix(note, "(") && strings.HasSuffix(note, ")") {
+						dev.Note = note
+					}
+				}
+
+				switch {
+				case dev.Name == name:
+					topDevice = dev
+					status.Devices = append(status.Devices, dev)
+				case strings.HasPrefix(dev.Name, "mirror-") ||
+					strings.HasPrefix(dev.Name, "raidz1-") ||
+					strings.HasPrefix(dev.Name, "raidz2-") ||
+					strings.HasPrefix(dev.Name, "raidz3-"):
+					currentVdev = dev
+					replacingDevice = nil
+					if topDevice != nil {
+						topDevice.Children = append(topDevice.Children, dev)
+					}
+				case strings.HasPrefix(dev.Name, "replacing-"):
+					replacingDevice = dev
+					if currentVdev != nil {
+						currentVdev.Children = append(currentVdev.Children, dev)
+					}
+				case strings.HasPrefix(dev.Name, "/dev/"):
+					if replacingDevice != nil {
+						replacingDevice.Children = append(replacingDevice.Children, dev)
+					} else if currentVdev != nil {
+						currentVdev.Children = append(currentVdev.Children, dev)
+					}
+				}
+			}
+		}
+	}
+
+	return status, nil
 }
 
 func (z *Zpool) Datasets() ([]*Dataset, error) {

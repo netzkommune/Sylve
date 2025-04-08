@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { listDisks } from '$lib/api/disk/disk';
-	import { createPool, getPools } from '$lib/api/zfs/pool';
+	import { createPool, deletePool, getPools, replaceDevice } from '$lib/api/zfs/pool';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
@@ -14,21 +14,38 @@
 	import type { Column, Row } from '$lib/types/components/tree-table';
 	import type { Disk, Partition } from '$lib/types/disk/disk';
 	import type { Zpool, ZpoolRaidType } from '$lib/types/zfs/pool';
-	import { simplifyDisks, zpoolUseableDisks } from '$lib/utils/disk';
+	import {
+		getDiskSize,
+		simplifyDisks,
+		stripDev,
+		zpoolUseableDisks,
+		zpoolUseablePartitions
+	} from '$lib/utils/disk';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
 	import { flip } from 'svelte/animate';
-	import { fade, slide } from 'svelte/transition';
+	import { slide } from 'svelte/transition';
 
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { draggable, dropzone } from '$lib/utils/dnd';
 	import { isValidPoolName } from '$lib/utils/zfs';
-	import { generateTableData } from '$lib/utils/zfs/pool';
+	import {
+		generateTableData,
+		getPoolByDevice,
+		isPool,
+		isReplaceableDevice,
+		parsePoolActionError
+	} from '$lib/utils/zfs/pool';
 	import humanFormat from 'human-format';
 	import { untrack } from 'svelte';
 	import toast from 'svelte-french-toast';
 
+	import AlertDialogModal from '$lib/components/custom/AlertDialog.svelte';
+	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
+	import { getTranslation } from '$lib/utils/i18n';
+	import { capitalizeFirstLetter } from '$lib/utils/string';
 
 	interface Data {
 		disks: Disk[];
@@ -64,10 +81,15 @@
 		}
 	]);
 
+	let activeRow: Row | null = $state(null);
+	let replaceInProgress: boolean = $state(false);
+
+	$effect(() => {});
+
 	let raidTypes = $state([
 		{ value: 'stripe', label: 'Stripe', available: true },
 		{ value: 'mirror', label: 'Mirror', available: false },
-		{ value: 'raidz1', label: 'RAIDZ1', available: false },
+		{ value: 'raidz', label: 'RAIDZ1', available: false },
 		{ value: 'raidz2', label: 'RAIDZ2', available: false },
 		{ value: 'raidz3', label: 'RAIDZ3', available: false }
 	]);
@@ -80,6 +102,7 @@
 		raidType: 'stripe' as ZpoolRaidType,
 		mountPoint: '',
 		advanced: false,
+		forceCreate: false,
 		properties: {
 			comment: '',
 			ashift: 12,
@@ -89,6 +112,7 @@
 			failmode: 'wait'
 		},
 		useable: 0,
+		creating: false,
 		close: () => {
 			modal.name = '';
 			modal.open = false;
@@ -106,21 +130,41 @@
 			modal.raidType = 'stripe';
 			modal.mountPoint = '';
 			modal.useable = 0;
+			modal.forceCreate = false;
+		}
+	});
+
+	let confirmModals = $state({
+		active: '' as 'statusPool' | 'deletePool' | 'replaceDevice',
+		statusPool: {
+			open: false,
+			data: {
+				status: {} as Zpool['status']
+			},
+			title: 'Pool Status'
+		},
+		deletePool: {
+			open: false,
+			data: '',
+			title: 'Delete Pool'
+		},
+		replaceDevice: {
+			open: false,
+			data: {
+				pool: '',
+				old: '',
+				new: ''
+			},
+			title: 'Replace Device'
 		}
 	});
 
 	let disks = $derived($results[0].data as Disk[]);
 	let pools = $derived($results[1].data as Zpool[]);
 	let useableDisks = $derived(zpoolUseableDisks(disks, pools));
-	let useablePartitions = $derived.by(() => {
-		return Array.from(
-			new Map(
-				useableDisks
-					.flatMap((disk) => disk.Partitions)
-					.map((partition) => [partition.uuid, partition])
-			).values()
-		);
-	});
+	let useablePartitions = $derived(zpoolUseablePartitions(disks, pools));
+	let tableData = $derived(generateTableData(pools));
+	let sPool = $derived(pools.find((p) => p.name === activeRow?.name)?.status as Zpool['status']);
 
 	$effect(() => {
 		modal.vdevCount = Math.max(1, Math.min(128, modal.vdevCount));
@@ -169,7 +213,7 @@
 				case 'mirror':
 					const allMirrors = vdevLengths.every((length) => length === 2) && vdevLengths.length > 0;
 					return { ...type, available: allMirrors };
-				case 'raidz1':
+				case 'raidz':
 					return {
 						...type,
 						available: vdevLengths.every((length) => length >= 3) && vdevLengths.length > 0
@@ -190,7 +234,7 @@
 		});
 
 		if (!raidTypes.find((rt) => rt.value === modal.raidType)?.available) {
-			modal.raidType = raidTypes.find((rt) => rt.available)?.value || 'stripe';
+			modal.raidType = (raidTypes.find((rt) => rt.available)?.value as ZpoolRaidType) || 'stripe';
 		}
 
 		setUsableSpace();
@@ -218,7 +262,7 @@
 				case 'mirror':
 					totalUsable += sizes[0];
 					break;
-				case 'raidz1':
+				case 'raidz':
 					if (sizes.length > 1) {
 						totalUsable += total - sizes[sizes.length - 1];
 					}
@@ -305,7 +349,6 @@
 
 		setRedundancyAvailability();
 		setUsableSpace();
-		// console.log(modal.vdevContainers);
 	}
 
 	function vdevContains(id: number): boolean {
@@ -387,6 +430,8 @@
 	}
 
 	async function makePool() {
+		if (modal.creating) return;
+
 		if (useableDisks.length === 0 && useablePartitions.length === 0) {
 			toast.error('No available disks or partitions', {
 				position: 'bottom-center'
@@ -408,129 +453,197 @@
 			return;
 		}
 
+		if (
+			modal.vdevContainers.some((vdev) => {
+				return vdev.disks.length === 0 && vdev.partitions.length === 0;
+			})
+		) {
+			modal.vdevContainers = modal.vdevContainers.filter((vdev) => {
+				return vdev.disks.length > 0 || vdev.partitions.length > 0;
+			});
+			return;
+		}
+
 		let raidType: ZpoolRaidType = modal.raidType;
 
 		if (modal.raidType === 'stripe') {
 			raidType = undefined;
 		}
 
-		console.log(
-			await createPool({
-				name: modal.name,
-				raidType: raidType,
-				vdevs: modal.vdevContainers.map((vdev) => ({
-					name: vdev.id,
-					devices: [
-						...vdev.disks.map((disk) => disk.Device),
-						...vdev.partitions.map((partition) => partition.name)
-					]
-				})),
-				properties: {
-					comment: modal.properties.comment
-				},
-				createForce: true
-			})
-		);
+		modal.creating = true;
+
+		const response = await createPool({
+			name: modal.name,
+			raidType: raidType,
+			vdevs: modal.vdevContainers.map((vdev) => ({
+				name: vdev.id,
+				devices: [
+					...vdev.disks.map((disk) => disk.Device),
+					...vdev.partitions.map((partition) => partition.name)
+				]
+			})),
+			properties: {
+				comment: modal.properties.comment,
+				ashift: modal.properties.ashift.toString()
+			},
+			createForce: modal.forceCreate
+		});
+
+		modal.creating = false;
+
+		if (response.status === 'error') {
+			toast.error(parsePoolActionError(response), {
+				position: 'bottom-center'
+			});
+		} else {
+			toast.success(getTranslation(`zfs.pool.${response.message}`, 'Pool created'), {
+				position: 'bottom-center'
+			});
+
+			modal.close();
+		}
 	}
 
-	// console.log(pools);
-	// console.log(generateTableData(pools));
+	async function confirmAction() {
+		if (confirmModals.active === 'deletePool') {
+			const response = await deletePool(confirmModals.deletePool.data);
+			if (response.status === 'error') {
+				toast.error(parsePoolActionError(response), {
+					position: 'bottom-center'
+				});
+			} else {
+				toast.success(getTranslation(`zfs.pool.${response.message}`, 'Pool deleted'), {
+					position: 'bottom-center'
+				});
+			}
+		}
 
-	// const tableData: { rows: Row[]; columns: Column[] } = {
-	// 	rows: [
-	// 		{
-	// 			id: 1,
-	// 			name: 'zroot',
-	// 			size: '100G',
-	// 			health: 'ONLINE',
-	// 			redundancy: 'Stripe',
-	// 			children: [{ id: 2, name: 'nda0p4', size: '100G', health: 'ONLINE', redundancy: '-' }]
-	// 		},
-	// 		{
-	// 			id: 3,
-	// 			name: 'test',
-	// 			size: '128G',
-	// 			health: 'ONLINE',
-	// 			redundancy: 'Mirror',
-	// 			children: [
-	// 				{
-	// 					id: 4,
-	// 					name: 'mirror',
-	// 					size: '128G',
-	// 					health: 'ONLINE',
-	// 					redundancy: '-',
-	// 					children: [
-	// 						{ id: 5, name: 'ada0', size: '64G', health: 'ONLINE', redundancy: '-' },
-	// 						{ id: 6, name: 'ada1', size: '64G', health: 'ONLINE', redundancy: '-' }
-	// 					]
-	// 				}
-	// 			]
-	// 		},
-	// 		{
-	// 			id: 7,
-	// 			name: 'test2',
-	// 			size: '128G',
-	// 			health: 'ONLINE',
-	// 			redundancy: 'Mirror',
-	// 			children: [
-	// 				{
-	// 					id: 8,
-	// 					name: 'mirror-1',
-	// 					size: '64G',
-	// 					health: 'ONLINE',
-	// 					redundancy: '-',
-	// 					children: [
-	// 						{ id: 9, name: 'ada2', size: '64G', health: 'ONLINE', redundancy: '-' },
-	// 						{ id: 10, name: 'ada3', size: '64G', health: 'ONLINE', redundancy: '-' }
-	// 					]
-	// 				},
-	// 				{
-	// 					id: 11,
-	// 					name: 'mirror-2',
-	// 					size: '64G',
-	// 					health: 'ONLINE',
-	// 					redundancy: '-',
-	// 					children: [
-	// 						{ id: 12, name: 'ada4', size: '64G', health: 'ONLINE', redundancy: '-' },
-	// 						{ id: 13, name: 'ada5', size: '64G', health: 'ONLINE', redundancy: '-' }
-	// 					]
-	// 				},
-	// 				{
-	// 					id: 14,
-	// 					name: 'mirror-3',
-	// 					size: '64G',
-	// 					health: 'ONLINE',
-	// 					redundancy: '-',
-	// 					children: [
-	// 						{ id: 15, name: 'ada6', size: '64G', health: 'ONLINE', redundancy: '-' },
-	// 						{ id: 16, name: 'ada7', size: '64G', health: 'ONLINE', redundancy: '-' }
-	// 					]
-	// 				}
-	// 			]
-	// 		}
-	// 	],
-	// 	columns: [
-	// 		{
-	// 			key: 'name',
-	// 			label: 'Name'
-	// 		},
-	// 		{
-	// 			key: 'size',
-	// 			label: 'Size'
-	// 		},
-	// 		{
-	// 			key: 'health',
-	// 			label: 'Health'
-	// 		},
-	// 		{
-	// 			key: 'redundancy',
-	// 			label: 'Redundancy'
-	// 		}
-	// 	]
-	// };
+		if (confirmModals.active === 'replaceDevice') {
+			const { old: oldName, new: newName, pool: poolName } = confirmModals.replaceDevice.data;
+			const pool = pools.find((p) => p.name === poolName);
+			const vdev = pool?.vdevs.find((v) => v.devices.some((d) => d.name === oldName));
+			const oldDevice = vdev?.devices.find((d) => d.name === oldName);
+			const newDevice = useableDisks.find((d) => d.Device === newName);
+			const disks = {
+				old: oldDevice,
+				new: newDevice
+			};
 
-	let tableData = $derived(generateTableData(pools));
+			if (disks.old && disks.new) {
+				console.log(parseInt(getDiskSize(disks.new)), disks.old.size);
+				if (parseInt(getDiskSize(disks.new)) < disks.old.size) {
+					toast.error('New device is smaller than old device', {
+						position: 'bottom-center'
+					});
+
+					return;
+				}
+			}
+
+			replaceInProgress = true;
+
+			try {
+				await toast.promise(
+					replaceDevice({
+						name: poolName,
+						old: oldName,
+						new: newName
+					}),
+					{
+						loading: `Replacing ${stripDev(oldName)} with ${stripDev(newName)}`,
+						success: (response) => {
+							return getTranslation(`zfs.pool.${response.message}`, 'Device replacement started');
+						},
+						error: (error) => {
+							return getTranslation(`zfs.pool.${error.message}`, 'Error replacing device');
+						}
+					},
+					{
+						position: 'bottom-center'
+					}
+				);
+			} finally {
+				replaceInProgress = false;
+			}
+		}
+
+		confirmModals[confirmModals.active].open = false;
+	}
+
+	$effect(() => {
+		if (JSON.stringify(tableData).includes('replaced')) {
+			replaceInProgress = true;
+		} else {
+			replaceInProgress = false;
+		}
+	});
 </script>
+
+{#snippet button(type: string)}
+	{#if activeRow !== null}
+		{#if type === 'pool-status'}
+			{#if isPool(pools, activeRow.name)}
+				<Button
+					on:click={() => {
+						confirmModals.active = 'statusPool';
+						confirmModals.statusPool.open = true;
+						confirmModals.statusPool.title = activeRow?.name;
+						confirmModals.statusPool.data.status = pools.find((p) => p.name === activeRow?.name)
+							?.status as Zpool['status'];
+					}}
+					size="sm"
+					class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+				>
+					<Icon icon="mdi:eye" class="mr-1 h-4 w-4" /> Status
+				</Button>
+			{/if}
+		{/if}
+
+		{#if type === 'delete-pool'}
+			{#if isPool(pools, activeRow.name)}
+				<Button
+					on:click={() => {
+						confirmModals.active = 'deletePool';
+						confirmModals.deletePool.open = true;
+						confirmModals.deletePool.title = activeRow?.name;
+						confirmModals.deletePool.data = activeRow?.name;
+					}}
+					size="sm"
+					class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+					disabled={replaceInProgress}
+					title={replaceInProgress ? 'Cannot delete pool while replacing device in any pool' : ''}
+				>
+					<Icon icon="mdi:delete" class="mr-1 h-4 w-4" /> Delete Pool
+				</Button>
+			{/if}
+		{/if}
+
+		{#if type === 'replace-device'}
+			{#if isReplaceableDevice(pools, activeRow.name)}
+				<Button
+					on:click={() => {
+						confirmModals.active = 'replaceDevice';
+						confirmModals.replaceDevice.open = true;
+						confirmModals.replaceDevice.title = activeRow?.name;
+						confirmModals.replaceDevice.data = {
+							pool: getPoolByDevice(pools, activeRow?.name),
+							old: activeRow?.name,
+							new: ''
+						};
+					}}
+					size="sm"
+					class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+					disabled={replaceInProgress}
+					title={replaceInProgress
+						? 'Cannot replace device while replacing device in any pool'
+						: ''}
+				>
+					<Icon icon="mdi:swap-horizontal" class="mr-1 h-4 w-4" /> Replace Device
+				</Button>
+			{/if}
+		{/if}
+	{/if}
+{/snippet}
 
 {#snippet diskContainer(type: string)}
 	<div id="{type.toLowerCase()}-container">
@@ -665,7 +778,7 @@
 {/snippet}
 
 <div class="flex h-full w-full flex-col">
-	<div class="flex h-10 w-full items-center border p-2">
+	<div class="flex h-10 w-full items-center gap-2 border p-2">
 		<Button
 			on:click={() => (modal.open = !modal.open)}
 			size="sm"
@@ -673,18 +786,27 @@
 		>
 			<Icon icon="gg:add" class="mr-1 h-4 w-4" /> New
 		</Button>
+
+		{@render button('pool-status')}
+		{@render button('delete-pool')}
+		{@render button('replace-device')}
 	</div>
 
 	<div class="relative flex h-full w-full cursor-pointer flex-col">
 		<div class="flex-1">
 			<div class="h-full overflow-y-auto">
-				<TreeTable data={tableData} name="tt-zfsPool" itemIcon={'carbon:partition-collection'} />
+				<TreeTable
+					data={tableData}
+					name="tt-zfsPool"
+					itemIcon={'carbon:partition-collection'}
+					bind:parentActiveRow={activeRow}
+				/>
 			</div>
 		</div>
 	</div>
 </div>
 
-<Dialog.Root bind:open={modal.open} onOutsideClick={() => modal.close()}>
+<Dialog.Root bind:open={modal.open} closeOnOutsideClick={false}>
 	<Dialog.Content
 		class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-visible overflow-y-auto p-0 transition-all duration-300 ease-in-out lg:max-w-[70%]"
 	>
@@ -727,6 +849,39 @@
 								min={1}
 								bind:value={modal.vdevCount}
 							/>
+						</div>
+						<div class="flex-1 space-y-1">
+							<Label class="w-24 whitespace-nowrap text-sm" for="raid"
+								>Redundancy <span
+									class="font-semibold text-green-500 {modal.useable ? '' : 'hidden'}"
+									>({humanFormat(modal.useable)})</span
+								></Label
+							>
+							<Select.Root
+								selected={{
+									label: raidTypes.find((rt) => rt.value === modal.raidType)?.label,
+									value: raidTypes.find((rt) => rt.value === modal.raidType)?.value
+								}}
+								onSelectedChange={(value) => {
+									modal.raidType = value?.value as ZpoolRaidType;
+									setRedundancyAvailability();
+								}}
+							>
+								<Select.Trigger class="w-full">
+									<Select.Value placeholder="Select Redundancy" />
+								</Select.Trigger>
+								<Select.Content class="max-h-36 overflow-y-auto">
+									<Select.Group>
+										{#each raidTypes as raidType}
+											{#if raidType.available}
+												<Select.Item value={raidType.value} label={raidType.label}
+													>{raidType.label}</Select.Item
+												>
+											{/if}
+										{/each}
+									</Select.Group>
+								</Select.Content>
+							</Select.Root>
 						</div>
 					</Card.Content>
 
@@ -787,51 +942,6 @@
 			<Tabs.Content class="mt-0" value="tab-options">
 				<Card.Root class="min-h-[20vh] border-none pb-6">
 					<Card.Content class="flex flex-col gap-4 p-4 !pb-0">
-						<div transition:slide class="grid grid-cols-1 gap-4 md:grid-cols-2">
-							<div class="flex-1 space-y-1">
-								<Label class="w-24 whitespace-nowrap text-sm" for="raid"
-									>Redundancy <span class="text-neutral-500 {modal.useable ? '' : 'hidden'}"
-										>({humanFormat(modal.useable)})</span
-									></Label
-								>
-								<Select.Root
-									selected={{
-										label: raidTypes.find((rt) => rt.value === modal.raidType)?.label,
-										value: raidTypes.find((rt) => rt.value === modal.raidType)?.value
-									}}
-									onSelectedChange={(value) => {
-										modal.raidType = value?.value as string;
-										setRedundancyAvailability();
-									}}
-								>
-									<Select.Trigger class="w-full">
-										<Select.Value placeholder="Select Redundancy" />
-									</Select.Trigger>
-									<Select.Content class="max-h-36 overflow-y-auto">
-										<Select.Group>
-											{#each raidTypes as raidType}
-												{#if raidType.available}
-													<Select.Item value={raidType.value} label={raidType.label}
-														>{raidType.label}</Select.Item
-													>
-												{/if}
-											{/each}
-										</Select.Group>
-									</Select.Content>
-								</Select.Root>
-							</div>
-
-							<div class="flex-1 space-y-1">
-								<Label for="mountPoint">Mount Point</Label>
-								<Input
-									type="text"
-									id="mountPoint"
-									placeholder="/tank"
-									bind:value={modal.mountPoint}
-								/>
-							</div>
-						</div>
-
 						<div transition:slide class="grid grid-cols-1 gap-4">
 							<div class="flex-1 space-y-1">
 								<Label for="comment">Comment</Label>
@@ -842,19 +952,48 @@
 								/>
 							</div>
 
-							<div class="flex gap-2 space-y-1">
-								<Checkbox
-									id="advanced"
-									bind:checked={modal.advanced}
-									aria-labelledby="advanced-label"
-								/>
-								<Label
-									id="advanced-label"
-									for="advanced"
-									class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-								>
-									Advanced
-								</Label>
+							<div transition:slide class="grid grid-cols-1 items-center gap-4 md:grid-cols-3">
+								<div class="flex flex-col space-y-1">
+									<Label for="mountPoint" class="text-sm font-medium">Mount Point</Label>
+									<Input
+										type="text"
+										id="mountPoint"
+										placeholder="/tank"
+										bind:value={modal.mountPoint}
+									/>
+								</div>
+
+								<div class="col-span-2 flex items-center gap-6 md:mt-4">
+									<div class="flex items-center gap-2">
+										<Checkbox
+											id="forceCreate"
+											bind:checked={modal.forceCreate}
+											aria-labelledby="forceCreate-label"
+										/>
+										<Label
+											id="forceCreate-label"
+											for="forceCreate"
+											class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+										>
+											Force Create
+										</Label>
+									</div>
+
+									<div class="flex items-center gap-2">
+										<Checkbox
+											id="advanced"
+											bind:checked={modal.advanced}
+											aria-labelledby="advanced-label"
+										/>
+										<Label
+											id="advanced-label"
+											for="advanced"
+											class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+										>
+											Advanced
+										</Label>
+									</div>
+								</div>
 							</div>
 						</div>
 
@@ -1026,16 +1165,430 @@
 		<Dialog.Footer class="flex justify-between gap-2 border-t px-4 py-3">
 			<div class="flex gap-2">
 				<Button
-					variant="outline"
-					class="h-8 disabled:!pointer-events-auto"
-					onclick={() => modal.close()}>Cancel</Button
-				>
-				<Button
 					variant="default"
 					class="h-8 bg-blue-700 text-white hover:bg-blue-600"
-					onclick={() => makePool()}>Next</Button
+					onclick={() => makePool()}
 				>
+					{#if modal.creating}
+						<Icon icon="mdi:loading" class="mr-1 h-4 w-4 animate-spin" />
+					{:else}
+						{capitalizeFirstLetter(getTranslation('common.create', 'Create'))}
+					{/if}
+				</Button>
 			</div>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
+
+{#if confirmModals.active == 'deletePool'}
+	<AlertDialogModal
+		open={confirmModals.active && confirmModals[confirmModals.active].open}
+		names={{
+			parent: 'pool',
+			element: confirmModals.active ? confirmModals[confirmModals.active].title || '' : ''
+		}}
+		actions={{
+			onConfirm: () => {
+				if (confirmModals.active) {
+					confirmAction();
+				}
+			},
+			onCancel: () => {
+				if (confirmModals.active) {
+					confirmModals[confirmModals.active].open = false;
+				}
+			}
+		}}
+	></AlertDialogModal>
+{/if}
+
+{#if confirmModals.active == 'statusPool'}
+	<AlertDialog.Root
+		bind:open={confirmModals.statusPool.open}
+		closeOnOutsideClick={false}
+		closeOnEscape={false}
+	>
+		<AlertDialog.Content class="sm:max-w-[600px] md:max-w-[700px]">
+			<AlertDialog.Header>
+				<AlertDialog.Title class="flex items-center">
+					<span class="text-primary">Pool Status</span>
+					<span class="text-muted-foreground mx-2">•</span>
+					<span class="text-xl">{confirmModals.statusPool.data.status.name}</span>
+					<div
+						class="ml-3 rounded-full px-3 py-1 text-sm font-medium text-white
+                    {sPool.state === 'ONLINE'
+							? 'bg-green-500'
+							: sPool.state === 'DEGRADED'
+								? 'bg-yellow-500'
+								: sPool.state === 'FAULTED'
+									? 'bg-red-500'
+									: 'bg-gray-500'}"
+					>
+						{sPool.state}
+					</div>
+				</AlertDialog.Title>
+			</AlertDialog.Header>
+
+			<div class="space-y-3 py-2">
+				{#if sPool}
+					<!-- Pool Status Message -->
+					{#if sPool.status && sPool.status.length > 0}
+						<div
+							class="mb-4 rounded-md border border-yellow-200 bg-yellow-50 p-3 text-yellow-800 dark:border-yellow-800 dark:bg-yellow-950 dark:text-yellow-200"
+						>
+							<div class="flex gap-2">
+								<Icon icon="mdi:alert-circle" class="h-5 w-5 flex-shrink-0" />
+								<div>
+									<p class="font-medium">{sPool.status}</p>
+									{#if sPool.action && sPool.action.length > 0}
+										<p class="mt-1 text-sm">{sPool.action}</p>
+									{/if}
+								</div>
+							</div>
+						</div>
+					{/if}
+
+					<!-- Scan Status -->
+					<div class="mb-4">
+						<div class="bg-muted mb-2 flex items-center gap-2 rounded-md px-3 py-1">
+							<Icon icon="mdi:magnify" class="text-primary h-5 w-5" />
+							<span class="font-semibold">Scan Activity</span>
+						</div>
+						<div class="border-primary/20 mt-2 border-l-2 pl-3">
+							{#if sPool.scan && sPool.scan.length > 0}
+								{#if sPool.scan.includes('in progress') || sPool.scan.includes('resilver in progress')}
+									{@const progressMatch = sPool.scan.match(/(\d+\.\d+)%/)}
+									{@const progress = progressMatch ? parseFloat(progressMatch[1]) : 0}
+									{@const isResilver = sPool.scan.includes('resilver')}
+
+									<div class="text-muted-foreground text-sm">
+										{capitalizeFirstLetter(sPool.scan)}
+									</div>
+									<div class="bg-secondary mt-3 h-3 w-full overflow-hidden rounded-full">
+										<div
+											class="h-full rounded-full {isResilver ? 'bg-blue-500' : 'bg-primary'}"
+											style="width: {progress}%"
+										></div>
+									</div>
+								{:else}
+									<div class="text-muted-foreground text-sm">
+										{capitalizeFirstLetter(sPool.scan)}
+									</div>
+								{/if}
+							{:else}
+								<div class="text-muted-foreground flex items-center gap-2 py-1">
+									<Icon icon="material-symbols:info" class="h-4 w-4" />
+									<span>No recent scan activity</span>
+								</div>
+							{/if}
+						</div>
+					</div>
+
+					<!-- Devices Tree -->
+					<div class="mb-4">
+						<div class="bg-muted mb-2 flex items-center gap-2 rounded-md px-3 py-1">
+							<Icon icon="tabler:topology-bus" class="text-primary h-5 w-5" />
+							<span class="font-semibold">Device Topology</span>
+						</div>
+						<div class="mt-2">
+							{#if sPool.devices && sPool.devices.length > 0}
+								<div class="space-y-3">
+									{#each sPool.devices as device}
+										<div class="device-tree">
+											<div class="bg-background flex items-center rounded-md border p-2">
+												<div
+													class="mr-2 h-3 w-3 rounded-full
+                                                    {device.state === 'ONLINE'
+														? 'bg-green-500'
+														: device.state === 'DEGRADED'
+															? 'bg-yellow-500'
+															: device.state === 'FAULTED'
+																? 'bg-red-500'
+																: 'bg-gray-500'}"
+												></div>
+												<div class="font-medium">{device.name}</div>
+												<div class="text-muted-foreground ml-2 text-sm">({device.state})</div>
+
+												{#if device.read > 0 || device.write > 0 || device.cksum > 0}
+													<div class="ml-auto flex gap-2 text-xs">
+														{#if device.read > 0}
+															<span class="text-red-500">READ: {device.read}</span>
+														{/if}
+														{#if device.write > 0}
+															<span class="text-red-500">WRITE: {device.write}</span>
+														{/if}
+														{#if device.cksum > 0}
+															<span class="text-red-500">CKSUM: {device.cksum}</span>
+														{/if}
+													</div>
+												{/if}
+											</div>
+
+											{#if device.children && device.children.length > 0}
+												<div class="border-border ml-4 mt-2 space-y-2 border-l-2 pl-4">
+													{#each device.children as child}
+														<div class="device-tree">
+															<div class="bg-background/80 flex items-center rounded-md border p-2">
+																<div
+																	class="mr-2 h-2 w-2 rounded-full
+                                                                    {child.state === 'ONLINE'
+																		? 'bg-green-500'
+																		: child.state === 'DEGRADED'
+																			? 'bg-yellow-500'
+																			: child.state === 'FAULTED'
+																				? 'bg-red-500'
+																				: 'bg-gray-500'}"
+																></div>
+																<div class="font-medium">{child.name}</div>
+																<div class="text-muted-foreground ml-2 text-sm">
+																	({child.state})
+																</div>
+
+																{#if child.read > 0 || child.write > 0 || child.cksum > 0}
+																	<div class="ml-auto flex gap-2 text-xs">
+																		{#if child.read > 0}
+																			<span class="text-red-500">READ: {child.read}</span>
+																		{/if}
+																		{#if child.write > 0}
+																			<span class="text-red-500">WRITE: {child.write}</span>
+																		{/if}
+																		{#if child.cksum > 0}
+																			<span class="text-red-500">CKSUM: {child.cksum}</span>
+																		{/if}
+																	</div>
+																{/if}
+															</div>
+
+															{#if child.children && child.children.length > 0}
+																<div class="border-border ml-4 mt-2 space-y-2 border-l-2 pl-4">
+																	{#each child.children as grandchild}
+																		<div
+																			class="bg-background/60 flex items-center rounded-md border p-2"
+																		>
+																			<div
+																				class="mr-2 h-2 w-2 rounded-full
+                                                                                {grandchild.state ===
+																				'ONLINE'
+																					? 'bg-green-500'
+																					: grandchild.state === 'DEGRADED'
+																						? 'bg-yellow-500'
+																						: grandchild.state === 'FAULTED'
+																							? 'bg-red-500'
+																							: 'bg-gray-500'}"
+																			></div>
+																			<div class="font-medium">{grandchild.name}</div>
+																			<div class="text-muted-foreground ml-2 text-sm">
+																				({grandchild.state})
+																			</div>
+
+																			{#if grandchild.note}
+																				<div
+																					class="ml-2 rounded bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-100"
+																				>
+																					{grandchild.note}
+																				</div>
+																			{/if}
+
+																			{#if grandchild.read > 0 || grandchild.write > 0 || grandchild.cksum > 0}
+																				<div class="ml-auto flex gap-2 text-xs">
+																					{#if grandchild.read > 0}
+																						<span class="text-red-500">READ: {grandchild.read}</span
+																						>
+																					{/if}
+																					{#if grandchild.write > 0}
+																						<span class="text-red-500"
+																							>WRITE: {grandchild.write}</span
+																						>
+																					{/if}
+																					{#if grandchild.cksum > 0}
+																						<span class="text-red-500"
+																							>CKSUM: {grandchild.cksum}</span
+																						>
+																					{/if}
+																				</div>
+																			{/if}
+																		</div>
+
+																		<!-- Handle replacing disk children -->
+																		{#if grandchild.name.startsWith('replacing') && grandchild.children && grandchild.children.length > 0}
+																			<div
+																				class="border-border ml-4 mt-2 space-y-2 border-l-2 pl-4"
+																			>
+																				{#each grandchild.children as replaceDisk}
+																					<div
+																						class="bg-background/40 flex items-center rounded-md border p-2"
+																					>
+																						<div
+																							class="mr-2 h-2 w-2 rounded-full
+                                                                                            {replaceDisk.state ===
+																							'ONLINE'
+																								? 'bg-green-500'
+																								: replaceDisk.state === 'DEGRADED'
+																									? 'bg-yellow-500'
+																									: replaceDisk.state === 'FAULTED'
+																										? 'bg-red-500'
+																										: 'bg-gray-500'}"
+																						></div>
+																						<div class="font-medium">{replaceDisk.name}</div>
+																						<div class="text-muted-foreground ml-2 text-sm">
+																							({replaceDisk.state})
+																						</div>
+
+																						{#if replaceDisk.note}
+																							<div
+																								class="ml-2 rounded bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-100"
+																							>
+																								{replaceDisk.note}
+																							</div>
+																						{/if}
+
+																						{#if replaceDisk.read > 0 || replaceDisk.write > 0 || replaceDisk.cksum > 0}
+																							<div class="ml-auto flex gap-2 text-xs">
+																								{#if replaceDisk.read > 0}
+																									<span class="text-red-500"
+																										>READ: {replaceDisk.read}</span
+																									>
+																								{/if}
+																								{#if replaceDisk.write > 0}
+																									<span class="text-red-500"
+																										>WRITE: {replaceDisk.write}</span
+																									>
+																								{/if}
+																								{#if replaceDisk.cksum > 0}
+																									<span class="text-red-500"
+																										>CKSUM: {replaceDisk.cksum}</span
+																									>
+																								{/if}
+																							</div>
+																						{/if}
+																					</div>
+																				{/each}
+																			</div>
+																		{/if}
+																	{/each}
+																</div>
+															{/if}
+														</div>
+													{/each}
+												</div>
+											{/if}
+										</div>
+									{/each}
+								</div>
+							{:else}
+								<div class="text-muted-foreground flex items-center gap-2 py-2">
+									<Icon icon="material-symbols:info" class="h-4 w-4" />
+									<span>No devices found</span>
+								</div>
+							{/if}
+						</div>
+					</div>
+
+					<!-- Errors -->
+					<div>
+						<div class="bg-muted mb-2 flex items-center gap-2 rounded-md px-3 py-1">
+							<Icon icon="mdi:alert" class="text-primary h-5 w-5" />
+							<span class="font-semibold">Error Status</span>
+						</div>
+						<div class="mt-2 rounded-md border p-2">
+							<div
+								class="flex items-center gap-2 pl-2 {sPool.errors.includes('No known data errors')
+									? 'text-green-600 dark:text-green-400'
+									: 'text-red-600 dark:text-red-400'}"
+							>
+								<Icon
+									icon={sPool.errors.includes('No known data errors')
+										? 'mdi:check-circle'
+										: 'mdi:alert-circle'}
+									class="h-5 w-5"
+								/>
+								<span>{sPool.errors}</span>
+							</div>
+						</div>
+					</div>
+				{/if}
+			</div>
+
+			<AlertDialog.Footer>
+				<AlertDialog.Cancel
+					onclick={() => {
+						confirmModals.statusPool.open = false;
+					}}>Close</AlertDialog.Cancel
+				>
+			</AlertDialog.Footer>
+		</AlertDialog.Content>
+	</AlertDialog.Root>
+{/if}
+
+{#if confirmModals.active == 'replaceDevice'}
+	<AlertDialog.Root
+		bind:open={confirmModals.replaceDevice.open}
+		closeOnOutsideClick={false}
+		closeOnEscape={false}
+	>
+		<AlertDialog.Content>
+			<AlertDialog.Header>
+				<AlertDialog.Title
+					>Replace {confirmModals.replaceDevice.data.old} in {confirmModals.replaceDevice.data
+						.pool}</AlertDialog.Title
+				>
+			</AlertDialog.Header>
+
+			<div class="space-y-1 py-1">
+				<div>
+					<Select.Root
+						selected={{
+							label:
+								useableDisks.find((d) => d.Device === confirmModals.replaceDevice.data?.new)
+									?.Device ||
+								useablePartitions.find((d) => d.name === confirmModals.replaceDevice.data?.new)
+									?.name,
+							value: confirmModals.replaceDevice.data?.new
+						}}
+						onSelectedChange={(value) => {
+							confirmModals.replaceDevice.data = {
+								...confirmModals.replaceDevice.data,
+								new: value?.value as string
+							};
+						}}
+					>
+						<Select.Trigger class="w-full">
+							<Select.Value placeholder="Select replacement device" />
+						</Select.Trigger>
+						<Select.Content class="max-h-36 overflow-y-auto">
+							<Select.Group>
+								{#each useableDisks as disk}
+									<Select.Item value={disk.Device} label={disk.Device}>
+										{disk.Device}
+									</Select.Item>
+								{/each}
+
+								{#each useablePartitions as partition}
+									<Select.Item value={partition.name} label={partition.name}>
+										{partition.name}
+									</Select.Item>
+								{/each}
+							</Select.Group>
+						</Select.Content>
+					</Select.Root>
+				</div>
+			</div>
+
+			<AlertDialog.Footer>
+				<AlertDialog.Cancel
+					onclick={() => {
+						confirmModals.replaceDevice.open = false;
+					}}>Cancel</AlertDialog.Cancel
+				>
+				<AlertDialog.Action
+					disabled={!confirmModals.replaceDevice.data?.new}
+					onclick={() => {
+						confirmAction();
+					}}
+				>
+					Replace
+				</AlertDialog.Action>
+			</AlertDialog.Footer>
+		</AlertDialog.Content>
+	</AlertDialog.Root>
+{/if}

@@ -247,5 +247,12 @@ func ReplaceDevice(zfsSerice *zfs.Service) gin.HandlerFunc {
 			})
 			return
 		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "device_replaced",
+			Error:   "",
+			Data:    nil,
+		})
 	}
 }

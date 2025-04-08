@@ -108,14 +108,13 @@ func (z *zfs) run(in io.Reader, out io.Writer, cmd string, args ...string) ([][]
 	}
 
 	cmdOut := out
+
 	if cmdOut == nil {
 		cmdOut = &stdout
 	}
 
-	// id := uuid.New().String()
 	joinedArgs := strings.Join(args, " ")
 
-	// z.logger.Log([]string{"ID:" + id, "START", joinedArgs})
 	if err := z.exec.Run(in, cmdOut, &stderr, cmd, args...); err != nil {
 		return nil, &Error{
 			Err:    err,
@@ -124,17 +123,13 @@ func (z *zfs) run(in io.Reader, out io.Writer, cmd string, args ...string) ([][]
 		}
 	}
 
-	// z.logger.Log([]string{"ID:" + id, "FINISH"})
-
-	// assume if you passed in something for stdout, that you know what to do with it
 	if out != nil {
 		return nil, nil
 	}
 
 	lines := strings.Split(stdout.String(), "\n")
-
-	// last line is always blank
 	lines = lines[0 : len(lines)-1]
+
 	output := make([][]string, len(lines))
 
 	for i, l := range lines {

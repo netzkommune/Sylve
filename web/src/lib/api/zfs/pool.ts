@@ -48,3 +48,7 @@ export async function replaceDevice(data: ReplaceDevice) {
 export async function deletePool(name: string) {
 	return await apiRequest(`/zfs/pools/${name}`, APIResponseSchema, 'DELETE');
 }
+
+export async function scrubPool(name: string) {
+	return await apiRequest(`/zfs/pools/${name}/scrub`, APIResponseSchema, 'POST');
+}

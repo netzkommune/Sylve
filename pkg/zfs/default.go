@@ -97,3 +97,17 @@ func GetZpoolStatus(poolName string) (ZpoolStatus, error) {
 
 	return status, nil
 }
+
+func ScrubPool(poolName string) error {
+	pool, err := GetZpool(poolName)
+	if err != nil {
+		return fmt.Errorf("failed to get pool %s: %w", poolName, err)
+	}
+
+	err = z.ScrubPool(pool.Name)
+	if err != nil {
+		return fmt.Errorf("failed to scrub pool %s: %w", pool.Name, err)
+	}
+
+	return nil
+}

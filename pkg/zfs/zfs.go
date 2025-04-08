@@ -49,6 +49,7 @@ type ZFS interface {
 
 	ListZpools() ([]*Zpool, error)
 	GetZpool(name string) (*Zpool, error)
+	ScrubPool(name string) error
 	CreateZpool(name string, properties map[string]string, args ...string) (*Zpool, error)
 	GetPoolIODelay(poolName string) (float64, error)
 	GetTotalIODelay() float64

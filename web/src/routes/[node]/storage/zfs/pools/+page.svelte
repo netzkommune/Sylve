@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { listDisks } from '$lib/api/disk/disk';
-	import { createPool, deletePool, getPools, replaceDevice } from '$lib/api/zfs/pool';
+	import { createPool, deletePool, getPools, replaceDevice, scrubPool } from '$lib/api/zfs/pool';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
@@ -83,6 +83,7 @@
 
 	let activeRow: Row | null = $state(null);
 	let replaceInProgress: boolean = $state(false);
+	let scrubInProgress: boolean = $state(false);
 
 	$effect(() => {});
 
@@ -571,10 +572,19 @@
 	}
 
 	$effect(() => {
-		if (JSON.stringify(tableData).includes('replaced')) {
+		if (
+			JSON.stringify(tableData).toLowerCase().includes('replaced') &&
+			JSON.stringify(tableData).toLowerCase().includes('replacing')
+		) {
 			replaceInProgress = true;
 		} else {
 			replaceInProgress = false;
+		}
+
+		if (JSON.stringify(pools).toLowerCase().includes('scrub in progress since')) {
+			scrubInProgress = true;
+		} else {
+			scrubInProgress = false;
 		}
 	});
 </script>
@@ -599,7 +609,33 @@
 			{/if}
 		{/if}
 
-		{#if type === 'delete-pool'}
+		{#if type === 'pool-scrub'}
+			{#if isPool(pools, activeRow.name)}
+				<Button
+					on:click={async () => {
+						const response = await scrubPool(activeRow?.name);
+						console.log(response);
+						if (response.status === 'error') {
+							toast.error(parsePoolActionError(response), {
+								position: 'bottom-center'
+							});
+						} else {
+							toast.success(getTranslation(`zfs.pool.${response.message}`, 'Scrub started'), {
+								position: 'bottom-center'
+							});
+						}
+					}}
+					size="sm"
+					class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+					disabled={scrubInProgress}
+					title={scrubInProgress ? 'A scrub is already in progress' : ''}
+				>
+					<Icon icon="cil:scrubber" class="mr-1 h-4 w-4" /> Scrub
+				</Button>
+			{/if}
+		{/if}
+
+		{#if type === 'pool-delete'}
 			{#if isPool(pools, activeRow.name)}
 				<Button
 					on:click={() => {
@@ -613,7 +649,7 @@
 					disabled={replaceInProgress}
 					title={replaceInProgress ? 'Cannot delete pool while replacing device in any pool' : ''}
 				>
-					<Icon icon="mdi:delete" class="mr-1 h-4 w-4" /> Delete Pool
+					<Icon icon="mdi:delete" class="mr-1 h-4 w-4" /> Delete
 				</Button>
 			{/if}
 		{/if}
@@ -788,7 +824,8 @@
 		</Button>
 
 		{@render button('pool-status')}
-		{@render button('delete-pool')}
+		{@render button('pool-scrub')}
+		{@render button('pool-delete')}
 		{@render button('replace-device')}
 	</div>
 
@@ -1202,18 +1239,96 @@
 	></AlertDialogModal>
 {/if}
 
+{#snippet dtEl(device: Zpool['status']['devices'][0], showNote: boolean)}
+	<div
+		class="mr-3 h-2.5 w-2.5 rounded-full
+        {device.state === 'ONLINE'
+			? 'bg-green-500'
+			: device.state === 'DEGRADED'
+				? 'bg-yellow-500'
+				: device.state === 'FAULTED'
+					? 'bg-red-500'
+					: 'bg-gray-500'}"
+		title={device.state}
+	></div>
+
+	<div class="flex items-center gap-2 font-medium">
+		<div>{device.name}</div>
+		{#if device.note && showNote}
+			<div
+				class="rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-100"
+			>
+				{#if device.note === '(resilvering)'}
+					<span>Resilvering</span>
+				{:else}
+					<span>{device.note}</span>
+				{/if}
+			</div>
+		{/if}
+	</div>
+
+	{#if device.read > 0 || device.write > 0 || device.cksum > 0}
+		<div class="ml-auto flex gap-2 text-xs">
+			{#if device.read > 0}
+				<span class="rounded bg-red-100 px-2 py-0.5 text-red-800 dark:bg-red-900 dark:text-red-100"
+					>READ: {device.read}</span
+				>
+			{/if}
+			{#if device.write > 0}
+				<span class="rounded bg-red-100 px-2 py-0.5 text-red-800 dark:bg-red-900 dark:text-red-100"
+					>WRITE: {device.write}</span
+				>
+			{/if}
+			{#if device.cksum > 0}
+				<span class="rounded bg-red-100 px-2 py-0.5 text-red-800 dark:bg-red-900 dark:text-red-100"
+					>CKSUM: {device.cksum}</span
+				>
+			{/if}
+		</div>
+	{/if}
+{/snippet}
+
+{#snippet deviceTreeNode(device: Zpool['status']['devices'][0], showNote: boolean)}
+	<div class="device-tree">
+		<div class="bg-background flex items-center rounded-md border p-3">
+			{@render dtEl(device, showNote)}
+		</div>
+
+		{#if device.children && device.children.length > 0 && !device.name.startsWith('replacing')}
+			<div class="border-border ml-5 mt-2 space-y-2 border-l-2 pl-4">
+				{#each device.children as child}
+					{@render deviceTreeNode(child, true)}
+				{/each}
+			</div>
+		{/if}
+
+		{#if device.name.startsWith('replacing') && device.children && device.children.length > 0}
+			<div class="border-border ml-5 mt-2 space-y-2 border-l-2 pl-4">
+				{#each device.children as replaceDisk}
+					{@render deviceTreeNode(replaceDisk, true)}
+				{/each}
+			</div>
+		{/if}
+	</div>
+{/snippet}
+
 {#if confirmModals.active == 'statusPool'}
 	<AlertDialog.Root
 		bind:open={confirmModals.statusPool.open}
-		closeOnOutsideClick={false}
+		onOutsideClick={() => {
+			confirmModals.statusPool.open = false;
+		}}
+		closeOnOutsideClick={true}
 		closeOnEscape={false}
 	>
-		<AlertDialog.Content class="sm:max-w-[600px] md:max-w-[700px]">
+		<AlertDialog.Content
+			class="max-h-[calc(80vh-4rem)] overflow-y-auto sm:max-w-[600px] md:max-w-[700px]"
+		>
 			<AlertDialog.Header>
 				<AlertDialog.Title class="flex items-center">
-					<span class="text-primary">Pool Status</span>
+					<span class="text-primary font-semibold">Pool Status</span>
 					<span class="text-muted-foreground mx-2">•</span>
-					<span class="text-xl">{confirmModals.statusPool.data.status.name}</span>
+					<span class="text-xl font-medium">{confirmModals.statusPool.data.status.name}</span>
 					<div
 						class="ml-3 rounded-full px-3 py-1 text-sm font-medium text-white
                     {sPool.state === 'ONLINE'
@@ -1229,280 +1344,102 @@
 				</AlertDialog.Title>
 			</AlertDialog.Header>
 
-			<div class="space-y-3 py-2">
+			<div class="space-y-4 py-3">
 				{#if sPool}
-					<!-- Pool Status Message -->
 					{#if sPool.status && sPool.status.length > 0}
 						<div
-							class="mb-4 rounded-md border border-yellow-200 bg-yellow-50 p-3 text-yellow-800 dark:border-yellow-800 dark:bg-yellow-950 dark:text-yellow-200"
+							class="rounded-md border border-yellow-200 bg-yellow-50 p-4 text-yellow-800 dark:border-yellow-800 dark:bg-yellow-950 dark:text-yellow-200"
 						>
-							<div class="flex gap-2">
-								<Icon icon="mdi:alert-circle" class="h-5 w-5 flex-shrink-0" />
+							<div class="flex gap-3">
+								<Icon icon="mdi:alert-circle" class="mt-0.5 h-5 w-5 flex-shrink-0" />
 								<div>
 									<p class="font-medium">{sPool.status}</p>
 									{#if sPool.action && sPool.action.length > 0}
-										<p class="mt-1 text-sm">{sPool.action}</p>
+										<p class="mt-2 text-sm">{sPool.action}</p>
 									{/if}
 								</div>
 							</div>
 						</div>
 					{/if}
 
-					<!-- Scan Status -->
-					<div class="mb-4">
-						<div class="bg-muted mb-2 flex items-center gap-2 rounded-md px-3 py-1">
-							<Icon icon="mdi:magnify" class="text-primary h-5 w-5" />
-							<span class="font-semibold">Scan Activity</span>
-						</div>
-						<div class="border-primary/20 mt-2 border-l-2 pl-3">
-							{#if sPool.scan && sPool.scan.length > 0}
-								{#if sPool.scan.includes('in progress') || sPool.scan.includes('resilver in progress')}
-									{@const progressMatch = sPool.scan.match(/(\d+\.\d+)%/)}
-									{@const progress = progressMatch ? parseFloat(progressMatch[1]) : 0}
-									{@const isResilver = sPool.scan.includes('resilver')}
+					<div class="overflow-hidden rounded-md border">
+						<div class="border-b">
+							<div class="bg-muted flex items-center gap-2 px-4 py-2">
+								<Icon icon="mdi:magnify" class="text-primary h-5 w-5" />
+								<span class="font-semibold">Scan Activity</span>
+							</div>
+							<div class="p-4">
+								{#if sPool.scan && sPool.scan.length > 0}
+									{#if sPool.scan.includes('in progress') || sPool.scan.includes('resilver in progress')}
+										{@const progressMatch = sPool.scan.match(/(\d+\.\d+)%/)}
+										{@const progress = progressMatch ? parseFloat(progressMatch[1]) : 0}
+										{@const isResilver = sPool.scan.includes('resilver')}
 
-									<div class="text-muted-foreground text-sm">
-										{capitalizeFirstLetter(sPool.scan)}
-									</div>
-									<div class="bg-secondary mt-3 h-3 w-full overflow-hidden rounded-full">
-										<div
-											class="h-full rounded-full {isResilver ? 'bg-blue-500' : 'bg-primary'}"
-											style="width: {progress}%"
-										></div>
-									</div>
+										<div class="text-muted-foreground text-sm">
+											{capitalizeFirstLetter(sPool.scan)}
+										</div>
+										<div class="bg-secondary mt-3 h-2.5 w-full overflow-hidden rounded-full">
+											<div
+												class="h-full rounded-full {isResilver ? 'bg-blue-500' : 'bg-primary'}"
+												style="width: {progress}%"
+											></div>
+										</div>
+									{:else}
+										<div class="text-muted-foreground text-sm">
+											{capitalizeFirstLetter(sPool.scan)}
+										</div>
+									{/if}
 								{:else}
-									<div class="text-muted-foreground text-sm">
-										{capitalizeFirstLetter(sPool.scan)}
+									<div class="text-muted-foreground flex items-center gap-2 py-1">
+										<Icon icon="material-symbols:info" class="h-4 w-4" />
+										<span>No recent scan activity</span>
 									</div>
 								{/if}
-							{:else}
-								<div class="text-muted-foreground flex items-center gap-2 py-1">
-									<Icon icon="material-symbols:info" class="h-4 w-4" />
-									<span>No recent scan activity</span>
+							</div>
+						</div>
+
+						<div class="border-b">
+							<div class="bg-muted flex items-center gap-2 px-4 py-2">
+								<Icon icon="tabler:topology-bus" class="text-primary h-5 w-5" />
+								<span class="font-semibold">Device Topology</span>
+							</div>
+							<div class="p-4">
+								{#if sPool.devices && sPool.devices.length > 0}
+									<div class="space-y-3">
+										{#each sPool.devices as device}
+											{@render deviceTreeNode(device, false)}
+										{/each}
+									</div>
+								{:else}
+									<div class="text-muted-foreground flex items-center gap-2 py-2">
+										<Icon icon="material-symbols:info" class="h-4 w-4" />
+										<span>No devices found</span>
+									</div>
+								{/if}
+							</div>
+						</div>
+
+						<div>
+							<div class="bg-muted flex items-center gap-2 px-4 py-2">
+								<Icon icon="mdi:alert" class="text-primary h-5 w-5" />
+								<span class="font-semibold">Error Status</span>
+							</div>
+							<div class="p-4">
+								<div
+									class="flex items-center gap-2 rounded-md border p-3 {sPool.errors.includes(
+										'No known data errors'
+									)
+										? 'border-green-200 bg-green-50 text-green-800 dark:border-green-800 dark:bg-green-950 dark:text-green-200'
+										: 'border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-200'}"
+								>
+									<Icon
+										icon={sPool.errors.includes('No known data errors')
+											? 'mdi:check-circle'
+											: 'mdi:alert-circle'}
+										class="h-5 w-5"
+									/>
+									<span>{sPool.errors}</span>
 								</div>
-							{/if}
-						</div>
-					</div>
-
-					<!-- Devices Tree -->
-					<div class="mb-4">
-						<div class="bg-muted mb-2 flex items-center gap-2 rounded-md px-3 py-1">
-							<Icon icon="tabler:topology-bus" class="text-primary h-5 w-5" />
-							<span class="font-semibold">Device Topology</span>
-						</div>
-						<div class="mt-2">
-							{#if sPool.devices && sPool.devices.length > 0}
-								<div class="space-y-3">
-									{#each sPool.devices as device}
-										<div class="device-tree">
-											<div class="bg-background flex items-center rounded-md border p-2">
-												<div
-													class="mr-2 h-3 w-3 rounded-full
-                                                    {device.state === 'ONLINE'
-														? 'bg-green-500'
-														: device.state === 'DEGRADED'
-															? 'bg-yellow-500'
-															: device.state === 'FAULTED'
-																? 'bg-red-500'
-																: 'bg-gray-500'}"
-												></div>
-												<div class="font-medium">{device.name}</div>
-												<div class="text-muted-foreground ml-2 text-sm">({device.state})</div>
-
-												{#if device.read > 0 || device.write > 0 || device.cksum > 0}
-													<div class="ml-auto flex gap-2 text-xs">
-														{#if device.read > 0}
-															<span class="text-red-500">READ: {device.read}</span>
-														{/if}
-														{#if device.write > 0}
-															<span class="text-red-500">WRITE: {device.write}</span>
-														{/if}
-														{#if device.cksum > 0}
-															<span class="text-red-500">CKSUM: {device.cksum}</span>
-														{/if}
-													</div>
-												{/if}
-											</div>
-
-											{#if device.children && device.children.length > 0}
-												<div class="border-border ml-4 mt-2 space-y-2 border-l-2 pl-4">
-													{#each device.children as child}
-														<div class="device-tree">
-															<div class="bg-background/80 flex items-center rounded-md border p-2">
-																<div
-																	class="mr-2 h-2 w-2 rounded-full
-                                                                    {child.state === 'ONLINE'
-																		? 'bg-green-500'
-																		: child.state === 'DEGRADED'
-																			? 'bg-yellow-500'
-																			: child.state === 'FAULTED'
-																				? 'bg-red-500'
-																				: 'bg-gray-500'}"
-																></div>
-																<div class="font-medium">{child.name}</div>
-																<div class="text-muted-foreground ml-2 text-sm">
-																	({child.state})
-																</div>
-
-																{#if child.read > 0 || child.write > 0 || child.cksum > 0}
-																	<div class="ml-auto flex gap-2 text-xs">
-																		{#if child.read > 0}
-																			<span class="text-red-500">READ: {child.read}</span>
-																		{/if}
-																		{#if child.write > 0}
-																			<span class="text-red-500">WRITE: {child.write}</span>
-																		{/if}
-																		{#if child.cksum > 0}
-																			<span class="text-red-500">CKSUM: {child.cksum}</span>
-																		{/if}
-																	</div>
-																{/if}
-															</div>
-
-															{#if child.children && child.children.length > 0}
-																<div class="border-border ml-4 mt-2 space-y-2 border-l-2 pl-4">
-																	{#each child.children as grandchild}
-																		<div
-																			class="bg-background/60 flex items-center rounded-md border p-2"
-																		>
-																			<div
-																				class="mr-2 h-2 w-2 rounded-full
-                                                                                {grandchild.state ===
-																				'ONLINE'
-																					? 'bg-green-500'
-																					: grandchild.state === 'DEGRADED'
-																						? 'bg-yellow-500'
-																						: grandchild.state === 'FAULTED'
-																							? 'bg-red-500'
-																							: 'bg-gray-500'}"
-																			></div>
-																			<div class="font-medium">{grandchild.name}</div>
-																			<div class="text-muted-foreground ml-2 text-sm">
-																				({grandchild.state})
-																			</div>
-
-																			{#if grandchild.note}
-																				<div
-																					class="ml-2 rounded bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-100"
-																				>
-																					{grandchild.note}
-																				</div>
-																			{/if}
-
-																			{#if grandchild.read > 0 || grandchild.write > 0 || grandchild.cksum > 0}
-																				<div class="ml-auto flex gap-2 text-xs">
-																					{#if grandchild.read > 0}
-																						<span class="text-red-500">READ: {grandchild.read}</span
-																						>
-																					{/if}
-																					{#if grandchild.write > 0}
-																						<span class="text-red-500"
-																							>WRITE: {grandchild.write}</span
-																						>
-																					{/if}
-																					{#if grandchild.cksum > 0}
-																						<span class="text-red-500"
-																							>CKSUM: {grandchild.cksum}</span
-																						>
-																					{/if}
-																				</div>
-																			{/if}
-																		</div>
-
-																		<!-- Handle replacing disk children -->
-																		{#if grandchild.name.startsWith('replacing') && grandchild.children && grandchild.children.length > 0}
-																			<div
-																				class="border-border ml-4 mt-2 space-y-2 border-l-2 pl-4"
-																			>
-																				{#each grandchild.children as replaceDisk}
-																					<div
-																						class="bg-background/40 flex items-center rounded-md border p-2"
-																					>
-																						<div
-																							class="mr-2 h-2 w-2 rounded-full
-                                                                                            {replaceDisk.state ===
-																							'ONLINE'
-																								? 'bg-green-500'
-																								: replaceDisk.state === 'DEGRADED'
-																									? 'bg-yellow-500'
-																									: replaceDisk.state === 'FAULTED'
-																										? 'bg-red-500'
-																										: 'bg-gray-500'}"
-																						></div>
-																						<div class="font-medium">{replaceDisk.name}</div>
-																						<div class="text-muted-foreground ml-2 text-sm">
-																							({replaceDisk.state})
-																						</div>
-
-																						{#if replaceDisk.note}
-																							<div
-																								class="ml-2 rounded bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-100"
-																							>
-																								{replaceDisk.note}
-																							</div>
-																						{/if}
-
-																						{#if replaceDisk.read > 0 || replaceDisk.write > 0 || replaceDisk.cksum > 0}
-																							<div class="ml-auto flex gap-2 text-xs">
-																								{#if replaceDisk.read > 0}
-																									<span class="text-red-500"
-																										>READ: {replaceDisk.read}</span
-																									>
-																								{/if}
-																								{#if replaceDisk.write > 0}
-																									<span class="text-red-500"
-																										>WRITE: {replaceDisk.write}</span
-																									>
-																								{/if}
-																								{#if replaceDisk.cksum > 0}
-																									<span class="text-red-500"
-																										>CKSUM: {replaceDisk.cksum}</span
-																									>
-																								{/if}
-																							</div>
-																						{/if}
-																					</div>
-																				{/each}
-																			</div>
-																		{/if}
-																	{/each}
-																</div>
-															{/if}
-														</div>
-													{/each}
-												</div>
-											{/if}
-										</div>
-									{/each}
-								</div>
-							{:else}
-								<div class="text-muted-foreground flex items-center gap-2 py-2">
-									<Icon icon="material-symbols:info" class="h-4 w-4" />
-									<span>No devices found</span>
-								</div>
-							{/if}
-						</div>
-					</div>
-
-					<!-- Errors -->
-					<div>
-						<div class="bg-muted mb-2 flex items-center gap-2 rounded-md px-3 py-1">
-							<Icon icon="mdi:alert" class="text-primary h-5 w-5" />
-							<span class="font-semibold">Error Status</span>
-						</div>
-						<div class="mt-2 rounded-md border p-2">
-							<div
-								class="flex items-center gap-2 pl-2 {sPool.errors.includes('No known data errors')
-									? 'text-green-600 dark:text-green-400'
-									: 'text-red-600 dark:text-red-400'}"
-							>
-								<Icon
-									icon={sPool.errors.includes('No known data errors')
-										? 'mdi:check-circle'
-										: 'mdi:alert-circle'}
-									class="h-5 w-5"
-								/>
-								<span>{sPool.errors}</span>
 							</div>
 						</div>
 					</div>
@@ -1511,6 +1448,7 @@
 
 			<AlertDialog.Footer>
 				<AlertDialog.Cancel
+					class="bg-secondary hover:bg-secondary/80 text-secondary-foreground"
 					onclick={() => {
 						confirmModals.statusPool.open = false;
 					}}>Close</AlertDialog.Cancel

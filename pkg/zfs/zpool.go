@@ -291,7 +291,7 @@ func (z *zfs) GetZpoolStatus(name string) (ZpoolStatus, error) {
 	status := ZpoolStatus{}
 	var currentSection string
 	var topDevice *ZpoolDevice
-	var currentVdev *ZpoolDevice // Generic vdev holder for mirror/raidz
+	var currentVdev *ZpoolDevice
 	var replacingDevice *ZpoolDevice
 
 	for _, line := range out {
@@ -299,7 +299,6 @@ func (z *zfs) GetZpoolStatus(name string) (ZpoolStatus, error) {
 			continue
 		}
 
-		// Join the fields with a single space
 		lineStr := strings.Join(line, " ")
 
 		switch {
@@ -359,7 +358,6 @@ func (z *zfs) GetZpoolStatus(name string) (ZpoolStatus, error) {
 					Children: []*ZpoolDevice{},
 				}
 
-				// Check for note in parentheses
 				if len(fields) > 5 {
 					noteFields := fields[5:]
 					note := strings.Join(noteFields, " ")
@@ -391,6 +389,8 @@ func (z *zfs) GetZpoolStatus(name string) (ZpoolStatus, error) {
 						replacingDevice.Children = append(replacingDevice.Children, dev)
 					} else if currentVdev != nil {
 						currentVdev.Children = append(currentVdev.Children, dev)
+					} else if topDevice != nil {
+						topDevice.Children = append(topDevice.Children, dev)
 					}
 				}
 			}
@@ -549,4 +549,12 @@ func (z *zfs) GetTotalIODelay() float64 {
 	}
 
 	return totalDelay / float64(count)
+}
+
+func (z *zfs) ScrubPool(poolName string) error {
+	_, err := z.zpoolOutput("scrub", poolName)
+	if err != nil {
+		return fmt.Errorf("failed to scrub pool %s: %w", poolName, err)
+	}
+	return nil
 }

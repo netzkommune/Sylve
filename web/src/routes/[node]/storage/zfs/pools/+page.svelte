@@ -425,6 +425,9 @@
 						...vdev.partitions.map((partition) => partition.name)
 					]
 				})),
+				properties: {
+					comment: modal.properties.comment
+				},
 				createForce: true
 			})
 		);

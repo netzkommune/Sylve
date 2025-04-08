@@ -42,7 +42,13 @@
 				{
 					label: 'ZFS',
 					icon: 'file-icons:openzfs',
-					href: `/${node}/storage/zfs`
+					children: [
+						{
+							label: 'Pools',
+							icon: 'bi:hdd-stack-fill',
+							href: `/${node}/storage/zfs/pools`
+						}
+					]
 				}
 			]
 		},

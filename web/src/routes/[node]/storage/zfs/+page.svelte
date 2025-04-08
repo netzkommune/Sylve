@@ -13,7 +13,7 @@
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import type { Column, Row } from '$lib/types/components/tree-table';
 	import type { Disk, Partition } from '$lib/types/disk/disk';
-	import type { Zpool } from '$lib/types/zfs/pool';
+	import type { Zpool, ZpoolRaidType } from '$lib/types/zfs/pool';
 	import { simplifyDisks, zpoolUseableDisks } from '$lib/utils/disk';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
@@ -77,7 +77,7 @@
 		name: '',
 		vdevCount: 1,
 		vdevContainers: [] as VdevContainer[],
-		raidType: 'stripe',
+		raidType: 'stripe' as ZpoolRaidType,
 		mountPoint: '',
 		advanced: false,
 		properties: {
@@ -408,18 +408,26 @@
 			return;
 		}
 
-		await createPool({
-			name: modal.name,
-			raidType: modal.raidType as 'mirror' | 'raidz' | 'raidz2' | 'raidz3' | undefined,
-			vdevs: modal.vdevContainers.map((vdev) => ({
-				name: vdev.id,
-				devices: [
-					...vdev.disks.map((disk) => disk.Device),
-					...vdev.partitions.map((partition) => partition.name)
-				]
-			})),
-			createForce: true
-		});
+		let raidType: ZpoolRaidType = modal.raidType;
+
+		if (modal.raidType === 'stripe') {
+			raidType = undefined;
+		}
+
+		console.log(
+			await createPool({
+				name: modal.name,
+				raidType: raidType,
+				vdevs: modal.vdevContainers.map((vdev) => ({
+					name: vdev.id,
+					devices: [
+						...vdev.disks.map((disk) => disk.Device),
+						...vdev.partitions.map((partition) => partition.name)
+					]
+				})),
+				createForce: true
+			})
+		);
 	}
 
 	// console.log(pools);

@@ -42,6 +42,7 @@
 
 	import AlertDialogModal from '$lib/components/custom/AlertDialog.svelte';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import { Badge } from '$lib/components/ui/badge';
 
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import { getTranslation } from '$lib/utils/i18n';
@@ -1289,15 +1290,32 @@
 {/snippet}
 
 {#snippet deviceTreeNode(device: Zpool['status']['devices'][0], showNote: boolean)}
-	<div class="device-tree">
-		<div class="bg-background flex items-center rounded-md border p-3">
+	<div class="device-tree relative">
+		<div class="bg-background relative flex items-center rounded-md border p-1.5">
+			{#if showNote && !device.__isLast}
+				<div
+					class="bg-secondary absolute -left-6 bottom-0 top-0 w-0.5"
+					style="height: calc(100% + 0.7rem);"
+				></div>
+			{:else}
+				<div class="bg-secondary absolute -left-6 bottom-0 top-0 w-0.5" style="height: 18px;"></div>
+			{/if}
 			{@render dtEl(device, showNote)}
 		</div>
 
 		{#if device.children && device.children.length > 0 && !device.name.startsWith('replacing')}
-			<div class="border-border ml-5 mt-2 space-y-2 border-l-2 pl-4">
-				{#each device.children as child}
-					{@render deviceTreeNode(child, true)}
+			<div class=" ml-5 mt-2 space-y-2 pl-4">
+				{#each device.children as child, index (child.name)}
+					<div class="relative">
+						<div
+							class="bg-secondary h-0.5 w-6"
+							style="position: absolute;left: -23px;top:18px"
+						></div>
+						{@render deviceTreeNode(
+							{ ...child, __isLast: index === device.children.length - 1 },
+							true
+						)}
+					</div>
 				{/each}
 			</div>
 		{/if}
@@ -1313,7 +1331,7 @@
 {/snippet}
 
 {#if confirmModals.active == 'statusPool'}
-	<AlertDialog.Root
+	<Dialog.Root
 		bind:open={confirmModals.statusPool.open}
 		onOutsideClick={() => {
 			confirmModals.statusPool.open = false;
@@ -1321,30 +1339,39 @@
 		closeOnOutsideClick={true}
 		closeOnEscape={false}
 	>
-		<AlertDialog.Content
-			class="max-h-[calc(80vh-4rem)] overflow-y-auto sm:max-w-[600px] md:max-w-[700px]"
+		<Dialog.Content
+			class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-visible overflow-y-auto p-0 transition-all duration-300 ease-in-out lg:max-w-[70%]"
 		>
-			<AlertDialog.Header>
-				<AlertDialog.Title class="flex items-center">
-					<span class="text-primary font-semibold">Pool Status</span>
-					<span class="text-muted-foreground mx-2">•</span>
-					<span class="text-xl font-medium">{confirmModals.statusPool.data.status.name}</span>
-					<div
-						class="ml-3 rounded-full px-3 py-1 text-sm font-medium text-white
-                    {sPool.state === 'ONLINE'
-							? 'bg-green-500'
-							: sPool.state === 'DEGRADED'
-								? 'bg-yellow-500'
-								: sPool.state === 'FAULTED'
-									? 'bg-red-500'
-									: 'bg-gray-500'}"
-					>
-						{sPool.state}
-					</div>
-				</AlertDialog.Title>
-			</AlertDialog.Header>
+			<div class="flex items-center justify-between px-4 py-3">
+				<Dialog.Header>
+					<Dialog.Title class="flex items-center">
+						<span class="text-primary font-semibold">Pool Status</span>
+						<span class="text-muted-foreground mx-2">•</span>
+						<span class="text-xl font-medium">{confirmModals.statusPool.data.status.name}</span>
+						<Badge
+							variant={sPool.state === 'ONLINE'
+								? 'success'
+								: sPool.state === 'DEGRADED'
+									? 'warning'
+									: sPool.state === 'FAULTED'
+										? 'destructive'
+										: 'secondary'}
+							class="ml-3">{sPool.state}</Badge
+						>
+					</Dialog.Title>
+				</Dialog.Header>
 
-			<div class="space-y-4 py-3">
+				<Dialog.Close
+					class="flex h-5 w-5 items-center justify-center rounded-sm opacity-70 transition-opacity hover:opacity-100"
+					onclick={() => {
+						confirmModals.statusPool.open = false;
+					}}
+				>
+					<Icon icon="material-symbols:close-rounded" class="h-5 w-5" />
+				</Dialog.Close>
+			</div>
+
+			<div class="space-y-4 px-4 py-3">
 				{#if sPool}
 					{#if sPool.status && sPool.status.length > 0}
 						<div
@@ -1362,8 +1389,8 @@
 						</div>
 					{/if}
 
-					<div class="overflow-hidden rounded-md border">
-						<div class="border-b">
+					<div class="space-y-4 overflow-hidden rounded-md">
+						<div class="border">
 							<div class="bg-muted flex items-center gap-2 px-4 py-2">
 								<Icon icon="mdi:magnify" class="text-primary h-5 w-5" />
 								<span class="font-semibold">Scan Activity</span>
@@ -1398,16 +1425,19 @@
 							</div>
 						</div>
 
-						<div class="border-b">
+						<div class="border">
 							<div class="bg-muted flex items-center gap-2 px-4 py-2">
 								<Icon icon="tabler:topology-bus" class="text-primary h-5 w-5" />
 								<span class="font-semibold">Device Topology</span>
 							</div>
-							<div class="p-4">
+							<div class="h-full max-h-28 overflow-auto p-4 md:max-h-44 xl:max-h-72">
 								{#if sPool.devices && sPool.devices.length > 0}
 									<div class="space-y-3">
-										{#each sPool.devices as device}
-											{@render deviceTreeNode(device, false)}
+										{#each sPool.devices as device, index (device.name)}
+											{@render deviceTreeNode(
+												{ ...device, __isLast: index === device.children.length - 1 },
+												false
+											)}
 										{/each}
 									</div>
 								{:else}
@@ -1419,14 +1449,14 @@
 							</div>
 						</div>
 
-						<div>
+						<div class="border">
 							<div class="bg-muted flex items-center gap-2 px-4 py-2">
 								<Icon icon="mdi:alert" class="text-primary h-5 w-5" />
 								<span class="font-semibold">Error Status</span>
 							</div>
 							<div class="p-4">
 								<div
-									class="flex items-center gap-2 rounded-md border p-3 {sPool.errors.includes(
+									class="flex items-center gap-2 rounded-md border p-2 {sPool.errors.includes(
 										'No known data errors'
 									)
 										? 'border-green-200 bg-green-50 text-green-800 dark:border-green-800 dark:bg-green-950 dark:text-green-200'
@@ -1446,16 +1476,17 @@
 				{/if}
 			</div>
 
-			<AlertDialog.Footer>
-				<AlertDialog.Cancel
-					class="bg-secondary hover:bg-secondary/80 text-secondary-foreground"
+			<Dialog.Footer class="px-4 py-3">
+				<Button
+					variant="default"
+					class="h-8 bg-blue-700 text-white hover:bg-blue-600"
 					onclick={() => {
 						confirmModals.statusPool.open = false;
-					}}>Close</AlertDialog.Cancel
+					}}>Close</Button
 				>
-			</AlertDialog.Footer>
-		</AlertDialog.Content>
-	</AlertDialog.Root>
+			</Dialog.Footer>
+		</Dialog.Content>
+	</Dialog.Root>
 {/if}
 
 {#if confirmModals.active == 'replaceDevice'}

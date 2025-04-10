@@ -210,7 +210,7 @@
 
 		<Dialog.Footer>
 			<div class="flex w-full flex-col justify-between px-3 py-3 md:flex-row">
-				<Button size="sm" class="h-7">
+				<Button size="sm" class="h-8">
 					<CircleHelp class="mr-2 h-4 w-4" />
 					Help
 				</Button>
@@ -235,7 +235,7 @@
 					<Button
 						size="sm"
 						type="button"
-						class="h-7 w-full bg-blue-600 text-white hover:bg-blue-700"
+						class="h-8 w-full bg-blue-600 text-white hover:bg-blue-700"
 					>
 						Next
 					</Button>

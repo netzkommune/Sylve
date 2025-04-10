@@ -41,7 +41,7 @@
 	];
 </script>
 
-<header class="sticky top-0 flex h-[5vh] items-center gap-4 px-2 md:h-[4vh]">
+<header class="sticky top-0 flex h-[5vh] items-center gap-4 border-b px-2 md:h-[4vh]">
 	<nav
 		class="hidden flex-col gap-2 text-lg font-medium md:items-center md:gap-2 md:text-sm lg:flex lg:flex-row lg:gap-4"
 	>
@@ -157,7 +157,7 @@
 				<Button
 					builders={[builder]}
 					variant="outline"
-					class="flex h-6 items-center gap-1 rounded-md border border-primary"
+					class="flex h-7 items-center gap-1 rounded-md border border-border"
 					><Icon icon="mdi:user" class="h-4 w-4" /> Root <Icon
 						icon="famicons:chevron-down"
 						class="h-4 w-4"

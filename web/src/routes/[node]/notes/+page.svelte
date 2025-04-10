@@ -96,7 +96,7 @@
 </script>
 
 <div class="flex h-full w-full flex-col">
-	<div class="flex h-10 w-full items-center border p-2">
+	<div class="flex h-10 w-full items-center border-b p-2">
 		<Button onclick={() => handleNote()} size="sm" class="h-6  ">
 			<Icon icon="gg:add" class="mr-1 h-4 w-4" /> New
 		</Button>

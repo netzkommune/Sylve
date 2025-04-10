@@ -41,7 +41,7 @@
 	];
 </script>
 
-<header class="bg-background sticky top-0 flex h-[5vh] items-center gap-4 border-b px-2 md:h-[4vh]">
+<header class="sticky top-0 flex h-[5vh] items-center gap-4 px-2 md:h-[4vh]">
 	<nav
 		class="hidden flex-col gap-2 text-lg font-medium md:items-center md:gap-2 md:text-sm lg:flex lg:flex-row lg:gap-4"
 	>
@@ -55,10 +55,7 @@
 		</div>
 		<form class="ml-auto flex-1 sm:flex-initial">
 			<div class="relative">
-				<Icon
-					icon="ic:sharp-search"
-					class="text-muted-foreground absolute left-2.5 top-1.5 h-4 w-4"
-				/>
+				<Icon icon="ic:sharp-search" class="absolute left-2.5 top-1.5 h-4 w-4" />
 				<Input
 					type="search"
 					placeholder="Search products..."
@@ -107,7 +104,7 @@
 		<div class="relative lg:hidden">
 			<Icon
 				icon="ic:sharp-search"
-				class="text-muted-foreground absolute left-2.5 top-1.5 h-4 w-4"
+				class="absolute left-2.5 top-1.5 h-4 w-4 text-muted-foreground"
 			/>
 			<Input
 				type="search"
@@ -121,7 +118,7 @@
 			<Button
 				size="sm"
 				variant="ghost"
-				class="dark:hover-bg-muted hover:bg-muted-foreground/40 relative z-[9999] flex h-6 items-center justify-center px-0"
+				class="relative z-[9999] flex h-6 items-center justify-center px-0"
 				onclick={() => openTerminal()}
 			>
 				<Icon icon="garden:terminal-cli-stroke-16" class="h-5 w-5" />
@@ -134,8 +131,8 @@
 				{/if}
 			</Button>
 
-			<Button size="sm" class="h-6 bg-neutral-600 text-white hover:bg-neutral-700">
-				<Icon icon="material-symbols-light:mail-outline-sharp" class="mr-2 h-5 w-5" />
+			<Button size="sm" class="h-6">
+				<Icon icon="material-symbols:mail-outline" class="mr-2 h-5 w-5" />
 				Documentation
 			</Button>
 
@@ -160,7 +157,7 @@
 				<Button
 					builders={[builder]}
 					variant="outline"
-					class="flex h-6 items-center gap-1 rounded-md border border-neutral-500"
+					class="flex h-6 items-center gap-1 rounded-md border border-primary"
 					><Icon icon="mdi:user" class="h-4 w-4" /> Root <Icon
 						icon="famicons:chevron-down"
 						class="h-4 w-4"

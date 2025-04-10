@@ -36,7 +36,7 @@
 		}
 	};
 
-	const sidebarActive = 'rounded-md bg-muted-foreground/40 dark:bg-muted font-inter font-medium';
+	const sidebarActive = 'rounded-md bg-primary/10 dark:bg-muted font-inter font-medium';
 
 	function isItemActive(menuItem: SidebarProps, currentUrl: string): boolean {
 		if (menuItem.href && currentUrl.startsWith(menuItem.href)) {
@@ -72,7 +72,7 @@
 
 <li class={`w-full`}>
 	<a
-		class={`my-0.5 flex w-full items-center justify-between px-1.5 py-0.5 ${isActive ? sidebarActive : ' hover:bg-muted-foreground/40 dark:hover:bg-muted  rounded-md'}${lastActiveUrl === item.label ? '!text-primary' : ' '}`}
+		class={`my-0.5 flex w-full items-center justify-between px-1.5 py-0.5 ${isActive ? sidebarActive : 'rounded-md hover:bg-primary/10 dark:hover:bg-muted'}${lastActiveUrl === item.label ? '!text-primary' : ' '}`}
 		href={item.href}
 		onclick={toggle}
 	>

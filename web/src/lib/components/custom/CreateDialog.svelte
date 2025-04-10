@@ -34,11 +34,11 @@
 	];
 </script>
 
-<Dialog.Root let:close>
-	<Dialog.Trigger>
-		<Button size="sm" class="{buttonClass} w-full bg-blue-700 text-white hover:bg-blue-600">
+<Dialog.Root>
+	<Dialog.Trigger class={buttonClass}>
+		<Button size="sm" class="{buttonClass} w-full bg-blue-600 text-white hover:bg-blue-700">
 			{#if icon}
-				<Icon {icon} class="mr-1.5 h-4 w-4" />
+				<Icon {icon} class="mr-1.5 h-5 w-5" />
 			{/if}
 
 			{buttonText}
@@ -51,9 +51,9 @@
 				<Dialog.Title class="p-4 text-left">{title}</Dialog.Title>
 			</Dialog.Header>
 			<Dialog.Close
-				class="mr-4 flex h-4 w-4 items-center justify-center rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+				class="mr-4 flex h-5 w-5 items-center justify-center rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-0 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
 			>
-				<Icon icon="lucide:x" class="h-4 w-4" />
+				<Icon icon="lucide:x" class="h-5 w-5" />
 				<span class="sr-only">Close</span>
 			</Dialog.Close>
 		</div>
@@ -123,7 +123,7 @@
 						{:else if value === 'ct_general'}
 							<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 								<div class="flex items-center gap-1">
-									<Label class="w-full whitespace-nowrap text-sm" for="terms">Node:</Label>
+									<Label class="w-full whitespace-nowrap text-sm" for="terms">Node</Label>
 									<Select.Root>
 										<Select.Trigger class="h-8 ">
 											<Select.Value placeholder="Select a fruit" />
@@ -143,7 +143,7 @@
 								</div>
 
 								<div class="flex items-center gap-1">
-									<Label class="w-full whitespace-nowrap text-sm" for="terms">Resource Pool:</Label>
+									<Label class="w-full whitespace-nowrap text-sm" for="terms">Resource Pool</Label>
 									<Select.Root>
 										<Select.Trigger class="h-8 ">
 											<Select.Value placeholder="Select a fruit" />
@@ -163,17 +163,17 @@
 								</div>
 
 								<div class="flex items-center gap-1">
-									<Label class="w-full whitespace-nowrap text-sm" for="terms">CT ID:</Label>
+									<Label class="w-full whitespace-nowrap text-sm" for="terms">CT ID</Label>
 									<Input class="h-8" type="number" id="ct_id" placeholder="email" />
 								</div>
 
 								<div class="flex items-center gap-1">
-									<Label class="w-full whitespace-nowrap text-sm" for="terms">Password:</Label>
+									<Label class="w-full whitespace-nowrap text-sm" for="terms">Password</Label>
 									<Input class="h-8" type="number" id="hostname" placeholder="email" />
 								</div>
 
 								<div class="flex items-center gap-1">
-									<Label class="w-full whitespace-nowrap text-sm" for="terms">Hostname:</Label>
+									<Label class="w-full whitespace-nowrap text-sm" for="terms">Hostname</Label>
 									<Input class="h-8" type="number" id="hostname" placeholder="email" />
 								</div>
 
@@ -192,12 +192,12 @@
 								</div>
 
 								<div class="flex items-center gap-1">
-									<Label class="w-44 whitespace-nowrap text-sm" for="terms">Nesting:</Label>
+									<Label class="w-44 whitespace-nowrap text-sm" for="terms">Nesting</Label>
 									<Checkbox id="terms" bind:checked aria-labelledby="terms-label" />
 								</div>
 								<div class="flex items-center gap-1">
 									<Label class="w-full whitespace-nowrap text-sm" for="terms"
-										>SSH public key(s):</Label
+										>SSH public key(s)</Label
 									>
 									<Textarea placeholder="Type your message here." />
 								</div>
@@ -210,7 +210,7 @@
 
 		<Dialog.Footer>
 			<div class="flex w-full flex-col justify-between px-3 py-3 md:flex-row">
-				<Button size="sm" class="h-8 bg-neutral-500 text-white hover:bg-neutral-400">
+				<Button size="sm" class="h-7">
 					<CircleHelp class="mr-2 h-4 w-4" />
 					Help
 				</Button>
@@ -228,14 +228,14 @@
 					<Button
 						size="sm"
 						type="button"
-						class="disabled h-8 w-full bg-blue-700 text-white hover:bg-blue-600"
+						class="disabled h-7 w-full bg-blue-600 text-white hover:bg-blue-700"
 					>
 						Back
 					</Button>
 					<Button
 						size="sm"
 						type="button"
-						class="h-8 w-full bg-blue-700 text-white hover:bg-blue-600"
+						class="h-7 w-full bg-blue-600 text-white hover:bg-blue-700"
 					>
 						Next
 					</Button>

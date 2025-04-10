@@ -97,11 +97,7 @@
 
 <div class="flex h-full w-full flex-col">
 	<div class="flex h-10 w-full items-center border p-2">
-		<Button
-			onclick={() => handleNote()}
-			size="sm"
-			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black dark:text-white"
-		>
+		<Button onclick={() => handleNote()} size="sm" class="h-6  ">
 			<Icon icon="gg:add" class="mr-1 h-4 w-4" /> New
 		</Button>
 	</div>
@@ -175,7 +171,7 @@
 					<Button
 						type="submit"
 						size="sm"
-						class="bg-muted hover:bg-muted-foreground/50 h-8 text-white"
+						class="h-8 bg-muted text-white hover:bg-muted-foreground/50"
 					>
 						Help
 					</Button>
@@ -206,7 +202,7 @@
 
 	<div class="flex h-full flex-col overflow-hidden">
 		<Table.Root class="w-full table-fixed border-collapse">
-			<Table.Header class="bg-background sticky top-0 z-[50]">
+			<Table.Header class="sticky top-0 z-[50] bg-background">
 				<Table.Row>
 					<Table.Head class="h-10 px-4 py-2">Title</Table.Head>
 					<Table.Head class="h-10 px-4 py-2">Content</Table.Head>

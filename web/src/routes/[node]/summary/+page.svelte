@@ -120,7 +120,7 @@
 	<div class="min-h-0 flex-1">
 		<ScrollArea orientation="both" class="h-full w-full">
 			<div class="space-y-3 p-3">
-				<Card.Root class="w-full dark:border-none">
+				<Card.Root class="w-full">
 					<Card.Header class="p-2 ">
 						<Card.Description class="text-md ml-3 font-normal text-blue-600 dark:text-blue-500"
 							>{basicInfo.hostname} (Started {secondsToHoursAgo(
@@ -226,7 +226,7 @@
 					</Card.Content>
 				</Card.Root>
 
-				<Card.Root class="w-full dark:border-none">
+				<Card.Root class="w-full">
 					<Card.Header>
 						<Card.Title>
 							<div class="flex items-center justify-between space-x-2">

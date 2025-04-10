@@ -931,7 +931,7 @@
 							<Label>VDEVs</Label>
 							<ScrollArea class="w-full whitespace-nowrap rounded-md" orientation="horizontal">
 								<div
-									class="mt-1 flex w-full items-center justify-center gap-7 overflow-hidden rounded-lg border-y border-none bg-primary-foreground p-4 pr-4"
+									class="mt-1 flex w-full items-center justify-center gap-7 overflow-hidden rounded-lg border-y border-none bg-muted p-4 pr-4"
 								>
 									{#each Array(modal.vdevCount) as _, i}
 										<div class="relative flex flex-col">
@@ -968,7 +968,7 @@
 						<div id="disk-containers">
 							<Label>Disks</Label>
 							<div
-								class="mt-1 grid grid-cols-4 gap-6 overflow-hidden border-y border-none bg-primary-foreground p-4"
+								class="mt-1 grid grid-cols-4 gap-6 overflow-hidden border-y border-none bg-muted p-4"
 							>
 								{@render diskContainer('HDD')}
 								{@render diskContainer('SSD')}

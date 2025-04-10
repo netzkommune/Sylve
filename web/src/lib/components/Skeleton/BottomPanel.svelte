@@ -17,14 +17,26 @@
 	<Tabs.Content value="cluster" class="flex h-full flex-col border">
 		<div class="flex h-full flex-col overflow-hidden">
 			<Table.Root class="w-full table-fixed border-collapse">
-				<Table.Header class="bg-background sticky top-0 z-[50]">
-					<Table.Row>
-						<Table.Head class="h-10 px-4 py-2">Start Time</Table.Head>
-						<Table.Head class="h-10 px-4 py-2">End Time</Table.Head>
-						<Table.Head class="h-10 px-4 py-2">Node</Table.Head>
-						<Table.Head class="h-10 px-4 py-2">User</Table.Head>
-						<Table.Head class="h-10 px-4 py-2">Action</Table.Head>
-						<Table.Head class="h-10 px-4 py-2">Status</Table.Head>
+				<Table.Header class="sticky top-0 z-[50] bg-background ">
+					<Table.Row class="dark:hover:bg-background ">
+						<Table.Head class="h-10 px-4 py-2 font-semibold text-black dark:text-white"
+							>Start Time</Table.Head
+						>
+						<Table.Head class="h-10 px-4 py-2 font-semibold text-black dark:text-white"
+							>End Time</Table.Head
+						>
+						<Table.Head class="h-10 px-4 py-2 font-semibold text-black dark:text-white"
+							>Node</Table.Head
+						>
+						<Table.Head class="h-10 px-4 py-2 font-semibold text-black dark:text-white"
+							>User</Table.Head
+						>
+						<Table.Head class="h-10 px-4 py-2 font-semibold text-black dark:text-white"
+							>Action</Table.Head
+						>
+						<Table.Head class="h-10 px-4 py-2 font-semibold text-black dark:text-white"
+							>Status</Table.Head
+						>
 					</Table.Row>
 				</Table.Header>
 

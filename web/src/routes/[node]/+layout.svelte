@@ -47,6 +47,17 @@
 							label: 'Pools',
 							icon: 'bi:hdd-stack-fill',
 							href: `/${node}/storage/zfs/pools`
+						},
+						{
+							label: 'Datasets',
+							icon: 'material-symbols:dataset',
+							children: [
+								{
+									label: 'File Systems',
+									icon: 'eos-icons:file-system',
+									href: `/${node}/storage/zfs/datasets/fs`
+								}
+							]
 						}
 					]
 				}

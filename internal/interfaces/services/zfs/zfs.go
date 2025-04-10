@@ -14,5 +14,7 @@ type ZfsServiceInterface interface {
 	GetTotalIODelayHisorical() ([]infoModels.IODelay, error)
 	CreatePool(Zpool) error
 
+	GetDatasets() ([]Dataset, error)
+
 	Cron()
 }

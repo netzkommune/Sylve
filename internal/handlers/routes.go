@@ -87,6 +87,9 @@ func RegisterRoutes(r *gin.Engine,
 	zfs := api.Group("/zfs")
 	zfs.Use(middleware.EnsureAuthenticated(authService))
 	{
+		zfs.GET("/pool/io-delay", zfsHandlers.AvgIODelay(zfsService))
+		zfs.GET("/pool/io-delay/historical", zfsHandlers.AvgIODelayHistorical(zfsService))
+
 		pools := zfs.Group("/pools")
 		{
 			pools.GET("", zfsHandlers.GetPools(zfsService))
@@ -96,8 +99,10 @@ func RegisterRoutes(r *gin.Engine,
 			pools.DELETE("/:name", zfsHandlers.DeletePool(zfsService))
 		}
 
-		zfs.GET("/pool/io-delay", zfsHandlers.AvgIODelay(zfsService))
-		zfs.GET("/pool/io-delay/historical", zfsHandlers.AvgIODelayHistorical(zfsService))
+		datasets := zfs.Group("/datasets")
+		{
+			datasets.GET("", zfsHandlers.GetDatasets(zfsService))
+		}
 	}
 
 	disk := api.Group("/disk")

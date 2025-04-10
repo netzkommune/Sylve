@@ -74,6 +74,7 @@
 		"svelte-french-toast": "^2.0.0-alpha.0",
 		"svelte-i18n": "^4.0.1",
 		"svelte-multiselect": "^11.0.0-rc.1",
-		"svelte-ux": "^1.0.3"
+		"svelte-ux": "^1.0.3",
+		"tabulator-tables": "^6.3.1"
 	}
 }

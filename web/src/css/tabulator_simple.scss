@@ -144,6 +144,10 @@
 .tabulator-row {
 	@apply border-b border-border bg-background text-black dark:text-white;
 
+	.tabulator-selected {
+		@apply bg-muted;
+	}
+
 	@media (hover: hover) and (pointer: fine) {
 		&.tabulator-selectable:hover {
 			@apply bg-background;

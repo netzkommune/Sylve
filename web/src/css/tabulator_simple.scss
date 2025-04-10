@@ -1,1 +1,203 @@
 @use './tabulator.scss';
+
+.tabulator {
+	@apply border-none bg-primary;
+
+	.tabulator-header {
+		@apply border-border bg-background;
+
+		.tabulator-header-contents {
+			@apply bg-background;
+		}
+
+		.tabulator-col-content {
+			@apply bg-background hover:bg-muted;
+		}
+
+		.tabulator-calcs-holder {
+			@apply border border-border bg-background !important;
+
+			.tabulator-row {
+				@apply bg-background !important;
+			}
+		}
+
+		.tabulator-col {
+			@apply bg-background;
+
+			&.tabulator-sortable {
+				@media (hover: hover) and (pointer: fine) {
+					@apply border-border;
+					&.tabulator-col-sorter-element:hover {
+						@apply cursor-pointer bg-background;
+					}
+				}
+			}
+		}
+
+		.tabulator-col-title-holder {
+			@apply text-black dark:text-white;
+
+			.tabulator-col-title {
+				@apply text-black dark:text-white;
+			}
+		}
+
+		.tabulator-col-title input {
+			@apply border border-border;
+		}
+	}
+
+	.tabulator-tableholder {
+		.tabulator-cell {
+			.tabulator-data-tree-control {
+				@apply bg-primary;
+			}
+		}
+
+		@apply bg-background;
+		.tabulator-placeholder {
+			span {
+				@apply text-secondary;
+			}
+			.tabulator-placeholder-contents {
+				@apply text-red-500;
+			}
+		}
+	}
+
+	.tabulator-footer {
+		@apply border-border bg-primary;
+
+		.tabulator-footer-contents {
+			@apply text-black dark:text-white;
+
+			.tabulator-paginator {
+				label {
+					@apply text-black dark:text-white;
+				}
+
+				select {
+					@apply border-border bg-primary text-black dark:text-white;
+				}
+
+				button {
+					@apply bg-primary text-black hover:bg-primary dark:text-white;
+				}
+			}
+		}
+		.tabulator-page {
+			@apply border-border text-black dark:text-white;
+		}
+		.tabulator-calcs-holder {
+			.tabulator-row {
+				@apply bg-primary !important;
+			}
+		}
+
+		.tabulator-spreadsheet-tabs {
+			.tabulator-spreadsheet-tab {
+				font-weight: normal;
+
+				&.tabulator-spreadsheet-tab-active {
+					color: tabulator.$footerActiveColor;
+					font-weight: bold;
+				}
+			}
+		}
+	}
+}
+
+.tabulator-table .tabulator-row-odd {
+	@apply border-b border-none border-border bg-background text-black dark:text-white;
+
+	.tabulator-frozen {
+		@apply bg-secondary;
+	}
+
+	@media (hover: hover) and (pointer: fine) {
+		&.tabulator-selectable:hover {
+			@apply bg-background hover:bg-muted;
+			cursor: pointer;
+		}
+	}
+}
+
+.tabulator-table .tabulator-row-even {
+	@apply border-b border-none border-border bg-background text-black dark:text-white;
+	.tabulator-frozen {
+		@apply bg-secondary;
+	}
+
+	.tabulator-frozen input {
+		@apply border border-border;
+	}
+
+	@media (hover: hover) and (pointer: fine) {
+		&.tabulator-selectable:hover {
+			@apply bg-background hover:bg-muted;
+			cursor: pointer;
+		}
+	}
+}
+
+.tabulator-row {
+	@apply border-b border-border bg-background text-black dark:text-white;
+
+	@media (hover: hover) and (pointer: fine) {
+		&.tabulator-selectable:hover {
+			@apply bg-background;
+			cursor: pointer;
+		}
+	}
+
+	.tabulator-cell {
+		&:last-of-type {
+			border-right: none;
+		}
+
+		&.tabulator-row-header {
+			border-bottom: none;
+		}
+
+		.tabulator-data-tree-control {
+			@apply border-primary bg-primary;
+
+			.tabulator-data-tree-control-collapse {
+				background: transparent;
+				&:after {
+					@apply bg-primary-foreground;
+				}
+			}
+
+			.tabulator-data-tree-control-expand {
+				@apply bg-primary-foreground;
+
+				&:after {
+					@apply bg-primary-foreground;
+				}
+			}
+		}
+	}
+
+	&.tabulator-group {
+		span {
+			color: #666;
+		}
+	}
+
+	.tabulator-frozen input {
+		@apply opacity-40;
+		background-color: rgb(63 63 70) !important;
+		@apply border border-border;
+	}
+}
+
+.tabulator-print-table {
+	.tabulator-print-table-group {
+		span {
+			margin-left: 10px;
+			color: #666;
+		}
+	}
+}

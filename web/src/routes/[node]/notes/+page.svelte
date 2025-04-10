@@ -168,19 +168,13 @@
 
 			<Dialog.Footer class="flex justify-end">
 				<div class="flex w-full items-center justify-between gap-2 px-3 py-2">
-					<Button
-						type="submit"
-						size="sm"
-						class="h-8 bg-muted text-white hover:bg-muted-foreground/50"
-					>
-						Help
-					</Button>
+					<Button type="submit" size="sm" class="h-7">Help</Button>
 
 					<div class="flex gap-2">
 						<Dialog.Close>
 							<Button
 								variant="outline"
-								class="h-8"
+								class="h-7"
 								on:click={() => handleNote(undefined, false, true)}>Cancel</Button
 							>
 						</Dialog.Close>
@@ -189,7 +183,7 @@
 								onclick={saveNote}
 								type="submit"
 								size="sm"
-								class="h-8 w-16 bg-blue-600 text-white hover:bg-blue-500"
+								class="h-7 w-16 bg-blue-600 text-white hover:bg-blue-700"
 							>
 								Ok
 							</Button>

@@ -336,7 +336,7 @@
 	<div class="inline-flex w-full gap-2 border-b px-3 py-2">
 		<Button
 			size="sm"
-			class="h-8 bg-neutral-600 text-white hover:bg-neutral-700 disabled:!pointer-events-auto disabled:hover:bg-neutral-600"
+			class="h-8"
 			disabled={!buttonAbilities.smart.ability}
 			onclick={() => diskAction('smart')}
 		>
@@ -344,7 +344,7 @@
 		</Button>
 		<Button
 			size="sm"
-			class="h-8 bg-neutral-600 text-white hover:bg-neutral-700 disabled:!pointer-events-auto disabled:hover:bg-neutral-600"
+			class="h-8"
 			title={buttonAbilities.gpt.reason}
 			disabled={!buttonAbilities.gpt.ability}
 			onclick={() => diskAction('gpt')}
@@ -355,7 +355,7 @@
 		{#if activeDisk}
 			<Button
 				size="sm"
-				class="h-8 bg-neutral-600 text-white hover:bg-neutral-700 disabled:!pointer-events-auto disabled:hover:bg-neutral-600"
+				class="h-8"
 				title={buttonAbilities.wipe.reason}
 				disabled={!buttonAbilities.wipe.ability}
 				onclick={() => diskAction('wipe')}
@@ -367,7 +367,7 @@
 		{#if activePartition}
 			<Button
 				size="sm"
-				class="h-8 bg-neutral-600 text-white hover:bg-neutral-700"
+				class="h-8"
 				disabled={!buttonAbilities.wipe.ability}
 				onclick={() => diskAction('wipe')}
 			>
@@ -377,9 +377,7 @@
 
 		<Button
 			size="sm"
-			class="{activeDisk === null
-				? 'hidden'
-				: ''} h-8 bg-neutral-600 text-white hover:bg-neutral-700 disabled:!pointer-events-auto disabled:hover:bg-neutral-600"
+			class="{activeDisk === null ? 'hidden' : ''} h-8"
 			title={buttonAbilities.createPartition.reason}
 			onclick={() => diskAction('partition')}
 			disabled={!buttonAbilities.createPartition.ability}
@@ -412,9 +410,7 @@
 						<tr>
 							{#each keys as key}
 								{#if visibleColumns.value[key]}
-									<th
-										class="group h-8 w-48 whitespace-nowrap border border-neutral-300 px-3 text-left text-black dark:border-neutral-800 dark:text-white"
-									>
+									<th class="group h-8 w-48 whitespace-nowrap border border-border px-3 text-left">
 										<ContextMenu.Root
 											open={openContextMenuId === key}
 											closeOnItemClick={false}
@@ -461,7 +457,7 @@
 					<tbody>
 						{#each table.rows as row, index}
 							<tr
-								class={activeRow === row.Device ? 'bg-muted-foreground/40 dark:bg-muted' : ''}
+								class={`${activeRow === row.Device ? 'bg-muted' : ''} hover:bg-muted`}
 								onclick={(event: MouseEvent) => {
 									if (!(event.target as HTMLElement).closest('.toggle-icon')) {
 										handleRowClick(row.Device);
@@ -500,9 +496,7 @@
 							{#if expandedRows[index] && row.Partitions}
 								{#each row.Partitions as child, childIndex}
 									<tr
-										class={activeRow === `${row.Device}-${childIndex}`
-											? 'bg-muted-foreground/40 dark:bg-muted'
-											: ''}
+										class={`${activeRow === `${row.Device}-${childIndex}` ? 'bg-muted' : ''} hover:bg-muted`}
 										onclick={() => handleRowClick(`${row.Device}-${childIndex}`)}
 									>
 										{#each keys as key, _}
@@ -512,17 +506,17 @@
 														<div class="relative flex items-center">
 															{#if row.Partitions.length > 1}
 																<div
-																	class="bg-muted-foreground absolute left-1.5 top-0 h-full w-0.5"
+																	class="absolute left-1.5 top-0 h-full w-0.5 bg-muted-foreground"
 																	style="height: calc(100% + 0.8rem);"
 																	class:hidden={childIndex === row.Partitions.length - 1}
 																></div>
 															{:else}
 																<div
-																	class="bg-muted-foreground absolute left-1.5 top-0 h-3 w-0.5"
+																	class="absolute left-1.5 top-0 h-3 w-0.5 bg-muted-foreground"
 																></div>
 															{/if}
 															<div class="relative left-1.5 top-0 mr-2 w-4">
-																<div class="bg-muted-foreground h-0.5 w-4"></div>
+																<div class="h-0.5 w-4 bg-muted-foreground"></div>
 															</div>
 															{#if childIndex === row.Partitions.length - 1}
 																<div

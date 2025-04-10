@@ -167,9 +167,9 @@
 />
 
 <div class="flex h-full w-full flex-col">
-	<div class="flex h-10 w-full items-center justify-between border p-2">
+	<div class="flex h-10 w-full items-center justify-between border-b p-2">
 		<p>Datacenter</p>
-		<Button size="sm" class="h-6 bg-neutral-500 text-white hover:bg-neutral-400">
+		<Button size="sm" class="h-6 ">
 			<CircleHelp class="mr-2 h-3 w-3" />
 			Help
 		</Button>
@@ -182,7 +182,7 @@
 		autoSaveId="main-pane-auto-save"
 	>
 		<Resizable.Pane>
-			<div class="h-full px-1">
+			<div class="h-full px-1.5">
 				<div class="h-full overflow-y-auto">
 					<nav aria-label="Difuse-sidebar" class="menu thin-scrollbar w-full">
 						<ul>

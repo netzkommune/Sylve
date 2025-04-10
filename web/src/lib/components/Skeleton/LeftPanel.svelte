@@ -32,7 +32,7 @@
 	];
 </script>
 
-<div class="h-full overflow-y-auto">
+<div class="h-full overflow-y-auto px-1.5 pt-1">
 	<nav aria-label="Difuse-sidebar" class="menu thin-scrollbar w-full">
 		<ul>
 			<ScrollArea orientation="both" class="h-full w-full">

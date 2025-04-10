@@ -122,7 +122,7 @@
 			<div class="space-y-3 p-3">
 				<Card.Root class="w-full">
 					<Card.Header class="p-2 ">
-						<Card.Description class="text-md ml-3 font-normal text-blue-500"
+						<Card.Description class="text-md ml-3 font-normal text-blue-600 dark:text-blue-500"
 							>{basicInfo.hostname} (Started {secondsToHoursAgo(
 								basicInfo.uptime
 							)})</Card.Description

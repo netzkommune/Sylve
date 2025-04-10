@@ -15,7 +15,7 @@
 	{...$$restProps}
 >
 	<div
-		class="h-full w-full flex-1 bg-blue-400 transition-all dark:bg-blue-700"
+		class="h-full w-full flex-1 bg-blue-500 transition-all dark:bg-blue-700"
 		style={`transform: translateX(-${100 - (100 * (value ?? 0)) / (max ?? 1)}%)`}
 	></div>
 </ProgressPrimitive.Root>

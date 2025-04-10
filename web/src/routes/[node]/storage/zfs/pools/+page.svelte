@@ -692,7 +692,7 @@
 {#snippet diskContainer(type: string)}
 	<div id="{type.toLowerCase()}-container">
 		<Label>{type}</Label>
-		<div class="mt-1 rounded-lg bg-neutral-200 p-4 dark:bg-neutral-950">
+		<div class="bg-primary/10 dark:bg-background mt-1 rounded-lg p-4">
 			<ScrollArea class="w-full whitespace-nowrap rounded-md" orientation="horizontal">
 				<div class="flex min-h-[80px] items-center justify-center gap-4">
 					{#each useableDisks.filter((disk) => disk.Type === type && disk.Partitions.length === 0 && !isDiskInVdev(disk.UUID)) as disk (disk.UUID)}
@@ -709,14 +709,14 @@
 							<div class="max-w-[64px] truncate text-xs">
 								{disk.Device.replaceAll('/dev/', '')}
 							</div>
-							<div class="text-xs text-neutral-400">
+							<div class="text-muted-foreground text-xs">
 								{humanFormat(disk.Size)}
 							</div>
 						</div>
 					{/each}
 
 					{#if useableDisks.filter((disk) => disk.Type === type).length === 0 || useableDisks.filter((disk) => disk.Type === type && disk.Partitions.length === 0 && !isDiskInVdev(disk.UUID)).length === 0}
-						<div class="flex h-16 w-full items-center justify-center text-neutral-400">
+						<div class="text-muted-foreground/80 flex h-16 w-full items-center justify-center">
 							No available disks
 						</div>
 					{/if}
@@ -729,7 +729,7 @@
 {#snippet partitionsContainer()}
 	<div id="partitions-container">
 		<Label>Partitions</Label>
-		<div class="mt-1 rounded-lg bg-neutral-200 p-4 dark:bg-neutral-950">
+		<div class="bg-primary/10 dark:bg-background mt-1 rounded-lg p-4">
 			<ScrollArea class="w-full whitespace-nowrap rounded-md" orientation="horizontal">
 				<div class="flex min-h-[80px] items-center justify-center gap-4">
 					{#each useablePartitions.filter((partition) => !modal.vdevContainers
@@ -745,7 +745,7 @@
 							<div class="max-w-[64px] truncate text-xs">
 								{partition.name}
 							</div>
-							<div class="text-xs text-neutral-400">
+							<div class="text-muted-foreground text-xs">
 								{humanFormat(partition.size)}
 							</div>
 						</div>
@@ -823,11 +823,7 @@
 
 <div class="flex h-full w-full flex-col">
 	<div class="flex h-10 w-full items-center gap-2 border p-2">
-		<Button
-			on:click={() => (modal.open = !modal.open)}
-			size="sm"
-			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black dark:text-white"
-		>
+		<Button on:click={() => (modal.open = !modal.open)} size="sm" class="h-6">
 			<Icon icon="gg:add" class="mr-1 h-4 w-4" /> New
 		</Button>
 
@@ -935,14 +931,14 @@
 							<Label>VDEVs</Label>
 							<ScrollArea class="w-full whitespace-nowrap rounded-md" orientation="horizontal">
 								<div
-									class="border-primary-foreground bg-primary-foreground mt-1 flex w-full items-center justify-center gap-7 overflow-hidden rounded-lg border-y p-4 pr-4"
+									class="bg-muted mt-1 flex w-full items-center justify-center gap-7 overflow-hidden rounded-lg border-y border-none p-4 pr-4"
 								>
 									{#each Array(modal.vdevCount) as _, i}
 										<div class="relative flex flex-col">
 											{@render vdevErrors(i)}
 
 											<div
-												class={`relative h-28 w-48 flex-shrink-0 overflow-auto rounded-lg bg-neutral-200 p-2 dark:bg-neutral-950 ${getVdevErrors(i) ? 'border border-yellow-700 ' : ''}`}
+												class={`bg-primary/10 dark:bg-background relative h-28 w-48 flex-shrink-0 overflow-auto rounded-lg p-2 ${getVdevErrors(i) ? 'border border-yellow-700 ' : ''}`}
 												use:dropzone={{
 													on_dropzone: (_: unknown, event: DragEvent) => handleDropToVdev(i, event),
 													dragover_class: 'droppable'
@@ -950,9 +946,9 @@
 											>
 												{#if !vdevContains(i)}
 													<div
-														class="flex h-full flex-col items-center justify-center gap-1 text-neutral-500"
+														class="text-muted-foreground/60 flex h-full flex-col items-center justify-center gap-1"
 													>
-														<span class="dark:text-muted text-neutral-500">{i + 1}</span>
+														<span class="text-muted-foreground/60">{i + 1}</span>
 														<span>Drop disks here</span>
 													</div>
 												{:else}
@@ -972,7 +968,7 @@
 						<div id="disk-containers">
 							<Label>Disks</Label>
 							<div
-								class="border-primary-foreground bg-primary-foreground mt-1 grid grid-cols-4 gap-6 overflow-hidden border-y p-4"
+								class="bg-muted mt-1 grid grid-cols-4 gap-6 overflow-hidden border-y border-none p-4"
 							>
 								{@render diskContainer('HDD')}
 								{@render diskContainer('SSD')}
@@ -1211,7 +1207,7 @@
 			<div class="flex gap-2">
 				<Button
 					variant="default"
-					class="h-8 bg-blue-700 text-white hover:bg-blue-600"
+					class="h-8 bg-blue-600 text-white hover:bg-blue-700"
 					onclick={() => makePool()}
 				>
 					{#if modal.creating}

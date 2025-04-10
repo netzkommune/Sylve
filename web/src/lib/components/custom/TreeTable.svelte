@@ -69,9 +69,14 @@
 			layout: 'fitColumns',
 			data: rows,
 			reactiveData: true,
+			selectableRows: true,
 			dataTree: true,
 			dataTreeChildField: 'children',
 			columns: columns
+		});
+
+		table.on('rowSelected', function (row) {
+			console.log('Row selected:', row.getData());
 		});
 	});
 </script>

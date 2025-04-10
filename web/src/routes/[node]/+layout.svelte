@@ -27,7 +27,7 @@
 		},
 		{
 			label: 'notes',
-			icon: 'arcticons:notes',
+			icon: 'mdi:notes',
 			href: `/${node}/notes`
 		},
 		{

@@ -45,6 +45,7 @@
 	import { Badge } from '$lib/components/ui/badge';
 
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
+	import { updateCache } from '$lib/utils/http';
 	import { getTranslation } from '$lib/utils/i18n';
 	import { capitalizeFirstLetter } from '$lib/utils/string';
 
@@ -69,7 +70,10 @@
 			},
 			refetchInterval: 1000,
 			keepPreviousData: true,
-			initialData: data.disks
+			initialData: data.disks,
+			onSuccess: (data: Disk[]) => {
+				updateCache('disks', data);
+			}
 		},
 		{
 			queryKey: ['poolList'],
@@ -78,7 +82,10 @@
 			},
 			refetchInterval: 1000,
 			keepPreviousData: true,
-			initialData: data.pools
+			initialData: data.pools,
+			onSuccess: (data: Zpool[]) => {
+				updateCache('pools', data);
+			}
 		}
 	]);
 

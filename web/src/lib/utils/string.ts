@@ -27,3 +27,8 @@ export function parseJwt(token: string) {
 
 	return JSON.parse(jsonPayload);
 }
+
+export function shortenString(str: string, maxLength: number): string {
+	if (str.length <= maxLength) return str;
+	return str.slice(0, maxLength) + '...';
+}

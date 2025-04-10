@@ -14,7 +14,7 @@
 	import { ModeWatcher } from 'mode-watcher';
 	import { onMount, tick } from 'svelte';
 	import { Toaster } from 'svelte-french-toast';
-	import '../app.css';
+	import '../app.scss';
 
 	const queryClient = new QueryClient();
 	let { children } = $props();

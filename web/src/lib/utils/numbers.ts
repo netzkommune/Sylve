@@ -20,7 +20,11 @@ export function bytesToHumanReadable(value: number | undefined): string {
 	return humanFormat(value, { unit: 'B' });
 }
 
-export function getDeterministicIdFromString(str: string): string {
-	const hash = Array.from(str).reduce((acc, char) => acc + char.charCodeAt(0), 0);
-	return `id-${hash}`;
+export function generateNumberFromString(str: string): number {
+	let hash = 0x811c9dc5;
+	for (let i = 0; i < str.length; i++) {
+		hash ^= str.charCodeAt(i);
+		hash = Math.imul(hash, 0x01000193);
+	}
+	return hash >>> 0;
 }

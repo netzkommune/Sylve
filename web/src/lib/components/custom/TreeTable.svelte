@@ -1,10 +1,11 @@
 <script lang="ts">
-	import type { Column, ExpandedRows, Row } from '$lib/types/components/tree-table';
+	import type { Column, Row } from '$lib/types/components/tree-table';
+	import Icon from '@iconify/svelte';
 	import { onMount, untrack } from 'svelte';
-	import { TabulatorFull as Tabulator } from 'tabulator-tables';
+	import { TabulatorFull as Tabulator, type RowComponent } from 'tabulator-tables';
 
-	let tableComponent: Tabulator;
-	let table = null;
+	let tableComponent: HTMLDivElement | null = null;
+	let table: Tabulator | null = $state(null);
 
 	interface Props {
 		data: {
@@ -35,12 +36,10 @@
 	});
 
 	let rows = $derived.by(() => {
-		function clean(row) {
-			// Create a shallow copy of the row
+		function clean(row: Row) {
 			let newRow = { ...row };
 
 			if (Array.isArray(newRow.children)) {
-				// Recursively clean children
 				let cleanedChildren = newRow.children.map(clean).filter(Boolean);
 
 				if (cleanedChildren.length > 0) {
@@ -65,18 +64,33 @@
 	});
 
 	onMount(() => {
-		table = new Tabulator(tableComponent, {
-			layout: 'fitColumns',
-			data: rows,
-			reactiveData: true,
-			selectableRows: true,
-			dataTree: true,
-			dataTreeChildField: 'children',
-			columns: columns
+		if (tableComponent) {
+			table = new Tabulator(tableComponent, {
+				layout: 'fitColumns',
+				data: rows,
+				reactiveData: true,
+				selectableRows: 1,
+				dataTreeChildIndent: 16,
+				dataTree: true,
+				dataTreeChildField: 'children',
+				columns: columns
+			});
+		}
+
+		table?.on('rowSelected', function (row: RowComponent) {
+			const selectedRow = row.getData();
+			for (const column of columns) {
+				parentActiveRow = {
+					...parentActiveRow,
+					[`${column.field}`]: selectedRow[column.field],
+					id: selectedRow.id ?? parentActiveRow?.id ?? 0
+				};
+			}
 		});
 
-		table.on('rowSelected', function (row) {
-			console.log('Row selected:', row.getData());
+		table?.on('rowDeselected', function (row: RowComponent) {
+			console.log('rowDeselected', row);
+			parentActiveRow = null;
 		});
 	});
 </script>

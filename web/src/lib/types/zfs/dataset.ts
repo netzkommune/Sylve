@@ -94,6 +94,7 @@ export const DatasetSchema = z.object({
 export const GroupedByPoolSchema = z.object({
 	name: z.string(),
 	filesystems: z.array(DatasetSchema).default([]),
+	snapshots: z.array(DatasetSchema).default([]),
 	volumes: z.array(DatasetSchema).default([])
 });
 

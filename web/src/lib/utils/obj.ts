@@ -19,3 +19,10 @@ export function deepDiff(
 
 	return changes;
 }
+
+export function findValue(value: unknown, object: Record<string, any>): boolean {
+	if (typeof value === 'object' && value !== null) {
+		return Object.keys(object).some((key) => object[key] === value);
+	}
+	return Object.values(object).some((val) => val === value);
+}

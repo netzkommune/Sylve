@@ -13,6 +13,7 @@
 			columns: Column[];
 		};
 		name: string;
+		hideId?: boolean;
 		parentIcon?: string;
 		itemIcon?: string;
 		parentActiveRow?: Row | null;
@@ -23,6 +24,7 @@
 		name,
 		parentIcon = undefined,
 		itemIcon = undefined,
+		hideId = true,
 		parentActiveRow = $bindable()
 	}: Props = $props();
 
@@ -30,69 +32,80 @@
 		return data.columns.map((column) => {
 			return {
 				title: column.label,
-				field: column.key
+				field: column.key,
+				visible: column.key !== 'id' || !hideId
 			};
 		});
 	});
 
-	let rows = $derived.by(() => {
-		function clean(row: Row) {
-			let newRow = { ...row };
-
-			if (Array.isArray(newRow.children)) {
-				let cleanedChildren = newRow.children.map(clean).filter(Boolean);
-
-				if (cleanedChildren.length > 0) {
-					newRow.children = cleanedChildren;
-				} else {
-					delete newRow.children;
-				}
-			}
-
-			return newRow;
-		}
-
-		return data.rows.map(clean);
-	});
-
 	$effect(() => {
-		untrack(() => {
-			if (table) {
-				table.updateData(data.rows);
-			}
-		});
+		if (data.rows.length > 0) {
+			untrack(() => {
+				if (parentActiveRow === null) {
+					if (table) {
+						table?.updateOrAddData(data.rows);
+					}
+				}
+			});
+		}
 	});
+
+	function selectParentActiveRow(row: RowComponent) {
+		const expandedRow = row.getData();
+		for (const column of columns) {
+			parentActiveRow = {
+				...parentActiveRow,
+				[`${column.field}`]: expandedRow[column.field],
+				id: expandedRow.id ?? parentActiveRow?.id ?? 0
+			};
+		}
+	}
 
 	onMount(() => {
 		if (tableComponent) {
 			table = new Tabulator(tableComponent, {
 				layout: 'fitColumns',
-				data: rows,
-				reactiveData: true,
+				data: data.rows,
 				selectableRows: 1,
 				dataTreeChildIndent: 16,
 				dataTree: true,
 				dataTreeChildField: 'children',
-				columns: columns
+				columns: columns,
+				dataTreeStartExpanded: true
 			});
 		}
 
 		table?.on('rowSelected', function (row: RowComponent) {
-			const selectedRow = row.getData();
-			for (const column of columns) {
-				parentActiveRow = {
-					...parentActiveRow,
-					[`${column.field}`]: selectedRow[column.field],
-					id: selectedRow.id ?? parentActiveRow?.id ?? 0
-				};
-			}
+			selectParentActiveRow(row);
 		});
 
 		table?.on('rowDeselected', function (row: RowComponent) {
-			console.log('rowDeselected', row);
 			parentActiveRow = null;
+		});
+
+		table?.on('dataTreeRowExpanded', function (row: RowComponent) {
+			const selectedRows = table?.getSelectedRows();
+			if (selectedRows) {
+				for (const selectedRow of selectedRows) {
+					selectedRow.deselect();
+				}
+			}
+			row.select();
+		});
+
+		table?.on('dataTreeRowCollapsed', function (row: RowComponent) {
+			const selectedRows = table?.getSelectedRows();
+			if (selectedRows) {
+				for (const selectedRow of selectedRows) {
+					selectedRow.deselect();
+				}
+			}
+
+			row.select();
 		});
 	});
 </script>
 
-<div bind:this={tableComponent}></div>
+<div class="flex h-full flex-col">
+	<div bind:this={tableComponent} class="flex-1 overflow-auto"></div>
+</div>

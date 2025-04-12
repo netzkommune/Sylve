@@ -72,7 +72,7 @@
 
 <li class={`w-full`}>
 	<a
-		class={`my-0.5 flex w-full items-center justify-between px-1.5 py-0.5 ${isActive ? sidebarActive : 'rounded-md hover:bg-primary/10 dark:hover:bg-muted'}${lastActiveUrl === item.label ? '!text-primary' : ' '}`}
+		class={`my-0.5 flex w-full items-center justify-between px-1.5 py-0.5 ${isActive ? sidebarActive : 'hover:bg-primary/10 dark:hover:bg-muted rounded-md'}${lastActiveUrl === item.label ? '!text-primary' : ' '}`}
 		href={item.href}
 		onclick={toggle}
 	>

@@ -20,3 +20,14 @@ export function deepDiffArr(arr1: any[], arr2: any[]): any[] {
 
 	return changes;
 }
+
+export function findValueInArrayByKey<T extends Record<string, any>>(
+	value: unknown,
+	array: T[],
+	key: keyof T
+): boolean {
+	if (typeof value === 'object' && value !== null) {
+		return array.some((obj) => obj[key] === value);
+	}
+	return array.some((obj) => obj[key] === value);
+}

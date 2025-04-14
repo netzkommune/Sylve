@@ -1,11 +1,18 @@
 <script lang="ts">
-	import { createSnapshot, deleteSnapshot, getDatasets } from '$lib/api/zfs/datasets';
+	import {
+		createFileSystem,
+		createSnapshot,
+		deleteSnapshot,
+		getDatasets
+	} from '$lib/api/zfs/datasets';
 	import { getPools } from '$lib/api/zfs/pool';
 	import AlertDialogModal from '$lib/components/custom/AlertDialog.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import { Badge } from '$lib/components/ui/badge/index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
+	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import * as Select from '$lib/components/ui/select/index.js';
@@ -15,7 +22,8 @@
 	import { generateTableData, groupByPool } from '$lib/utils/zfs/dataset';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
-	import { tick } from 'svelte';
+	import humanFormat, { type ParsedInfo, type ScaleLike } from 'human-format';
+	import { tick, untrack } from 'svelte';
 
 	interface Data {
 		pools: Zpool[];
@@ -97,7 +105,13 @@
 				name: '',
 				properties: {
 					parent: '',
-					compression: 'on'
+					aTime: 'on',
+					checksum: 'on',
+					compression: 'on',
+					deduplication: 'off',
+					encryption: 'off',
+					encryptionKey: '',
+					quota: ''
 				}
 			},
 			title: ''
@@ -123,6 +137,15 @@
 			}
 		}
 
+		if (confirmModals.active === 'createFilesystem') {
+			await createFileSystem(
+				confirmModals.createFilesystem.data.name,
+				confirmModals.createFilesystem.data.properties.parent,
+				confirmModals.createFilesystem.data.properties
+			);
+			activeRow = null;
+		}
+
 		confirmModals[confirmModals.active].open = false;
 
 		if (confirmModals.active === 'createSnapshot') {
@@ -134,7 +157,171 @@
 			confirmModals.deleteSnapshot.data = '';
 			confirmModals.deleteSnapshot.title = '';
 		}
+
+		if (confirmModals.active === 'createFilesystem') {
+			confirmModals.createFilesystem.data.name = '';
+			confirmModals.createFilesystem.data.properties = {
+				parent: '',
+				aTime: 'on',
+				checksum: 'on',
+				compression: 'on',
+				deduplication: 'off',
+				encryption: 'off',
+				encryptionKey: '',
+				quota: ''
+			};
+		}
 	}
+
+	let remainingSpace = $state(14229176320);
+	let currentPartition = $state(0);
+	let currentPartitionInput = $derived(confirmModals.createFilesystem.data.properties.quota);
+
+	$effect(() => {
+		if (currentPartitionInput === '') {
+			currentPartition = 0;
+		} else {
+			let parsed: ParsedInfo<ScaleLike> | null = null;
+
+			try {
+				parsed = humanFormat.parse.raw(currentPartitionInput);
+			} catch (e) {
+				parsed = { factor: 1, value: 0, prefix: 'B' };
+				currentPartitionInput = '1B';
+			}
+
+			if (parsed) {
+				untrack(() => {
+					currentPartition = parsed.factor * parsed.value;
+					if (currentPartition > remainingSpace) {
+						currentPartition = remainingSpace;
+						currentPartitionInput = humanFormat(remainingSpace);
+					}
+				});
+			}
+		}
+	});
+
+	let zfsProperties = $state({
+		atime: [
+			{
+				label: 'on',
+				value: 'on'
+			},
+			{
+				label: 'off',
+				value: 'off'
+			}
+		],
+		checksum: [
+			{
+				label: 'on',
+				value: 'on'
+			},
+			{
+				label: 'off',
+				value: 'off'
+			},
+			{
+				label: 'fletcher2',
+				value: 'fletcher2'
+			},
+			{
+				label: 'fletcher4',
+				value: 'fletcher4'
+			},
+			{
+				label: 'sha256',
+				value: 'sha256'
+			},
+			{
+				label: 'noparity',
+				value: 'noparity'
+			}
+		],
+		compression: [
+			{
+				label: 'on',
+				value: 'on'
+			},
+			{
+				label: 'off',
+				value: 'off'
+			},
+			{
+				label: 'gzip',
+				value: 'gzip'
+			},
+			{
+				label: 'lz4',
+				value: 'lz4'
+			},
+			{
+				label: 'lzjb',
+				value: 'lzjb'
+			},
+			{
+				label: 'zle',
+				value: 'zle'
+			},
+			{
+				label: 'zstd',
+				value: 'zstd'
+			},
+			{
+				label: 'zstd-fast',
+				value: 'zstd-fast'
+			}
+		],
+		deduplication: [
+			{
+				label: 'off',
+				value: 'off'
+			},
+			{
+				label: 'on',
+				value: 'on'
+			},
+			{
+				label: 'Verify',
+				value: 'verify'
+			}
+		],
+		encryption: [
+			{
+				label: 'off',
+				value: 'off'
+			},
+			{
+				label: 'on',
+				value: 'on'
+			},
+			{
+				label: 'aes-128-ccm',
+				value: 'aes-128-ccm'
+			},
+			{
+				label: 'aes-192-ccm',
+				value: 'aes-192-ccm'
+			},
+			{
+				label: 'aes-256-ccm',
+				value: 'aes-256-ccm'
+			},
+			{
+				label: 'aes-128-gcm',
+				value: 'aes-128-gcm'
+			},
+			{
+				label: 'aes-192-gcm',
+				value: 'aes-192-gcm'
+			},
+			{
+				label: 'aes-256-gcm',
+				value: 'aes-256-gcm'
+			}
+		]
+	});
 </script>
 
 {#snippet button(type: string)}
@@ -301,24 +488,31 @@
 {/if}
 
 {#if confirmModals.active === 'createFilesystem'}
-	<AlertDialog.Root
+	<Dialog.Root
 		bind:open={confirmModals.createFilesystem.open}
 		closeOnOutsideClick={false}
 		closeOnEscape={false}
 	>
-		<AlertDialog.Content>
-			<AlertDialog.Header>
-				<AlertDialog.Title>
-					<div class="flex items-center">
-						<Icon icon="material-symbols:files" class="mr-2 h-6 w-6" />
-						Create Filesystem
-					</div>
-				</AlertDialog.Title>
-			</AlertDialog.Header>
+		<Dialog.Content
+			class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-visible overflow-y-auto p-0 transition-all duration-300 ease-in-out lg:max-w-[70%]"
+		>
+			<div class="flex items-center justify-between">
+				<Dialog.Header class="flex justify-between p-4">
+					<Dialog.Title class="flex items-center text-left">
+						<Icon icon="material-symbols:files" class="mr-2 h-5 w-5" />Create Filesystem</Dialog.Title
+					>
+				</Dialog.Header>
+				<Dialog.Close
+					class="ring-offset-background data-[state=open]:bg-accent data-[state=open]:text-muted-foreground mr-4 flex h-5 w-5 items-center justify-center rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-0 disabled:pointer-events-none"
+				>
+					<Icon icon="lucide:x" class="h-5 w-5" />
+					<span class="sr-only">Close</span>
+				</Dialog.Close>
+			</div>
 
-			<div class="w-full">
-				<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-					<div class="flex-1 space-y-1">
+			<div class="w-full p-4">
+				<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+					<div class="space-y-1">
 						<Label for="name">Name</Label>
 						<Input
 							type="text"
@@ -329,53 +523,237 @@
 						/>
 					</div>
 
-					<div class="space-y-1 py-1">
-						<div>
-							<Label class="w-24 whitespace-nowrap text-sm">Parent</Label>
-							<Select.Root
-								selected={{
-									label:
-										confirmModals.createFilesystem.data.properties.parent || activeDataset?.name,
-									value:
-										confirmModals.createFilesystem.data.properties.parent || activeDataset?.name
-								}}
-								onSelectedChange={(value) => {
-									confirmModals.createFilesystem.data.properties.parent = value?.value || '';
-								}}
-							>
-								<Select.Trigger class="w-full">
-									<Select.Value placeholder="Select Parent" />
-								</Select.Trigger>
+					<div class="space-y-1">
+						<Label class="w-24 whitespace-nowrap text-sm">Parent</Label>
+						<Select.Root
+							selected={{
+								label: confirmModals.createFilesystem.data.properties.parent || activeDataset?.name,
+								value: confirmModals.createFilesystem.data.properties.parent || activeDataset?.name
+							}}
+							onSelectedChange={(value) => {
+								confirmModals.createFilesystem.data.properties.parent = value?.value || '';
+							}}
+						>
+							<Select.Trigger class="w-full">
+								<Select.Value placeholder="Select Parent" />
+							</Select.Trigger>
 
-								<Select.Content class="max-h-36 overflow-y-auto">
-									<Select.Group>
-										{#each grouped as pool}
-											{#each pool.filesystems as fs}
-												<Select.Item value={fs.name} label={fs.name}>{fs.name}</Select.Item>
-											{/each}
+							<Select.Content class="max-h-36 overflow-y-auto">
+								<Select.Group>
+									{#each grouped as pool}
+										{#each pool.filesystems as fs}
+											<Select.Item value={fs.name} label={fs.name}>{fs.name}</Select.Item>
 										{/each}
-									</Select.Group>
-								</Select.Content>
-							</Select.Root>
+									{/each}
+								</Select.Group>
+							</Select.Content>
+						</Select.Root>
+					</div>
+
+					<div class="space-y-1">
+						<Label class="w-24 whitespace-nowrap text-sm">ATime</Label>
+						<Select.Root
+							selected={{
+								label: confirmModals.createFilesystem.data.properties.aTime,
+								value: confirmModals.createFilesystem.data.properties.aTime
+							}}
+							onSelectedChange={(value) => {
+								confirmModals.createFilesystem.data.properties.aTime = value?.value || '';
+							}}
+						>
+							<Select.Trigger class="w-full">
+								<Select.Value placeholder="Select access time mode" />
+							</Select.Trigger>
+							<Select.Content class="max-h-36 overflow-y-auto">
+								<Select.Group>
+									{#each zfsProperties.atime as option}
+										<Select.Item value={option.value} label={option.label}
+											>{option.label}</Select.Item
+										>
+									{/each}
+								</Select.Group>
+							</Select.Content>
+							<Select.Input name="favoriteFruit" />
+						</Select.Root>
+					</div>
+
+					<div class="space-y-1">
+						<Label class="w-24 whitespace-nowrap text-sm">Checkum</Label>
+						<Select.Root
+							selected={{
+								label: confirmModals.createFilesystem.data.properties.checksum,
+								value: confirmModals.createFilesystem.data.properties.checksum
+							}}
+							onSelectedChange={(value) => {
+								confirmModals.createFilesystem.data.properties.checksum = value?.value || '';
+							}}
+						>
+							<Select.Trigger class="w-full">
+								<Select.Value placeholder="Select checksum algorithm" />
+							</Select.Trigger>
+							<Select.Content class="max-h-36 overflow-y-auto">
+								<Select.Group>
+									{#each zfsProperties.checksum as option}
+										<Select.Item value={option.value} label={option.label}
+											>{option.label}</Select.Item
+										>
+									{/each}
+								</Select.Group>
+							</Select.Content>
+							<Select.Input name="favoriteFruit" />
+						</Select.Root>
+					</div>
+
+					<div class="space-y-1">
+						<Label class="w-24 whitespace-nowrap text-sm">Compression</Label>
+						<Select.Root
+							selected={{
+								label: confirmModals.createFilesystem.data.properties.compression,
+								value: confirmModals.createFilesystem.data.properties.compression
+							}}
+							onSelectedChange={(value) => {
+								confirmModals.createFilesystem.data.properties.compression = value?.value || '';
+							}}
+						>
+							<Select.Trigger class="w-full">
+								<Select.Value placeholder="Select compression type" />
+							</Select.Trigger>
+							<Select.Content class="max-h-36 overflow-y-auto">
+								<Select.Group>
+									{#each zfsProperties.compression as option}
+										<Select.Item value={option.value} label={option.label}
+											>{option.label}</Select.Item
+										>
+									{/each}
+								</Select.Group>
+							</Select.Content>
+							<Select.Input name="favoriteFruit" />
+						</Select.Root>
+					</div>
+
+					<div class="space-y-1">
+						<Label class="w-24 whitespace-nowrap text-sm">Deduplication</Label>
+						<Select.Root
+							portal={null}
+							selected={{
+								label: confirmModals.createFilesystem.data.properties.deduplication,
+								value: confirmModals.createFilesystem.data.properties.deduplication
+							}}
+							onSelectedChange={(value) => {
+								confirmModals.createFilesystem.data.properties.deduplication = value?.value || '';
+							}}
+						>
+							<Select.Trigger class="w-full">
+								<Select.Value placeholder="Select deduplication mode" />
+							</Select.Trigger>
+							<Select.Content class="max-h-36 overflow-y-auto">
+								<Select.Group>
+									{#each zfsProperties.deduplication as option}
+										<Select.Item value={option.value} label={option.label}
+											>{option.label}</Select.Item
+										>
+									{/each}
+								</Select.Group>
+							</Select.Content>
+							<Select.Input name="favoriteFruit" />
+						</Select.Root>
+					</div>
+
+					<div class="space-y-1">
+						<Label class="w-24 whitespace-nowrap text-sm">Encryption</Label>
+						<Select.Root
+							portal={null}
+							selected={{
+								label: confirmModals.createFilesystem.data.properties.encryption,
+								value: confirmModals.createFilesystem.data.properties.encryption
+							}}
+							onSelectedChange={(value) => {
+								confirmModals.createFilesystem.data.properties.encryption = value?.value || '';
+							}}
+						>
+							<Select.Trigger class="w-full">
+								<Select.Value placeholder="Select encryption standard" />
+							</Select.Trigger>
+							<Select.Content class="max-h-36 overflow-y-auto">
+								<Select.Group>
+									{#each zfsProperties.encryption as option}
+										<Select.Item value={option.value} label={option.label}
+											>{option.label}</Select.Item
+										>
+									{/each}
+								</Select.Group>
+							</Select.Content>
+							<Select.Input name="favoriteFruit" />
+						</Select.Root>
+					</div>
+
+					{#if confirmModals.createFilesystem.data.properties.encryption !== 'off'}
+						<div class="space-y-1">
+							<Label class="w-24 whitespace-nowrap text-sm "></Label>
+							<div class="space-x-2 space-y-1 pt-6">
+								<Input
+									type="text"
+									placeholder="Enter or generate encryption key"
+									class="w-full"
+									autocomplete="off"
+									bind:value={confirmModals.createFilesystem.data.properties.encryptionKey}
+								/>
+								<div class="flex justify-end">
+									<!-- <Button size="sm" variant="outline">Generate</Button> -->
+									<Badge
+										variant="secondary"
+										class="cursor-pointer rounded-md bg-blue-600 px-2 py-0.5 hover:bg-blue-700"
+										>Generate</Badge
+									>
+								</div>
+							</div>
+						</div>
+					{/if}
+
+					<div class="space-y-1">
+						<Label class="w-24 whitespace-nowrap text-sm">Quota</Label>
+						<Input
+							type="text"
+							class="w-full text-right"
+							min="0"
+							max={remainingSpace}
+							bind:value={confirmModals.createFilesystem.data.properties.quota}
+							placeholder="0B"
+						/>
+						<div class="flex justify-end">
+							<span class="text-muted-foreground text-sm">
+								Size: {humanFormat(currentPartition)}
+							</span>
 						</div>
 					</div>
 				</div>
 			</div>
 
-			<AlertDialog.Footer>
-				<AlertDialog.Cancel
-					onclick={() => {
-						confirmModals.createFilesystem.open = false;
-					}}>Cancel</AlertDialog.Cancel
-				>
-				<AlertDialog.Action
-					onclick={() => {
-						confirmAction();
-					}}
-				>
-					Create
-				</AlertDialog.Action>
-			</AlertDialog.Footer>
-		</AlertDialog.Content>
-	</AlertDialog.Root>
+			<Dialog.Footer>
+				<div class="flex items-center justify-end space-x-4 p-4">
+					<Button
+						size="sm"
+						type="button"
+						variant="ghost"
+						class="disabled border-border h-8 w-full border"
+						onclick={() => {
+							confirmModals.createFilesystem.open = false;
+						}}
+					>
+						Cancel
+					</Button>
+					<Button
+						size="sm"
+						type="button"
+						class="h-8 w-full bg-blue-600 text-white hover:bg-blue-700"
+						onclick={() => {
+							confirmAction();
+						}}
+					>
+						Create
+					</Button>
+				</div>
+			</Dialog.Footer>
+		</Dialog.Content>
+	</Dialog.Root>
 {/if}

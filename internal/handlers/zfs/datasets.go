@@ -15,6 +15,12 @@ type CreateSnapshotRequest struct {
 	Recursive bool   `json:"recursive"`
 }
 
+type CreateFilesystemRequest struct {
+	Name       string            `json:"name" binding:"required"`
+	Parent     string            `json:"parent" binding:"required"`
+	Properties map[string]string `json:"properties"`
+}
+
 func GetDatasets(zfsSerice *zfs.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		datasets, err := zfsSerice.GetDatasets()
@@ -98,5 +104,35 @@ func CreateSnapshot(zfsService *zfs.Service) gin.HandlerFunc {
 }
 
 func CreateFilesystem(zfsService *zfs.Service) gin.HandlerFunc {
-	return func(c *gin.Context) {}
+	return func(c *gin.Context) {
+		var request CreateFilesystemRequest
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		err := zfsService.CreateFilesystem(request.Name, request.Properties)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "created_filesystem",
+			Error:   "",
+			Data:    nil,
+		})
+	}
 }

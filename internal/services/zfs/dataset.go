@@ -95,31 +95,38 @@ func (s *Service) CreateSnapshot(guid string, name string, recursive bool) error
 }
 
 func (s *Service) CreateFilesystem(name string, props map[string]string) error {
-	// find parent from props
-	// if parent is not found, return error
-	// parent := ""
+	parent := ""
 
-	// for k, v := range props {
-	// 	if k == "parent" {
-	// 		parent = v
-	// 		break
-	// 	}
-	// }
+	for k, v := range props {
+		if k == "parent" {
+			parent = v
+			continue
+		}
+	}
 
-	// if parent == "" {
-	// 	return fmt.Errorf("parent_not_found")
-	// }
+	if parent == "" {
+		return fmt.Errorf("parent_not_found")
+	}
 
-	// dataset, err := zfs.Datasets(name)
-	// if err != nil {
-	// 	return err
-	// }
+	name = fmt.Sprintf("%s/%s", parent, name)
+	delete(props, "parent")
 
-	// if dataset.Name == name {
-	// 	return nil
-	// }
+	_, err := zfs.CreateFilesystem(name, props)
 
-	// return fmt.Errorf("failed to create filesystem %s", name)
+	if err != nil {
+		return err
+	}
 
-	return nil
+	datasets, err := zfs.Datasets(name)
+	if err != nil {
+		return err
+	}
+
+	for _, dataset := range datasets {
+		if dataset.Name == name {
+			return nil
+		}
+	}
+
+	return fmt.Errorf("failed to create filesystem %s", name)
 }

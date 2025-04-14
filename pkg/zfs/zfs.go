@@ -1,9 +1,12 @@
 package zfs
 
 import (
+	"fmt"
 	"io"
+	"os"
 	"strconv"
 	"sylve/pkg/exe"
+	"sylve/pkg/utils"
 )
 
 type InodeType int
@@ -122,6 +125,19 @@ func (z *zfs) CreateVolume(name string, size uint64, properties map[string]strin
 func (z *zfs) CreateFilesystem(name string, properties map[string]string) (*Dataset, error) {
 	args := make([]string, 1, 4)
 	args[0] = "create"
+
+	if _, ok := properties["encryptionKey"]; ok {
+		if properties["encryptionKey"] != "" && properties["encryption"] != "off" {
+			randomFile := fmt.Sprintf("/tmp/%s", utils.GenerateRandomString(8))
+			if err := os.WriteFile(randomFile, []byte(properties["encryptionKey"]), 0600); err != nil {
+				return nil, fmt.Errorf("failed to write encryption key to file: %w", err)
+			}
+
+			properties["keylocation"] = fmt.Sprintf("file://%s", randomFile)
+		}
+
+		delete(properties, "encryptionKey")
+	}
 
 	if properties != nil {
 		args = append(args, propsSlice(properties)...)

@@ -29,10 +29,7 @@ export function groupByPool(
 	return grouped;
 }
 
-export function generateTableData(grouped: GroupedByPool[]): {
-	rows: Row[];
-	columns: Column[];
-} {
+export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; columns: Column[] } {
 	const rows: Row[] = [];
 	const columns: Column[] = [
 		{

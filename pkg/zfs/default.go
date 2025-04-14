@@ -111,3 +111,7 @@ func ScrubPool(poolName string) error {
 
 	return nil
 }
+
+func CreateFilesystem(name string, props map[string]string) (*Dataset, error) {
+	return z.CreateFilesystem(name, props)
+}

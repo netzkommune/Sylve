@@ -105,10 +105,10 @@
 				name: '',
 				properties: {
 					parent: '',
-					aTime: 'on',
+					atime: 'on',
 					checksum: 'on',
 					compression: 'on',
-					deduplication: 'off',
+					dedup: 'off',
 					encryption: 'off',
 					encryptionKey: '',
 					quota: ''
@@ -162,10 +162,10 @@
 			confirmModals.createFilesystem.data.name = '';
 			confirmModals.createFilesystem.data.properties = {
 				parent: '',
-				aTime: 'on',
+				atime: 'on',
 				checksum: 'on',
 				compression: 'on',
-				deduplication: 'off',
+				dedup: 'off',
 				encryption: 'off',
 				encryptionKey: '',
 				quota: ''
@@ -173,7 +173,7 @@
 		}
 	}
 
-	let remainingSpace = $state(14229176320);
+	let remainingSpace = $state(0);
 	let currentPartition = $state(0);
 	let currentPartitionInput = $derived(confirmModals.createFilesystem.data.properties.quota);
 
@@ -273,7 +273,7 @@
 				value: 'zstd-fast'
 			}
 		],
-		deduplication: [
+		dedup: [
 			{
 				label: 'off',
 				value: 'off'
@@ -358,34 +358,25 @@
 			<Icon icon="carbon:ibm-cloud-vpc-block-storage-snapshots" class="mr-1 h-4 w-4" /> Create Snapshot
 		</Button>
 	{/if}
-
-	{#if type === 'create-filesystem' && activeDataset?.type === 'filesystem'}
-		<Button
-			on:click={async () => {
-				if (activeDataset) {
-					confirmModals.active = 'createFilesystem';
-					confirmModals.parent = 'filesystem';
-					confirmModals.createFilesystem.open = true;
-					confirmModals.createFilesystem.title = activeDataset.name;
-				}
-			}}
-			size="sm"
-			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
-		>
-			<Icon icon="material-symbols:files" class="mr-1 h-4 w-4" /> Create Filesystem
-		</Button>
-	{/if}
 {/snippet}
 
 <div class="flex h-full w-full flex-col">
 	<div class="flex h-10 w-full items-center gap-2 border p-2">
-		<Button on:click={() => console.log('New dataset')} size="sm" class="h-6">
+		<Button
+			on:click={() => {
+				confirmModals.active = 'createFilesystem';
+				confirmModals.parent = 'filesystem';
+				confirmModals.createFilesystem.open = true;
+				confirmModals.createFilesystem.title = '';
+			}}
+			size="sm"
+			class="h-6"
+		>
 			<Icon icon="gg:add" class="mr-1 h-4 w-4" /> New
 		</Button>
 
 		{@render button('delete-snapshot')}
 		{@render button('create-snapshot')}
-		{@render button('create-filesystem')}
 	</div>
 	<div class="relative flex h-full w-full cursor-pointer flex-col">
 		<div class="flex-1">
@@ -554,11 +545,11 @@
 						<Label class="w-24 whitespace-nowrap text-sm">ATime</Label>
 						<Select.Root
 							selected={{
-								label: confirmModals.createFilesystem.data.properties.aTime,
-								value: confirmModals.createFilesystem.data.properties.aTime
+								label: confirmModals.createFilesystem.data.properties.atime,
+								value: confirmModals.createFilesystem.data.properties.atime
 							}}
 							onSelectedChange={(value) => {
-								confirmModals.createFilesystem.data.properties.aTime = value?.value || '';
+								confirmModals.createFilesystem.data.properties.atime = value?.value || '';
 							}}
 						>
 							<Select.Trigger class="w-full">
@@ -636,19 +627,19 @@
 						<Select.Root
 							portal={null}
 							selected={{
-								label: confirmModals.createFilesystem.data.properties.deduplication,
-								value: confirmModals.createFilesystem.data.properties.deduplication
+								label: confirmModals.createFilesystem.data.properties.dedup,
+								value: confirmModals.createFilesystem.data.properties.dedup
 							}}
 							onSelectedChange={(value) => {
-								confirmModals.createFilesystem.data.properties.deduplication = value?.value || '';
+								confirmModals.createFilesystem.data.properties.dedup = value?.value || '';
 							}}
 						>
 							<Select.Trigger class="w-full">
-								<Select.Value placeholder="Select deduplication mode" />
+								<Select.Value placeholder="Select dedup mode" />
 							</Select.Trigger>
 							<Select.Content class="max-h-36 overflow-y-auto">
 								<Select.Group>
-									{#each zfsProperties.deduplication as option}
+									{#each zfsProperties.dedup as option}
 										<Select.Item value={option.value} label={option.label}
 											>{option.label}</Select.Item
 										>

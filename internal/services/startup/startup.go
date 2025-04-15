@@ -9,6 +9,7 @@
 package startup
 
 import (
+	"os"
 	serviceInterfaces "sylve/internal/interfaces/services"
 	infoServiceInterfaces "sylve/internal/interfaces/services/info"
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
@@ -36,6 +37,10 @@ func NewStartupService(db *gorm.DB,
 
 func (s *Service) InitKeys(authService serviceInterfaces.AuthServiceInterface) error {
 	if err := authService.InitSecret("JWTSecret", 6); err != nil {
+		return err
+	}
+
+	if err := os.MkdirAll("/etc/zfs/keys", os.ModePerm); err != nil {
 		return err
 	}
 

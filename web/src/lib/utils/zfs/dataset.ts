@@ -5,6 +5,127 @@ import humanFormat from 'human-format';
 import { generateNumberFromString } from '../numbers';
 import { cleanChildren } from '../tree-table';
 
+export const createFSProps = {
+	atime: [
+		{
+			label: 'on',
+			value: 'on'
+		},
+		{
+			label: 'off',
+			value: 'off'
+		}
+	],
+	checksum: [
+		{
+			label: 'on',
+			value: 'on'
+		},
+		{
+			label: 'off',
+			value: 'off'
+		},
+		{
+			label: 'fletcher2',
+			value: 'fletcher2'
+		},
+		{
+			label: 'fletcher4',
+			value: 'fletcher4'
+		},
+		{
+			label: 'sha256',
+			value: 'sha256'
+		},
+		{
+			label: 'noparity',
+			value: 'noparity'
+		}
+	],
+	compression: [
+		{
+			label: 'on',
+			value: 'on'
+		},
+		{
+			label: 'off',
+			value: 'off'
+		},
+		{
+			label: 'gzip',
+			value: 'gzip'
+		},
+		{
+			label: 'lz4',
+			value: 'lz4'
+		},
+		{
+			label: 'lzjb',
+			value: 'lzjb'
+		},
+		{
+			label: 'zle',
+			value: 'zle'
+		},
+		{
+			label: 'zstd',
+			value: 'zstd'
+		},
+		{
+			label: 'zstd-fast',
+			value: 'zstd-fast'
+		}
+	],
+	dedup: [
+		{
+			label: 'off',
+			value: 'off'
+		},
+		{
+			label: 'on',
+			value: 'on'
+		},
+		{
+			label: 'Verify',
+			value: 'verify'
+		}
+	],
+	encryption: [
+		{
+			label: 'off',
+			value: 'off'
+		},
+		{
+			label: 'on',
+			value: 'on'
+		},
+		{
+			label: 'aes-128-ccm',
+			value: 'aes-128-ccm'
+		},
+		{
+			label: 'aes-192-ccm',
+			value: 'aes-192-ccm'
+		},
+		{
+			label: 'aes-256-ccm',
+			value: 'aes-256-ccm'
+		},
+		{
+			label: 'aes-128-gcm',
+			value: 'aes-128-gcm'
+		},
+		{
+			label: 'aes-192-gcm',
+			value: 'aes-192-gcm'
+		},
+		{
+			label: 'aes-256-gcm',
+			value: 'aes-256-gcm'
+		}
+	]
+};
+
 export function groupByPool(
 	pools: Zpool[] | undefined,
 	datasets: Dataset[] | undefined

@@ -51,6 +51,32 @@ definitions:
       delay:
         type: number
     type: object
+  internal_handlers_zfs.CreateFilesystemRequest:
+    properties:
+      name:
+        type: string
+      parent:
+        type: string
+      properties:
+        additionalProperties:
+          type: string
+        type: object
+    required:
+    - name
+    - parent
+    type: object
+  internal_handlers_zfs.CreateSnapshotRequest:
+    properties:
+      guid:
+        type: string
+      name:
+        type: string
+      recursive:
+        type: boolean
+    required:
+    - guid
+    - name
+    type: object
   internal_handlers_zfs.ZpoolListResponse:
     properties:
       data:
@@ -131,6 +157,19 @@ definitions:
       data:
         items:
           $ref: '#/definitions/sylve_internal_interfaces_services_disk.Disk'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-array_sylve_internal_interfaces_services_zfs_Dataset:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_internal_interfaces_services_zfs.Dataset'
         type: array
       error:
         type: string
@@ -367,6 +406,39 @@ definitions:
       usedPercent:
         type: number
     type: object
+  sylve_internal_interfaces_services_zfs.Dataset:
+    properties:
+      avail:
+        type: integer
+      compression:
+        type: string
+      logicalused:
+        type: integer
+      mountpoint:
+        type: string
+      name:
+        type: string
+      origin:
+        type: string
+      properties:
+        additionalProperties:
+          type: string
+        type: object
+      quota:
+        type: integer
+      referenced:
+        type: integer
+      type:
+        type: string
+      used:
+        type: integer
+      usedbydataset:
+        type: integer
+      volsize:
+        type: integer
+      written:
+        type: integer
+    type: object
   sylve_internal_interfaces_services_zfs.ReplaceDevice:
     properties:
       name:
@@ -495,10 +567,50 @@ definitions:
         type: boolean
       size:
         type: integer
+      status:
+        $ref: '#/definitions/sylve_pkg_zfs.ZpoolStatus'
       vdevs:
         items:
           $ref: '#/definitions/sylve_pkg_zfs.Vdev'
         type: array
+    type: object
+  sylve_pkg_zfs.ZpoolDevice:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/sylve_pkg_zfs.ZpoolDevice'
+        type: array
+      cksum:
+        type: integer
+      name:
+        type: string
+      note:
+        type: string
+      read:
+        type: integer
+      state:
+        type: string
+      write:
+        type: integer
+    type: object
+  sylve_pkg_zfs.ZpoolStatus:
+    properties:
+      action:
+        type: string
+      devices:
+        items:
+          $ref: '#/definitions/sylve_pkg_zfs.ZpoolDevice'
+        type: array
+      errors:
+        type: string
+      name:
+        type: string
+      scan:
+        type: string
+      state:
+        type: string
+      status:
+        type: string
     type: object
 host: sylve.lan:8181
 info:
@@ -944,6 +1056,118 @@ paths:
       summary: Get Swap Info
       tags:
       - Info
+  /zfs/datasets:
+    get:
+      consumes:
+      - application/json
+      description: Get all ZFS datasets
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_internal_interfaces_services_zfs_Dataset'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Get all ZFS datasets
+      tags:
+      - ZFS
+  /zfs/datasets/filesystem:
+    post:
+      consumes:
+      - application/json
+      description: Create a ZFS filesystem
+      parameters:
+      - description: Create Filesystem Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_zfs.CreateFilesystemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Create a ZFS filesystem
+      tags:
+      - ZFS
+  /zfs/datasets/snapshot:
+    post:
+      consumes:
+      - application/json
+      description: Create a ZFS filesystem
+      parameters:
+      - description: Create Filesystem Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_zfs.CreateFilesystemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Create a ZFS filesystem
+      tags:
+      - ZFS
+  /zfs/datasets/snapshot/{guid}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a ZFS snapshot
+      parameters:
+      - description: Snapshot GUID
+        in: path
+        name: guid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Delete a ZFS snapshot
+      tags:
+      - ZFS
   /zfs/pool/avg-io-delay:
     get:
       consumes:
@@ -1087,6 +1311,33 @@ paths:
       security:
       - BearerAuth: []
       summary: Replace Device
+      tags:
+      - ZFS
+  /zfs/pools/{name}/scrub:
+    post:
+      consumes:
+      - application/json
+      description: Start a scrub on a ZFS pool
+      parameters:
+      - description: Pool Name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Scrub Pool
       tags:
       - ZFS
 securityDefinitions:

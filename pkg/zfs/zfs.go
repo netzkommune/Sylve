@@ -128,15 +128,32 @@ func (z *zfs) CreateFilesystem(name string, properties map[string]string) (*Data
 
 	if _, ok := properties["encryptionKey"]; ok {
 		if properties["encryptionKey"] != "" && properties["encryption"] != "off" {
-			randomFile := fmt.Sprintf("/tmp/%s", utils.GenerateRandomString(8))
+			if len([]byte(properties["encryptionKey"])) < 32 || len([]byte(properties["encryptionKey"])) > 512 {
+				return nil, fmt.Errorf("invalid_encryption_key_length")
+			}
+
+			seed := fmt.Sprintf("%s-%s", name, properties["encryptionKey"])
+			randomFile := fmt.Sprintf("/etc/zfs/keys/%s", utils.GenerateDeterministicUUID(seed))
+
+			if _, err := os.Stat(randomFile); err == nil {
+				return nil, fmt.Errorf("dont_reuse_encryption_keys")
+			}
+
 			if err := os.WriteFile(randomFile, []byte(properties["encryptionKey"]), 0600); err != nil {
-				return nil, fmt.Errorf("failed to write encryption key to file: %w", err)
+				return nil, fmt.Errorf("failed_to_write_encryption_key")
 			}
 
 			properties["keylocation"] = fmt.Sprintf("file://%s", randomFile)
+			properties["keyformat"] = "passphrase"
 		}
 
 		delete(properties, "encryptionKey")
+	}
+
+	if _, ok := properties["quota"]; ok {
+		if properties["quota"] == "" {
+			delete(properties, "quota")
+		}
 	}
 
 	if properties != nil {

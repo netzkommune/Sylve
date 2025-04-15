@@ -28,3 +28,12 @@ export function generateNumberFromString(str: string): number {
 	}
 	return hash >>> 0;
 }
+
+export function isValidSize(value: string): boolean {
+	try {
+		const parsed = humanFormat.parse(value);
+		return parsed !== null && !isNaN(parsed);
+	} catch (e) {
+		return false;
+	}
+}

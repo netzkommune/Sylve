@@ -8,6 +8,8 @@
  * under sponsorship from the FreeBSD Foundation.
  */
 
+import { Mnemonic } from './vendor/mnemonic';
+
 export function capitalizeFirstLetter(str: string): string {
 	return str.length > 0 ? str[0].toLocaleUpperCase() + str.slice(1) : str;
 }
@@ -31,4 +33,8 @@ export function parseJwt(token: string) {
 export function shortenString(str: string, maxLength: number): string {
 	if (str.length <= maxLength) return str;
 	return str.slice(0, maxLength) + '...';
+}
+
+export function generatePassword(): string {
+	return new Mnemonic().toWords().slice(0, 6).join('-');
 }

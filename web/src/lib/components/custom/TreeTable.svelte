@@ -38,12 +38,14 @@
 		});
 	});
 
+	let mouseOverRow = $state(false);
+
 	$effect(() => {
 		if (data.rows.length > 0) {
 			untrack(() => {
 				if (parentActiveRow === null) {
 					if (table) {
-						table?.updateOrAddData(data.rows);
+						table?.replaceData(data.rows);
 					}
 				}
 			});
@@ -71,7 +73,10 @@
 				dataTree: true,
 				dataTreeChildField: 'children',
 				columns: columns,
-				dataTreeStartExpanded: true
+				dataTreeStartExpanded: true,
+				persistence: {
+					sort: true
+				}
 			});
 		}
 
@@ -103,9 +108,13 @@
 
 			row.select();
 		});
+
+		table?.on('rowMouseMove', function (e, row) {
+			mouseOverRow = true;
+		});
 	});
 </script>
 
 <div class="flex h-full flex-col">
-	<div bind:this={tableComponent} class="flex-1 overflow-auto"></div>
+	<div bind:this={tableComponent} class="flex-1 overflow-auto" id={name}></div>
 </div>

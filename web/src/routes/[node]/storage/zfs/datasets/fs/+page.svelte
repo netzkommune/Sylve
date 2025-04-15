@@ -2,6 +2,7 @@
 	import {
 		createFileSystem,
 		createSnapshot,
+		deleteFileSystem,
 		deleteSnapshot,
 		getDatasets
 	} from '$lib/api/zfs/datasets';
@@ -19,11 +20,16 @@
 	import type { Row } from '$lib/types/components/tree-table';
 	import { type Dataset, type GroupedByPool } from '$lib/types/zfs/dataset';
 	import type { Zpool } from '$lib/types/zfs/pool';
-	import { generateTableData, groupByPool } from '$lib/utils/zfs/dataset';
+	import { isValidSize } from '$lib/utils/numbers';
+	import { generatePassword } from '$lib/utils/string';
+	import { deleteRowByFieldValue } from '$lib/utils/table';
+	import { isValidPoolName } from '$lib/utils/zfs';
+	import { createFSProps, generateTableData, groupByPool } from '$lib/utils/zfs/dataset';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
 	import humanFormat, { type ParsedInfo, type ScaleLike } from 'human-format';
 	import { tick, untrack } from 'svelte';
+	import toast from 'svelte-french-toast';
 
 	interface Data {
 		pools: Zpool[];
@@ -31,6 +37,7 @@
 	}
 
 	let { data }: { data: Data } = $props();
+	let tableName = 'tt-zfsDatasets';
 
 	const results = useQueries([
 		{
@@ -80,11 +87,13 @@
 	});
 
 	$effect(() => {
-		console.log(activeDataset);
+		if (activeDataset && confirmModals.active === 'createFilesystem') {
+			confirmModals.createFilesystem.data.properties.parent = activeDataset.name;
+		}
 	});
 
 	let confirmModals = $state({
-		active: '' as 'deleteSnapshot' | 'createSnapshot' | 'createFilesystem',
+		active: '' as 'deleteSnapshot' | 'createSnapshot' | 'createFilesystem' | 'deleteFilesystem',
 		parent: 'filesystem' as 'filesystem' | 'snapshot',
 		deleteSnapshot: {
 			open: false,
@@ -114,6 +123,12 @@
 					quota: ''
 				}
 			},
+			title: '',
+			showKey: false
+		},
+		deleteFilesystem: {
+			open: false,
+			data: '',
 			title: ''
 		}
 	});
@@ -138,12 +153,51 @@
 		}
 
 		if (confirmModals.active === 'createFilesystem') {
+			if (!isValidPoolName(confirmModals.createFilesystem.data.name)) {
+				toast.error('Invalid name', {
+					position: 'bottom-center'
+				});
+				return;
+			}
+
+			if (!confirmModals.createFilesystem.data.properties.parent) {
+				toast.error('No parent selected', {
+					position: 'bottom-center'
+				});
+				return;
+			}
+
+			if (confirmModals.createFilesystem.data.properties.encryption !== 'off') {
+				if (confirmModals.createFilesystem.data.properties.encryptionKey === '') {
+					toast.error('Encryption key is required', {
+						position: 'bottom-center'
+					});
+					return;
+				}
+			}
+
+			if (confirmModals.createFilesystem.data.properties.quota !== '') {
+				if (!isValidSize(confirmModals.createFilesystem.data.properties.quota)) {
+					toast.error('Invalid quota size', {
+						position: 'bottom-center'
+					});
+					return;
+				}
+			}
+
 			await createFileSystem(
 				confirmModals.createFilesystem.data.name,
 				confirmModals.createFilesystem.data.properties.parent,
 				confirmModals.createFilesystem.data.properties
 			);
 			activeRow = null;
+		}
+
+		if (confirmModals.active === 'deleteFilesystem') {
+			if (activeDataset) {
+				await deleteFileSystem(activeDataset);
+				activeRow = null;
+			}
 		}
 
 		confirmModals[confirmModals.active].open = false;
@@ -153,9 +207,9 @@
 			confirmModals.createSnapshot.data.recursive = false;
 		}
 
-		if (confirmModals.active === 'deleteSnapshot') {
-			confirmModals.deleteSnapshot.data = '';
-			confirmModals.deleteSnapshot.title = '';
+		if (confirmModals.active === 'deleteSnapshot' || confirmModals.active === 'deleteFilesystem') {
+			confirmModals[confirmModals.active].data = '';
+			confirmModals[confirmModals.active].title = '';
 		}
 
 		if (confirmModals.active === 'createFilesystem') {
@@ -202,126 +256,7 @@
 		}
 	});
 
-	let zfsProperties = $state({
-		atime: [
-			{
-				label: 'on',
-				value: 'on'
-			},
-			{
-				label: 'off',
-				value: 'off'
-			}
-		],
-		checksum: [
-			{
-				label: 'on',
-				value: 'on'
-			},
-			{
-				label: 'off',
-				value: 'off'
-			},
-			{
-				label: 'fletcher2',
-				value: 'fletcher2'
-			},
-			{
-				label: 'fletcher4',
-				value: 'fletcher4'
-			},
-			{
-				label: 'sha256',
-				value: 'sha256'
-			},
-			{
-				label: 'noparity',
-				value: 'noparity'
-			}
-		],
-		compression: [
-			{
-				label: 'on',
-				value: 'on'
-			},
-			{
-				label: 'off',
-				value: 'off'
-			},
-			{
-				label: 'gzip',
-				value: 'gzip'
-			},
-			{
-				label: 'lz4',
-				value: 'lz4'
-			},
-			{
-				label: 'lzjb',
-				value: 'lzjb'
-			},
-			{
-				label: 'zle',
-				value: 'zle'
-			},
-			{
-				label: 'zstd',
-				value: 'zstd'
-			},
-			{
-				label: 'zstd-fast',
-				value: 'zstd-fast'
-			}
-		],
-		dedup: [
-			{
-				label: 'off',
-				value: 'off'
-			},
-			{
-				label: 'on',
-				value: 'on'
-			},
-			{
-				label: 'Verify',
-				value: 'verify'
-			}
-		],
-		encryption: [
-			{
-				label: 'off',
-				value: 'off'
-			},
-			{
-				label: 'on',
-				value: 'on'
-			},
-			{
-				label: 'aes-128-ccm',
-				value: 'aes-128-ccm'
-			},
-			{
-				label: 'aes-192-ccm',
-				value: 'aes-192-ccm'
-			},
-			{
-				label: 'aes-256-ccm',
-				value: 'aes-256-ccm'
-			},
-			{
-				label: 'aes-128-gcm',
-				value: 'aes-128-gcm'
-			},
-			{
-				label: 'aes-192-gcm',
-				value: 'aes-192-gcm'
-			},
-			{
-				label: 'aes-256-gcm',
-				value: 'aes-256-gcm'
-			}
-		]
-	});
+	let zfsProperties = $state(createFSProps);
 </script>
 
 {#snippet button(type: string)}
@@ -358,6 +293,24 @@
 			<Icon icon="carbon:ibm-cloud-vpc-block-storage-snapshots" class="mr-1 h-4 w-4" /> Create Snapshot
 		</Button>
 	{/if}
+
+	{#if type === 'delete-filesystem' && activeDataset?.type === 'filesystem' && activeDataset?.name.includes('/')}
+		<Button
+			on:click={async () => {
+				if (activeDataset) {
+					console.log(activeDataset);
+					confirmModals.active = 'deleteFilesystem';
+					confirmModals.parent = 'filesystem';
+					confirmModals.deleteFilesystem.open = true;
+					confirmModals.deleteFilesystem.title = activeDataset.name;
+				}
+			}}
+			size="sm"
+			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+		>
+			<Icon icon="mdi:delete" class="mr-1 h-4 w-4" /> Delete Filesystem
+		</Button>
+	{/if}
 {/snippet}
 
 <div class="flex h-full w-full flex-col">
@@ -377,13 +330,14 @@
 
 		{@render button('delete-snapshot')}
 		{@render button('create-snapshot')}
+		{@render button('delete-filesystem')}
 	</div>
 	<div class="relative flex h-full w-full cursor-pointer flex-col">
 		<div class="flex-1">
 			<div class="h-full overflow-y-auto">
 				<TreeTable
 					data={tableData}
-					name="tt-zfsDatasets"
+					name={tableName}
 					parentIcon={'carbon:partition-collection'}
 					itemIcon={'eos-icons:file-system'}
 					bind:parentActiveRow={activeRow}
@@ -393,11 +347,11 @@
 	</div>
 </div>
 
-{#if confirmModals.active == 'deleteSnapshot'}
+{#if confirmModals.active == 'deleteSnapshot' || confirmModals.active == 'deleteFilesystem'}
 	<AlertDialogModal
 		open={confirmModals.active && confirmModals[confirmModals.active].open}
 		names={{
-			parent: 'snapshot',
+			parent: confirmModals.parent,
 			element: confirmModals.active ? confirmModals[confirmModals.active].title || '' : ''
 		}}
 		actions={{
@@ -680,23 +634,32 @@
 
 					{#if confirmModals.createFilesystem.data.properties.encryption !== 'off'}
 						<div class="space-y-1">
-							<Label class="w-24 whitespace-nowrap text-sm "></Label>
-							<div class="space-x-2 space-y-1 pt-6">
+							<Label class="w-24 whitespace-nowrap text-sm">Passphrase</Label>
+							<div class="flex w-full max-w-sm items-center space-x-2">
 								<Input
-									type="text"
-									placeholder="Enter or generate encryption key"
+									type="password"
+									id="d-passphrase"
+									placeholder="Enter or generate passphrase"
 									class="w-full"
 									autocomplete="off"
 									bind:value={confirmModals.createFilesystem.data.properties.encryptionKey}
 								/>
-								<div class="flex justify-end">
-									<!-- <Button size="sm" variant="outline">Generate</Button> -->
-									<Badge
-										variant="secondary"
-										class="cursor-pointer rounded-md bg-blue-600 px-2 py-0.5 hover:bg-blue-700"
-										>Generate</Badge
-									>
-								</div>
+
+								<Button
+									onclick={() => {
+										confirmModals.createFilesystem.data.properties.encryptionKey =
+											generatePassword();
+									}}
+								>
+									<Icon
+										icon="fad:random-2dice"
+										class="h-6 w-6"
+										onclick={() => {
+											confirmModals.createFilesystem.data.properties.encryptionKey =
+												generatePassword();
+										}}
+									/>
+								</Button>
 							</div>
 						</div>
 					{/if}
@@ -705,17 +668,12 @@
 						<Label class="w-24 whitespace-nowrap text-sm">Quota</Label>
 						<Input
 							type="text"
-							class="w-full text-right"
+							class="w-full text-left"
 							min="0"
 							max={remainingSpace}
 							bind:value={confirmModals.createFilesystem.data.properties.quota}
-							placeholder="0B"
+							placeholder="256M (Empty for no quota)"
 						/>
-						<div class="flex justify-end">
-							<span class="text-muted-foreground text-sm">
-								Size: {humanFormat(currentPartition)}
-							</span>
-						</div>
 					</div>
 				</div>
 			</div>

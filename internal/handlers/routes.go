@@ -106,6 +106,7 @@ func RegisterRoutes(r *gin.Engine,
 			datasets.DELETE("/snapshot/:guid", zfsHandlers.DeleteSnapshot(zfsService))
 
 			datasets.POST("/filesystem", zfsHandlers.CreateFilesystem(zfsService))
+			datasets.DELETE("/filesystem/:guid", zfsHandlers.DeleteFilesystem(zfsService))
 		}
 	}
 

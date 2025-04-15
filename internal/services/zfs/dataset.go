@@ -1,7 +1,16 @@
+// SPDX-License-Identifier: BSD-2-Clause
+//
+// Copyright (c) 2025 The FreeBSD Foundation.
+//
+// This software was developed by Hayzam Sherif <hayzam@alchemilla.io>
+// of Alchemilla Ventures Pvt. Ltd. <hello@alchemilla.io>,
+// under sponsorship from the FreeBSD Foundation.
+
 package zfs
 
 import (
 	"fmt"
+	"os"
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
 	"sylve/pkg/zfs"
 )
@@ -129,4 +138,51 @@ func (s *Service) CreateFilesystem(name string, props map[string]string) error {
 	}
 
 	return fmt.Errorf("failed to create filesystem %s", name)
+}
+
+func (s *Service) DeleteFilesystem(guid string) error {
+	datasets, err := zfs.Datasets("")
+	if err != nil {
+		return err
+	}
+
+	for _, dataset := range datasets {
+		properties, err := dataset.GetAllProperties()
+		if err != nil {
+			return err
+		}
+
+		var keylocation string
+		found := false
+
+		for k, v := range properties {
+			if v == guid {
+				found = true
+			}
+			if k == "keylocation" {
+				keylocation = v
+			}
+		}
+
+		if found {
+			if err := dataset.Destroy(zfs.DestroyDefault); err != nil {
+				return err
+			}
+
+			if keylocation != "" {
+				keylocation = keylocation[7:]
+				if _, err := os.Stat(keylocation); err == nil {
+					if err := os.Remove(keylocation); err != nil {
+						return err
+					}
+				} else {
+					fmt.Println("Keylocation file not found", keylocation)
+				}
+			}
+
+			return nil
+		}
+	}
+
+	return fmt.Errorf("filesystem with guid %s not found", guid)
 }

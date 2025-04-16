@@ -6,10 +6,10 @@
 	import * as Resizable from '$lib/components/ui/resizable';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 	import { hostname } from '$lib/stores/basic';
+	import { getTranslation } from '$lib/utils/i18n';
 	import { triggers } from '$lib/utils/keyboard-shortcuts';
 	import { shortcut, type ShortcutTrigger } from '@svelte-put/shortcut';
 	import CircleHelp from 'lucide-svelte/icons/circle-help';
-	import { onMount } from 'svelte';
 
 	let openCategories: { [key: string]: boolean } = $state({});
 
@@ -31,29 +31,29 @@
 			href: `/${node}/notes`
 		},
 		{
-			label: 'Storage',
+			label: 'storage',
 			icon: 'mdi:storage',
 			children: [
 				{
-					label: 'Disks',
+					label: 'disks',
 					icon: 'mdi:harddisk',
 					href: `/${node}/storage/disks`
 				},
 				{
-					label: 'ZFS',
+					label: 'zfs',
 					icon: 'file-icons:openzfs',
 					children: [
 						{
-							label: 'Pools',
+							label: 'pools',
 							icon: 'bi:hdd-stack-fill',
 							href: `/${node}/storage/zfs/pools`
 						},
 						{
-							label: 'Datasets',
+							label: 'datasets',
 							icon: 'material-symbols:dataset',
 							children: [
 								{
-									label: 'File Systems',
+									label: 'file_systems',
 									icon: 'eos-icons:file-system',
 									href: `/${node}/storage/zfs/datasets/fs`
 								}
@@ -69,78 +69,6 @@
 		}
 	]);
 
-	const hundredItems = $state([
-		{
-			label: 'Search',
-			icon: 'mdi:magnify'
-		},
-		{
-			label: 'Summary',
-			icon: 'basil:document-outline'
-		},
-		{
-			label: 'Resources',
-			icon: 'arcticons:notes'
-		},
-		{
-			label: 'Network',
-			icon: 'fa-solid:server'
-		},
-		{
-			label: 'DNS',
-			icon: 'tabler:fingerprint'
-		},
-		{
-			label: 'Options',
-			icon: 'material-symbols-light:settings-outline-rounded'
-		},
-		{
-			label: 'Task History',
-			icon: 'mdi:database'
-		},
-		{
-			label: 'Backup',
-			icon: 'tdesign:system-storage'
-		},
-		{
-			label: 'Replication',
-			icon: 'icomoon-free:loop'
-		},
-		{
-			label: 'Snapshots',
-			icon: 'icomoon-free:loop'
-		},
-		{
-			label: 'Permissions',
-			icon: 'bi:unlock-fill'
-		},
-		{
-			label: 'Firewall',
-			icon: 'mdi:home',
-			children: [
-				{
-					label: 'Options',
-					icon: 'mdi:phone',
-					href: ''
-				},
-				{
-					label: 'Alias',
-					icon: 'mdi:phone',
-					href: ''
-				},
-				{
-					label: 'IPSet',
-					icon: 'mdi:phone',
-					href: ''
-				},
-				{
-					label: 'Log',
-					icon: 'mdi:phone',
-					href: ''
-				}
-			]
-		}
-	]);
 	interface Props {
 		children?: import('svelte').Snippet;
 	}
@@ -150,7 +78,7 @@
 	let mainTree = $derived.by(() => {
 		const pathname = page.url.pathname;
 		const shouldShowHundredItems = /1|local/.test(pathname);
-		return shouldShowHundredItems ? hundredItems : nodeItems;
+		return shouldShowHundredItems ? [] : nodeItems;
 	});
 
 	$effect(() => {
@@ -168,7 +96,7 @@
 
 <div class="flex h-full w-full flex-col">
 	<div class="flex h-10 w-full items-center justify-between border-b p-2">
-		<p>Datacenter</p>
+		<p>{getTranslation('common.datacenter', 'Datacenter')}</p>
 		<Button size="sm" class="h-6 ">
 			<CircleHelp class="mr-2 h-3 w-3" />
 			Help
@@ -181,7 +109,7 @@
 		id="main-pane-auto"
 		autoSaveId="main-pane-auto-save"
 	>
-		<Resizable.Pane>
+		<Resizable.Pane defaultSize={22}>
 			<div class="h-full px-1.5">
 				<div class="h-full overflow-y-auto">
 					<nav aria-label="Difuse-sidebar" class="menu thin-scrollbar w-full">

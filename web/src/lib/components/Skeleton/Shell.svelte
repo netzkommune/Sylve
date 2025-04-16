@@ -27,7 +27,7 @@
 						id="child-left-pane-auto"
 						autoSaveId="child-left-pane-auto-save"
 					>
-						<Resizable.Pane>
+						<Resizable.Pane defaultSize={16}>
 							<LeftPanel />
 						</Resizable.Pane>
 
@@ -41,7 +41,7 @@
 
 				<Resizable.Handle withHandle />
 
-				<Resizable.Pane class="h-full min-h-20">
+				<Resizable.Pane class="h-full min-h-20" defaultSize={10}>
 					<BottomPanel />
 				</Resizable.Pane>
 			</Resizable.PaneGroup>

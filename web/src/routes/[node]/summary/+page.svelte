@@ -14,6 +14,7 @@
 	import type { CPUInfo, CPUInfoHistorical } from '$lib/types/info/cpu';
 	import type { RAMInfo } from '$lib/types/info/ram';
 	import type { IODelay, IODelayHistorical } from '$lib/types/zfs/pool';
+	import { getTranslation } from '$lib/utils/i18n';
 	import { bytesToHumanReadable, floatToNDecimals } from '$lib/utils/numbers';
 	import { secondsToHoursAgo } from '$lib/utils/time';
 	import { getTotalDiskUsage } from '$lib/utils/zfs';
@@ -133,10 +134,13 @@
 							<div>
 								<div class="flex w-full justify-between pb-1">
 									<p class="inline-flex items-center">
-										<Icon icon="solar:cpu-bold" class="mr-1 h-5 w-5" />CPU Usage
+										<Icon icon="solar:cpu-bold" class="mr-1 h-5 w-5" />
+										{getTranslation('summary.cpu_usage', 'CPU Usage')}
 									</p>
 									<p>
-										{floatToNDecimals(cpuInfo.usage, 2)}% of {cpuInfo.logicalCores} CPU(s)
+										{floatToNDecimals(cpuInfo.usage, 2)}% {getTranslation('common.of', 'of')}
+										{cpuInfo.logicalCores}
+										{getTranslation('summary.CPU_s', 'CPU(s)')}
 									</p>
 								</div>
 								<Progress value={cpuInfo.usage || 0} max={100} class="h-2 w-[100%] " />
@@ -144,7 +148,8 @@
 							<div>
 								<div class="flex w-full justify-between pb-1">
 									<p class="inline-flex items-center">
-										<Icon icon="ri:ram-fill" class="mr-1 h-5 w-5" />RAM Usage
+										<Icon icon="ri:ram-fill" class="mr-1 h-5 w-5" />
+										{getTranslation('summary.ram_usage', 'RAM Usage')}
 									</p>
 									<p>
 										{floatToNDecimals(ramInfo.usedPercent, 2)}% of {bytesToHumanReadable(
@@ -157,7 +162,10 @@
 							<div>
 								<div class="flex w-full justify-between pb-1">
 									<p class="inline-flex items-center">
-										<Icon icon="bxs:server" class="mr-1 h-5 w-5" />Disk Usage
+										<Icon icon="bxs:server" class="mr-1 h-5 w-5" />{getTranslation(
+											'summary.disk_usage',
+											'Disk Usage'
+										)}
 									</p>
 									<p>
 										{floatToNDecimals(totalDiskUsage, 2)} %
@@ -172,7 +180,8 @@
 							<div>
 								<div class="flex w-full justify-between pb-1">
 									<p class="inline-flex items-center">
-										<Icon icon="lets-icons:time-light" class="mr-1 h-5 w-5" />I/O Delay
+										<Icon icon="lets-icons:time-light" class="mr-1 h-5 w-5" />
+										{getTranslation('summary.io_delay', 'I/O Delay')}
 									</p>
 									<p>{floatToNDecimals(ioDelay.delay, 3) || 0} %</p>
 								</div>
@@ -185,7 +194,10 @@
 							<div>
 								<div class="flex w-full justify-between pb-1">
 									<p class="inline-flex items-center">
-										<Icon icon="ic:baseline-loop" class="mr-1 h-5 w-5" />SWAP usage
+										<Icon icon="ic:baseline-loop" class="mr-1 h-5 w-5" />{getTranslation(
+											'summary.swap_usage',
+											'Swap Usage'
+										)}
 									</p>
 									<p>
 										{floatToNDecimals(swapInfo.usedPercent, 2)}% of {bytesToHumanReadable(
@@ -200,25 +212,35 @@
 						<Table.Root class="mt-5">
 							<Table.Body>
 								<Table.Row>
-									<Table.Cell class="p-1.5 px-4">CPU(s)</Table.Cell>
+									<Table.Cell class="p-1.5 px-4"
+										>{getTranslation('summary.CPU_s', 'CPU(s)')}</Table.Cell
+									>
 									<Table.Cell class="p-1.5 px-4">{cpuInfo.logicalCores} x {cpuInfo.name}</Table.Cell
 									>
 								</Table.Row>
 								<Table.Row>
-									<Table.Cell class="p-1.5 px-4">Operating System</Table.Cell>
+									<Table.Cell class="p-1.5 px-4"
+										>{getTranslation('summary.operating_system', 'Operating System')}</Table.Cell
+									>
 									<Table.Cell class="p-1.5 px-4">{basicInfo.os}</Table.Cell>
 								</Table.Row>
 								<Table.Row>
-									<Table.Cell class="p-1.5 px-4">Load Average</Table.Cell>
+									<Table.Cell class="p-1.5 px-4"
+										>{getTranslation('summary.load_average', 'Load Average')}</Table.Cell
+									>
 									<Table.Cell class="p-1.5 px-4">{basicInfo.loadAverage}</Table.Cell>
 								</Table.Row>
 								<Table.Row>
-									<Table.Cell class="p-1.5 px-4">Boot Mode</Table.Cell>
+									<Table.Cell class="p-1.5 px-4"
+										>{getTranslation('summary.boot_mode', 'Boot Mode')}</Table.Cell
+									>
 									<Table.Cell class="p-1.5 px-4">{basicInfo.bootMode}</Table.Cell>
 								</Table.Row>
 
 								<Table.Row>
-									<Table.Cell class="p-1.5 px-4">Sylve Version</Table.Cell>
+									<Table.Cell class="p-1.5 px-4"
+										>{getTranslation('summary.sylve_version', 'Sylve Version')}</Table.Cell
+									>
 									<Table.Cell class="p-1.5 px-4">{basicInfo.sylveVersion}</Table.Cell>
 								</Table.Row>
 							</Table.Body>
@@ -230,7 +252,7 @@
 					<Card.Header>
 						<Card.Title>
 							<div class="flex items-center justify-between space-x-2">
-								<p>CPU Usage</p>
+								<p>{getTranslation('summary.cpu_usage', 'CPU Usage')}</p>
 							</div>
 						</Card.Title>
 					</Card.Header>
@@ -238,8 +260,16 @@
 						<LineGraph
 							data={[cpuHistoricalData, ioDelayHistoricalData]}
 							keys={[
-								{ key: 'cpuUsage', title: 'CPU Usage', color: 'hsl(0, 50%, 50%)' },
-								{ key: 'ioDelay', title: 'I/O Delay', color: 'hsl(50, 50%, 50%)' }
+								{
+									key: 'cpuUsage',
+									title: getTranslation('summary.cpu_usage', 'CPU Usage'),
+									color: 'hsl(0, 50%, 50%)'
+								},
+								{
+									key: 'ioDelay',
+									title: getTranslation('summary.io_delay', 'I/O Delay'),
+									color: 'hsl(50, 50%, 50%)'
+								}
 							]}
 						/>
 					</Card.Content>

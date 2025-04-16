@@ -4,7 +4,8 @@
 		createSnapshot,
 		deleteFileSystem,
 		deleteSnapshot,
-		getDatasets
+		getDatasets,
+		rollbackSnapshot
 	} from '$lib/api/zfs/datasets';
 	import { getPools } from '$lib/api/zfs/pool';
 	import AlertDialogModal from '$lib/components/custom/AlertDialog.svelte';
@@ -93,7 +94,12 @@
 	});
 
 	let confirmModals = $state({
-		active: '' as 'deleteSnapshot' | 'createSnapshot' | 'createFilesystem' | 'deleteFilesystem',
+		active: '' as
+			| 'deleteSnapshot'
+			| 'createSnapshot'
+			| 'rollbackSnapshot'
+			| 'createFilesystem'
+			| 'deleteFilesystem',
 		parent: 'filesystem' as 'filesystem' | 'snapshot',
 		deleteSnapshot: {
 			open: false,
@@ -105,6 +111,13 @@
 			data: {
 				name: '',
 				recursive: false
+			},
+			title: ''
+		},
+		rollbackSnapshot: {
+			open: false,
+			data: {
+				name: ''
 			},
 			title: ''
 		},
@@ -148,6 +161,13 @@
 					confirmModals.createSnapshot.data.name,
 					confirmModals.createSnapshot.data.recursive
 				);
+				activeRow = null;
+			}
+		}
+
+		if (confirmModals.active === 'rollbackSnapshot') {
+			if (activeDataset) {
+				await rollbackSnapshot(activeDataset.properties.guid || '');
 				activeRow = null;
 			}
 		}
@@ -207,7 +227,11 @@
 			confirmModals.createSnapshot.data.recursive = false;
 		}
 
-		if (confirmModals.active === 'deleteSnapshot' || confirmModals.active === 'deleteFilesystem') {
+		if (
+			confirmModals.active === 'deleteSnapshot' ||
+			confirmModals.active === 'deleteFilesystem' ||
+			confirmModals.active === 'rollbackSnapshot'
+		) {
 			confirmModals[confirmModals.active].data = '';
 			confirmModals[confirmModals.active].title = '';
 		}
@@ -260,6 +284,24 @@
 </script>
 
 {#snippet button(type: string)}
+	{#if type === 'rollback-snapshot' && activeDataset?.type === 'snapshot'}
+		<Button
+			on:click={async () => {
+				if (activeDataset) {
+					confirmModals.active = 'rollbackSnapshot';
+					confirmModals.parent = 'snapshot';
+					confirmModals.rollbackSnapshot.open = true;
+					confirmModals.rollbackSnapshot.data.name = activeDataset.name;
+					confirmModals.rollbackSnapshot.title = activeDataset.name;
+				}
+			}}
+			size="sm"
+			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+		>
+			<Icon icon="eos-icons:snapshot-rollback" class="mr-1 h-4 w-4" /> Rollback To Snapshot
+		</Button>
+	{/if}
+
 	{#if type === 'delete-snapshot' && activeDataset?.type === 'snapshot'}
 		<Button
 			on:click={async () => {
@@ -328,8 +370,9 @@
 			<Icon icon="gg:add" class="mr-1 h-4 w-4" /> New
 		</Button>
 
-		{@render button('delete-snapshot')}
 		{@render button('create-snapshot')}
+		{@render button('rollback-snapshot')}
+		{@render button('delete-snapshot')}
 		{@render button('delete-filesystem')}
 	</div>
 	<div class="relative flex h-full w-full cursor-pointer flex-col">
@@ -350,6 +393,29 @@
 {#if confirmModals.active == 'deleteSnapshot' || confirmModals.active == 'deleteFilesystem'}
 	<AlertDialogModal
 		open={confirmModals.active && confirmModals[confirmModals.active].open}
+		names={{
+			parent: confirmModals.parent,
+			element: confirmModals.active ? confirmModals[confirmModals.active].title || '' : ''
+		}}
+		actions={{
+			onConfirm: () => {
+				if (confirmModals.active) {
+					confirmAction();
+				}
+			},
+			onCancel: () => {
+				if (confirmModals.active) {
+					confirmModals[confirmModals.active].open = false;
+				}
+			}
+		}}
+	></AlertDialogModal>
+{/if}
+
+{#if confirmModals.active === 'rollbackSnapshot'}
+	<AlertDialogModal
+		open={confirmModals.active && confirmModals[confirmModals.active].open}
+		customTitle={`Are you sure you would like to rollback to <b>${confirmModals[confirmModals.active].data.name}</b>?`}
 		names={{
 			parent: confirmModals.parent,
 			element: confirmModals.active ? confirmModals[confirmModals.active].title || '' : ''

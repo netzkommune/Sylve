@@ -29,6 +29,11 @@ type CreateFilesystemRequest struct {
 	Properties map[string]string `json:"properties"`
 }
 
+type RollbackSnapshotRequest struct {
+	GUID              string `json:"guid" binding:"required"`
+	DestroyMoreRecent bool   `json:"destroyMoreRecent"`
+}
+
 // @Summary Get all ZFS datasets
 // @Description Get all ZFS datasets
 // @Tags ZFS
@@ -135,6 +140,39 @@ func CreateSnapshot(zfsService *zfs.Service) gin.HandlerFunc {
 		c.JSON(http.StatusOK, internal.APIResponse[any]{
 			Status:  "success",
 			Message: "created_snapshot",
+			Error:   "",
+			Data:    nil,
+		})
+	}
+}
+
+func RollbackSnapshot(zfsService *zfs.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var request RollbackSnapshotRequest
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		err := zfsService.RollbackSnapshot(request.GUID, request.DestroyMoreRecent)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "rolled_back_snapshot",
 			Error:   "",
 			Data:    nil,
 		})

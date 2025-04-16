@@ -7,6 +7,8 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
+	import { hostname, language as langStore } from '$lib/stores/basic';
+	import { getTranslation } from '$lib/utils/i18n';
 	import { mode } from 'mode-watcher';
 	import { _ } from 'svelte-i18n';
 
@@ -24,8 +26,8 @@
 
 	let username = $state('');
 	let password = $state('');
-	let authType = $state('');
-	let language = $state('');
+	let authType = $state('sylve');
+	let language = $state('en');
 	let remember = $state(false);
 
 	$effect(() => {
@@ -76,25 +78,35 @@
 					onSelectedChange={(v) => {
 						authType = v?.value as string;
 					}}
+					selected={{
+						label: getTranslation(`auth.${authType}`, authType),
+						value: authType
+					}}
 				>
 					<Select.Trigger class="h-8 w-full">
 						<Select.Value placeholder={$_('auth.select_authentication')} />
 					</Select.Trigger>
 					<Select.Content>
-						<Select.Item value="pam">{$_('auth.pam_standard_authentication')}</Select.Item>
-						<Select.Item value="sylve">{$_('auth.sylve_authentication')}</Select.Item>
+						<Select.Item value="pam">{$_('auth.pam')}</Select.Item>
+						<Select.Item value="sylve">{$_('auth.sylve')}</Select.Item>
 					</Select.Content>
 				</Select.Root>
 			</div>
 
 			<div class="flex items-center gap-2">
 				<Label for="language" class="w-44">{$_('auth.language')}</Label>
-				<Select.Root onSelectedChange={(v) => (language = v?.value as string)}>
+				<Select.Root
+					onSelectedChange={(v) => (language = v?.value as string)}
+					selected={{
+						label: getTranslation(`common.languages.${language}`, language),
+						value: language
+					}}
+				>
 					<Select.Trigger class="h-8 w-full">
 						<Select.Value placeholder={$_('auth.select_language')} />
 					</Select.Trigger>
 					<Select.Content>
-						<Select.Item value="en">Default (English)</Select.Item>
+						<Select.Item value="en">English</Select.Item>
 						<Select.Item value="mal">Malayalam</Select.Item>
 					</Select.Content>
 				</Select.Root>

@@ -27,6 +27,7 @@ type ReplacingDevice struct {
 
 type Vdev struct {
 	Name             string            `json:"name"`
+	GUID             string            `json:"guid"`
 	Alloc            uint64            `json:"alloc"`
 	Free             uint64            `json:"free"`
 	Size             uint64            `json:"size"`
@@ -39,7 +40,9 @@ type Vdev struct {
 
 type Zpool struct {
 	z             *zfs        `json:"-"`
+	ID            string      `json:"id"` /* Same as GUID but for ease of use in Tabulator*/
 	Name          string      `json:"name"`
+	GUID          string      `json:"guid"`
 	Health        string      `json:"health"`
 	Allocated     uint64      `json:"allocated"`
 	Size          uint64      `json:"size"`
@@ -113,10 +116,29 @@ func (z *Zpool) parseLine(line []string) error {
 	case "leaked":
 		err = setUint(&z.Leaked, val)
 	case "dedupratio":
-		// Trim trailing "x" before parsing float64
 		z.DedupRatio, err = strconv.ParseFloat(val[:len(val)-1], 64)
+	case "guid":
+		setString(&z.GUID, val)
+		setString(&z.ID, val)
 	}
 	return err
+}
+
+func (z *zfs) GetZpoolGUID(name string) (uint64, error) {
+	args := zpoolArgs
+	args = append(args, name)
+	out, err := z.zpoolOutput(args...)
+	if err != nil {
+		return 0, err
+	}
+
+	for _, line := range out {
+		if line[1] == "guid" {
+			return utils.StringToUint64(line[2]), nil
+		}
+	}
+
+	return 0, fmt.Errorf("failed to get GUID for pool %s", name)
 }
 
 func (z *zfs) GetZpool(name string) (*Zpool, error) {

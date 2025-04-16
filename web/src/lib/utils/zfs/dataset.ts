@@ -154,28 +154,29 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 	const rows: Row[] = [];
 	const columns: Column[] = [
 		{
-			key: 'id',
-			label: 'ID'
+			field: 'id',
+			title: 'ID',
+			visible: false
 		},
 		{
-			key: 'name',
-			label: 'Name'
+			field: 'name',
+			title: 'Name'
 		},
 		{
-			key: 'used',
-			label: 'Used'
+			field: 'used',
+			title: 'Used'
 		},
 		{
-			key: 'avail',
-			label: 'Available'
+			field: 'avail',
+			title: 'Available'
 		},
 		{
-			key: 'referenced',
-			label: 'Referenced'
+			field: 'referenced',
+			title: 'Referenced'
 		},
 		{
-			key: 'mountpoint',
-			label: 'Mount Point'
+			field: 'mountpoint',
+			title: 'Mount Point'
 		}
 	];
 

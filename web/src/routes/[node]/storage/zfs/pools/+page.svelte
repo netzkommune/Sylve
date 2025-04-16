@@ -16,7 +16,6 @@
 	import type { Zpool, ZpoolRaidType } from '$lib/types/zfs/pool';
 	import {
 		getDiskSize,
-		simplifyDisks,
 		stripDev,
 		zpoolUseableDisks,
 		zpoolUseablePartitions
@@ -66,7 +65,7 @@
 		{
 			queryKey: ['diskList'],
 			queryFn: async () => {
-				return await simplifyDisks(await listDisks());
+				return await listDisks();
 			},
 			refetchInterval: 1000,
 			keepPreviousData: true,
@@ -190,14 +189,14 @@
 			const removedContainers = modal.vdevContainers.slice(modal.vdevCount);
 			removedContainers.forEach((container) => {
 				container.disks.forEach((disk) => {
-					if (!useableDisks.some((ud) => ud.UUID === disk.UUID)) {
+					if (!useableDisks.some((ud) => ud.uuid === disk.uuid)) {
 						useableDisks = [...useableDisks, disk];
 					}
 				});
 				container.partitions.forEach((partition) => {
-					if (!useableDisks.some((ud) => ud.Partitions.some((p) => p.name === partition.name))) {
+					if (!useableDisks.some((ud) => ud.partitions.some((p) => p.name === partition.name))) {
 						const parentDisk = disks.find((d) =>
-							d.Partitions.some((p) => p.name === partition.name)
+							d.partitions.some((p) => p.name === partition.name)
 						);
 						if (parentDisk) {
 							useableDisks = [...useableDisks, { ...parentDisk }];
@@ -254,7 +253,7 @@
 
 		for (const vdev of modal.vdevContainers) {
 			const sizes = [
-				...(vdev.disks ?? []).map((d) => d.Size),
+				...(vdev.disks ?? []).map((d) => d.size),
 				...(vdev.partitions ?? []).map((p) => p.size)
 			].filter((size) => typeof size === 'number');
 
@@ -299,7 +298,7 @@
 
 		if (typeof diskId === 'string') {
 			return modal.vdevContainers.some((vdev) => {
-				return vdev.disks.some((disk) => disk.UUID === diskId);
+				return vdev.disks.some((disk) => disk.uuid === diskId);
 			});
 		}
 
@@ -323,25 +322,25 @@
 			};
 		}
 
-		const disk = disks.find((d) => d.UUID === diskId);
+		const disk = disks.find((d) => d.uuid === diskId);
 
 		if (disk) {
 			const existingDisk = modal.vdevContainers[containerId].disks.find(
-				(d) => d.UUID === disk.UUID
+				(d) => d.uuid === disk.uuid
 			);
 			if (!existingDisk) {
 				modal.vdevContainers[containerId].disks.push(disk);
-				useableDisks = useableDisks.filter((ud) => ud.UUID !== disk.UUID);
+				useableDisks = useableDisks.filter((ud) => ud.uuid !== disk.uuid);
 			}
 		}
 
 		if (!disk) {
 			const diskContainingPartition = disks.find((d) =>
-				d.Partitions.some((p) => p.name === diskId)
+				d.partitions.some((p) => p.name === diskId)
 			);
 
 			if (diskContainingPartition) {
-				const partition = diskContainingPartition.Partitions.find((p) => p.name === diskId);
+				const partition = diskContainingPartition.partitions.find((p) => p.name === diskId);
 				if (partition) {
 					const existingPartition = modal.vdevContainers[containerId].partitions.find(
 						(p) => p.name === partition.name
@@ -349,7 +348,7 @@
 					if (!existingPartition) {
 						modal.vdevContainers[containerId].partitions.push(partition);
 						useableDisks = useableDisks.filter(
-							(ud) => !ud.Partitions.some((p) => p.name === partition.name)
+							(ud) => !ud.partitions.some((p) => p.name === partition.name)
 						);
 					}
 				}
@@ -371,10 +370,10 @@
 		const vdev = modal.vdevContainers[id];
 		if (!vdev) return;
 
-		const diskIndex = vdev.disks.findIndex((d) => d.UUID === diskId);
+		const diskIndex = vdev.disks.findIndex((d) => d.uuid === diskId);
 		if (diskIndex !== -1) {
 			const removedDisk = vdev.disks.splice(diskIndex, 1)[0];
-			if (!useableDisks.some((ud) => ud.UUID === removedDisk.UUID)) {
+			if (!useableDisks.some((ud) => ud.uuid === removedDisk.uuid)) {
 				useableDisks = [...useableDisks, removedDisk];
 			}
 		}
@@ -383,11 +382,11 @@
 		if (partitionIndex !== -1) {
 			const removedPartition = vdev.partitions.splice(partitionIndex, 1)[0];
 			const parentDisk = disks.find((d) =>
-				d.Partitions.some((p) => p.name === removedPartition.name)
+				d.partitions.some((p) => p.name === removedPartition.name)
 			);
 			if (
 				parentDisk &&
-				!useableDisks.some((ud) => ud.Partitions.some((p) => p.name === removedPartition.name))
+				!useableDisks.some((ud) => ud.partitions.some((p) => p.name === removedPartition.name))
 			) {
 				useableDisks = [...useableDisks, { ...parentDisk }];
 			}
@@ -401,11 +400,11 @@
 		const vdev = modal.vdevContainers[id];
 		const disks = vdev?.disks || [];
 		const partitions = vdev?.partitions || [];
-		const diskSizes = disks.map((disk) => disk.Size);
+		const diskSizes = disks.map((disk) => disk.size);
 		const partSizes = partitions.map((partition) => partition.size);
 		const allSizes = [...diskSizes, ...partSizes];
 
-		const diskTypes = disks.map((disk) => disk.Type);
+		const diskTypes = disks.map((disk) => disk.type);
 		for (let i = 0; i < diskTypes.length - 1; i++) {
 			if (diskTypes[i] !== diskTypes[i + 1]) {
 				return 'Disks within a VDEV should ideally be the same type';
@@ -413,8 +412,8 @@
 		}
 
 		const partitionTypes = partitions.map((partition) => {
-			const disk = useableDisks.find((d) => d.Partitions.some((p) => p.name === partition.name));
-			return disk ? disk.Type : null;
+			const disk = useableDisks.find((d) => d.partitions.some((p) => p.name === partition.name));
+			return disk ? disk.type : null;
 		});
 
 		for (let i = 0; i < partitionTypes.length - 1; i++) {
@@ -487,7 +486,7 @@
 			vdevs: modal.vdevContainers.map((vdev) => ({
 				name: vdev.id,
 				devices: [
-					...vdev.disks.map((disk) => disk.Device),
+					...vdev.disks.map((disk) => disk.device),
 					...vdev.partitions.map((partition) => partition.name)
 				]
 			})),
@@ -532,7 +531,7 @@
 			const pool = pools.find((p) => p.name === poolName);
 			const vdev = pool?.vdevs.find((v) => v.devices.some((d) => d.name === oldName));
 			const oldDevice = vdev?.devices.find((d) => d.name === oldName);
-			const newDevice = useableDisks.find((d) => d.Device === newName);
+			const newDevice = useableDisks.find((d) => d.device === newName);
 			const disks = {
 				old: oldDevice,
 				new: newDevice
@@ -695,9 +694,9 @@
 		<div class="bg-primary/10 dark:bg-background mt-1 rounded-lg p-4">
 			<ScrollArea class="w-full whitespace-nowrap rounded-md" orientation="horizontal">
 				<div class="flex min-h-[80px] items-center justify-center gap-4">
-					{#each useableDisks.filter((disk) => disk.Type === type && disk.Partitions.length === 0 && !isDiskInVdev(disk.UUID)) as disk (disk.UUID)}
+					{#each useableDisks.filter((disk) => disk.type === type && disk.partitions.length === 0 && !isDiskInVdev(disk.uuid)) as disk (disk.uuid)}
 						<div class="text-center" animate:flip={{ duration: 300 }}>
-							<div class="cursor-move" use:draggable={disk.UUID ?? ''}>
+							<div class="cursor-move" use:draggable={disk.uuid ?? ''}>
 								{#if type === 'HDD'}
 									<Icon icon="mdi:harddisk" class="h-11 w-11 text-green-500" />
 								{:else if type === 'SSD'}
@@ -707,15 +706,15 @@
 								{/if}
 							</div>
 							<div class="max-w-[64px] truncate text-xs">
-								{disk.Device.replaceAll('/dev/', '')}
+								{disk.device.replaceAll('/dev/', '')}
 							</div>
 							<div class="text-muted-foreground text-xs">
-								{humanFormat(disk.Size)}
+								{humanFormat(disk.size)}
 							</div>
 						</div>
 					{/each}
 
-					{#if useableDisks.filter((disk) => disk.Type === type).length === 0 || useableDisks.filter((disk) => disk.Type === type && disk.Partitions.length === 0 && !isDiskInVdev(disk.UUID)).length === 0}
+					{#if useableDisks.filter((disk) => disk.type === type).length === 0 || useableDisks.filter((disk) => disk.type === type && disk.partitions.length === 0 && !isDiskInVdev(disk.uuid)).length === 0}
 						<div class="text-muted-foreground/80 flex h-16 w-full items-center justify-center">
 							No available disks
 						</div>
@@ -765,23 +764,23 @@
 {/snippet}
 
 {#snippet vdevContainer(id: number)}
-	{#each modal.vdevContainers[id]?.disks || [] as disk (disk.UUID)}
+	{#each modal.vdevContainers[id]?.disks || [] as disk (disk.uuid)}
 		<div animate:flip={{ duration: 300 }} class="relative">
-			{#if disk.Type === 'HDD'}
+			{#if disk.type === 'HDD'}
 				<Icon icon="mdi:harddisk" class="h-11 w-11 text-green-500" />
-			{:else if disk.Type === 'SSD'}
+			{:else if disk.type === 'SSD'}
 				<Icon icon="icon-park-outline:ssd" class="h-11 w-11 text-blue-500" />
-			{:else if disk.Type === 'NVMe'}
+			{:else if disk.type === 'NVMe'}
 				<Icon icon="bi:nvme" class="h-11 w-11 rotate-90 text-blue-500" />
 			{/if}
 
 			<div class="max-w-[48px] truncate text-center text-xs">
-				{disk.Device.split('/').pop()}
+				{disk.device.split('/').pop()}
 			</div>
 
 			<button
 				class="absolute -right-1 -top-1 rounded-full bg-red-500 p-0.5 text-white hover:bg-red-600"
-				onclick={() => removeFromVdev(id, disk.UUID as string)}
+				onclick={() => removeFromVdev(id, disk.uuid as string)}
 			>
 				<Icon icon="mdi:close" class="h-3 w-3" />
 			</button>
@@ -1511,8 +1510,8 @@
 					<Select.Root
 						selected={{
 							label:
-								useableDisks.find((d) => d.Device === confirmModals.replaceDevice.data?.new)
-									?.Device ||
+								useableDisks.find((d) => d.device === confirmModals.replaceDevice.data?.new)
+									?.device ||
 								useablePartitions.find((d) => d.name === confirmModals.replaceDevice.data?.new)
 									?.name,
 							value: confirmModals.replaceDevice.data?.new
@@ -1530,8 +1529,8 @@
 						<Select.Content class="max-h-36 overflow-y-auto">
 							<Select.Group>
 								{#each useableDisks as disk}
-									<Select.Item value={disk.Device} label={disk.Device}>
-										{disk.Device}
+									<Select.Item value={disk.device} label={disk.device}>
+										{disk.device}
 									</Select.Item>
 								{/each}
 

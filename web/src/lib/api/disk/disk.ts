@@ -1,15 +1,10 @@
 import { APIResponseSchema, type APIResponse } from '$lib/types/common';
-import {
-	DiskActionSchema,
-	DiskInfoSchema,
-	type Disk,
-	type DiskInfo,
-	type Partition
-} from '$lib/types/disk/disk';
+import { DiskSchema, type Disk } from '$lib/types/disk/disk';
 import { apiRequest } from '$lib/utils/http';
+import { z } from 'zod';
 
-export async function listDisks(): Promise<DiskInfo> {
-	return await apiRequest('/disk/list', DiskInfoSchema, 'GET');
+export async function listDisks(): Promise<Disk[]> {
+	return await apiRequest('/disk/list', z.array(DiskSchema), 'GET');
 }
 
 export async function destroyDisk(disk: string): Promise<APIResponse> {

@@ -186,3 +186,29 @@ func (s *Service) DeleteFilesystem(guid string) error {
 
 	return fmt.Errorf("filesystem with guid %s not found", guid)
 }
+
+func (s *Service) RollbackSnapshot(guid string, destroyMoreRecent bool) error {
+	datasets, err := zfs.Snapshots("")
+	if err != nil {
+		return err
+	}
+
+	for _, dataset := range datasets {
+		properties, err := dataset.GetAllProperties()
+		if err != nil {
+			return err
+		}
+
+		for _, v := range properties {
+			if v == guid {
+				err := dataset.Rollback(destroyMoreRecent)
+				if err != nil {
+					return err
+				}
+				return nil
+			}
+		}
+	}
+
+	return fmt.Errorf("snapshot with guid %s not found", guid)
+}

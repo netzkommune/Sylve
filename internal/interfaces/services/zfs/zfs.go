@@ -17,9 +17,11 @@ type ZfsServiceInterface interface {
 	GetDatasets() ([]Dataset, error)
 
 	CreateSnapshot(guid string, name string, recursive bool) error
+	RollbackSnapshot(guid string, destroyMoreRecent bool) error
 	DeleteSnapshot(guid string) error
 
-	// CreateFileSystem(name string, props map[string]string) error
+	CreateFilesystem(name string, props map[string]string) error
+	DeleteFilesystem(guid string) error
 
 	Cron()
 }

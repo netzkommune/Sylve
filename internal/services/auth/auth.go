@@ -55,11 +55,11 @@ func (s *Service) CreateJWT(username, password, authType string, remember bool) 
 
 	if authType == "sylve" {
 		if err := s.DB.Where("username = ?", username).First(&user).Error; err != nil {
-			return "", fmt.Errorf("user_not_found")
+			return "", fmt.Errorf("invalid_credentials")
 		}
 
 		if !utils.CheckPasswordHash(password, user.Password) {
-			return "", fmt.Errorf("invalid_password")
+			return "", fmt.Errorf("invalid_credentials")
 		}
 	} else if authType == "pam" {
 		valid, err := s.AuthenticatePAM(username, password)

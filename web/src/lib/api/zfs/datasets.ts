@@ -46,3 +46,10 @@ export async function deleteFileSystem(dataset: Dataset): Promise<APIResponse> {
 		'DELETE'
 	);
 }
+
+export async function rollbackSnapshot(guid: string): Promise<APIResponse> {
+	return await apiRequest(`/zfs/datasets/snapshot/rollback`, APIResponseSchema, 'POST', {
+		guid: guid,
+		destroyMoreRecent: true
+	});
+}

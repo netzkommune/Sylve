@@ -2,7 +2,8 @@
 	import '@fontsource/noto-sans';
 	import '@fontsource/noto-sans/700.css';
 
-	import { goto } from '$app/navigation';
+	import { goto, replaceState } from '$app/navigation';
+	import { page } from '$app/state';
 	import { isTokenValid, login } from '$lib/api/auth';
 	import Login from '$lib/components/custom/Login.svelte';
 	import Throbber from '$lib/components/custom/Throbber.svelte';
@@ -13,7 +14,7 @@
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
 	import { ModeWatcher } from 'mode-watcher';
 	import { onMount, tick } from 'svelte';
-	import { Toaster } from 'svelte-french-toast';
+	import toast, { Toaster } from 'svelte-french-toast';
 	import '../app.scss';
 
 	const queryClient = new QueryClient();
@@ -30,6 +31,14 @@
 		}
 	});
 
+	$effect(() => {
+		if (page.state.hasOwnProperty('loggedOut')) {
+			toast.success('Logged out', {
+				position: 'bottom-center'
+			});
+		}
+	});
+
 	onMount(async () => {
 		const faviconEl = document.getElementById('favicon');
 		if (faviconEl) {
@@ -40,6 +49,7 @@
 				faviconEl.setAttribute('href', '/logo/black.svg');
 			}
 		}
+
 		if ($token) {
 			try {
 				if (await isTokenValid()) {
@@ -68,9 +78,11 @@
 		language: string,
 		remember: boolean
 	) {
-		isLoading = true;
+		let isError = false;
+
 		try {
 			if (await login(username, password, type, remember, language)) {
+				isLoading = true;
 				isLoggedIn = true;
 				const path = window.location.pathname;
 
@@ -78,14 +90,17 @@
 					await goto(`/${$hostname}/summary`, { replaceState: true });
 				}
 			} else {
-				alert('Login failed');
+				isError = true;
+				isLoggedIn = false;
 			}
 		} catch (error) {
-			console.error('Login error:', error);
-			alert('Login failed: An error occurred');
+			isError = true;
+			isLoggedIn = false;
 		} finally {
-			await sleep(2500);
-			isLoading = false;
+			if (!isError) {
+				await sleep(2500);
+				isLoading = false;
+			}
 		}
 		return;
 	}

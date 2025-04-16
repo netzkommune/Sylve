@@ -8,88 +8,47 @@
  * under sponsorship from the FreeBSD Foundation.
  */
 
-import type {
-	Disk,
-	DiskInfo,
-	Partition,
-	SmartAttribute,
-	SmartCtl,
-	SmartNVME
-} from '$lib/types/disk/disk';
+import type { Column, Row } from '$lib/types/components/tree-table';
+import type { Disk, Partition, SmartAttribute, SmartCtl, SmartNVME } from '$lib/types/disk/disk';
 import type { Zpool } from '$lib/types/zfs/pool';
-
-export async function simplifyDisks(disks: DiskInfo): Promise<Disk[]> {
-	const transformed: Disk[] = [];
-	for (const disk of disks) {
-		if (disk.size > 0) {
-			const o = {
-				UUID: disk.uuid,
-				Device: `/dev/${disk.device}`,
-				Type: disk.type,
-				Usage: disk.usage,
-				Size: disk.size,
-				GPT: disk.gpt,
-				Model: disk.model,
-				Serial: disk.serial,
-				Wearout:
-					typeof disk.wearOut === 'number' && !isNaN(disk.wearOut) ? `-` : `${disk.wearOut} %`,
-				'S.M.A.R.T.': 'Passed',
-				Partitions: disk.partitions,
-				SmartData: disk.smartData ?? null
-			};
-
-			o.Partitions.sort((a, b) => a.size - b.size);
-			transformed.push(o);
-		}
-	}
-
-	transformed.sort((a, b) => {
-		if (a.Usage === 'Partitions' && b.Usage !== 'Partitions') {
-			return -1;
-		}
-		if (a.Usage !== 'Partitions' && b.Usage === 'Partitions') {
-			return 1;
-		}
-		return 0;
-	});
-
-	return transformed;
-}
+import humanFormat from 'human-format';
+import type { CellComponent } from 'tabulator-tables';
+import { generateNumberFromString } from './numbers';
 
 export function parseSMART(disk: Disk): SmartAttribute | SmartAttribute[] {
-	if (disk.Type === 'NVMe') {
+	if (disk.type === 'NVMe') {
 		return {
-			'Available Spare': (disk.SmartData as SmartNVME).availableSpare,
-			'Available Spare Threshold': (disk.SmartData as SmartNVME).availableSpareThreshold,
-			'Controller Busy Time': (disk.SmartData as SmartNVME).controllerBusyTime,
-			'Critical Warning': (disk.SmartData as SmartNVME).criticalWarning,
+			'Available Spare': (disk.smartData as SmartNVME).availableSpare,
+			'Available Spare Threshold': (disk.smartData as SmartNVME).availableSpareThreshold,
+			'Controller Busy Time': (disk.smartData as SmartNVME).controllerBusyTime,
+			'Critical Warning': (disk.smartData as SmartNVME).criticalWarning,
 			'Critical Warning State': {
-				'Available Spare': (disk.SmartData as SmartNVME).criticalWarningState.availableSpare,
-				'Device Reliability': (disk.SmartData as SmartNVME).criticalWarningState.deviceReliability,
-				'Read Only': (disk.SmartData as SmartNVME).criticalWarningState.readOnly,
-				Temperature: (disk.SmartData as SmartNVME).criticalWarningState.temperature,
-				'Volatile Memory Backup': (disk.SmartData as SmartNVME).criticalWarningState
+				'Available Spare': (disk.smartData as SmartNVME).criticalWarningState.availableSpare,
+				'Device Reliability': (disk.smartData as SmartNVME).criticalWarningState.deviceReliability,
+				'Read Only': (disk.smartData as SmartNVME).criticalWarningState.readOnly,
+				Temperature: (disk.smartData as SmartNVME).criticalWarningState.temperature,
+				'Volatile Memory Backup': (disk.smartData as SmartNVME).criticalWarningState
 					.volatileMemoryBackup
 			},
-			'Data Units Read': (disk.SmartData as SmartNVME).dataUnitsRead,
-			'Data Units Written': (disk.SmartData as SmartNVME).dataUnitsWritten,
-			'Error Info Log Entries': (disk.SmartData as SmartNVME).errorInfoLogEntries,
-			'Host Read Commands': (disk.SmartData as SmartNVME).hostReadCommands,
-			'Host Write Commands': (disk.SmartData as SmartNVME).hostWriteCommands,
-			'Media Errors': (disk.SmartData as SmartNVME).mediaErrors,
-			'Percentage Used': (disk.SmartData as SmartNVME).percentageUsed,
-			'Power Cycles': (disk.SmartData as SmartNVME).powerCycles,
-			'Power On Hours': (disk.SmartData as SmartNVME).powerOnHours,
-			Temperature: (disk.SmartData as SmartNVME).temperature,
-			'Temperature 1 Transition Count': (disk.SmartData as SmartNVME).temperature1TransitionCnt,
-			'Temperature 2 Transition Count': (disk.SmartData as SmartNVME).temperature2TransitionCnt,
-			'Total Time For Temperature 1': (disk.SmartData as SmartNVME).totalTimeForTemperature1,
-			'Total Time For Temperature 2': (disk.SmartData as SmartNVME).totalTimeForTemperature2,
-			'Unsafe Shutdowns': (disk.SmartData as SmartNVME).unsafeShutdowns,
-			'Warning Composite Temp Time': (disk.SmartData as SmartNVME).warningCompositeTempTime
+			'Data Units Read': (disk.smartData as SmartNVME).dataUnitsRead,
+			'Data Units Written': (disk.smartData as SmartNVME).dataUnitsWritten,
+			'Error Info Log Entries': (disk.smartData as SmartNVME).errorInfoLogEntries,
+			'Host Read Commands': (disk.smartData as SmartNVME).hostReadCommands,
+			'Host Write Commands': (disk.smartData as SmartNVME).hostWriteCommands,
+			'Media Errors': (disk.smartData as SmartNVME).mediaErrors,
+			'Percentage Used': (disk.smartData as SmartNVME).percentageUsed,
+			'Power Cycles': (disk.smartData as SmartNVME).powerCycles,
+			'Power On Hours': (disk.smartData as SmartNVME).powerOnHours,
+			Temperature: (disk.smartData as SmartNVME).temperature,
+			'Temperature 1 Transition Count': (disk.smartData as SmartNVME).temperature1TransitionCnt,
+			'Temperature 2 Transition Count': (disk.smartData as SmartNVME).temperature2TransitionCnt,
+			'Total Time For Temperature 1': (disk.smartData as SmartNVME).totalTimeForTemperature1,
+			'Total Time For Temperature 2': (disk.smartData as SmartNVME).totalTimeForTemperature2,
+			'Unsafe Shutdowns': (disk.smartData as SmartNVME).unsafeShutdowns,
+			'Warning Composite Temp Time': (disk.smartData as SmartNVME).warningCompositeTempTime
 		};
-	} else if (disk.Type === 'HDD' || disk.Type === 'SSD') {
-		const data = disk.SmartData as SmartCtl;
+	} else if (disk.type === 'HDD' || disk.type === 'SSD') {
+		const data = disk.smartData as SmartCtl;
 		const attributes: SmartAttribute[] = [];
 
 		if (data?.ata_smart_attributes?.table?.length) {
@@ -114,42 +73,60 @@ export function parseSMART(disk: Disk): SmartAttribute | SmartAttribute[] {
 	return {};
 }
 
+export function smartStatus(disk: Disk): string {
+	if (disk.smartData) {
+		if (disk.smartData.hasOwnProperty('smart_status')) {
+			if ((disk.smartData as SmartCtl).smart_status.passed) {
+				return 'Passed';
+			}
+			return 'Failed';
+		}
+
+		if (disk.smartData.hasOwnProperty('criticalWarning')) {
+			if ((disk.smartData as SmartNVME).criticalWarning !== '0x00') {
+				return 'Failed';
+			}
+
+			return 'Passed';
+		}
+	}
+
+	return '-';
+}
+
 export function diskSpaceAvailable(disk: Disk, required: number): boolean {
-	if (disk.Usage === 'Partitions') {
-		const total = disk.Size;
-		const used = disk.Partitions.reduce((acc, cur) => acc + cur.size, 0);
+	if (disk.usage === 'Partitions') {
+		const total = disk.size;
+		const used = disk.partitions.reduce((acc, cur) => acc + cur.size, 0);
 		return total - used >= required;
 	}
 
-	return disk.Size >= required;
+	return disk.size >= required;
 }
 
-export function getGPTLabel(disk: Disk, pools: Zpool[]): string {
-	if (disk) {
-		if (disk.GPT) {
-			return 'Yes';
-		}
-
-		if (disk.GPT === false) {
-			if (pools.length > 0) {
-				if (pools.some((pool) => pool.vdevs.some((vdev) => vdev.name === disk.Device))) {
-					return '-';
+export function isPartitionInDisk(disks: Disk[], partition: Partition): Disk | null {
+	for (const disk of disks) {
+		if (disk.usage === 'Partitions') {
+			for (const p of disk.partitions) {
+				const raw = p.name.replace(/p\d+$/, '');
+				if (disk.device === raw) {
+					return disk;
 				}
 			}
 		}
 	}
 
-	return 'No';
+	return null;
 }
 
 export function zpoolUseableDisks(disks: Disk[], pools: Zpool[]): Disk[] {
 	const useableDisks: Disk[] = [];
 	for (const disk of disks) {
-		if (disk.Usage === 'Partitions') {
+		if (disk.usage === 'Partitions') {
 			continue;
 		}
 
-		if (disk.Usage === 'Unused' && disk.GPT === false) {
+		if (disk.usage === 'Unused' && disk.gpt === false) {
 			useableDisks.push(disk);
 		}
 	}
@@ -171,14 +148,13 @@ export function zpoolUseablePartitions(disks: Disk[], pools: Zpool[]): Partition
 	}
 
 	for (const disk of disks) {
-		if (disk.Usage === 'Partitions') {
-			const hasEFI = disk.Partitions.some((partition) => partition.usage === 'EFI');
+		if (disk.usage === 'Partitions') {
+			const hasEFI = disk.partitions.some((partition) => partition.usage === 'EFI');
 			if (hasEFI) {
 				continue;
 			}
 
-			for (const partition of disk.Partitions) {
-				// Check if this partition is already used in a pool
+			for (const partition of disk.partitions) {
 				if (!usedPartitionNames.has(partition.name)) {
 					useablePartitions.push(partition);
 				}
@@ -190,13 +166,105 @@ export function zpoolUseablePartitions(disks: Disk[], pools: Zpool[]): Partition
 }
 
 export function getDiskSize(disk: Disk): string {
-	if (disk.Usage === 'Partitions') {
-		return disk.Partitions.reduce((acc, cur) => acc + cur.size, 0).toString();
+	if (disk.usage === 'Partitions') {
+		return disk.partitions.reduce((acc, cur) => acc + cur.size, 0).toString();
 	}
 
-	return disk.Size.toString();
+	return disk.size.toString();
 }
 
 export function stripDev(disk: string): string {
 	return disk.replace(/^\/dev\//, '');
+}
+
+export function generateTableData(disks: Disk[]): { rows: Row[]; columns: Column[] } {
+	const rows: Row[] = [];
+	const columns: Column[] = [
+		{
+			field: 'device',
+			title: 'Device'
+		},
+		{
+			field: 'type',
+			title: 'Type'
+		},
+		{
+			field: 'usage',
+			title: 'Usage'
+		},
+		{
+			field: 'size',
+			title: 'Size',
+			formatter: (cell: CellComponent) => {
+				return humanFormat(cell.getValue());
+			}
+		},
+		{
+			field: 'gpt',
+			title: 'GPT'
+		},
+		{
+			field: 'model',
+			title: 'Model'
+		},
+		{
+			field: 'serial',
+			title: 'Serial'
+		},
+		{
+			field: 'smartStatus',
+			title: 'S.M.A.R.T.',
+			visible: false
+		},
+		{
+			field: 'wearOut',
+			title: 'Wearout'
+		}
+	];
+
+	for (const disk of disks) {
+		if (disk.size <= 0) continue;
+		const row: Row = {
+			id: generateNumberFromString(disk.uuid),
+			device: disk.device,
+			type: disk.type,
+			usage: disk.usage,
+			size: disk.size,
+			gpt: disk.gpt ? 'Yes' : 'No',
+			model: disk.model,
+			serial: disk.serial,
+			smartStatus: smartStatus(disk),
+			wearOut: disk.wearOut
+		};
+
+		if (disk.partitions && disk.partitions.length > 0) {
+			row.children = [];
+
+			for (const partition of disk.partitions) {
+				const partitionRow: Row = {
+					id: generateNumberFromString(partition.uuid),
+					device: partition.name,
+					type: partition.usage,
+					usage: partition.usage,
+					size: partition.size,
+					gpt: disk.gpt ? 'Yes' : 'No',
+					model: '-',
+					serial: '-',
+					smartData: '-',
+					wearOut: '-'
+				};
+
+				row.children.push(partitionRow);
+			}
+		} else {
+			row.children = [];
+		}
+
+		rows.push(row);
+	}
+
+	return {
+		rows: rows,
+		columns: columns
+	};
 }

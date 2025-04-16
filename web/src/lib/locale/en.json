@@ -4,22 +4,41 @@
 		"password": "Password",
 		"realm": "Realm",
 		"select_authentication": "Select Authentication",
-		"pam_standard_authentication": "PAM Standard Authentication",
-		"sylve_authentication": "Sylve Authentication",
+		"pam": "PAM Standard Authentication",
+		"sylve": "Sylve Authentication",
 		"language": "Language",
 		"select_language": "Select Language",
 		"remember_me": "Remember Me",
 		"login": "Login",
-		"logout": "Logout"
+		"logout": "Logout",
+		"invalid_auth_type": "Authentication type required",
+		"invalid_credentials": "Invalid credentials",
+		"pam_auth_error": "PAM authentication error"
 	},
 	"node": {
 		"summary": "Summary",
 		"search": "Search",
 		"notes": "Notes",
+		"storage": "Storage",
 		"certificates": "Certificates",
 		"firewall": "Firewall",
 		"disks": "Disks",
+		"zfs": "ZFS",
+		"pools": "Pools",
+		"datasets": "Datasets",
+		"file_systems": "Filesystems",
 		"notifications": "Notifications"
+	},
+	"summary": {
+		"CPU_s": "CPU(s)",
+		"Operating System": "Operating System",
+		"load_average": "Load Average",
+		"boot_mode": "Boot Mode",
+		"cpu_usage": "CPU Usage",
+		"disk_usage": "Disk Usage",
+		"swap_usage": "Swap Usage",
+		"ram_usage": "RAM Usage",
+		"io_delay": "I/O Delay"
 	},
 	"notes": {
 		"note": "Note",
@@ -53,6 +72,7 @@
 	},
 	"common": {
 		"example": "Example",
+		"of": "of",
 		"are_you_sure": "Are you sure?",
 		"this_action_cannot_be_undone": "This action cannot be undone",
 		"this_will_permanently": "This will permanently",
@@ -63,7 +83,14 @@
 		"created_successfully": "created successfully",
 		"error": "error",
 		"delete": "delete",
-		"create": "create"
+		"create": "create",
+		"invalid_response_received": "Invalid response received",
+		"datacenter": "Datacenter",
+		"languages": {
+			"en": "English",
+			"en_default": "English (Default)",
+			"mal": "Malayalam"
+		}
 	},
 	"validation_errors": {
 		"failed validation: min": "too small"

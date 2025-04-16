@@ -3,6 +3,7 @@ import type { Column, Row } from '$lib/types/components/tree-table';
 import type { Zpool } from '$lib/types/zfs/pool';
 import humanFormat, { type ScaleLike } from 'human-format';
 import { getTranslation } from '../i18n';
+import { generateNumberFromString } from '../numbers';
 
 const sizeOptions = {
 	scale: 'binary' as ScaleLike,
@@ -17,32 +18,35 @@ export function generateTableData(pools: Zpool[]): {
 	let rows: Row[] = [];
 	let columns: Column[] = [
 		{
-			key: 'name',
-			label: 'Name'
+			field: 'id',
+			title: 'ID',
+			visible: false
 		},
 		{
-			key: 'size',
-			label: 'Size'
+			field: 'name',
+			title: 'Name'
 		},
 		{
-			key: 'used',
-			label: 'Used'
+			field: 'size',
+			title: 'Size'
 		},
 		{
-			key: 'health',
-			label: 'Health'
+			field: 'used',
+			title: 'Used'
 		},
 		{
-			key: 'redundancy',
-			label: 'Redundancy'
+			field: 'health',
+			title: 'Health'
+		},
+		{
+			field: 'redundancy',
+			title: 'Redundancy'
 		}
 	];
 
-	let id = 0;
-
 	for (const pool of pools) {
 		const poolRow = {
-			id: id++,
+			id: generateNumberFromString(pool.name),
 			name: pool.name,
 			size: humanFormat(pool.size, sizeOptions),
 			used: humanFormat(pool.allocated, sizeOptions),
@@ -60,15 +64,12 @@ export function generateTableData(pools: Zpool[]): {
 					redundancy = 'Mirror';
 					vdevLabel = vdev.name.replace(/mirror-?(\d+)/i, 'Mirror $1');
 				} else if (vdev.name.startsWith('raidz')) {
-					// redundancy = 'RAIDZ';
-					// vdevLabel = vdev.name.replace(/^raidz/i, 'RAIDZ');
-
 					redundancy = 'RAIDZ ' + vdev.name.match(/raidz-?(\d+)/i)?.[1];
 					vdevLabel = vdev.name.replace(/^raidz/i, 'RAIDZ');
 				}
 
 				const vdevRow = {
-					id: id++,
+					id: generateNumberFromString(vdev.name),
 					name: vdevLabel,
 					size: humanFormat(vdev.alloc + vdev.free, sizeOptions),
 					used: humanFormat(vdev.alloc, sizeOptions),
@@ -88,7 +89,7 @@ export function generateTableData(pools: Zpool[]): {
 					}
 
 					vdevRow.children.push({
-						id: id++,
+						id: generateNumberFromString(device.name),
 						name: device.name,
 						size: humanFormat(device.size, sizeOptions),
 						used: '-',
@@ -101,7 +102,7 @@ export function generateTableData(pools: Zpool[]): {
 				if (vdev.replacingDevices && vdev.replacingDevices.length > 0) {
 					for (const replacing of vdev.replacingDevices) {
 						vdevRow.children.push({
-							id: id++,
+							id: generateNumberFromString(replacing.oldDrive.name),
 							name: `${replacing.oldDrive.name} [OLD]`,
 							size: humanFormat(replacing.oldDrive.size, sizeOptions),
 							used: '-',
@@ -111,7 +112,7 @@ export function generateTableData(pools: Zpool[]): {
 						});
 
 						vdevRow.children.push({
-							id: id++,
+							id: generateNumberFromString(replacing.newDrive.name),
 							name: `${replacing.newDrive.name} [NEW]`,
 							size: humanFormat(replacing.newDrive.size, sizeOptions),
 							used: '-',
@@ -126,7 +127,7 @@ export function generateTableData(pools: Zpool[]): {
 				poolRow.redundancy = redundancy;
 			} else {
 				poolRow.children.push({
-					id: id++,
+					id: generateNumberFromString(vdev.devices[0].name),
 					name: vdev.devices[0].name,
 					size: humanFormat(vdev.devices[0].size, sizeOptions),
 					used: '-',

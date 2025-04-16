@@ -20,12 +20,14 @@ export interface KeyboardTrigger {
 
 export const triggers: KeyboardTrigger[] = [
 	{
-		key: 'Q',
+		key: 'l',
 		modifier: [
-			['ctrl', 'shift'],
-			['meta', 'shift']
+			['ctrl', 'alt'],
+			['meta', 'alt']
 		],
-		callback: logOut
+		callback: () => {
+			logOut();
+		}
 	},
 	{
 		key: 't',

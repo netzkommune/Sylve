@@ -2,7 +2,11 @@
 	import type { Column, Row } from '$lib/types/components/tree-table';
 	import Icon from '@iconify/svelte';
 	import { onMount, untrack } from 'svelte';
-	import { TabulatorFull as Tabulator, type RowComponent } from 'tabulator-tables';
+	import {
+		TabulatorFull as Tabulator,
+		type ColumnDefinition,
+		type RowComponent
+	} from 'tabulator-tables';
 
 	let tableComponent: HTMLDivElement | null = null;
 	let table: Tabulator | null = $state(null);
@@ -13,40 +17,90 @@
 			columns: Column[];
 		};
 		name: string;
-		hideId?: boolean;
-		parentIcon?: string;
-		itemIcon?: string;
 		parentActiveRow?: Row | null;
 	}
 
-	let {
-		data,
-		name,
-		parentIcon = undefined,
-		itemIcon = undefined,
-		hideId = true,
-		parentActiveRow = $bindable()
-	}: Props = $props();
-
-	let columns = $derived.by(() => {
-		return data.columns.map((column) => {
-			return {
-				title: column.label,
-				field: column.key,
-				visible: column.key !== 'id' || !hideId
-			};
-		});
-	});
-
+	let { data, name, parentActiveRow = $bindable() }: Props = $props();
 	let mouseOverRow = $state(false);
 
-	$effect(() => {
-		if (data.rows.length > 0) {
-			untrack(() => {
-				if (parentActiveRow === null) {
-					if (table) {
-						table?.replaceData(data.rows);
+	function pruneEmptyChildren(rows: Row[]): Row[] {
+		return rows.map((row) => {
+			const hasValidChildren = Array.isArray(row.children) && row.children.length > 0;
+
+			const cleanedRow: Row = {
+				...row,
+				...(hasValidChildren
+					? {
+							children: pruneEmptyChildren(row.children!)
+						}
+					: { children: undefined })
+			};
+
+			return cleanedRow;
+		});
+	}
+
+	function syncRows(currentRows: RowComponent[], newRows: Row[], parentRow?: RowComponent) {
+		for (const currentRow of currentRows) {
+			const currentData = currentRow.getData();
+			const newRow = newRows.find((r) => r.id === currentData.id);
+
+			if (newRow) {
+				for (const column of data.columns) {
+					const cell = currentRow.getCells().find((c) => c.getField() === column.field);
+					if (cell) {
+						const newValue = newRow[column.field];
+						const oldValue = cell.getValue();
+						if (newValue !== oldValue) {
+							cell.setValue(newValue);
+						}
 					}
+				}
+
+				const existingChildren = currentRow.getTreeChildren?.() ?? [];
+				const newChildren = newRow.children ?? [];
+
+				if (newChildren.length > 0 && existingChildren.length === 0 && table) {
+					const pruned = pruneEmptyChildren([newRow])[0];
+					table.updateData([pruned]);
+				}
+
+				syncRows(existingChildren, newChildren, currentRow);
+			}
+		}
+
+		const currentRowIds = currentRows.map((r) => r.getData().id);
+		const rowsToAdd = newRows.filter((r) => !currentRowIds.includes(r.id));
+
+		if (rowsToAdd.length > 0 && table) {
+			if (parentRow) {
+				parentRow.getTreeChildren().forEach((child) => child.delete());
+				parentRow.update({ children: pruneEmptyChildren(rowsToAdd) });
+			} else {
+				const currentData = table.getData();
+				const newData = [...currentData, ...pruneEmptyChildren(rowsToAdd)];
+				table.setData(newData);
+			}
+		}
+
+		const newRowIds = newRows.map((r) => r.id);
+		for (const row of currentRows) {
+			const rowData = row.getData();
+			if (!newRowIds.includes(rowData.id)) {
+				if (rowData.id === parentActiveRow?.id) {
+					parentActiveRow = null;
+				}
+				row.delete();
+			}
+		}
+	}
+
+	$effect(() => {
+		if (data.rows.length > 0 && table) {
+			untrack(() => {
+				const rootRows = table?.getRows();
+				if (rootRows) {
+					syncRows(rootRows, pruneEmptyChildren(data.rows));
 				}
 			});
 		}
@@ -54,7 +108,7 @@
 
 	function selectParentActiveRow(row: RowComponent) {
 		const expandedRow = row.getData();
-		for (const column of columns) {
+		for (const column of data.columns) {
 			parentActiveRow = {
 				...parentActiveRow,
 				[`${column.field}`]: expandedRow[column.field],
@@ -67,13 +121,13 @@
 		if (tableComponent) {
 			table = new Tabulator(tableComponent, {
 				layout: 'fitColumns',
-				data: data.rows,
+				data: pruneEmptyChildren(data.rows),
 				selectableRows: 1,
 				dataTreeChildIndent: 16,
 				dataTree: true,
 				dataTreeChildField: 'children',
-				columns: columns,
-				dataTreeStartExpanded: true,
+				columns: data.columns as ColumnDefinition[],
+				dataTreeStartExpanded: false,
 				persistence: {
 					sort: true
 				}

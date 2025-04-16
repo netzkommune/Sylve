@@ -10,8 +10,8 @@
 	import { getTranslation } from '$lib/utils/i18n';
 	import { capitalizeFirstLetter } from '$lib/utils/string';
 	import Icon from '@iconify/svelte';
-	import humanFormat, { type ParsedInfo, type ScaleLike } from 'human-format';
-	import { tick, untrack } from 'svelte';
+	import humanFormat from 'human-format';
+	import { tick } from 'svelte';
 	import toast from 'svelte-french-toast';
 
 	interface Data {
@@ -24,43 +24,19 @@
 
 	let newPartitions: { name: string; size: number }[] = $state([]);
 	let remainingSpace = $state(0);
-	let currentPartition = $state(0);
 	let currentPartitionInput = $state('');
+	let currentPartition = $derived.by(() => {
+		try {
+			const parsed = humanFormat.parse.raw(currentPartitionInput);
+			return parsed.factor * parsed.value;
+		} catch (e) {
+			return 0;
+		}
+	});
 
 	$effect(() => {
 		if (disk) {
 			remainingSpace = calculateRemainingSpace(disk);
-		}
-	});
-
-	$effect(() => {
-		if (currentPartitionInput === '') {
-			currentPartition = 0;
-		} else {
-			let parsed: ParsedInfo<ScaleLike> | null = null;
-
-			try {
-				parsed = humanFormat.parse.raw(currentPartitionInput);
-			} catch (e) {
-				parsed = { factor: 1, value: 0, prefix: 'B' };
-				currentPartitionInput = '1B';
-			}
-
-			if (parsed) {
-				untrack(() => {
-					currentPartition = parsed.factor * parsed.value;
-					if (currentPartition > remainingSpace) {
-						currentPartition = remainingSpace;
-						currentPartitionInput = humanFormat(remainingSpace);
-					}
-				});
-			}
-		}
-	});
-
-	$effect(() => {
-		if (currentPartition > 0) {
-			currentPartitionInput = humanFormat(currentPartition);
 		}
 	});
 
@@ -72,7 +48,7 @@
 	async function savePartitions() {
 		if (disk) {
 			const sizes = newPartitions.map((partition) => Math.floor(partition.size));
-			const result = await createPartitions(disk.Device, sizes);
+			const result = await createPartitions(`/dev/${disk.device}`, sizes);
 			if (result.status === 'success') {
 				let successMessage = '';
 				if (sizes.length === 1) {
@@ -134,11 +110,11 @@
 	function calculateRemainingSpace(disk: Disk) {
 		if (!disk) return 0;
 		const usedSpace =
-			disk.Partitions && disk.Partitions.length > 0
-				? disk.Partitions.reduce((total, partition) => total + partition.size, 0)
+			disk.partitions && disk.partitions.length > 0
+				? disk.partitions.reduce((total, partition) => total + partition.size, 0)
 				: 0;
 
-		let actual = disk.Size - usedSpace;
+		let actual = disk.size - usedSpace;
 
 		if (actual > 128 * 1024 * 1024) {
 			actual = actual - 128 * 1024 * 1024;
@@ -177,8 +153,8 @@
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
-					{#if disk && disk.Partitions && disk.Partitions.length > 0}
-						{#each disk.Partitions as partition}
+					{#if disk && disk.partitions && disk.partitions.length > 0}
+						{#each disk.partitions as partition}
 							<Table.Row>
 								<Table.Cell>{partition.name}</Table.Cell>
 								<Table.Cell class="text-right">{humanFormat(partition.size)}</Table.Cell>
@@ -205,7 +181,7 @@
 						{/each}
 					{/if}
 
-					{#if (!disk || !disk.Partitions || disk.Partitions.length === 0) && newPartitions.length === 0}
+					{#if (!disk || !disk.partitions || disk.partitions.length === 0) && newPartitions.length === 0}
 						<Table.Row>
 							<Table.Cell colspan={4} class="text-muted-foreground h-20 text-center">
 								No partitions created yet
@@ -224,7 +200,9 @@
 						max={remainingSpace}
 						step={0.1}
 						onValueChange={(e) => {
-							currentPartition = e[0];
+							const value = Math.floor(e[0]);
+							currentPartition = value <= 0 ? 0 : value;
+							currentPartitionInput = humanFormat(currentPartition);
 						}}
 					/>
 				</div>

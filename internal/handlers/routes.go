@@ -103,6 +103,7 @@ func RegisterRoutes(r *gin.Engine,
 		{
 			datasets.GET("", zfsHandlers.GetDatasets(zfsService))
 			datasets.POST("/snapshot", zfsHandlers.CreateSnapshot(zfsService))
+			datasets.POST("/snapshot/rollback", zfsHandlers.RollbackSnapshot(zfsService))
 			datasets.DELETE("/snapshot/:guid", zfsHandlers.DeleteSnapshot(zfsService))
 
 			datasets.POST("/filesystem", zfsHandlers.CreateFilesystem(zfsService))

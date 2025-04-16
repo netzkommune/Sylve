@@ -104,21 +104,19 @@ export const PartitionSchema = z.object({
 	id: z.string().optional()
 });
 
-export const DiskInfoSchema = z.array(
-	z.object({
-		uuid: z.string(),
-		device: z.string(),
-		type: z.string(),
-		usage: z.string(),
-		size: z.number(),
-		gpt: z.boolean(),
-		model: z.string(),
-		serial: z.string(),
-		smartData: z.union([SmartNVMESchema, SmartCtlSchema, z.null()]).optional(),
-		wearOut: z.union([z.number(), z.string()]).optional(),
-		partitions: z.array(PartitionSchema).optional().default([])
-	})
-);
+export const DiskSchema = z.object({
+	uuid: z.string(),
+	device: z.string(),
+	type: z.string(),
+	usage: z.string(),
+	size: z.number(),
+	gpt: z.boolean(),
+	model: z.string(),
+	serial: z.string(),
+	smartData: z.union([SmartNVMESchema, SmartCtlSchema, z.null()]).optional(),
+	wearOut: z.union([z.number(), z.string()]).optional(),
+	partitions: z.array(PartitionSchema).optional().default([])
+});
 
 export const DiskActionSchema = z.object({
 	device: z.string()
@@ -130,20 +128,20 @@ export type SmartAttribute = Record<
 >;
 export type SmartNVME = z.infer<typeof SmartNVMESchema>;
 export type SmartCtl = z.infer<typeof SmartCtlSchema>;
-export type DiskInfo = z.infer<typeof DiskInfoSchema>;
+export type Disk = z.infer<typeof DiskSchema>;
 export type Partition = z.infer<typeof PartitionSchema>;
 
-export interface Disk {
-	UUID: string;
-	Device: string;
-	Type: string;
-	Usage: string;
-	Size: number;
-	GPT: boolean;
-	Model: string;
-	Serial: string;
-	'S.M.A.R.T.': string;
-	Wearout: string | number | undefined;
-	Partitions: Partition[];
-	SmartData: SmartNVME | SmartCtl | null;
-}
+// export interface Disk {
+// 	UUID: string;
+// 	Device: string;
+// 	Type: string;
+// 	Usage: string;
+// 	Size: number;
+// 	GPT: boolean;
+// 	Model: string;
+// 	Serial: string;
+// 	'S.M.A.R.T.': string;
+// 	Wearout: string | number | undefined;
+// 	Partitions: Partition[];
+// 	SmartData: SmartNVME | SmartCtl | null;
+// }

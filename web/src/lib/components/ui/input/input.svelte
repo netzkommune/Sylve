@@ -3,7 +3,10 @@
 	import type { HTMLInputAttributes } from 'svelte/elements';
 	import type { InputEvents } from './index.js';
 
-	type $$Props = HTMLInputAttributes;
+	type $$Props = HTMLInputAttributes & {
+		showPasswordOnFocus?: boolean;
+	};
+
 	type $$Events = InputEvents;
 
 	let className: $$Props['class'] = undefined;
@@ -11,9 +14,10 @@
 	export { className as class };
 	export let readonly: $$Props['readonly'] = undefined;
 
-	// Add these for password visibility control
 	export let type: $$Props['type'] = 'text';
-	let showPassword = false;
+	export let showPasswordOnFocus: boolean = false;
+
+	let showPassword: boolean = false;
 
 	function handleFocus() {
 		if (type === 'password') {
@@ -35,7 +39,7 @@
 	)}
 	bind:value
 	{readonly}
-	type={type === 'password' && showPassword ? 'text' : type}
+	type={type === 'password' && showPassword && showPasswordOnFocus ? 'text' : type}
 	on:focus={handleFocus}
 	on:blur={handleBlur}
 	on:change

@@ -4,8 +4,8 @@
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
-	import CircleHelp from 'lucide-svelte/icons/circle-help';
 	import Icon from '@iconify/svelte';
+	import CircleHelp from 'lucide-svelte/icons/circle-help';
 
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 
@@ -51,7 +51,7 @@
 				<Dialog.Title class="p-4 text-left">{title}</Dialog.Title>
 			</Dialog.Header>
 			<Dialog.Close
-				class="mr-4 flex h-5 w-5 items-center justify-center rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-0 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+				class="ring-offset-background data-[state=open]:bg-accent data-[state=open]:text-muted-foreground mr-4 flex h-5 w-5 items-center justify-center rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-0 disabled:pointer-events-none"
 			>
 				<Icon icon="lucide:x" class="h-5 w-5" />
 				<span class="sr-only">Close</span>

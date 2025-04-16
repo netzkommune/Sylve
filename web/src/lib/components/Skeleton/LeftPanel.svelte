@@ -2,6 +2,7 @@
 	import { default as TreeView } from '$lib/components/custom/TreeView.svelte';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 	import { hostname } from '$lib/stores/basic';
+	import { getTranslation } from '$lib/utils/i18n';
 
 	let openCategories: { [key: string]: boolean } = $state({});
 	let node = $hostname;
@@ -12,7 +13,7 @@
 
 	const tree = [
 		{
-			label: 'datacenter',
+			label: getTranslation('common.datacenter', 'Data Center'),
 			icon: 'fa-solid:server',
 			children: [
 				{

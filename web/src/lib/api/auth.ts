@@ -12,6 +12,8 @@ import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
 import { oldStore, store } from '$lib/stores/auth';
 import { hostname, language as langStore } from '$lib/stores/basic';
+import type { APIResponse } from '$lib/types/common';
+import { getTranslation } from '$lib/utils/i18n';
 import adze from 'adze';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'svelte-french-toast';
@@ -25,6 +27,22 @@ export async function login(
 	language: string
 ) {
 	try {
+		if (username === '' || password === '') {
+			toast.error('Credentials are required', {
+				position: 'bottom-center'
+			});
+
+			return;
+		}
+
+		if (authType === '') {
+			toast.error(getTranslation('auth.invalid_auth_type', 'Authentication type is required'), {
+				position: 'bottom-center'
+			});
+
+			return;
+		}
+
 		const response = await axios.post('/api/auth/login', {
 			username,
 			password,
@@ -39,47 +57,30 @@ export async function login(
 				store.set(response.data.data.token);
 				return true;
 			} else {
-				toast.error('Error logging in', {
-					position: 'bottom-center'
-				});
+				toast.error(
+					getTranslation('common.invalid_response_received', 'Invalid response received'),
+					{
+						position: 'bottom-center'
+					}
+				);
 			}
 		} else {
-			toast.error('Error logging in', {
-				position: 'bottom-center'
-			});
 			return false;
 		}
-
-		return false;
 	} catch (error) {
 		if (axios.isAxiosError(error)) {
 			const axiosError = error as AxiosError;
-			if (axiosError.response) {
-				if (axiosError.response.status === 401) {
-					toast.error('Invalid credentials', {
-						position: 'bottom-center'
-					});
-				} else {
-					toast.error('Error logging in', {
-						position: 'bottom-center'
-					});
-				}
-			} else if (axiosError.request) {
-				toast.error('Error logging in', {
-					position: 'bottom-center'
-				});
-			} else {
-				toast.error('Error logging in', {
+			const data = axiosError.response?.data as APIResponse;
+			if (data.error) {
+				toast.error(getTranslation(`auth.${data.error}`, data.error), {
 					position: 'bottom-center'
 				});
 			}
 		} else {
-			toast.error('Error logging in', {
+			toast.error('Fatal error logging in, check logs!', {
 				position: 'bottom-center'
 			});
 		}
-
-		adze.withEmoji.error('Login failed', error);
 		return false;
 	}
 }
@@ -126,12 +127,18 @@ export async function logOut() {
 
 	store.set('');
 	hostname.set('');
+
 	if (browser) {
 		localStorage.removeItem('token');
 		localStorage.removeItem('hostname');
 	}
 
-	goto('/?loggedOut=true');
+	goto('/', {
+		replaceState: true,
+		state: {
+			loggedOut: true
+		}
+	});
 }
 
 export async function revokeJWT() {

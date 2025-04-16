@@ -65,7 +65,9 @@ export const ZpoolStatusSchema = z.object({
 });
 
 export const ZpoolSchema = z.object({
+	id: z.string(),
 	name: z.string(),
+	guid: z.string(),
 	health: z.string(),
 	allocated: z.number(),
 	size: z.number(),

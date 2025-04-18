@@ -373,13 +373,8 @@
 		{@render button('delete-snapshot')}
 		{@render button('delete-filesystem')}
 	</div>
-	<div class="relative flex h-full w-full cursor-pointer flex-col">
-		<div class="flex-1">
-			<div class="h-full overflow-y-auto">
-				<TreeTable data={tableData} name={tableName} bind:parentActiveRow={activeRow} />
-			</div>
-		</div>
-	</div>
+
+	<TreeTable data={tableData} name={tableName} bind:parentActiveRow={activeRow} />
 </div>
 
 {#if confirmModals.active == 'deleteSnapshot' || confirmModals.active == 'deleteFilesystem'}

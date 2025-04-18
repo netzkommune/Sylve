@@ -84,7 +84,10 @@
 				persistence: {
 					sort: true
 				},
-				placeholder: 'No data available'
+				placeholder: 'No data available',
+				pagination: true,
+				paginationSize: 25,
+				paginationCounter: 'pages'
 			});
 		}
 
@@ -98,6 +101,4 @@
 	});
 </script>
 
-<div class="flex h-full flex-col">
-	<div bind:this={tableComponent} class="flex-1 overflow-auto" id={name}></div>
-</div>
+<div bind:this={tableComponent} class="flex-1" id={name}></div>

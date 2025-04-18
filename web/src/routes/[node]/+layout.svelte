@@ -131,7 +131,7 @@
 		</Resizable.Pane>
 		<Resizable.Handle withHandle />
 		<Resizable.Pane>
-			<div class="h-full">
+			<div class="h-full overflow-auto">
 				{@render children?.()}
 			</div>
 		</Resizable.Pane>

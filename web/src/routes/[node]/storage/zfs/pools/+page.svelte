@@ -843,13 +843,7 @@
 		{@render button('replace-device')}
 	</div>
 
-	<div class="relative flex h-full w-full cursor-pointer flex-col">
-		<div class="flex-1">
-			<div class="h-full overflow-y-auto">
-				<TreeTable data={tableData} name="tt-zfsPool" bind:parentActiveRow={activeRow} />
-			</div>
-		</div>
-	</div>
+	<TreeTable data={tableData} name="tt-zfsPool" bind:parentActiveRow={activeRow} />
 </div>
 
 <Dialog.Root bind:open={modal.open} closeOnOutsideClick={false}>

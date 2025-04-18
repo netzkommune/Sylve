@@ -1,9 +1,9 @@
 import type { Column, Row } from '$lib/types/components/tree-table';
 import type { Dataset, GroupedByPool } from '$lib/types/zfs/dataset';
 import type { Zpool } from '$lib/types/zfs/pool';
+import { generateNumberFromString } from '$lib/utils/numbers';
+import { cleanChildren } from '$lib/utils/tree-table';
 import humanFormat from 'human-format';
-import { generateNumberFromString } from '../numbers';
-import { cleanChildren } from '../tree-table';
 
 export const createFSProps = {
 	atime: [
@@ -137,13 +137,16 @@ export function groupByPool(
 	const grouped = pools.map((pool) => {
 		return {
 			name: pool.name,
+			pool: pool,
 			filesystems: datasets.filter(
 				(dataset) => dataset.name.startsWith(pool.name) && dataset.type === 'filesystem'
 			),
 			snapshots: datasets.filter(
 				(dataset) => dataset.name.startsWith(pool.name) && dataset.type === 'snapshot'
 			),
-			volumes: []
+			volumes: datasets.filter(
+				(dataset) => dataset.name.startsWith(pool.name) && dataset.type === 'volume'
+			)
 		};
 	});
 

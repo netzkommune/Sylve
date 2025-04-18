@@ -25,7 +25,7 @@
 	import { generatePassword } from '$lib/utils/string';
 	import { deleteRowByFieldValue } from '$lib/utils/table';
 	import { isValidPoolName } from '$lib/utils/zfs';
-	import { createFSProps, generateTableData, groupByPool } from '$lib/utils/zfs/dataset';
+	import { createFSProps, generateTableData, groupByPool } from '$lib/utils/zfs/dataset/dataset';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
 	import humanFormat, { type ParsedInfo, type ScaleLike } from 'human-format';
@@ -136,8 +136,7 @@
 					quota: ''
 				}
 			},
-			title: '',
-			showKey: false
+			title: ''
 		},
 		deleteFilesystem: {
 			open: false,
@@ -340,7 +339,6 @@
 		<Button
 			on:click={async () => {
 				if (activeDataset) {
-					console.log(activeDataset);
 					confirmModals.active = 'deleteFilesystem';
 					confirmModals.parent = 'filesystem';
 					confirmModals.deleteFilesystem.open = true;
@@ -378,13 +376,7 @@
 	<div class="relative flex h-full w-full cursor-pointer flex-col">
 		<div class="flex-1">
 			<div class="h-full overflow-y-auto">
-				<TreeTable
-					data={tableData}
-					name={tableName}
-					parentIcon={'carbon:partition-collection'}
-					itemIcon={'eos-icons:file-system'}
-					bind:parentActiveRow={activeRow}
-				/>
+				<TreeTable data={tableData} name={tableName} bind:parentActiveRow={activeRow} />
 			</div>
 		</div>
 	</div>
@@ -584,7 +576,7 @@
 									{/each}
 								</Select.Group>
 							</Select.Content>
-							<Select.Input name="favoriteFruit" />
+							<Select.Input />
 						</Select.Root>
 					</div>
 
@@ -611,7 +603,7 @@
 									{/each}
 								</Select.Group>
 							</Select.Content>
-							<Select.Input name="favoriteFruit" />
+							<Select.Input />
 						</Select.Root>
 					</div>
 
@@ -638,7 +630,7 @@
 									{/each}
 								</Select.Group>
 							</Select.Content>
-							<Select.Input name="favoriteFruit" />
+							<Select.Input />
 						</Select.Root>
 					</div>
 
@@ -666,7 +658,7 @@
 									{/each}
 								</Select.Group>
 							</Select.Content>
-							<Select.Input name="favoriteFruit" />
+							<Select.Input />
 						</Select.Root>
 					</div>
 
@@ -694,7 +686,7 @@
 									{/each}
 								</Select.Group>
 							</Select.Content>
-							<Select.Input name="favoriteFruit" />
+							<Select.Input />
 						</Select.Root>
 					</div>
 
@@ -709,6 +701,7 @@
 									class="w-full"
 									autocomplete="off"
 									bind:value={confirmModals.createFilesystem.data.properties.encryptionKey}
+									showPasswordOnFocus={true}
 								/>
 
 								<Button

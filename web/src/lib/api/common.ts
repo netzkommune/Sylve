@@ -10,9 +10,10 @@
 
 import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
-import { oldStore as oldToken, store as token } from '$lib/stores/auth';
+import { store as token } from '$lib/stores/auth';
 import adze from 'adze';
 import axios, { AxiosError, type AxiosInstance, type InternalAxiosRequestConfig } from 'axios';
+import toast from 'svelte-french-toast';
 import { get } from 'svelte/store';
 
 export let ENDPOINT: string;
@@ -48,12 +49,9 @@ api.interceptors.response.use(
 	(response) => response,
 	async (error) => {
 		if (error.response?.status === 401 && browser) {
-			// showToast({
-			// 	text: 'Session expired, please login again',
-			// 	type: 'error',
-			// 	timeout: 5000
-			// });
-			console.log('Session expired, please login again');
+			toast.error('Session expired, please login again', {
+				position: 'bottom-center'
+			});
 			goto('/login');
 			return;
 		}
@@ -66,18 +64,14 @@ export function handleAxiosError(error: unknown): void {
 	if (!browser) return;
 
 	if (!axios.isAxiosError(error)) {
-		// showToast({
-		// 	text: 'An unexpected error occurred',
-		// 	type: 'error',
-		// 	timeout: 5000
-		// });
-		console.log('An unexpected error occurred');
+		toast.error('An unexpected error occurred', {
+			position: 'bottom-center'
+		});
+		adze.withEmoji.error('An unexpected error occurred');
 		return;
 	}
 
 	const axiosError = error as AxiosError<{ message?: string }>;
-	// adze.withEmoji.error('Axios error:', axiosError.message);
-
 	if (axiosError.response) {
 		const errorMessage =
 			axiosError.response.data?.message || axiosError.message || 'An error occurred';
@@ -92,8 +86,5 @@ export function handleAxiosError(error: unknown): void {
 		// 	type: 'error',
 		// 	timeout: 5000
 		// });
-	} else {
-		// showToast({ text: 'An error occurred', type: 'error', timeout: 5000 });
-		adze.withEmoji.error('An error occurred');
 	}
 }

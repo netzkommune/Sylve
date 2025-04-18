@@ -189,3 +189,61 @@ func UnescapeFilepath(path string) (string, error) {
 	}
 	return string(buf), nil
 }
+
+func HumanFormatToSize(size string) uint64 {
+	size = strings.TrimSpace(size)
+	re := regexp.MustCompile(`(?i)^(\d+(?:\.\d+)?)\s*([kmgtp]?b?)$`)
+
+	matches := re.FindStringSubmatch(size)
+
+	if len(matches) != 3 {
+		reScientific := regexp.MustCompile(`(?i)^(\d+(?:\.\d+)?(?:e[+-]?\d+)?)\s*([kmgtp]?b?)$`)
+		matches = reScientific.FindStringSubmatch(size)
+		if len(matches) != 3 {
+			return 0
+		}
+	}
+
+	num, err := strconv.ParseFloat(matches[1], 64)
+	if err != nil || num < 0 {
+		return 0
+	}
+
+	unit := strings.ToUpper(matches[2])
+	if unit == "" {
+		unit = "B"
+	} else if !strings.HasSuffix(unit, "B") {
+		unit += "B"
+	}
+
+	var multiplier float64
+	switch unit {
+	case "B":
+		multiplier = 1
+	case "KB":
+		multiplier = 1 << 10
+	case "MB":
+		multiplier = 1 << 20
+	case "GB":
+		multiplier = 1 << 30
+	case "TB":
+		multiplier = 1 << 40
+	case "PB":
+		multiplier = 1 << 50
+	default:
+		return 0
+	}
+
+	maxVal := float64(^uint64(0))
+	result := num * multiplier
+
+	if num > maxVal/multiplier {
+		return ^uint64(0)
+	}
+
+	if result >= maxVal {
+		return ^uint64(0)
+	}
+
+	return uint64(result)
+}

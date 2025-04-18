@@ -29,6 +29,12 @@ type CreateFilesystemRequest struct {
 	Properties map[string]string `json:"properties"`
 }
 
+type CreateVolumeRequest struct {
+	Name       string            `json:"name" binding:"required"`
+	Parent     string            `json:"parent" binding:"required"`
+	Properties map[string]string `json:"properties"`
+}
+
 type RollbackSnapshotRequest struct {
 	GUID              string `json:"guid" binding:"required"`
 	DestroyMoreRecent bool   `json:"destroyMoreRecent"`
@@ -253,6 +259,64 @@ func DeleteFilesystem(zfsService *zfs.Service) gin.HandlerFunc {
 		c.JSON(http.StatusOK, internal.APIResponse[any]{
 			Status:  "success",
 			Message: "deleted_filesystem",
+			Error:   "",
+			Data:    nil,
+		})
+	}
+}
+
+func CreateVolume(zfsService *zfs.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var request CreateVolumeRequest
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		err := zfsService.CreateVolume(request.Name, request.Parent, request.Properties)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "created_volume",
+			Error:   "",
+			Data:    nil,
+		})
+	}
+}
+
+func DeleteVolume(zfsService *zfs.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		guid := c.Param("guid")
+		err := zfsService.DeleteVolume(guid)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "deleted_volume",
 			Error:   "",
 			Data:    nil,
 		})

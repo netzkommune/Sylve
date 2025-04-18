@@ -111,13 +111,42 @@ func (z *zfs) CreateVolume(name string, size uint64, properties map[string]strin
 	args[1] = "-p"
 	args[2] = "-V"
 	args[3] = strconv.FormatUint(size, 10)
+
+	if _, ok := properties["encryptionKey"]; ok {
+		if properties["encryptionKey"] != "" && properties["encryption"] != "off" {
+			if len([]byte(properties["encryptionKey"])) < 32 || len([]byte(properties["encryptionKey"])) > 512 {
+				return nil, fmt.Errorf("invalid_encryption_key_length")
+			}
+
+			seed := fmt.Sprintf("%s-%s", name, properties["encryptionKey"])
+			randomFile := fmt.Sprintf("/etc/zfs/keys/%s", utils.GenerateDeterministicUUID(seed))
+
+			if _, err := os.Stat(randomFile); err == nil {
+				return nil, fmt.Errorf("dont_reuse_encryption_keys")
+			}
+
+			if err := os.WriteFile(randomFile, []byte(properties["encryptionKey"]), 0600); err != nil {
+				return nil, fmt.Errorf("failed_to_write_encryption_key")
+			}
+
+			properties["keylocation"] = fmt.Sprintf("file://%s", randomFile)
+			properties["keyformat"] = "passphrase"
+		}
+	}
+
+	delete(properties, "encryptionKey")
+	delete(properties, "parent")
+	delete(properties, "size")
+
 	if properties != nil {
 		args = append(args, propsSlice(properties)...)
 	}
+
 	args = append(args, name)
 	if err := z.do(args...); err != nil {
 		return nil, err
 	}
+
 	return z.GetDataset(name)
 }
 
@@ -146,9 +175,9 @@ func (z *zfs) CreateFilesystem(name string, properties map[string]string) (*Data
 			properties["keylocation"] = fmt.Sprintf("file://%s", randomFile)
 			properties["keyformat"] = "passphrase"
 		}
-
-		delete(properties, "encryptionKey")
 	}
+
+	delete(properties, "encryptionKey")
 
 	if _, ok := properties["quota"]; ok {
 		if properties["quota"] == "" {

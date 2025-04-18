@@ -53,3 +53,23 @@ export async function rollbackSnapshot(guid: string): Promise<APIResponse> {
 		destroyMoreRecent: true
 	});
 }
+
+export async function createVolume(
+	name: string,
+	parent: string,
+	props: Record<string, string>
+): Promise<APIResponse> {
+	return await apiRequest('/zfs/datasets/volume', APIResponseSchema, 'POST', {
+		name: name,
+		parent: parent,
+		properties: props
+	});
+}
+
+export async function deleteVolume(dataset: Dataset): Promise<APIResponse> {
+	return await apiRequest(
+		`/zfs/datasets/volume/${dataset.properties.guid}`,
+		APIResponseSchema,
+		'DELETE'
+	);
+}

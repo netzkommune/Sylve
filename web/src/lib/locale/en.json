@@ -27,7 +27,8 @@
 		"pools": "Pools",
 		"datasets": "Datasets",
 		"file_systems": "Filesystems",
-		"notifications": "Notifications"
+		"notifications": "Notifications",
+		"volumes": "Volumes"
 	},
 	"summary": {
 		"CPU_s": "CPU(s)",

@@ -133,8 +133,6 @@ func DeletePartition(device string) error {
 		return err
 	}
 
-	fmt.Println("gpart", "delete", "-i", fmt.Sprintf("%d", partition), disk)
-
 	output, err := utils.RunCommand("gpart", "delete", "-i", fmt.Sprintf("%d", partition), disk)
 	if err != nil {
 		return fmt.Errorf("error deleting partition %d from disk %s: %v, output: %s", partition, disk, err, output)

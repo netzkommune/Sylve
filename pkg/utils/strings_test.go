@@ -590,3 +590,46 @@ func TestUnescapeFilepath(t *testing.T) {
 		})
 	}
 }
+
+func TestHumanFormatToSize(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected uint64
+	}{
+		{"Bytes", "123", 123},
+		{"Bytes with B", "123B", 123},
+		{"Bytes with b", "123b", 123},
+		{"Kilobytes", "1KB", 1 << 10},
+		{"Kilobytes lowercase", "1kb", 1 << 10},
+		{"Megabytes", "1MB", 1 << 20},
+		{"Gigabytes", "1GB", 1 << 30},
+		{"Terabytes", "1TB", 1 << 40},
+		{"Petabytes", "1PB", 1 << 50},
+		{"Decimal KB", "1.5KB", (1 << 10) + (1 << 9)},
+		{"Decimal MB", "0.5MB", 1 << 19},
+		{"Small decimal", "0.0001GB", 107374},
+		{"Space before unit", "1 KB", 1 << 10},
+		{"Multiple spaces", "1   MB", 1 << 20},
+		{"Tab separator", "1\tGB", 1 << 30},
+		{"Zero", "0", 0},
+		{"Zero with unit", "0GB", 0},
+		{"Large number", "1000000000000000000", 1000000000000000000},
+		{"Max uint64", "18446744073709551615", ^uint64(0)},
+		{"Empty string", "", 0},
+		{"Only spaces", "   ", 0},
+		{"Invalid unit", "1XB", 0},
+		{"Negative number", "-1KB", 0},
+		{"Invalid format", "KB", 0},
+		{"Number too large", "18446744073709551616", ^uint64(0)},
+		{"Number way too large", "1e100PB", ^uint64(0)},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := HumanFormatToSize(tt.input); got != tt.expected {
+				t.Errorf("HumanFormatToSize(%q) = %v, want %v", tt.input, got, tt.expected)
+			}
+		})
+	}
+}

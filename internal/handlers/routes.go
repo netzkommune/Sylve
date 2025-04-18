@@ -108,6 +108,9 @@ func RegisterRoutes(r *gin.Engine,
 
 			datasets.POST("/filesystem", zfsHandlers.CreateFilesystem(zfsService))
 			datasets.DELETE("/filesystem/:guid", zfsHandlers.DeleteFilesystem(zfsService))
+
+			datasets.POST("/volume", zfsHandlers.CreateVolume(zfsService))
+			datasets.DELETE("/volume/:guid", zfsHandlers.DeleteVolume(zfsService))
 		}
 	}
 

@@ -538,13 +538,24 @@
 			};
 
 			if (disks.old && disks.new) {
-				console.log(parseInt(getDiskSize(disks.new)), disks.old.size);
+				console.log(getDiskSize(disks.new), disks.old.size);
 				if (parseInt(getDiskSize(disks.new)) < disks.old.size) {
 					toast.error('New device is smaller than old device', {
 						position: 'bottom-center'
 					});
 
 					return;
+				}
+			} else if (!disks.new && disks.old) {
+				const partition = useablePartitions.find((p) => p.name === newName);
+				if (partition) {
+					if (partition.size < disks.old.size) {
+						toast.error('New partition is smaller than old device', {
+							position: 'bottom-center'
+						});
+
+						return;
+					}
 				}
 			}
 
@@ -560,6 +571,7 @@
 					{
 						loading: `Replacing ${stripDev(oldName)} with ${stripDev(newName)}`,
 						success: (response) => {
+							console.log(response);
 							return getTranslation(`zfs.pool.${response.message}`, 'Device replacement started');
 						},
 						error: (error) => {
@@ -621,7 +633,6 @@
 				<Button
 					on:click={async () => {
 						const response = await scrubPool(activeRow?.name);
-						console.log(response);
 						if (response.status === 'error') {
 							toast.error(parsePoolActionError(response), {
 								position: 'bottom-center'
@@ -835,12 +846,7 @@
 	<div class="relative flex h-full w-full cursor-pointer flex-col">
 		<div class="flex-1">
 			<div class="h-full overflow-y-auto">
-				<TreeTable
-					data={tableData}
-					name="tt-zfsPool"
-					itemIcon={'carbon:partition-collection'}
-					bind:parentActiveRow={activeRow}
-				/>
+				<TreeTable data={tableData} name="tt-zfsPool" bind:parentActiveRow={activeRow} />
 			</div>
 		</div>
 	</div>

@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"os"
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
+	"sylve/pkg/utils"
 	"sylve/pkg/zfs"
 )
 
@@ -79,6 +80,10 @@ func (s *Service) CreateSnapshot(guid string, name string, recursive bool) error
 	}
 
 	for _, dataset := range datasets {
+		if dataset.Name == dataset.Name+"@"+name {
+			return fmt.Errorf("snapshot with name %s already exists", name)
+		}
+
 		properties, err := dataset.GetAllProperties()
 		if err != nil {
 			return err
@@ -211,4 +216,55 @@ func (s *Service) RollbackSnapshot(guid string, destroyMoreRecent bool) error {
 	}
 
 	return fmt.Errorf("snapshot with guid %s not found", guid)
+}
+
+func (s *Service) CreateVolume(name string, parent string, props map[string]string) error {
+	datasets, err := zfs.Datasets("")
+	if err != nil {
+		return err
+	}
+
+	for _, dataset := range datasets {
+		if dataset.Name == fmt.Sprintf("%s/%s", parent, name) && dataset.Type == "volume" {
+			return fmt.Errorf("volume with name %s already exists", name)
+		}
+	}
+
+	name = fmt.Sprintf("%s/%s", parent, name)
+
+	if _, ok := props["size"]; !ok {
+		return fmt.Errorf("size property not found")
+	}
+
+	pSize := utils.HumanFormatToSize(props["size"])
+
+	_, err = zfs.CreateVolume(name, pSize, props)
+
+	return err
+}
+
+func (s *Service) DeleteVolume(guid string) error {
+	datasets, err := zfs.Datasets("")
+	if err != nil {
+		return err
+	}
+
+	for _, dataset := range datasets {
+		properties, err := dataset.GetAllProperties()
+		if err != nil {
+			return err
+		}
+
+		for _, v := range properties {
+			if v == guid {
+				err := dataset.Destroy(zfs.DestroyDefault)
+				if err != nil {
+					return err
+				}
+				return nil
+			}
+		}
+	}
+
+	return fmt.Errorf("volume with guid %s not found", guid)
 }

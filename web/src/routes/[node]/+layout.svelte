@@ -56,6 +56,11 @@
 									label: 'file_systems',
 									icon: 'eos-icons:file-system',
 									href: `/${node}/storage/zfs/datasets/fs`
+								},
+								{
+									label: 'volumes',
+									icon: 'carbon:volume-block-storage',
+									href: `/${node}/storage/zfs/datasets/volumes`
 								}
 							]
 						}

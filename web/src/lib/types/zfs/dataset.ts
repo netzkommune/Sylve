@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ZpoolSchema } from './pool';
 
 export const DatasetSchema = z.object({
 	name: z.string(),
@@ -93,6 +94,7 @@ export const DatasetSchema = z.object({
 
 export const GroupedByPoolSchema = z.object({
 	name: z.string(),
+	pool: ZpoolSchema,
 	filesystems: z.array(DatasetSchema).default([]),
 	snapshots: z.array(DatasetSchema).default([]),
 	volumes: z.array(DatasetSchema).default([])

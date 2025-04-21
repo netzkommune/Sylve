@@ -633,3 +633,85 @@ func TestHumanFormatToSize(t *testing.T) {
 		})
 	}
 }
+func TestIsIndented(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected bool
+	}{
+		{
+			input:    "    indented line",
+			expected: true,
+		},
+		{
+			input:    "\tindented with tab",
+			expected: true,
+		},
+		{
+			input:    "not indented",
+			expected: false,
+		},
+		{
+			input:    "",
+			expected: false,
+		},
+		{
+			input:    " \t mixed spaces and tab",
+			expected: true,
+		},
+		{
+			input:    "\nnewline character",
+			expected: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("input=%q", tt.input), func(t *testing.T) {
+			result := IsIndented(tt.input)
+			if result != tt.expected {
+				t.Errorf("IsIndented(%q) = %v; want %v", tt.input, result, tt.expected)
+			}
+		})
+	}
+}
+func TestContains(t *testing.T) {
+	tests := []struct {
+		slice    []string
+		val      string
+		expected bool
+	}{
+		{
+			slice:    []string{"apple", "banana", "cherry"},
+			val:      "banana",
+			expected: true,
+		},
+		{
+			slice:    []string{"apple", "banana", "cherry"},
+			val:      "grape",
+			expected: false,
+		},
+		{
+			slice:    []string{},
+			val:      "apple",
+			expected: false,
+		},
+		{
+			slice:    []string{"apple", "banana", "cherry"},
+			val:      "",
+			expected: false,
+		},
+		{
+			slice:    []string{"", "banana", "cherry"},
+			val:      "",
+			expected: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("slice=%v,val=%q", tt.slice, tt.val), func(t *testing.T) {
+			result := Contains(tt.slice, tt.val)
+			if result != tt.expected {
+				t.Errorf("Contains(%v, %q) = %v; want %v", tt.slice, tt.val, result, tt.expected)
+			}
+		})
+	}
+}

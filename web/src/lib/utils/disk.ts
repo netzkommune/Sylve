@@ -15,6 +15,7 @@ import humanFormat from 'human-format';
 import type { CellComponent } from 'tabulator-tables';
 import { getTranslation } from './i18n';
 import { generateNumberFromString } from './numbers';
+import { renderWithIcon } from './table';
 
 export function parseSMART(disk: Disk): SmartAttribute | SmartAttribute[] {
 	if (disk.type === 'NVMe') {
@@ -183,7 +184,33 @@ export function generateTableData(disks: Disk[]): { rows: Row[]; columns: Column
 	const columns: Column[] = [
 		{
 			field: 'device',
-			title: getTranslation('disk.device', 'Device')
+			title: getTranslation('disk.device', 'Device'),
+			formatter: (cell: CellComponent) => {
+				const value = cell.getValue();
+				const row = cell.getRow();
+				const disk = disks.find((d) => d.device === value);
+
+				if (disk) {
+					if (disk.type === 'HDD') {
+						return renderWithIcon('mdi:harddisk', value);
+					}
+
+					if (disk.type === 'NVMe') {
+						return renderWithIcon('bi:nvme', value, 'rotate-90');
+					}
+
+					if (disk.type === 'SSD') {
+						return renderWithIcon('icon-park-outline:ssd', value);
+					}
+				}
+
+				// console.log(`Disk not found: ${value}`);
+				if (value.match(/p\d+$/)) {
+					return renderWithIcon('ant-design:partition-outlined', value);
+				}
+
+				return value;
+			}
 		},
 		{
 			field: 'type',

@@ -234,7 +234,7 @@
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
 			<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
-			{getTranslation('disk.wipe_disk', 'Wipe Disk')}
+			{capitalizeFirstLetter(getTranslation('disk.wipe_disk', 'Wipe Disk'))}
 		</Button>
 	{/if}
 
@@ -245,7 +245,7 @@
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
 			<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
-			{getTranslation('disk.delete_partition', 'Delete Partition')}
+			{capitalizeFirstLetter(getTranslation('disk.delete_partition', 'Delete Partition'))}
 		</Button>
 	{/if}
 
@@ -256,7 +256,7 @@
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
 			<Icon icon="ant-design:partition-outlined" class="mr-1 h-4 w-4" />
-			{getTranslation('disk.create_partition', 'Create Partition')}
+			{capitalizeFirstLetter(getTranslation('disk.create_partition', 'Create Partition'))}
 		</Button>
 	{/if}
 {/snippet}

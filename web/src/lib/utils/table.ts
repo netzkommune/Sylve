@@ -9,6 +9,7 @@
  */
 
 import { TabulatorFull, type RowComponent, type Tabulator } from 'tabulator-tables';
+import { iconCache } from './icons';
 
 export function deselectAllRows(table: Tabulator | null) {
 	if (table) {
@@ -61,3 +62,13 @@ export function deleteRowByFieldValue(tableId: string, field: string, value: str
 		console.error('Error deleting row:', error);
 	}
 }
+
+export const renderWithIcon = (iconKey: string, suffix: string, extraClass?: string) => {
+	const icon = iconCache[iconKey] || '';
+	return `
+                        <span class="inline-flex items-center gap-1 whitespace-nowrap text-ellipsis overflow-hidden">
+                            <span class="shrink-0 ${extraClass || ''}">${icon}</span>
+                            <span>${suffix}</span>
+                        </span>
+                    `.trim();
+};

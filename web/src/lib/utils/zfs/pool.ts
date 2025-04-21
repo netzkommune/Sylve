@@ -11,6 +11,34 @@ const sizeOptions = {
 	maxDecimals: 1
 };
 
+export const raidTypeArr = [
+	{
+		value: 'stripe',
+		label: getTranslation('zfs.pool.redundancy.stripe', 'Stripe'),
+		available: true
+	},
+	{
+		value: 'mirror',
+		label: getTranslation('zfs.pool.redundancy.mirror', 'Mirror'),
+		available: false
+	},
+	{
+		value: 'raidz',
+		label: getTranslation('zfs.pool.redundancy.raidz', 'RAIDZ'),
+		available: false
+	},
+	{
+		value: 'raidz2',
+		label: getTranslation('zfs.pool.redundancy.raidz2', 'RAIDZ2'),
+		available: false
+	},
+	{
+		value: 'raidz3',
+		label: getTranslation('zfs.pool.redundancy.raidz3', 'RAIDZ3'),
+		available: false
+	}
+];
+
 export function generateTableData(pools: Zpool[]): {
 	rows: Row[];
 	columns: Column[];
@@ -140,7 +168,51 @@ export function generateTableData(pools: Zpool[]): {
 		}
 
 		rows.push(poolRow);
+
+		if (pool.spares && pool.spares.length > 0) {
+			const sparesRow: Row = {
+				id: generateNumberFromString(`${pool.name}-spares`),
+				name: 'Spares',
+				size:
+					pool.spares.reduce((acc, spare) => acc + spare.size, 0) > 0
+						? humanFormat(
+								pool.spares.reduce((acc, spare) => acc + spare.size, 0),
+								sizeOptions
+							)
+						: '-',
+				used: '-',
+				health: '-',
+				redundancy: '-',
+				children: []
+			};
+
+			for (const spare of pool.spares) {
+				sparesRow.children!.push({
+					id: generateNumberFromString(spare.name),
+					name: spare.name,
+					size: humanFormat(spare.size, sizeOptions),
+					used: '-',
+					health: spare.health,
+					redundancy: '-',
+					children: []
+				});
+			}
+
+			poolRow.children!.push(sparesRow);
+		}
 	}
+
+	// spares should be at the end of the pool
+	rows = rows.map((row) => {
+		if (row.children) {
+			const sparesIndex = row.children.findIndex((child) => child.name === 'Spares');
+			if (sparesIndex !== -1) {
+				const sparesRow = row.children.splice(sparesIndex, 1)[0];
+				row.children.push(sparesRow);
+			}
+		}
+		return row;
+	});
 
 	return {
 		rows,

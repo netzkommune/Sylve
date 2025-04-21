@@ -8,10 +8,18 @@
  * under sponsorship from the FreeBSD Foundation.
  */
 
+import { getIcon, loadIcon } from '@iconify/svelte';
 import { Mnemonic } from './vendor/mnemonic';
 
-export function capitalizeFirstLetter(str: string): string {
-	return str.length > 0 ? str[0].toLocaleUpperCase() + str.slice(1) : str;
+export function capitalizeFirstLetter(str: string, firstOnly: boolean = false): string {
+	if (firstOnly) {
+		return str.charAt(0).toLocaleUpperCase() + str.slice(1);
+	}
+
+	return str
+		.split(' ')
+		.map((word) => word.charAt(0).toLocaleUpperCase() + word.slice(1))
+		.join(' ');
 }
 
 export function parseJwt(token: string) {
@@ -37,4 +45,17 @@ export function shortenString(str: string, maxLength: number): string {
 
 export function generatePassword(): string {
 	return new Mnemonic().toWords().slice(0, 6).join('-');
+}
+
+export async function iconToSVG(icon: string): Promise<string> {
+	await loadIcon(icon);
+	const i = getIcon(icon);
+	if (i) {
+		const { body, width, height, left, top } = i;
+		const viewBox = `${left} ${top} ${width} ${height}`;
+		const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="${viewBox}">${body}</svg>`;
+		return svg;
+	}
+
+	return ''; // Ensure the function always returns a string
 }

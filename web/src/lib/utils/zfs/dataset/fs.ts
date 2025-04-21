@@ -2,8 +2,10 @@ import type { APIResponse } from '$lib/types/common';
 import type { Column, Row } from '$lib/types/components/tree-table';
 import type { Dataset, GroupedByPool } from '$lib/types/zfs/dataset';
 import { getTranslation } from '$lib/utils/i18n';
+import { iconCache } from '$lib/utils/icons';
 import { generateNumberFromString } from '$lib/utils/numbers';
 import { capitalizeFirstLetter } from '$lib/utils/string';
+import { renderWithIcon } from '$lib/utils/table';
 import { cleanChildren } from '$lib/utils/tree-table';
 import humanFormat from 'human-format';
 import toast from 'svelte-french-toast';
@@ -139,7 +141,25 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 		},
 		{
 			field: 'name',
-			title: 'Name'
+			title: 'Name',
+			formatter: (cell) => {
+				const value = cell.getValue();
+
+				if (value.includes('@')) {
+					const [, snapshot] = value.split('@');
+					return renderWithIcon('carbon:ibm-cloud-vpc-block-storage-snapshots', snapshot);
+				}
+
+				if (value.includes('/')) {
+					return renderWithIcon('material-symbols:files', value.substring(value.indexOf('/') + 1));
+				}
+
+				if (!value.includes('/') && !value.includes('@')) {
+					return renderWithIcon('bi:hdd-stack-fill', value);
+				}
+
+				return `<span class="whitespace-nowrap">${value}</span>`;
+			}
 		},
 		{
 			field: 'used',

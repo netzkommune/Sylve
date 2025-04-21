@@ -19,6 +19,7 @@ type Zpool struct {
 	Vdevs       []Vdev            `json:"vdevs"`
 	Properties  map[string]string `json:"properties"`
 	CreateForce bool              `json:"createForce"`
+	Spares      []string          `json:"spares"`
 }
 
 type ReplaceDevice struct {

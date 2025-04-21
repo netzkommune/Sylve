@@ -18,6 +18,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
@@ -246,4 +247,17 @@ func HumanFormatToSize(size string) uint64 {
 	}
 
 	return uint64(result)
+}
+
+func IsIndented(line string) bool {
+	return len(line) > 0 && unicode.IsSpace(rune(line[0]))
+}
+
+func Contains(slice []string, val string) bool {
+	for _, s := range slice {
+		if s == val {
+			return true
+		}
+	}
+	return false
 }

@@ -88,7 +88,7 @@ func WipeDisk(diskService *disk.Service, infoService *info.Service) gin.HandlerF
 			return
 		}
 
-		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("wipe_disk|-|%s", r.Device), "started")
+		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("disk.wipe_disk|-|%s", r.Device), "started")
 		err := diskUtils.DestroyDisk(r.Device)
 
 		if err != nil {
@@ -99,10 +99,7 @@ func WipeDisk(diskService *disk.Service, infoService *info.Service) gin.HandlerF
 				Data:    nil,
 			})
 
-			if id != 0 {
-				infoService.EndAuditLog(id, "failed")
-			}
-
+			infoService.EndAuditLog(id, "failed")
 			return
 		}
 
@@ -113,9 +110,7 @@ func WipeDisk(diskService *disk.Service, infoService *info.Service) gin.HandlerF
 			Data:    nil,
 		})
 
-		if id != 0 {
-			infoService.EndAuditLog(id, "success")
-		}
+		infoService.EndAuditLog(id, "success")
 	}
 }
 
@@ -145,7 +140,7 @@ func InitializeGPT(diskService *disk.Service, infoService *info.Service) gin.Han
 			return
 		}
 
-		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("initialize_gpt_disk|-|%s", r.Device), "started")
+		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("disk.initialize|-|%s", r.Device), "started")
 		err := diskService.InitializeGPT(r.Device)
 
 		if err != nil {
@@ -156,9 +151,7 @@ func InitializeGPT(diskService *disk.Service, infoService *info.Service) gin.Han
 				Data:    nil,
 			})
 
-			if id != 0 {
-				infoService.EndAuditLog(id, "failed")
-			}
+			infoService.EndAuditLog(id, "failed")
 			return
 		}
 
@@ -169,9 +162,7 @@ func InitializeGPT(diskService *disk.Service, infoService *info.Service) gin.Han
 			Data:    nil,
 		})
 
-		if id != 0 {
-			infoService.EndAuditLog(id, "success")
-		}
+		infoService.EndAuditLog(id, "success")
 	}
 }
 
@@ -201,7 +192,7 @@ func CreatePartition(infoService *info.Service) gin.HandlerFunc {
 			return
 		}
 
-		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("create_partition|-|%s", r.Device), "started")
+		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("disk.create_partition|-|%s", r.Device), "started")
 		err := diskUtils.CreatePartitions(r.Device, r.Sizes)
 
 		if err != nil {
@@ -212,9 +203,7 @@ func CreatePartition(infoService *info.Service) gin.HandlerFunc {
 				Data:    nil,
 			})
 
-			if id != 0 {
-				infoService.EndAuditLog(id, "failed")
-			}
+			infoService.EndAuditLog(id, "failed")
 			return
 		}
 
@@ -225,9 +214,7 @@ func CreatePartition(infoService *info.Service) gin.HandlerFunc {
 			Data:    nil,
 		})
 
-		if id != 0 {
-			infoService.EndAuditLog(id, "success")
-		}
+		infoService.EndAuditLog(id, "success")
 	}
 }
 
@@ -257,7 +244,7 @@ func DeletePartition(infoService *info.Service) gin.HandlerFunc {
 			return
 		}
 
-		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("create_partition|-|%s", r.Device), "started")
+		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("disk.delete_partition|-|%s", r.Device), "started")
 		err := diskUtils.DeletePartition(r.Device)
 
 		if err != nil {
@@ -268,9 +255,7 @@ func DeletePartition(infoService *info.Service) gin.HandlerFunc {
 				Data:    nil,
 			})
 
-			if id != 0 {
-				infoService.EndAuditLog(id, "failed")
-			}
+			infoService.EndAuditLog(id, "failed")
 			return
 		}
 
@@ -281,8 +266,6 @@ func DeletePartition(infoService *info.Service) gin.HandlerFunc {
 			Data:    nil,
 		})
 
-		if id != 0 {
-			infoService.EndAuditLog(id, "success")
-		}
+		infoService.EndAuditLog(id, "success")
 	}
 }

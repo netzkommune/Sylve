@@ -93,10 +93,10 @@ func RegisterRoutes(r *gin.Engine,
 		pools := zfs.Group("/pools")
 		{
 			pools.GET("", zfsHandlers.GetPools(zfsService))
-			pools.POST("", zfsHandlers.CreatePool(zfsService))
-			pools.POST("/:name/scrub", zfsHandlers.ScrubPool(zfsService))
-			pools.POST("/:name/replace-device", zfsHandlers.ReplaceDevice(zfsService))
-			pools.DELETE("/:name", zfsHandlers.DeletePool(zfsService))
+			pools.POST("", zfsHandlers.CreatePool(infoService, zfsService))
+			pools.POST("/:name/scrub", zfsHandlers.ScrubPool(infoService, zfsService))
+			pools.DELETE("/:name", zfsHandlers.DeletePool(infoService, zfsService))
+			pools.POST("/:name/replace-device", zfsHandlers.ReplaceDevice(infoService, zfsService))
 		}
 
 		datasets := zfs.Group("/datasets")

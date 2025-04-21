@@ -50,16 +50,16 @@
 		"smart": "S.M.A.R.T.",
 		"smart_values": "S.M.A.R.T. values",
 		"initialize_gpt": "Initialize GPT",
-		"wipe_disk": "Wipe Disk",
+		"wipe_disk": "wipe disk",
 		"attribute": "Attribute",
-		"delete_partition": "Delete Partition",
-		"create_partition": "Create Partition",
+		"delete_partition": "delete partition",
+		"create_partition": "create partition",
 		"value": "Value",
 		"wipe": "wipe",
 		"partition": "partition",
 		"partitions": "partitions",
 		"gpt_initialized": "initialized with GPT",
-		"initialize": "Initialize",
+		"initialize": "initialize",
 		"full_wipe_success": "Disk wiped",
 		"partition_wipe_success": "Partition deleted",
 		"device": "Device",
@@ -70,6 +70,9 @@
 		"model": "Model",
 		"serial": "Serial",
 		"wearout": "Wearout"
+	},
+	"partition": {
+		"create": "Create Partition"
 	},
 	"zfs": {
 		"pool": {
@@ -103,8 +106,8 @@
 				"redundancy": "redundancy"
 			},
 			"pool_status": "Pool Status",
-			"delete_pool": "Delete Pool",
-			"replace_device": "Replace Device",
+			"delete_pool": "delete pool",
+			"replace_device": "replace device",
 			"replacing": "Replacing",
 			"scrub": "Scrub",
 			"delete": "Delete",
@@ -112,7 +115,9 @@
 			"no_available_disks": "No available disks",
 			"partitions": "Partitions",
 			"no_available_partitions": "No available partitions",
-			"create_zfs_pool": "Create ZFS Pool"
+			"create_zfs_pool": "Create ZFS Pool",
+			"create_pool": "create pool",
+			"scrub_pool": "scrub pool"
 		},
 		"datasets": {
 			"filesystem_already_exists": "filesystem already exists",

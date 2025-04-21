@@ -4,20 +4,28 @@
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import type { AuditLog } from '$lib/types/info/audit';
 	import { convertDbTime } from '$lib/utils/time';
+	import { useQueries } from '@sveltestack/svelte-query';
 	import { onMount } from 'svelte';
 
-	let logs: AuditLog = [];
+	const results = useQueries([
+		{
+			queryKey: ['auditLog'],
+			queryFn: async () => {
+				return await getAuditLogs();
+			},
+			refetchInterval: 1000,
+			keepPreviousData: true
+		}
+	]);
 
-	onMount(async () => {
-		logs = await getAuditLogs();
-	});
+	let logs = $derived($results[0].data as AuditLog);
 </script>
 
 <Tabs.Root value="cluster" class="flex h-full w-full flex-col">
 	<Tabs.Content value="cluster" class="flex h-full flex-col border">
 		<div class="flex h-full flex-col overflow-hidden">
 			<Table.Root class="w-full table-fixed border-collapse">
-				<Table.Header class="sticky top-0 z-[50] bg-background ">
+				<Table.Header class="bg-background sticky top-0 z-[50] ">
 					<Table.Row class="dark:hover:bg-background ">
 						<Table.Head class="h-10 px-4 py-2 font-semibold text-black dark:text-white"
 							>Start Time</Table.Head

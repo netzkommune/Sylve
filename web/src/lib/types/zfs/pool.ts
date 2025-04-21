@@ -64,6 +64,12 @@ export const ZpoolStatusSchema = z.object({
 	errors: z.string()
 });
 
+export const ZpoolSpareSchema = z.object({
+	name: z.string(),
+	size: z.number(),
+	health: z.string()
+});
+
 export const ZpoolSchema = z.object({
 	id: z.string(),
 	name: z.string(),
@@ -77,7 +83,8 @@ export const ZpoolSchema = z.object({
 	leaked: z.number(),
 	dedupRatio: z.number(),
 	vdevs: z.array(VdevSchema),
-	status: ZpoolStatusSchema
+	status: ZpoolStatusSchema,
+	spares: z.array(ZpoolSpareSchema).optional().default([])
 });
 
 export const CreateVdevSchema = z.object({
@@ -99,7 +106,8 @@ export const CreateZpoolSchema = z.object({
 	raidType: ZpoolRaidTypeSchema,
 	vdevs: z.array(CreateVdevSchema),
 	properties: z.record(z.string()).optional(),
-	createForce: z.boolean().default(false)
+	createForce: z.boolean().default(false),
+	spares: z.array(z.string()).optional()
 });
 
 export const ReplaceDeviceSchema = z.object({

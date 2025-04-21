@@ -38,22 +38,29 @@ type Vdev struct {
 	ReplacingDevices []ReplacingDevice `json:"replacingDevices,omitempty"`
 }
 
+type SpareDevice struct {
+	Name   string `json:"name"`
+	Size   uint64 `json:"size"`
+	Health string `json:"health"`
+}
+
 type Zpool struct {
-	z             *zfs        `json:"-"`
-	ID            string      `json:"id"` /* Same as GUID but for ease of use in Tabulator*/
-	Name          string      `json:"name"`
-	GUID          string      `json:"guid"`
-	Health        string      `json:"health"`
-	Allocated     uint64      `json:"allocated"`
-	Size          uint64      `json:"size"`
-	Free          uint64      `json:"free"`
-	Fragmentation uint64      `json:"fragmentation"`
-	ReadOnly      bool        `json:"readOnly"`
-	Freeing       uint64      `json:"freeing"`
-	Leaked        uint64      `json:"leaked"`
-	DedupRatio    float64     `json:"dedupRatio"`
-	Vdevs         []Vdev      `json:"vdevs"`
-	Status        ZpoolStatus `json:"status"`
+	z             *zfs          `json:"-"`
+	ID            string        `json:"id"` /* Same as GUID but for ease of use in Tabulator*/
+	Name          string        `json:"name"`
+	GUID          string        `json:"guid"`
+	Health        string        `json:"health"`
+	Allocated     uint64        `json:"allocated"`
+	Size          uint64        `json:"size"`
+	Free          uint64        `json:"free"`
+	Fragmentation uint64        `json:"fragmentation"`
+	ReadOnly      bool          `json:"readOnly"`
+	Freeing       uint64        `json:"freeing"`
+	Leaked        uint64        `json:"leaked"`
+	DedupRatio    float64       `json:"dedupRatio"`
+	Vdevs         []Vdev        `json:"vdevs"`
+	Status        ZpoolStatus   `json:"status"`
+	Spares        []SpareDevice `json:"spares"`
 }
 
 type ZpoolDevice struct {
@@ -149,7 +156,7 @@ func (z *zfs) GetZpool(name string) (*Zpool, error) {
 		return nil, err
 	}
 
-	pool := &Zpool{z: z, Name: name}
+	pool := &Zpool{z: z, Name: name, Spares: []SpareDevice{}}
 	for _, line := range out {
 		if err := pool.parseLine(line); err != nil {
 			return nil, err
@@ -164,6 +171,7 @@ func (z *zfs) GetZpool(name string) (*Zpool, error) {
 	var vdevPtrs []*Vdev
 	var currentVdev *Vdev
 	var currentReplacing *ReplacingDevice
+	var potentialSpares map[string]string = make(map[string]string) // Store potential spares with their health
 
 	for i, line := range vdevOut {
 		if len(line) < 10 {
@@ -197,6 +205,12 @@ func (z *zfs) GetZpool(name string) (*Zpool, error) {
 			}
 			vdevPtrs = append(vdevPtrs, currentVdev)
 			currentReplacing = nil
+		} else if vdevName == "spare" {
+			// The next devices are spares, store their names and health
+			currentVdev = &Vdev{Name: vdevName} // Treat "spare" as a temporary vdev
+			// We explicitly do NOT append currentVdev to vdevPtrs here for "spare"
+		} else if currentVdev != nil && currentVdev.Name == "spare" && strings.HasPrefix(vdevName, "/dev/") {
+			potentialSpares[vdevName] = line[9]
 		} else if strings.HasPrefix(vdevName, "replacing") {
 			// This is a replacing vdev
 			if currentVdev != nil {
@@ -229,7 +243,7 @@ func (z *zfs) GetZpool(name string) (*Zpool, error) {
 				currentReplacing = nil
 			}
 		} else if strings.HasPrefix(vdevName, "/dev/") {
-			// This is a device
+			// This is a regular device
 			device := VdevDevice{
 				Name:   vdevName,
 				Size:   utils.StringToUint64(line[1]),
@@ -290,12 +304,26 @@ func (z *zfs) GetZpool(name string) (*Zpool, error) {
 
 	var vdevs []Vdev
 	for _, v := range vdevPtrs {
-		vdevs = append(vdevs, *v)
+		// Skip adding the "spare" vdev to the list of vdevs
+		if v.Name != "spare" {
+			vdevs = append(vdevs, *v)
+		}
+	}
+	pool.Vdevs = vdevs
+
+	// Now, iterate through vdevOut again to find the size of the spares
+	for _, line := range vdevOut {
+		if len(line) >= 2 && strings.HasPrefix(line[0], "/dev/") {
+			deviceName := line[0]
+			size := utils.StringToUint64(line[1])
+			if health, ok := potentialSpares[deviceName]; ok {
+				pool.Spares = append(pool.Spares, SpareDevice{Name: deviceName, Size: size, Health: health})
+				delete(potentialSpares, deviceName) // Remove to avoid processing again
+			}
+		}
 	}
 
-	pool.Vdevs = vdevs
 	pool.Status, err = z.GetZpoolStatus(name)
-
 	if err != nil {
 		return nil, err
 	}

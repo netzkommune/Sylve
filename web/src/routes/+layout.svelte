@@ -11,6 +11,7 @@
 	import { store as token } from '$lib/stores/auth';
 	import { hostname } from '$lib/stores/basic';
 	import '$lib/utils/i18n';
+	import { preloadIcons } from '$lib/utils/icons';
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
 	import { ModeWatcher } from 'mode-watcher';
 	import { onMount, tick } from 'svelte';
@@ -63,6 +64,7 @@
 			}
 		}
 
+		await preloadIcons();
 		isLoading = false;
 		await tick();
 	});

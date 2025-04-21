@@ -75,6 +75,11 @@ func (s *Service) CreatePool(pool zfsServiceInterfaces.Zpool) error {
 	}
 	args = append(args, vdevArgs...)
 
+	if len(pool.Spares) > 0 {
+		args = append(args, "spare")
+		args = append(args, pool.Spares...)
+	}
+
 	_, err = zfs.CreateZpool(pool.Name, pool.Properties, args...)
 	if err != nil {
 		return fmt.Errorf("zpool_create_failed: %v", err)

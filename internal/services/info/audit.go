@@ -68,6 +68,10 @@ func (s *Service) StartAuditLog(token string, action string, status string) uint
 }
 
 func (s *Service) EndAuditLog(logID uint, status string) error {
+	if logID == 0 {
+		return nil
+	}
+
 	var log infoModels.AuditLog
 	err := s.DB.Where("id = ?", logID).First(&log).Error
 

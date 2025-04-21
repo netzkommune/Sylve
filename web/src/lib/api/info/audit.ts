@@ -9,22 +9,8 @@ export async function getAuditLogs(): Promise<AuditLog> {
 
 export function formatAction(action: string): string {
 	if (action.includes('|-|')) {
-		const split = action.split('|-|').join(' ');
-		const parts = split.split(' ');
-
-		if (parts.length >= 2) {
-			const command = parts[0];
-			const argument = parts[1];
-
-			const parent = command.split('_').pop();
-			const child = command.split('_').shift();
-
-			return (
-				capitalizeFirstLetter(getTranslation(`${parent}.${child}`, `${parent}.${child}`)) +
-				' ' +
-				argument
-			);
-		}
+		const parts = action.split('|-|');
+		return capitalizeFirstLetter(getTranslation(parts[0], parts[0]), true) + ' ' + parts[1];
 	}
 
 	switch (action) {
@@ -44,6 +30,8 @@ export function formatStatus(status: string): string {
 		case 'success':
 			return 'OK';
 		case 'failure':
+			return 'Failed';
+		case 'failed':
 			return 'Failed';
 		case 'progress':
 			return 'In Progress';

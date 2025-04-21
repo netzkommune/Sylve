@@ -33,7 +33,8 @@
 		getPoolByDevice,
 		isPool,
 		isReplaceableDevice,
-		parsePoolActionError
+		parsePoolActionError,
+		raidTypeArr
 	} from '$lib/utils/zfs/pool';
 	import humanFormat from 'human-format';
 	import { untrack } from 'svelte';
@@ -91,34 +92,13 @@
 	let activeRow: Row | null = $state(null);
 	let replaceInProgress: boolean = $state(false);
 	let scrubInProgress: boolean = $state(false);
+	let raidTypes = $state(raidTypeArr);
 
-	let raidTypes = $state([
-		{
-			value: 'stripe',
-			label: getTranslation('zfs.pool.redundancy.stripe', 'Stripe'),
-			available: true
-		},
-		{
-			value: 'mirror',
-			label: getTranslation('zfs.pool.redundancy.mirror', 'Mirror'),
-			available: false
-		},
-		{
-			value: 'raidz',
-			label: getTranslation('zfs.pool.redundancy.raidz', 'RAIDZ'),
-			available: false
-		},
-		{
-			value: 'raidz2',
-			label: getTranslation('zfs.pool.redundancy.raidz2', 'RAIDZ2'),
-			available: false
-		},
-		{
-			value: 'raidz3',
-			label: getTranslation('zfs.pool.redundancy.raidz3', 'RAIDZ3'),
-			available: false
-		}
-	]);
+	interface SelectSpares {
+		value: string;
+		label: string;
+		disabled: boolean;
+	}
 
 	let modal = $state({
 		open: false,
@@ -139,6 +119,7 @@
 		},
 		useable: 0,
 		creating: false,
+		spares: [] as SelectSpares[],
 		close: () => {
 			modal.name = '';
 			modal.open = false;
@@ -181,7 +162,7 @@
 				old: '',
 				new: ''
 			},
-			title: getTranslation('zfs.pool.replace_device', 'Replace Device')
+			title: capitalizeFirstLetter(getTranslation('zfs.pool.replace_device', 'Replace Device'))
 		}
 	});
 
@@ -191,6 +172,9 @@
 	let useablePartitions = $derived(zpoolUseablePartitions(disks, pools));
 	let tableData = $derived(generateTableData(pools));
 	let sPool = $derived(pools.find((p) => p.name === activeRow?.name)?.status as Zpool['status']);
+	let sPoolSpares = $derived(
+		pools.find((p) => p.name === activeRow?.name)?.spares as Zpool['spares']
+	);
 
 	$effect(() => {
 		modal.vdevCount = Math.max(1, Math.min(128, modal.vdevCount));
@@ -527,6 +511,47 @@
 		}
 
 		modal.creating = true;
+		let biggestSize = 0;
+
+		for (const vdev of modal.vdevContainers) {
+			const sizes = [
+				...(vdev.disks ?? []).map((d) => d.size),
+				...(vdev.partitions ?? []).map((p) => p.size)
+			].filter((size) => typeof size === 'number');
+
+			if (sizes.length === 0) continue;
+			sizes.sort((a, b) => a - b);
+			biggestSize = Math.max(biggestSize, ...sizes);
+		}
+
+		if (modal.spares.length !== 0) {
+			const spareSizes = modal.spares.map((spare) => {
+				const disk = useableDisks.find((d) => d.device === spare.value);
+				if (disk) {
+					return disk.size;
+				}
+				const partition = useablePartitions.find((p) => p.name === spare.value);
+				if (partition) {
+					return partition.size;
+				}
+				return 0;
+			});
+
+			const minSpareSize = Math.min(...spareSizes);
+			if (minSpareSize < biggestSize) {
+				toast.error(
+					getTranslation(
+						'zfs.pool.errors.pool_create_failed_spare_smaller',
+						'Spares must be larger than the largest disk in the pool'
+					),
+					{
+						position: 'bottom-center'
+					}
+				);
+				modal.creating = false;
+				return;
+			}
+		}
 
 		const response = await createPool({
 			name: modal.name,
@@ -540,8 +565,13 @@
 			})),
 			properties: {
 				comment: modal.properties.comment,
-				ashift: modal.properties.ashift.toString()
+				ashift: modal.properties.ashift.toString(),
+				autoexpand: modal.properties.autoexpand,
+				autotrim: modal.properties.autotrim,
+				delegation: modal.properties.delegation,
+				failmode: modal.properties.failmode
 			},
+			spares: modal.spares.map((spare) => spare.value),
 			createForce: modal.forceCreate
 		});
 
@@ -586,7 +616,6 @@
 			};
 
 			if (disks.old && disks.new) {
-				console.log(getDiskSize(disks.new), disks.old.size);
 				if (parseInt(getDiskSize(disks.new)) < disks.old.size) {
 					toast.error(
 						getTranslation(
@@ -664,6 +693,28 @@
 		} else {
 			scrubInProgress = false;
 		}
+	});
+
+	let possibleSpares: string[] = $derived.by(() => {
+		const uD: string[] = useableDisks
+			.filter((disk) => {
+				return !modal.vdevContainers.some((vdev) => {
+					return vdev.disks.some((d) => d.uuid === disk.uuid);
+				});
+			})
+			.map((disk) => disk.device);
+
+		const uP: string[] = useablePartitions
+			.filter((partition) => {
+				return !modal.vdevContainers.some((vdev) => {
+					return vdev.partitions.some((p) => p.name === partition.name);
+				});
+			})
+			.map((partition) => partition.name);
+
+		return [...uD, ...uP].filter((device) => {
+			return device !== 'da0' && device !== 'cd0';
+		});
 	});
 </script>
 
@@ -762,7 +813,7 @@
 						: ''}
 				>
 					<Icon icon="mdi:swap-horizontal" class="mr-1 h-4 w-4" />
-					{getTranslation('zfs.pool.replace_device', 'Replace Device')}
+					{capitalizeFirstLetter(getTranslation('zfs.pool.replace_device', 'Replace Device'))}
 				</Button>
 			{/if}
 		{/if}
@@ -1276,6 +1327,41 @@
 										</Select.Content>
 									</Select.Root>
 								</div>
+
+								{#if possibleSpares && possibleSpares.length > 0 && modal.raidType !== 'stripe'}
+									<div class="h-full space-y-1">
+										<Label class="w-24 whitespace-nowrap text-sm" for="spares">Spares</Label>
+										<Select.Root
+											multiple={true}
+											name="spares"
+											selected={modal.spares}
+											onSelectedChange={(v) => {
+												modal.spares = v as SelectSpares[];
+											}}
+										>
+											<Select.Trigger>
+												{#if possibleSpares.length > 0}
+													<span>
+														{modal.spares.length > 0
+															? modal.spares.map((s) => s.label).join(', ')
+															: 'Select spares'}
+													</span>
+												{:else}
+													<span>Select spares</span>
+												{/if}
+											</Select.Trigger>
+											<Select.Content>
+												<Select.Group>
+													{#each possibleSpares as spare}
+														<Select.Item value={spare} label={spare}>
+															{spare}
+														</Select.Item>
+													{/each}
+												</Select.Group>
+											</Select.Content>
+										</Select.Root>
+									</div>
+								{/if}
 							</div>
 						{/if}
 					</Card.Content>
@@ -1523,6 +1609,49 @@
 											)}
 										{/each}
 									</div>
+
+									{#if sPoolSpares && sPoolSpares.length > 0}
+										<div class="device-tree relative mt-2">
+											<div
+												class="bg-background relative flex items-center gap-2 rounded-md border p-1.5"
+											>
+												<div
+													class="bg-secondary absolute -left-6 bottom-0 top-0 w-0.5"
+													style="height: calc(100% + 0.7rem);"
+												></div>
+												<Icon icon="tabler:replace" />
+												<span class="font-medium">Spares</span>
+											</div>
+
+											<div class="ml-5 mt-2 space-y-2 pl-4">
+												{#each sPoolSpares as spare, index (spare.name)}
+													<div class="relative">
+														<div
+															class="bg-secondary h-0.5 w-6"
+															style="position: absolute; left: -23px; top: 18px"
+														></div>
+														<div class="device-tree relative">
+															<div
+																class="bg-background relative flex items-center gap-2 rounded-md border p-1.5"
+															>
+																<div
+																	class="bg-secondary absolute -left-6 bottom-0 top-0 w-0.5"
+																	style="height: 18px;"
+																></div>
+																<div
+																	class="h-2 w-2 rounded-full"
+																	class:bg-green-500={spare.health === 'AVAIL'}
+																	class:bg-yellow-400={spare.health !== 'AVAIL'}
+																></div>
+
+																<span>{spare.name}</span>
+															</div>
+														</div>
+													</div>
+												{/each}
+											</div>
+										</div>
+									{/if}
 								{:else}
 									<div class="text-muted-foreground flex items-center gap-2 py-2">
 										<Icon icon="material-symbols:info" class="h-4 w-4" />

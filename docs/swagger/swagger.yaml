@@ -500,6 +500,10 @@ definitions:
         - raidz2
         - raidz3
         type: string
+      spares:
+        items:
+          type: string
+        type: array
       vdevs:
         items:
           $ref: '#/definitions/sylve_internal_interfaces_services_zfs.Vdev'
@@ -524,6 +528,15 @@ definitions:
         $ref: '#/definitions/sylve_pkg_zfs.VdevDevice'
       oldDrive:
         $ref: '#/definitions/sylve_pkg_zfs.VdevDevice'
+    type: object
+  sylve_pkg_zfs.SpareDevice:
+    properties:
+      health:
+        type: string
+      name:
+        type: string
+      size:
+        type: integer
     type: object
   sylve_pkg_zfs.Vdev:
     properties:
@@ -588,6 +601,10 @@ definitions:
         type: boolean
       size:
         type: integer
+      spares:
+        items:
+          $ref: '#/definitions/sylve_pkg_zfs.SpareDevice'
+        type: array
       status:
         $ref: '#/definitions/sylve_pkg_zfs.ZpoolStatus'
       vdevs:

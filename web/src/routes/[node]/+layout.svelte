@@ -8,6 +8,7 @@
 	import { hostname } from '$lib/stores/basic';
 	import { getTranslation } from '$lib/utils/i18n';
 	import { triggers } from '$lib/utils/keyboard-shortcuts';
+	import { capitalizeFirstLetter } from '$lib/utils/string';
 	import { shortcut, type ShortcutTrigger } from '@svelte-put/shortcut';
 	import CircleHelp from 'lucide-svelte/icons/circle-help';
 
@@ -101,7 +102,7 @@
 
 <div class="flex h-full w-full flex-col">
 	<div class="flex h-10 w-full items-center justify-between border-b p-2">
-		<p>{getTranslation('common.datacenter', 'Datacenter')}</p>
+		<p>{capitalizeFirstLetter(getTranslation('common.datacenter', 'Datacenter'))}</p>
 		<Button size="sm" class="h-6 ">
 			<CircleHelp class="mr-2 h-3 w-3" />
 			Help

@@ -12,7 +12,6 @@ import (
 	"sylve/internal"
 	"sylve/internal/db/models"
 	infoModels "sylve/internal/db/models/info"
-	zfsModels "sylve/internal/db/models/zfs"
 	"sylve/internal/logger"
 	"sylve/pkg/utils"
 
@@ -52,9 +51,6 @@ func SetupDatabase(cfg *internal.SylveConfig, isTest bool) *gorm.DB {
 		&infoModels.IODelay{},
 		&infoModels.Note{},
 		&infoModels.AuditLog{},
-
-		&zfsModels.Dataset{},
-		&zfsModels.SnapshotJob{},
 	)
 
 	if err != nil {

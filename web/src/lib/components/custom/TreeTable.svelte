@@ -21,6 +21,7 @@
 	}
 
 	let { data, name, parentActiveRow = $bindable() }: Props = $props();
+	let mouseOverRow = $state(false);
 
 	function selectParentActiveRow(row: RowComponent) {
 		const expandedRow = row.getData();
@@ -36,6 +37,14 @@
 	$effect(() => {
 		if (data.rows) {
 			untrack(async () => {
+				if (data.rows.length === 0 || mouseOverRow) {
+					if (data.rows.length === 0) {
+						table?.clearData();
+					}
+
+					return;
+				}
+
 				const selectedIds = table?.getSelectedRows().map((row) => row.getData().id) || [];
 				const treeExpands =
 					getAllRows(table?.getRows() || []).map((row) => ({
@@ -98,7 +107,19 @@
 		table?.on('rowDeselected', function (row: RowComponent) {
 			parentActiveRow = null;
 		});
+
+		table?.on('rowDblClick', function (event: UIEvent, row: RowComponent) {
+			selectParentActiveRow(row);
+		});
+
+		table?.on('rowMouseEnter', function (e, row) {
+			mouseOverRow = true;
+		});
+
+		table?.on('rowMouseLeave', function (e, row) {
+			mouseOverRow = false;
+		});
 	});
 </script>
 
-<div bind:this={tableComponent} class="flex-1" id={name}></div>
+<div bind:this={tableComponent} class="flex-1 cursor-pointer" id={name}></div>

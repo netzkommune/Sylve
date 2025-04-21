@@ -13,6 +13,7 @@ import type { Disk, Partition, SmartAttribute, SmartCtl, SmartNVME } from '$lib/
 import type { Zpool } from '$lib/types/zfs/pool';
 import humanFormat from 'human-format';
 import type { CellComponent } from 'tabulator-tables';
+import { getTranslation } from './i18n';
 import { generateNumberFromString } from './numbers';
 
 export function parseSMART(disk: Disk): SmartAttribute | SmartAttribute[] {
@@ -182,43 +183,43 @@ export function generateTableData(disks: Disk[]): { rows: Row[]; columns: Column
 	const columns: Column[] = [
 		{
 			field: 'device',
-			title: 'Device'
+			title: getTranslation('disk.device', 'Device')
 		},
 		{
 			field: 'type',
-			title: 'Type'
+			title: getTranslation('disk.type', 'Type')
 		},
 		{
 			field: 'usage',
-			title: 'Usage'
+			title: getTranslation('disk.usage', 'Usage')
 		},
 		{
 			field: 'size',
-			title: 'Size',
+			title: getTranslation('disk.size', 'Size'),
 			formatter: (cell: CellComponent) => {
 				return humanFormat(cell.getValue());
 			}
 		},
 		{
 			field: 'gpt',
-			title: 'GPT'
+			title: getTranslation('disk.gpt', 'GPT')
 		},
 		{
 			field: 'model',
-			title: 'Model'
+			title: getTranslation('disk.model', 'Model')
 		},
 		{
 			field: 'serial',
-			title: 'Serial'
+			title: getTranslation('disk.serial', 'Serial')
 		},
 		{
 			field: 'smartStatus',
-			title: 'S.M.A.R.T.',
+			title: getTranslation('disk.smart', 'S.M.A.R.T.'),
 			visible: false
 		},
 		{
 			field: 'wearOut',
-			title: 'Wearout'
+			title: getTranslation('disk.wearout', 'Wearout')
 		}
 	];
 

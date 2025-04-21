@@ -11,7 +11,7 @@
 	import * as Select from '$lib/components/ui/select/index.js';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import * as Tooltip from '$lib/components/ui/tooltip';
-	import type { Column, Row } from '$lib/types/components/tree-table';
+	import type { Row } from '$lib/types/components/tree-table';
 	import type { Disk, Partition } from '$lib/types/disk/disk';
 	import type { Zpool, ZpoolRaidType } from '$lib/types/zfs/pool';
 	import {
@@ -92,14 +92,32 @@
 	let replaceInProgress: boolean = $state(false);
 	let scrubInProgress: boolean = $state(false);
 
-	$effect(() => {});
-
 	let raidTypes = $state([
-		{ value: 'stripe', label: 'Stripe', available: true },
-		{ value: 'mirror', label: 'Mirror', available: false },
-		{ value: 'raidz', label: 'RAIDZ1', available: false },
-		{ value: 'raidz2', label: 'RAIDZ2', available: false },
-		{ value: 'raidz3', label: 'RAIDZ3', available: false }
+		{
+			value: 'stripe',
+			label: getTranslation('zfs.pool.redundancy.stripe', 'Stripe'),
+			available: true
+		},
+		{
+			value: 'mirror',
+			label: getTranslation('zfs.pool.redundancy.mirror', 'Mirror'),
+			available: false
+		},
+		{
+			value: 'raidz',
+			label: getTranslation('zfs.pool.redundancy.raidz', 'RAIDZ'),
+			available: false
+		},
+		{
+			value: 'raidz2',
+			label: getTranslation('zfs.pool.redundancy.raidz2', 'RAIDZ2'),
+			available: false
+		},
+		{
+			value: 'raidz3',
+			label: getTranslation('zfs.pool.redundancy.raidz3', 'RAIDZ3'),
+			available: false
+		}
 	]);
 
 	let modal = $state({
@@ -149,12 +167,12 @@
 			data: {
 				status: {} as Zpool['status']
 			},
-			title: 'Pool Status'
+			title: getTranslation('zfs.pool.pool_status', 'Pool Status')
 		},
 		deletePool: {
 			open: false,
 			data: '',
-			title: 'Delete Pool'
+			title: getTranslation('zfs.pool.delete_pool', 'Delete Pool')
 		},
 		replaceDevice: {
 			open: false,
@@ -163,7 +181,7 @@
 				old: '',
 				new: ''
 			},
-			title: 'Replace Device'
+			title: getTranslation('zfs.pool.replace_device', 'Replace Device')
 		}
 	});
 
@@ -407,7 +425,10 @@
 		const diskTypes = disks.map((disk) => disk.type);
 		for (let i = 0; i < diskTypes.length - 1; i++) {
 			if (diskTypes[i] !== diskTypes[i + 1]) {
-				return 'Disks within a VDEV should ideally be the same type';
+				return getTranslation(
+					'zfs.pool.warnings.disks_within_vdev_should_be_same_type',
+					'Disks within a VDEV should ideally be the same type'
+				);
 			}
 		}
 
@@ -418,18 +439,30 @@
 
 		for (let i = 0; i < partitionTypes.length - 1; i++) {
 			if (partitionTypes[i] !== partitionTypes[i + 1]) {
-				return 'Partitions within a VDEV should ideally be the same drive type';
+				return getTranslation(
+					'disks_within_vdev_should_be_same_drive_type',
+					'Disks within a VDEV should ideally be the same drive type'
+				);
 			}
 		}
 
 		for (let i = 0; i < allSizes.length - 1; i++) {
 			if (allSizes[i] !== allSizes[i + 1]) {
 				if (partSizes.length === 0) {
-					return 'Disks within a VDEV should ideally be the same size';
+					return getTranslation(
+						'zfs.pool.warnings.disks_within_vdev_should_be_same_size',
+						'Disks within a VDEV should ideally be the same size'
+					);
 				} else if (diskSizes.length === 0) {
-					return 'Partitions within a VDEV should ideally be the same size';
+					return getTranslation(
+						'zfs.pool.warnings.partitions_within_vdev_should_be_same_size',
+						'Partitions within a VDEV should ideally be the same size'
+					);
 				} else {
-					return 'Disks/Partitions within a VDEV should ideally be the same size';
+					return getTranslation(
+						'zfs.pool.warnings.disks_or_partitions_within_vdev_should_be_same_drive_type',
+						'Disks/Partitions within a VDEV should ideally be the same drive type'
+					);
 				}
 			}
 		}
@@ -441,23 +474,38 @@
 		if (modal.creating) return;
 
 		if (useableDisks.length === 0 && useablePartitions.length === 0) {
-			toast.error('No available disks or partitions', {
-				position: 'bottom-center'
-			});
+			toast.error(
+				getTranslation(
+					'zfs.pool.errors.pool_create_failed_no_disks',
+					'No available disks or partitions'
+				),
+				{
+					position: 'bottom-center'
+				}
+			);
 			return;
 		}
 
 		if (!isValidPoolName(modal.name)) {
-			toast.error('Invalid pool name', {
-				position: 'bottom-center'
-			});
+			toast.error(
+				getTranslation('zfs.pool.errors.pool_create_failed_invalid_name', 'Invalid pool name'),
+				{
+					position: 'bottom-center'
+				}
+			);
 			return;
 		}
 
 		if (modal.vdevContainers.length === 0) {
-			toast.error('Please add at least one disk', {
-				position: 'bottom-center'
-			});
+			toast.error(
+				getTranslation(
+					'zfs.pool.errors.pool_create_failed_need_atleast_one',
+					'Please add at least one disk'
+				),
+				{
+					position: 'bottom-center'
+				}
+			);
 			return;
 		}
 
@@ -540,9 +588,15 @@
 			if (disks.old && disks.new) {
 				console.log(getDiskSize(disks.new), disks.old.size);
 				if (parseInt(getDiskSize(disks.new)) < disks.old.size) {
-					toast.error('New device is smaller than old device', {
-						position: 'bottom-center'
-					});
+					toast.error(
+						getTranslation(
+							'zfs.pool.errors.pool_create_failed_new_device_smaller',
+							'New device is smaller than old device'
+						),
+						{
+							position: 'bottom-center'
+						}
+					);
 
 					return;
 				}
@@ -550,9 +604,15 @@
 				const partition = useablePartitions.find((p) => p.name === newName);
 				if (partition) {
 					if (partition.size < disks.old.size) {
-						toast.error('New partition is smaller than old device', {
-							position: 'bottom-center'
-						});
+						toast.error(
+							getTranslation(
+								'zfs.pool.errors.pool_create_failed_new_partition_smaller',
+								'New partition is smaller than old device'
+							),
+							{
+								position: 'bottom-center'
+							}
+						);
 
 						return;
 					}
@@ -569,9 +629,8 @@
 						new: newName
 					}),
 					{
-						loading: `Replacing ${stripDev(oldName)} with ${stripDev(newName)}`,
+						loading: `${getTranslation('zfs.pool.replacing', 'Replacing')} ${stripDev(oldName)} ${getTranslation('common.with', 'with')} ${stripDev(newName)}`,
 						success: (response) => {
-							console.log(response);
 							return getTranslation(`zfs.pool.${response.message}`, 'Device replacement started');
 						},
 						error: (error) => {
@@ -623,7 +682,8 @@
 					size="sm"
 					class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 				>
-					<Icon icon="mdi:eye" class="mr-1 h-4 w-4" /> Status
+					<Icon icon="mdi:eye" class="mr-1 h-4 w-4" />
+					{getTranslation('common.status', 'Status')}
 				</Button>
 			{/if}
 		{/if}
@@ -646,9 +706,12 @@
 					size="sm"
 					class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 					disabled={scrubInProgress}
-					title={scrubInProgress ? 'A scrub is already in progress' : ''}
+					title={scrubInProgress
+						? getTranslation('zfs.pool.scrub_in_progress', 'A scrub is already in progress')
+						: ''}
 				>
-					<Icon icon="cil:scrubber" class="mr-1 h-4 w-4" /> Scrub
+					<Icon icon="cil:scrubber" class="mr-1 h-4 w-4" />
+					{getTranslation('zfs.pool.scrub', 'Scrub')}
 				</Button>
 			{/if}
 		{/if}
@@ -665,9 +728,15 @@
 					size="sm"
 					class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 					disabled={replaceInProgress}
-					title={replaceInProgress ? 'Cannot delete pool while replacing device in any pool' : ''}
+					title={replaceInProgress
+						? getTranslation(
+								'zfs.pool.warnings.cannot_delete_pool_while_replacing_device',
+								'Cannot delete pool while replacing device in any pool'
+							)
+						: ''}
 				>
-					<Icon icon="mdi:delete" class="mr-1 h-4 w-4" /> Delete
+					<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
+					{getTranslation('zfs.pool.delete', 'Delete')}
 				</Button>
 			{/if}
 		{/if}
@@ -692,7 +761,8 @@
 						? 'Cannot replace device while replacing device in any pool'
 						: ''}
 				>
-					<Icon icon="mdi:swap-horizontal" class="mr-1 h-4 w-4" /> Replace Device
+					<Icon icon="mdi:swap-horizontal" class="mr-1 h-4 w-4" />
+					{getTranslation('zfs.pool.replace_device', 'Replace Device')}
 				</Button>
 			{/if}
 		{/if}
@@ -727,7 +797,7 @@
 
 					{#if useableDisks.filter((disk) => disk.type === type).length === 0 || useableDisks.filter((disk) => disk.type === type && disk.partitions.length === 0 && !isDiskInVdev(disk.uuid)).length === 0}
 						<div class="text-muted-foreground/80 flex h-16 w-full items-center justify-center">
-							No available disks
+							{getTranslation('zfs.pool.no_available_disks', 'No available disks')}
 						</div>
 					{/if}
 				</div>
@@ -738,7 +808,7 @@
 
 {#snippet partitionsContainer()}
 	<div id="partitions-container">
-		<Label>Partitions</Label>
+		<Label>{getTranslation('zfs.pool.partitions', 'Partitions')}</Label>
 		<div class="bg-primary/10 dark:bg-background mt-1 rounded-lg p-4">
 			<ScrollArea class="w-full whitespace-nowrap rounded-md" orientation="horizontal">
 				<div class="flex min-h-[80px] items-center justify-center gap-4">
@@ -765,7 +835,7 @@
 									.flatMap((vdev) => vdev.partitions)
 									.some((p) => p.name === partition.name)).length === 0}
 						<div class="flex h-16 w-full items-center justify-center text-neutral-400">
-							No available partitions
+							{getTranslation('zfs.pool.no_available_partitions', 'No available partitions')}
 						</div>
 					{/if}
 				</div>
@@ -834,7 +904,8 @@
 <div class="flex h-full w-full flex-col">
 	<div class="flex h-10 w-full items-center gap-2 border p-2">
 		<Button on:click={() => (modal.open = !modal.open)} size="sm" class="h-6">
-			<Icon icon="gg:add" class="mr-1 h-4 w-4" /> New
+			<Icon icon="gg:add" class="mr-1 h-4 w-4" />
+			{capitalizeFirstLetter(getTranslation('common.new', 'New'))}
 		</Button>
 
 		{@render button('pool-status')}
@@ -852,7 +923,7 @@
 	>
 		<div class="flex items-center justify-between px-4 py-3">
 			<Dialog.Header class="p-0">
-				<Dialog.Title>Create ZFS Pool</Dialog.Title>
+				<Dialog.Title>{getTranslation('zfs.pool.create_zfs_pool', 'Create ZFS Pool')}</Dialog.Title>
 			</Dialog.Header>
 
 			<Dialog.Close
@@ -864,8 +935,12 @@
 		</div>
 		<Tabs.Root value="tab-devices" class="w-full overflow-hidden">
 			<Tabs.List class="grid w-full grid-cols-2 p-0 px-4">
-				<Tabs.Trigger value="tab-devices" class="border-b">Devices</Tabs.Trigger>
-				<Tabs.Trigger value="tab-options" class="border-b">Options</Tabs.Trigger>
+				<Tabs.Trigger value="tab-devices" class="border-b">
+					{capitalizeFirstLetter(getTranslation('common.devices', 'Devices'))}
+				</Tabs.Trigger>
+				<Tabs.Trigger value="tab-options" class="border-b"
+					>{capitalizeFirstLetter(getTranslation('common.options', 'Options'))}</Tabs.Trigger
+				>
 			</Tabs.List>
 			<Tabs.Content class="mt-0" value="tab-devices">
 				<Card.Root class="border-none pb-4">
@@ -881,7 +956,11 @@
 							/>
 						</div>
 						<div class="flex-1 space-y-1">
-							<Label for="vdev_count">Virtual Devices</Label>
+							<Label for="vdev_count"
+								>{capitalizeFirstLetter(
+									getTranslation('common.virtual', 'Virtual')
+								)}{capitalizeFirstLetter(getTranslation('common.devices', 'Devices'))}</Label
+							>
 							<Input
 								type="number"
 								id="vdev_count"
@@ -892,8 +971,10 @@
 						</div>
 						<div class="flex-1 space-y-1">
 							<Label class="w-24 whitespace-nowrap text-sm" for="raid"
-								>Redundancy <span
-									class="font-semibold text-green-500 {modal.useable ? '' : 'hidden'}"
+								>{capitalizeFirstLetter(
+									getTranslation('zfs.pool.redundancy.redundancy', 'Redundancy')
+								)}
+								<span class="font-semibold text-green-500 {modal.useable ? '' : 'hidden'}"
 									>({humanFormat(modal.useable)})</span
 								></Label
 							>

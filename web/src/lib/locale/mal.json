@@ -46,17 +46,29 @@
 		"title": "ശീർഷകം"
 	},
 	"disk": {
-		"smart": "എസ്.എം.എർ.ടി",
+		"smart": "എസ്.മാർട്ട്",
+		"smart_values": "എസ്.മാർട്ട് വിലകൾ",
+		"initialize_gpt": "ജിപിടി ആരംഭിക്കുക",
+		"wipe_disk": "ഡിസ്ക് ശുദ്ധീകരിക്കുക",
 		"attribute": "ഗുണം",
+		"delete_partition": "വിഭാഗം ഇല്ലാതാക്കുക",
+		"create_partition": "വിഭാഗം സൃഷ്ടിക്കുക",
 		"value": "മൂല്യം",
 		"wipe": "ശുദ്ധീകരിക്കുക",
-		"disk": "ഡിസ്ക്",
 		"partition": "വിഭാഗം",
 		"partitions": "വിഭാഗങ്ങൾ",
 		"gpt_initialized": "ജിപിടി ഉപയോഗിച്ച് ആരംഭിച്ചു",
 		"initialize": "ആരംഭിക്കുക",
 		"full_wipe_success": "ഡിസ്ക് ശുദ്ധീകരിച്ചു",
-		"partition_wipe_success": "വിഭാഗം ഇല്ലാതാക്കി"
+		"partition_wipe_success": "വിഭാഗം ഇല്ലാതാക്കി",
+		"device": "ഉപകരണം",
+		"type": "തരം",
+		"usage": "ഉപയോഗം",
+		"size": "വലുപ്പം",
+		"gpt": "ജിപിടി",
+		"model": "മോഡൽ",
+		"serial": "സീരിയൽ",
+		"wearout": "വെയർ ഔട്ട്"
 	},
 	"zfs": {
 		"pool": {

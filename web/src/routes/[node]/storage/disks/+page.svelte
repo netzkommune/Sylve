@@ -23,8 +23,6 @@
 		pools: Zpool[];
 	}
 
-	type ExpandedRows = Record<number, boolean>;
-
 	let { data }: { data: Data } = $props();
 
 	const results = useQueries([
@@ -213,7 +211,8 @@
 			size="sm"
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
-			<Icon icon="icon-park-outline:hdd" class="mr-1 h-4 w-4" /> S.M.A.R.T values
+			<Icon icon="icon-park-outline:hdd" class="mr-1 h-4 w-4" />
+			{getTranslation('disk.smart_values', 'S.M.A.R.T Values')}
 		</Button>
 	{/if}
 
@@ -223,7 +222,8 @@
 			size="sm"
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
-			<Icon icon="carbon:logical-partition" class="mr-1 h-4 w-4" /> Initialize GPT
+			<Icon icon="carbon:logical-partition" class="mr-1 h-4 w-4" />
+			{getTranslation('disk.initialize_gpt', 'Initialize GPT')}
 		</Button>
 	{/if}
 
@@ -234,7 +234,7 @@
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
 			<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
-			Wipe Disk
+			{getTranslation('disk.wipe_disk', 'Wipe Disk')}
 		</Button>
 	{/if}
 
@@ -245,7 +245,7 @@
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
 			<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
-			Delete Partition
+			{getTranslation('disk.delete_partition', 'Delete Partition')}
 		</Button>
 	{/if}
 
@@ -255,7 +255,8 @@
 			size="sm"
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
-			<Icon icon="ant-design:partition-outlined" class="mr-1 h-4 w-4" /> Create Partition
+			<Icon icon="ant-design:partition-outlined" class="mr-1 h-4 w-4" />
+			{getTranslation('disk.create_partition', 'Create Partition')}
 		</Button>
 	{/if}
 {/snippet}

@@ -11,7 +11,6 @@
 	import AlertDialogModal from '$lib/components/custom/AlertDialog.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
-	import { Badge } from '$lib/components/ui/badge/index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
@@ -19,17 +18,18 @@
 	import Label from '$lib/components/ui/label/label.svelte';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import type { Row } from '$lib/types/components/tree-table';
-	import { type Dataset, type GroupedByPool } from '$lib/types/zfs/dataset';
+	import { type Dataset } from '$lib/types/zfs/dataset';
 	import type { Zpool } from '$lib/types/zfs/pool';
+	import { getTranslation } from '$lib/utils/i18n';
 	import { isValidSize } from '$lib/utils/numbers';
-	import { generatePassword } from '$lib/utils/string';
-	import { deleteRowByFieldValue } from '$lib/utils/table';
+	import { capitalizeFirstLetter, generatePassword } from '$lib/utils/string';
 	import { isValidPoolName } from '$lib/utils/zfs';
-	import { createFSProps, generateTableData, groupByPool } from '$lib/utils/zfs/dataset/dataset';
+	import { groupByPool } from '$lib/utils/zfs/dataset/dataset';
+	import { createFSProps, generateTableData, handleError } from '$lib/utils/zfs/dataset/fs';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
 	import humanFormat, { type ParsedInfo, type ScaleLike } from 'human-format';
-	import { tick, untrack } from 'svelte';
+	import { untrack } from 'svelte';
 	import toast from 'svelte-french-toast';
 
 	interface Data {
@@ -148,18 +148,30 @@
 	async function confirmAction() {
 		if (confirmModals.active === 'deleteSnapshot') {
 			if (activeDataset) {
-				await deleteSnapshot(activeDataset);
+				const response = await deleteSnapshot(activeDataset);
+
+				if (response.error) {
+					handleError(response);
+					return;
+				}
+
 				activeRow = null;
 			}
 		}
 
 		if (confirmModals.active === 'createSnapshot') {
 			if (activeDataset) {
-				await createSnapshot(
+				const response = await createSnapshot(
 					activeDataset,
 					confirmModals.createSnapshot.data.name,
 					confirmModals.createSnapshot.data.recursive
 				);
+
+				if (response.error) {
+					handleError(response);
+					return;
+				}
+
 				activeRow = null;
 			}
 		}
@@ -204,17 +216,38 @@
 				}
 			}
 
-			await createFileSystem(
+			const response = await createFileSystem(
 				confirmModals.createFilesystem.data.name,
 				confirmModals.createFilesystem.data.properties.parent,
 				confirmModals.createFilesystem.data.properties
 			);
+
+			if (response.error) {
+				handleError(response);
+				return;
+			}
+
+			let n = `${confirmModals.createFilesystem.data.properties.parent}/${confirmModals.createFilesystem.data.name}`;
+
+			toast.success(
+				`${capitalizeFirstLetter(getTranslation('common.filesystem', 'filesystem'))} ${n} ${capitalizeFirstLetter(getTranslation('common.created', 'created'))}`,
+				{
+					position: 'bottom-center'
+				}
+			);
+
 			activeRow = null;
 		}
 
 		if (confirmModals.active === 'deleteFilesystem') {
 			if (activeDataset) {
-				await deleteFileSystem(activeDataset);
+				const response = await deleteFileSystem(activeDataset);
+
+				if (response.error) {
+					handleError(response);
+					return;
+				}
+
 				activeRow = null;
 			}
 		}
@@ -226,13 +259,14 @@
 			confirmModals.createSnapshot.data.recursive = false;
 		}
 
-		if (
-			confirmModals.active === 'deleteSnapshot' ||
-			confirmModals.active === 'deleteFilesystem' ||
-			confirmModals.active === 'rollbackSnapshot'
-		) {
+		if (confirmModals.active === 'deleteSnapshot' || confirmModals.active === 'deleteFilesystem') {
 			confirmModals[confirmModals.active].data = '';
 			confirmModals[confirmModals.active].title = '';
+		}
+
+		if (confirmModals.active === 'rollbackSnapshot') {
+			confirmModals.rollbackSnapshot.data.name = '';
+			confirmModals.rollbackSnapshot.title = '';
 		}
 
 		if (confirmModals.active === 'createFilesystem') {

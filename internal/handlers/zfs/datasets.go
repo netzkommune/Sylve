@@ -265,6 +265,17 @@ func DeleteFilesystem(zfsService *zfs.Service) gin.HandlerFunc {
 	}
 }
 
+// @Summary Create a ZFS volume
+// @Description Create a ZFS volume
+// @Tags ZFS
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body CreateVolumeRequest true "Create Volume Request"
+// @Success 200 {object} internal.APIResponse[any] "OK"
+// @Failure 400 {object} internal.APIResponse[any] "Bad Request"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /zfs/datasets/volume [post]
 func CreateVolume(zfsService *zfs.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var request CreateVolumeRequest
@@ -299,6 +310,16 @@ func CreateVolume(zfsService *zfs.Service) gin.HandlerFunc {
 	}
 }
 
+// @Summary Delete a ZFS volume
+// @Description Delete a ZFS volume
+// @Tags ZFS
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param guid path string true "Volume GUID"
+// @Success 200 {object} internal.APIResponse[any] "OK"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /zfs/datasets/volume/{guid} [delete]
 func DeleteVolume(zfsService *zfs.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		guid := c.Param("guid")

@@ -48,16 +48,28 @@
 	},
 	"disk": {
 		"smart": "S.M.A.R.T.",
+		"smart_values": "S.M.A.R.T. values",
+		"initialize_gpt": "Initialize GPT",
+		"wipe_disk": "Wipe Disk",
 		"attribute": "Attribute",
+		"delete_partition": "Delete Partition",
+		"create_partition": "Create Partition",
 		"value": "Value",
 		"wipe": "wipe",
-		"disk": "disk",
 		"partition": "partition",
 		"partitions": "partitions",
 		"gpt_initialized": "initialized with GPT",
 		"initialize": "Initialize",
 		"full_wipe_success": "Disk wiped",
-		"partition_wipe_success": "Partition deleted"
+		"partition_wipe_success": "Partition deleted",
+		"device": "Device",
+		"type": "Type",
+		"usage": "Usage",
+		"size": "Size",
+		"gpt": "GPT",
+		"model": "Model",
+		"serial": "Serial",
+		"wearout": "Wearout"
 	},
 	"zfs": {
 		"pool": {
@@ -67,8 +79,54 @@
 			"errors": {
 				"pool_create_failed_mirror_different_sizes": "Pool contains a mirror with devices of different sizes",
 				"pool_create_failed_raidz_different_sizes": "Pool contains a raidz vdev with devices of different sizes",
-				"pool_delete_failed_busy": "Pool is busy"
-			}
+				"pool_delete_failed_busy": "Pool is busy",
+				"pool_create_failed_no_disks": "No available disks or partitions",
+				"pool_create_failed_invalid_name": "Invalid pool name",
+				"pool_create_failed_need_atleast_one": "Please add at least one disk",
+				"pool_create_failed_new_device_smaller": "New device is smaller than old device",
+				"pool_create_failed_new_partition_smaller": "New partition is smaller than old device"
+			},
+			"warnings": {
+				"disks_within_vdev_should_be_same_type": "Disks within a VDEV should ideally be the same type",
+				"disks_within_vdev_should_be_same_drive_type": "Disks within a VDEV should ideally be the same drive type",
+				"disks_within_vdev_should_be_same_size": "Disks within a VDEV should ideally be the same size",
+				"partitions_within_vdev_should_be_same_size": "Partitions within a VDEV should ideally be the same size",
+				"disks_or_partitions_within_vdev_should_be_same_drive_type": "Disks/Partitions within a VDEV should ideally be the same drive type",
+				"cannot_delete_pool_while_replacing_device": "Cannot delete pool while replacing device in any pool"
+			},
+			"redundancy": {
+				"stripe": "Stripe",
+				"mirror": "Mirror",
+				"raidz": "RAIDZ",
+				"raidz2": "RAIDZ2",
+				"raidz3": "RAIDZ3",
+				"redundancy": "redundancy"
+			},
+			"pool_status": "Pool Status",
+			"delete_pool": "Delete Pool",
+			"replace_device": "Replace Device",
+			"replacing": "Replacing",
+			"scrub": "Scrub",
+			"delete": "Delete",
+			"scrub_in_progress": "A scrub is already in progress",
+			"no_available_disks": "No available disks",
+			"partitions": "Partitions",
+			"no_available_partitions": "No available partitions",
+			"create_zfs_pool": "Create ZFS Pool"
+		},
+		"datasets": {
+			"filesystem_already_exists": "filesystem already exists",
+			"dataset_already_exists": "dataset already exists",
+			"numeric_value_too_large": "numeric value is too large",
+			"invalid_encryption_key_length": "invalid encryption key length",
+			"snapshot_already_exists": "snapshot already exists",
+			"pool_or_dataset_is_busy": "pool or dataset is busy",
+			"vol_size_greater_than_available_space": "volume size is greater than available space",
+			"parent_not_found": "parent not found",
+			"invalid_volume_name": "invalid volume name",
+			"no_parent_selected": "no parent selected",
+			"encryption_key_required": "encryption key required",
+			"invalid_volume_size": "invalid volume size"
 		}
 	},
 	"common": {
@@ -86,12 +144,23 @@
 		"delete": "delete",
 		"create": "create",
 		"invalid_response_received": "Invalid response received",
-		"datacenter": "Datacenter",
+		"datacenter": "datacenter",
 		"languages": {
 			"en": "English",
 			"en_default": "English (Default)",
 			"mal": "Malayalam"
-		}
+		},
+		"values": "values",
+		"with": "with",
+		"status": "Status",
+		"new": "new",
+		"devices": "devices",
+		"options": "options",
+		"name": "name",
+		"virtual": "virtual",
+		"filesystem": "filesystem",
+		"volume": "volume",
+		"deleted": "deleted"
 	},
 	"validation_errors": {
 		"failed validation: min": "too small"

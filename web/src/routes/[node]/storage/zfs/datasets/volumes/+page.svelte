@@ -1,8 +1,15 @@
 <script lang="ts">
-	import { createVolume, deleteVolume, getDatasets } from '$lib/api/zfs/datasets';
+	import {
+		createSnapshot,
+		createVolume,
+		deleteSnapshot,
+		deleteVolume,
+		getDatasets
+	} from '$lib/api/zfs/datasets';
 	import { getPools } from '$lib/api/zfs/pool';
 	import AlertDialogModal from '$lib/components/custom/AlertDialog.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
+	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Input from '$lib/components/ui/input/input.svelte';
@@ -11,13 +18,15 @@
 	import type { Column, Row } from '$lib/types/components/tree-table';
 	import type { Dataset, GroupedByPool } from '$lib/types/zfs/dataset';
 	import type { Zpool } from '$lib/types/zfs/pool';
+	import { getTranslation } from '$lib/utils/i18n';
 	import { isValidSize } from '$lib/utils/numbers';
-	import { generatePassword } from '$lib/utils/string';
+	import { capitalizeFirstLetter, generatePassword } from '$lib/utils/string';
 	import { isValidPoolName } from '$lib/utils/zfs';
 	import { groupByPool } from '$lib/utils/zfs/dataset/dataset';
-	import { createVolProps, generateTableData } from '$lib/utils/zfs/dataset/volume';
+	import { createVolProps, generateTableData, handleError } from '$lib/utils/zfs/dataset/volume';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
+	import humanFormat from 'human-format';
 	import toast from 'svelte-french-toast';
 
 	interface Data {
@@ -67,6 +76,14 @@
 		return volume ?? null;
 	});
 
+	let activeSnapshot: Dataset | null = $derived.by(() => {
+		const snapshots = $results[1].data?.filter((snapshot) => snapshot.type === 'snapshot');
+		const snapshot = snapshots?.find((snapshot) => snapshot.name.endsWith(activeRow?.name));
+		return snapshot ?? null;
+	});
+
+	// $inspect(activeSnapshot);
+
 	type props = {
 		checksum: string;
 		compression: string;
@@ -76,7 +93,8 @@
 	};
 
 	let confirmModals = $state({
-		active: '' as 'createVolume' | 'deleteVolume',
+		active: '' as 'createVolume' | 'deleteVolume' | 'deleteSnapshot' | 'createSnapshot',
+		parent: '',
 		createVolume: {
 			open: false,
 			data: {
@@ -98,6 +116,18 @@
 			open: false,
 			data: '',
 			title: ''
+		},
+		deleteSnapshot: {
+			open: false,
+			data: '',
+			title: ''
+		},
+		createSnapshot: {
+			open: false,
+			data: {
+				name: ''
+			},
+			title: ''
 		}
 	});
 
@@ -106,58 +136,211 @@
 	async function confirmAction() {
 		if (confirmModals.active === 'createVolume') {
 			if (!isValidPoolName(confirmModals.createVolume.data.name)) {
-				toast.error('Invalid name', {
-					position: 'bottom-center'
-				});
+				toast.error(
+					capitalizeFirstLetter(
+						getTranslation('zfs.datasets.invalid_volume_name', 'invalid volume name')
+					),
+					{
+						position: 'bottom-center'
+					}
+				);
 				return;
 			}
 
 			if (!confirmModals.createVolume.data.properties.parent) {
-				toast.error('No parent selected', {
-					position: 'bottom-center'
-				});
+				toast.error(
+					capitalizeFirstLetter(
+						getTranslation('zfs.datasets.no_parent_selected', 'No parent selected')
+					),
+					{
+						position: 'bottom-center'
+					}
+				);
 				return;
 			}
 
 			if (confirmModals.createVolume.data.properties.encryption !== 'off') {
 				if (confirmModals.createVolume.data.properties.encryptionKey === '') {
-					toast.error('Encryption key is required', {
-						position: 'bottom-center'
-					});
+					toast.error(
+						capitalizeFirstLetter(
+							getTranslation('zfs.datasets.encryption_key_required', 'Encryption key is required')
+						),
+						{
+							position: 'bottom-center'
+						}
+					);
 					return;
 				}
 			}
 
 			if (!isValidSize(confirmModals.createVolume.data.properties.size)) {
-				toast.error('Invalid size', {
-					position: 'bottom-center'
-				});
+				toast.error(
+					capitalizeFirstLetter(
+						getTranslation('zfs.datasets.invalid_volume_size', 'Invalid volume size')
+					),
+					{
+						position: 'bottom-center'
+					}
+				);
 				return;
 			}
 
-			console.log(
-				await createVolume(
-					confirmModals.createVolume.data.name,
-					confirmModals.createVolume.data.properties.parent,
-					confirmModals.createVolume.data.properties
-				)
+			const parentSize = grouped.find(
+				(group) => group.pool.name === confirmModals.createVolume.data.properties.parent
+			)?.pool.free;
+
+			if (!parentSize) {
+				toast.error(
+					capitalizeFirstLetter(
+						getTranslation('zfs.datasets.parent_not_found', 'Parent not found')
+					),
+					{
+						position: 'bottom-center'
+					}
+				);
+				return;
+			}
+
+			if (humanFormat.parse(confirmModals.createVolume.data.properties.size) > parentSize) {
+				toast.error(
+					capitalizeFirstLetter(
+						getTranslation(
+							'zfs.datasets.vol_size_greater_than_available_space',
+							'volume size is greater than available space'
+						)
+					),
+					{
+						position: 'bottom-center'
+					}
+				);
+			}
+
+			const response = await createVolume(
+				confirmModals.createVolume.data.name,
+				confirmModals.createVolume.data.properties.parent,
+				confirmModals.createVolume.data.properties
 			);
+
+			if (response.error) {
+				handleError(response);
+				return;
+			}
+
+			let n = `${confirmModals.createVolume.data.properties.parent}/${confirmModals.createVolume.data.name}`;
+
+			toast.success(
+				`${capitalizeFirstLetter(getTranslation('common.volume', 'volume'))} ${n} ${capitalizeFirstLetter(getTranslation('common.created', 'created'))}`,
+				{
+					position: 'bottom-center'
+				}
+			);
+
+			confirmModals.createVolume.open = false;
+			confirmModals.createVolume.data.name = '';
+			confirmModals.createVolume.data.properties.parent = '';
+			confirmModals.createVolume.data.properties.size = '';
+			confirmModals.createVolume.data.properties.encryptionKey = '';
+			confirmModals.createVolume.data.properties.encryption = 'off';
+			confirmModals.createVolume.data.properties.dedup = 'off';
+			confirmModals.createVolume.data.properties.compression = 'on';
+			confirmModals.createVolume.data.properties.checksum = 'on';
+			confirmModals.createVolume.data.properties.volblocksize = '16384';
 		}
 
 		if (confirmModals.active === 'deleteVolume') {
 			if (activeVolume) {
-				console.log(await deleteVolume(activeVolume));
+				const response = await deleteVolume(activeVolume);
+				if (response.error) {
+					handleError(response);
+					return;
+				}
+
+				toast.success(
+					`${capitalizeFirstLetter(getTranslation('common.volume', 'volume'))} ${activeVolume.name} ${capitalizeFirstLetter(getTranslation('common.deleted', 'deleted'))}`,
+					{
+						position: 'bottom-center'
+					}
+				);
+			}
+		}
+
+		if (confirmModals.active === 'createSnapshot') {
+			if (activeVolume) {
+				const response = await createSnapshot(
+					activeVolume,
+					confirmModals.createSnapshot.data.name,
+					false
+				);
+
+				if (response.error) {
+					handleError(response);
+					return;
+				}
+
+				activeRow = null;
+			}
+		}
+
+		if (confirmModals.active === 'deleteSnapshot') {
+			if (activeSnapshot) {
+				const response = await deleteSnapshot(activeSnapshot);
+				if (response.error) {
+					handleError(response);
+					return;
+				}
+
+				toast.success(
+					`${capitalizeFirstLetter(getTranslation('common.snapshot', 'snapshot'))} ${activeSnapshot.name} ${capitalizeFirstLetter(getTranslation('common.deleted', 'deleted'))}`,
+					{
+						position: 'bottom-center'
+					}
+				);
 			}
 		}
 	}
 </script>
 
 {#snippet button(type: string)}
+	{#if type === 'create-snapshot' && activeVolume?.type === 'volume'}
+		<Button
+			on:click={async () => {
+				if (activeVolume) {
+					confirmModals.active = 'createSnapshot';
+					confirmModals.parent = 'volume';
+					confirmModals.createSnapshot.open = true;
+					confirmModals.createSnapshot.title = activeVolume.name;
+				}
+			}}
+			size="sm"
+			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+		>
+			<Icon icon="carbon:ibm-cloud-vpc-block-storage-snapshots" class="mr-1 h-4 w-4" /> Create Snapshot
+		</Button>
+	{/if}
+
+	{#if type === 'delete-snapshot' && activeSnapshot?.type === 'snapshot'}
+		<Button
+			on:click={async () => {
+				if (activeSnapshot) {
+					confirmModals.active = 'deleteSnapshot';
+					confirmModals.parent = 'snapshot';
+					confirmModals.deleteSnapshot.open = true;
+					confirmModals.deleteSnapshot.title = activeSnapshot.name;
+				}
+			}}
+			size="sm"
+			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+		>
+			<Icon icon="mdi:delete" class="mr-1 h-4 w-4" /> Delete Snapshot
+		</Button>
+	{/if}
+
 	{#if type === 'delete-volume' && activeVolume?.type === 'volume'}
 		<Button
 			on:click={async () => {
 				if (activeRow) {
 					confirmModals.active = 'deleteVolume';
+					confirmModals.parent = 'volume';
 					confirmModals.deleteVolume.open = true;
 					confirmModals.deleteVolume.data = activeRow.name;
 					confirmModals.deleteVolume.title = activeRow.name;
@@ -185,15 +368,12 @@
 			<Icon icon="gg:add" class="mr-1 h-4 w-4" /> New
 		</Button>
 
+		{@render button('create-snapshot')}
+		{@render button('delete-snapshot')}
 		{@render button('delete-volume')}
 	</div>
-	<div class="relative flex h-full w-full cursor-pointer flex-col">
-		<div class="flex-1">
-			<div class="h-full overflow-y-auto">
-				<TreeTable data={table} name={tableName} bind:parentActiveRow={activeRow} />
-			</div>
-		</div>
-	</div>
+
+	<TreeTable data={table} name={tableName} bind:parentActiveRow={activeRow} />
 </div>
 
 {#snippet simpleSlect(prop: keyof props, label: string, placeholder: string)}
@@ -373,6 +553,76 @@
 		open={confirmModals.active && confirmModals[confirmModals.active].open}
 		names={{
 			parent: 'volume',
+			element: confirmModals.active ? confirmModals[confirmModals.active].title || '' : ''
+		}}
+		actions={{
+			onConfirm: () => {
+				if (confirmModals.active) {
+					confirmAction();
+				}
+			},
+			onCancel: () => {
+				if (confirmModals.active) {
+					confirmModals[confirmModals.active].open = false;
+				}
+			}
+		}}
+	></AlertDialogModal>
+{/if}
+
+{#if confirmModals.active === 'createSnapshot'}
+	<AlertDialog.Root
+		bind:open={confirmModals.createSnapshot.open}
+		closeOnOutsideClick={false}
+		closeOnEscape={false}
+	>
+		<AlertDialog.Content>
+			<AlertDialog.Header>
+				<AlertDialog.Title>
+					<div class="flex items-center">
+						<Icon icon="carbon:ibm-cloud-vpc-block-storage-snapshots" class="mr-2 h-6 w-6" />
+						Snapshot -
+						{confirmModals.createSnapshot.data.name !== ''
+							? `${confirmModals.createSnapshot.title}@${confirmModals.createSnapshot.data.name}`
+							: `${confirmModals.createSnapshot.title}`}
+					</div>
+				</AlertDialog.Title>
+			</AlertDialog.Header>
+
+			<div class="flex-1 space-y-1">
+				<Label for="name">Name</Label>
+				<Input
+					type="text"
+					id="name"
+					placeholder="before-upgrade"
+					autocomplete="off"
+					bind:value={confirmModals.createSnapshot.data.name}
+				/>
+			</div>
+
+			<AlertDialog.Footer>
+				<AlertDialog.Cancel
+					onclick={() => {
+						confirmModals.createSnapshot.open = false;
+					}}>Cancel</AlertDialog.Cancel
+				>
+				<AlertDialog.Action
+					onclick={() => {
+						confirmAction();
+					}}
+				>
+					Create
+				</AlertDialog.Action>
+			</AlertDialog.Footer>
+		</AlertDialog.Content>
+	</AlertDialog.Root>
+{/if}
+
+{#if confirmModals.active == 'deleteSnapshot'}
+	<AlertDialogModal
+		open={confirmModals.active && confirmModals[confirmModals.active].open}
+		names={{
+			parent: confirmModals.parent,
 			element: confirmModals.active ? confirmModals[confirmModals.active].title || '' : ''
 		}}
 		actions={{

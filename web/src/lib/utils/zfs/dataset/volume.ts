@@ -1,8 +1,12 @@
+import type { APIResponse } from '$lib/types/common';
 import type { Column, Row } from '$lib/types/components/tree-table';
 import type { Dataset, GroupedByPool } from '$lib/types/zfs/dataset';
+import { getTranslation } from '$lib/utils/i18n';
 import { generateNumberFromString } from '$lib/utils/numbers';
+import { capitalizeFirstLetter } from '$lib/utils/string';
 import { cleanChildren } from '$lib/utils/tree-table';
 import humanFormat from 'human-format';
+import toast from 'svelte-french-toast';
 
 export const createVolProps = {
 	atime: [
@@ -245,4 +249,17 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 		rows: rows.filter((row) => row.children && row.children.length > 0).map(cleanChildren),
 		columns
 	};
+}
+
+export function handleError(error: APIResponse): void {
+	if (error.error?.includes('dataset already exists')) {
+		toast.error(
+			capitalizeFirstLetter(
+				getTranslation('zfs.datasets.dataset_already_exists', 'dataset already exists')
+			),
+			{
+				position: 'bottom-center'
+			}
+		);
+	}
 }

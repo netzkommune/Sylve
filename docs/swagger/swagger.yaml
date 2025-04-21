@@ -77,6 +77,20 @@ definitions:
     - guid
     - name
     type: object
+  internal_handlers_zfs.CreateVolumeRequest:
+    properties:
+      name:
+        type: string
+      parent:
+        type: string
+      properties:
+        additionalProperties:
+          type: string
+        type: object
+    required:
+    - name
+    - parent
+    type: object
   internal_handlers_zfs.ZpoolListResponse:
     properties:
       data:
@@ -523,6 +537,8 @@ definitions:
         type: array
       free:
         type: integer
+      guid:
+        type: string
       health:
         type: string
       name:
@@ -557,7 +573,12 @@ definitions:
         type: integer
       freeing:
         type: integer
+      guid:
+        type: string
       health:
+        type: string
+      id:
+        description: Same as GUID but for ease of use in Tabulator
         type: string
       leaked:
         type: integer
@@ -1109,6 +1130,33 @@ paths:
       summary: Create a ZFS filesystem
       tags:
       - ZFS
+  /zfs/datasets/filesystem/{guid}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a ZFS filesystem
+      parameters:
+      - description: Filesystem GUID
+        in: path
+        name: guid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Delete a ZFS filesystem
+      tags:
+      - ZFS
   /zfs/datasets/snapshot:
     post:
       consumes:
@@ -1166,6 +1214,65 @@ paths:
       security:
       - BearerAuth: []
       summary: Delete a ZFS snapshot
+      tags:
+      - ZFS
+  /zfs/datasets/volume:
+    post:
+      consumes:
+      - application/json
+      description: Create a ZFS volume
+      parameters:
+      - description: Create Volume Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_zfs.CreateVolumeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Create a ZFS volume
+      tags:
+      - ZFS
+  /zfs/datasets/volume/{guid}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a ZFS volume
+      parameters:
+      - description: Volume GUID
+        in: path
+        name: guid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Delete a ZFS volume
       tags:
       - ZFS
   /zfs/pool/avg-io-delay:

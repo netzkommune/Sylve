@@ -8,7 +8,13 @@
  * under sponsorship from the FreeBSD Foundation.
  */
 
-import { TabulatorFull, type RowComponent, type Tabulator } from 'tabulator-tables';
+import humanFormat, { type ScaleLike } from 'human-format';
+import {
+	TabulatorFull,
+	type CellComponent,
+	type RowComponent,
+	type Tabulator
+} from 'tabulator-tables';
 import { iconCache } from './icons';
 
 export function deselectAllRows(table: Tabulator | null) {
@@ -72,3 +78,17 @@ export const renderWithIcon = (iconKey: string, suffix: string, extraClass?: str
                         </span>
                     `.trim();
 };
+
+export function sizeFormatter(cell: CellComponent) {
+	try {
+		const sizeOptions = {
+			scale: 'binary' as ScaleLike,
+			unit: 'B',
+			maxDecimals: 1
+		};
+
+		return humanFormat(cell.getValue(), sizeOptions);
+	} catch (e) {
+		return cell.getValue();
+	}
+}

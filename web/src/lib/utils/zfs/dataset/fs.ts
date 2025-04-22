@@ -2,12 +2,10 @@ import type { APIResponse } from '$lib/types/common';
 import type { Column, Row } from '$lib/types/components/tree-table';
 import type { Dataset, GroupedByPool } from '$lib/types/zfs/dataset';
 import { getTranslation } from '$lib/utils/i18n';
-import { iconCache } from '$lib/utils/icons';
 import { generateNumberFromString } from '$lib/utils/numbers';
 import { capitalizeFirstLetter } from '$lib/utils/string';
-import { renderWithIcon } from '$lib/utils/table';
+import { renderWithIcon, sizeFormatter } from '$lib/utils/table';
 import { cleanChildren } from '$lib/utils/tree-table';
-import humanFormat from 'human-format';
 import toast from 'svelte-french-toast';
 
 export const createFSProps = {
@@ -163,15 +161,18 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 		},
 		{
 			field: 'used',
-			title: 'Used'
+			title: 'Used',
+			formatter: sizeFormatter
 		},
 		{
 			field: 'avail',
-			title: 'Available'
+			title: 'Available',
+			formatter: sizeFormatter
 		},
 		{
 			field: 'referenced',
-			title: 'Referenced'
+			title: 'Referenced',
+			formatter: sizeFormatter
 		},
 		{
 			field: 'mountpoint',
@@ -198,18 +199,18 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 			const childFilesystemsWithSnapshots = filesystemChildren.map((filesystem: Dataset) => ({
 				id: generateNumberFromString(filesystem.name) + 1,
 				name: filesystem.name,
-				used: humanFormat(filesystem.used),
-				avail: humanFormat(filesystem.avail),
-				referenced: humanFormat(filesystem.referenced),
+				used: filesystem.used,
+				avail: filesystem.avail,
+				referenced: filesystem.referenced,
 				mountpoint: filesystem.mountpoint || '',
 				children: snapshotChildren
 					.filter((snapshot) => snapshot.name.startsWith(filesystem.name + '@'))
 					.map((snapshot: Dataset) => ({
 						id: generateNumberFromString(snapshot.name) + 2,
 						name: snapshot.name,
-						used: humanFormat(snapshot.used),
-						avail: humanFormat(snapshot.avail),
-						referenced: humanFormat(snapshot.referenced),
+						used: snapshot.used,
+						avail: snapshot.avail,
+						referenced: snapshot.referenced,
 						mountpoint: snapshot.mountpoint || '',
 						children: []
 					}))
@@ -218,17 +219,17 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 			rows.push({
 				id: generateNumberFromString(group.name),
 				name: group.name,
-				used: humanFormat(poolLevelFilesystem.used),
-				avail: humanFormat(poolLevelFilesystem.avail),
-				referenced: humanFormat(poolLevelFilesystem.referenced),
+				used: poolLevelFilesystem.used,
+				avail: poolLevelFilesystem.avail,
+				referenced: poolLevelFilesystem.referenced,
 				mountpoint: poolLevelFilesystem.mountpoint || '',
 				children: [
 					...poolSnapshots.map((snapshot: Dataset) => ({
 						id: generateNumberFromString(snapshot.name) + 1,
 						name: snapshot.name,
-						used: humanFormat(snapshot.used),
-						avail: humanFormat(snapshot.avail),
-						referenced: humanFormat(snapshot.referenced),
+						used: snapshot.used,
+						avail: snapshot.avail,
+						referenced: snapshot.referenced,
 						mountpoint: snapshot.mountpoint || '',
 						children: [],
 						isPoolSnapshot: true
@@ -249,18 +250,18 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 					.map((filesystem: Dataset) => ({
 						id: generateNumberFromString(filesystem.name),
 						name: filesystem.name,
-						used: humanFormat(filesystem.used),
-						avail: humanFormat(filesystem.avail),
-						referenced: humanFormat(filesystem.referenced),
+						used: filesystem.used,
+						avail: filesystem.avail,
+						referenced: filesystem.referenced,
 						mountpoint: filesystem.mountpoint || '',
 						children: snapshotChildren
 							.filter((snapshot) => snapshot.name.startsWith(filesystem.name + '@'))
 							.map((snapshot: Dataset) => ({
 								id: generateNumberFromString(snapshot.name) + 1,
 								name: snapshot.name,
-								used: humanFormat(snapshot.used),
-								avail: humanFormat(snapshot.avail),
-								referenced: humanFormat(snapshot.referenced),
+								used: snapshot.used,
+								avail: snapshot.avail,
+								referenced: snapshot.referenced,
 								mountpoint: snapshot.mountpoint || '',
 								children: []
 							}))

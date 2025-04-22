@@ -19,6 +19,7 @@ interface Tab {
 	id: string;
 	title: string;
 }
+
 interface Terminal {
 	isOpen: boolean;
 	isMinimized: boolean;

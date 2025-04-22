@@ -1,14 +1,11 @@
 import type { APIResponse } from '$lib/types/common';
 import type { Column, Row } from '$lib/types/components/tree-table';
-import type { Dataset, GroupedByPool } from '$lib/types/zfs/dataset';
+import type { GroupedByPool } from '$lib/types/zfs/dataset';
 import { getTranslation } from '$lib/utils/i18n';
-import { iconCache } from '$lib/utils/icons';
 import { generateNumberFromString } from '$lib/utils/numbers';
-import { capitalizeFirstLetter, iconToSVG } from '$lib/utils/string';
-import { renderWithIcon } from '$lib/utils/table';
+import { capitalizeFirstLetter } from '$lib/utils/string';
+import { renderWithIcon, sizeFormatter } from '$lib/utils/table';
 import { cleanChildren } from '$lib/utils/tree-table';
-import { getIcon } from '@iconify/svelte';
-import humanFormat from 'human-format';
 import toast from 'svelte-french-toast';
 
 export const createVolProps = {
@@ -203,18 +200,12 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 		{
 			field: 'size',
 			title: 'Size',
-			formatter: (cell) => humanFormat(cell.getValue())
+			formatter: sizeFormatter
 		},
 		{
 			field: 'referenced',
 			title: 'Referenced',
-			formatter: (cell) => {
-				try {
-					return humanFormat(cell.getValue());
-				} catch (e) {
-					return cell.getValue();
-				}
-			}
+			formatter: sizeFormatter
 		},
 		{
 			field: 'guid',

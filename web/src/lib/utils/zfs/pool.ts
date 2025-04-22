@@ -1,15 +1,9 @@
 import type { APIResponse } from '$lib/types/common';
 import type { Column, Row } from '$lib/types/components/tree-table';
 import type { Zpool } from '$lib/types/zfs/pool';
-import humanFormat, { type ScaleLike } from 'human-format';
 import { getTranslation } from '../i18n';
 import { generateNumberFromString } from '../numbers';
-
-const sizeOptions = {
-	scale: 'binary' as ScaleLike,
-	unit: 'B',
-	maxDecimals: 1
-};
+import { sizeFormatter } from '../table';
 
 export const raidTypeArr = [
 	{
@@ -56,11 +50,13 @@ export function generateTableData(pools: Zpool[]): {
 		},
 		{
 			field: 'size',
-			title: 'Size'
+			title: 'Size',
+			formatter: sizeFormatter
 		},
 		{
 			field: 'used',
-			title: 'Used'
+			title: 'Used',
+			formatter: sizeFormatter
 		},
 		{
 			field: 'health',
@@ -74,10 +70,10 @@ export function generateTableData(pools: Zpool[]): {
 
 	for (const pool of pools) {
 		const poolRow = {
-			id: generateNumberFromString(pool.name),
+			id: generateNumberFromString(pool.name + '-pool'),
 			name: pool.name,
-			size: humanFormat(pool.size, sizeOptions),
-			used: humanFormat(pool.allocated, sizeOptions),
+			size: pool.size,
+			used: pool.allocated,
 			health: pool.health,
 			redundancy: '',
 			children: [] as Row[]
@@ -99,8 +95,8 @@ export function generateTableData(pools: Zpool[]): {
 				const vdevRow = {
 					id: generateNumberFromString(vdev.name),
 					name: vdevLabel,
-					size: humanFormat(vdev.alloc + vdev.free, sizeOptions),
-					used: humanFormat(vdev.alloc, sizeOptions),
+					size: vdev.alloc + vdev.free,
+					used: vdev.alloc,
 					health: vdev.health,
 					redundancy: '-',
 					children: [] as Row[]
@@ -119,7 +115,7 @@ export function generateTableData(pools: Zpool[]): {
 					vdevRow.children.push({
 						id: generateNumberFromString(device.name),
 						name: device.name,
-						size: humanFormat(device.size, sizeOptions),
+						size: device.size,
 						used: '-',
 						health: device.health,
 						redundancy: '-',
@@ -132,7 +128,7 @@ export function generateTableData(pools: Zpool[]): {
 						vdevRow.children.push({
 							id: generateNumberFromString(replacing.oldDrive.name),
 							name: `${replacing.oldDrive.name} [OLD]`,
-							size: humanFormat(replacing.oldDrive.size, sizeOptions),
+							size: replacing.oldDrive.size,
 							used: '-',
 							health: `${replacing.oldDrive.health} (Being replaced)`,
 							redundancy: '-',
@@ -142,7 +138,7 @@ export function generateTableData(pools: Zpool[]): {
 						vdevRow.children.push({
 							id: generateNumberFromString(replacing.newDrive.name),
 							name: `${replacing.newDrive.name} [NEW]`,
-							size: humanFormat(replacing.newDrive.size, sizeOptions),
+							size: replacing.newDrive.size,
 							used: '-',
 							health: `${replacing.newDrive.health} (Replacement)`,
 							redundancy: '-',
@@ -157,7 +153,7 @@ export function generateTableData(pools: Zpool[]): {
 				poolRow.children.push({
 					id: generateNumberFromString(vdev.devices[0].name),
 					name: vdev.devices[0].name,
-					size: humanFormat(vdev.devices[0].size, sizeOptions),
+					size: vdev.devices[0].size,
 					used: '-',
 					health: vdev.devices[0].health,
 					redundancy: '-',
@@ -175,10 +171,7 @@ export function generateTableData(pools: Zpool[]): {
 				name: 'Spares',
 				size:
 					pool.spares.reduce((acc, spare) => acc + spare.size, 0) > 0
-						? humanFormat(
-								pool.spares.reduce((acc, spare) => acc + spare.size, 0),
-								sizeOptions
-							)
+						? pool.spares.reduce((acc, spare) => acc + spare.size, 0)
 						: '-',
 				used: '-',
 				health: '-',
@@ -190,7 +183,7 @@ export function generateTableData(pools: Zpool[]): {
 				sparesRow.children!.push({
 					id: generateNumberFromString(spare.name),
 					name: spare.name,
-					size: humanFormat(spare.size, sizeOptions),
+					size: spare.size,
 					used: '-',
 					health: spare.health,
 					redundancy: '-',

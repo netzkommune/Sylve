@@ -115,7 +115,7 @@
 		id="main-pane-auto"
 		autoSaveId="main-pane-auto-save"
 	>
-		<Resizable.Pane defaultSize={22}>
+		<Resizable.Pane defaultSize={15}>
 			<div class="h-full px-1.5">
 				<div class="h-full overflow-y-auto">
 					<nav aria-label="Difuse-sidebar" class="menu thin-scrollbar w-full">

@@ -27,7 +27,7 @@
 						id="child-left-pane-auto"
 						autoSaveId="child-left-pane-auto-save"
 					>
-						<Resizable.Pane defaultSize={16}>
+						<Resizable.Pane defaultSize={12}>
 							<LeftPanel />
 						</Resizable.Pane>
 

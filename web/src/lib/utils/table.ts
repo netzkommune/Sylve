@@ -92,3 +92,41 @@ export function sizeFormatter(cell: CellComponent) {
 		return cell.getValue();
 	}
 }
+
+export function addTabulatorFilters() {
+	TabulatorFull.extendModule('filter', 'filters', {
+		matchAny
+	});
+}
+
+export function matchAny(data: any, filterParams: any): boolean {
+	const query = filterParams.query?.toString().toLowerCase();
+	if (!query) return false;
+
+	function recursiveMatch(obj: any): boolean {
+		for (let key in obj) {
+			const value = obj[key];
+
+			if (value == null) continue;
+
+			if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+				if (value.toString().toLowerCase().includes(query)) {
+					return true;
+				}
+			}
+
+			if (key === 'children' && Array.isArray(value)) {
+				for (const child of value) {
+					if (recursiveMatch(child)) return true;
+				}
+			}
+
+			if (typeof value === 'object' && key !== 'children') {
+				if (recursiveMatch(value)) return true;
+			}
+		}
+		return false;
+	}
+
+	return recursiveMatch(data);
+}

@@ -45,6 +45,7 @@
 	import { Badge } from '$lib/components/ui/badge';
 
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
+	import Search from '$lib/components/custom/TreeTable/Search.svelte';
 	import { updateCache } from '$lib/utils/http';
 	import { getTranslation } from '$lib/utils/i18n';
 	import { capitalizeFirstLetter } from '$lib/utils/string';
@@ -716,6 +717,8 @@
 			return device !== 'da0' && device !== 'cd0';
 		});
 	});
+
+	let query: string = $state('');
 </script>
 
 {#snippet button(type: string)}
@@ -954,6 +957,7 @@
 
 <div class="flex h-full w-full flex-col">
 	<div class="flex h-10 w-full items-center gap-2 border p-2">
+		<Search bind:query />
 		<Button on:click={() => (modal.open = !modal.open)} size="sm" class="h-6">
 			<Icon icon="gg:add" class="mr-1 h-4 w-4" />
 			{capitalizeFirstLetter(getTranslation('common.new', 'New'))}
@@ -965,7 +969,7 @@
 		{@render button('replace-device')}
 	</div>
 
-	<TreeTable data={tableData} name="tt-zfsPool" bind:parentActiveRow={activeRow} />
+	<TreeTable data={tableData} name="tt-zfsPool" bind:parentActiveRow={activeRow} bind:query />
 </div>
 
 <Dialog.Root bind:open={modal.open} closeOnOutsideClick={false}>

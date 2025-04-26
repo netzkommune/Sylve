@@ -28,7 +28,8 @@
 		"datasets": "Datasets",
 		"file_systems": "Filesystems",
 		"notifications": "Notifications",
-		"volumes": "Volumes"
+		"volumes": "Volumes",
+		"snapshots": "Snapshots"
 	},
 	"summary": {
 		"CPU_s": "CPU(s)",

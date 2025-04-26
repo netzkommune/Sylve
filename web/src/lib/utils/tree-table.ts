@@ -57,15 +57,19 @@ export function findRow(rows: RowComponent[], id: number): RowComponent | undefi
 }
 
 export function getAllRows(rows: RowComponent[]): RowComponent[] {
-	let allRows: RowComponent[] = [];
+	try {
+		let allRows: RowComponent[] = [];
 
-	for (const row of rows) {
-		allRows.push(row);
-		const children = row.getTreeChildren();
-		if (children.length > 0) {
-			allRows = allRows.concat(getAllRows(children));
+		for (const row of rows) {
+			allRows.push(row);
+			const children = row.getTreeChildren();
+			if (children.length > 0) {
+				allRows = allRows.concat(getAllRows(children));
+			}
 		}
-	}
 
-	return allRows;
+		return allRows;
+	} catch (e) {
+		return [];
+	}
 }

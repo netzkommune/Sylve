@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Column, Row } from '$lib/types/components/tree-table';
+	import { matchAny } from '$lib/utils/table';
 	import { findRow, getAllRows, pruneEmptyChildren } from '$lib/utils/tree-table';
 	import { onMount, untrack } from 'svelte';
 	import {
@@ -18,10 +19,12 @@
 		};
 		name: string;
 		parentActiveRow?: Row | null;
+		query?: string;
 	}
 
-	let { data, name, parentActiveRow = $bindable() }: Props = $props();
+	let { data, name, parentActiveRow = $bindable(), query = $bindable() }: Props = $props();
 	let mouseOverRow = $state(false);
+	let tableInitialized = $state(false);
 
 	function selectParentActiveRow(row: RowComponent) {
 		const expandedRow = row.getData();
@@ -37,6 +40,10 @@
 	$effect(() => {
 		if (data.rows) {
 			untrack(async () => {
+				if (query && query !== '') {
+					return;
+				}
+
 				if (data.rows.length === 0 || mouseOverRow) {
 					if (data.rows.length === 0) {
 						table?.clearData();
@@ -119,6 +126,24 @@
 		table?.on('rowMouseLeave', function (e, row) {
 			mouseOverRow = false;
 		});
+
+		table?.on('tableBuilt', function () {
+			tableInitialized = true;
+		});
+	});
+
+	function tableFilter(query: string) {
+		if (table && tableInitialized) {
+			if (query === '') {
+				table.clearFilter(true);
+				return;
+			}
+			table.setFilter(matchAny, { query: query });
+		}
+	}
+
+	$effect(() => {
+		tableFilter(query || '');
 	});
 </script>
 

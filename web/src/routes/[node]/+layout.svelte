@@ -62,6 +62,11 @@
 									label: 'volumes',
 									icon: 'carbon:volume-block-storage',
 									href: `/${node}/storage/zfs/datasets/volumes`
+								},
+								{
+									label: 'snapshots',
+									icon: 'carbon:ibm-cloud-vpc-block-storage-snapshots',
+									href: `/${node}/storage/zfs/datasets/snapshots`
 								}
 							]
 						}

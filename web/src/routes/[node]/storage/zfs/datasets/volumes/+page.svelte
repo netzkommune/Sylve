@@ -9,6 +9,7 @@
 	import { getPools } from '$lib/api/zfs/pool';
 	import AlertDialogModal from '$lib/components/custom/AlertDialog.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
+	import Search from '$lib/components/custom/TreeTable/Search.svelte';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
@@ -298,6 +299,8 @@
 			}
 		}
 	}
+
+	let query: string = $state('');
 </script>
 
 {#snippet button(type: string)}
@@ -356,6 +359,7 @@
 
 <div class="flex h-full w-full flex-col">
 	<div class="flex h-10 w-full items-center gap-2 border p-2">
+		<Search bind:query />
 		<Button
 			on:click={() => {
 				confirmModals.active = 'createVolume';
@@ -373,7 +377,7 @@
 		{@render button('delete-volume')}
 	</div>
 
-	<TreeTable data={table} name={tableName} bind:parentActiveRow={activeRow} />
+	<TreeTable data={table} name={tableName} bind:parentActiveRow={activeRow} bind:query />
 </div>
 
 {#snippet simpleSlect(prop: keyof props, label: string, placeholder: string)}

@@ -4,6 +4,7 @@
 	import AlertDialog from '$lib/components/custom/AlertDialog.svelte';
 	import KvTableModal from '$lib/components/custom/KVTableModal.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
+	import Search from '$lib/components/custom/TreeTable/Search.svelte';
 	import CreatePartition from '$lib/components/disk/CreatePartition.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import type { Row } from '$lib/types/components/tree-table';
@@ -202,6 +203,8 @@
 			});
 		}
 	});
+
+	let query = $state('');
 </script>
 
 {#snippet button(type: string)}
@@ -263,6 +266,8 @@
 
 <div class="flex h-full flex-col overflow-hidden">
 	<div class="flex h-10 w-full items-center gap-2 border p-2">
+		<Search bind:query />
+
 		{@render button('smart')}
 		{@render button('gpt')}
 		{@render button('partition')}
@@ -293,6 +298,7 @@
 		}}
 		name={'tt-disks'}
 		bind:parentActiveRow={activeRow}
+		bind:query
 	/>
 </div>
 

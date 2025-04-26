@@ -10,6 +10,7 @@
 	import { getPools } from '$lib/api/zfs/pool';
 	import AlertDialogModal from '$lib/components/custom/AlertDialog.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
+	import Search from '$lib/components/custom/TreeTable/Search.svelte';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
@@ -314,6 +315,7 @@
 	});
 
 	let zfsProperties = $state(createFSProps);
+	let query: string = $state('');
 </script>
 
 {#snippet button(type: string)}
@@ -389,6 +391,7 @@
 
 <div class="flex h-full w-full flex-col">
 	<div class="flex h-10 w-full items-center gap-2 border p-2">
+		<Search bind:query />
 		<Button
 			on:click={() => {
 				confirmModals.active = 'createFilesystem';
@@ -408,7 +411,7 @@
 		{@render button('delete-filesystem')}
 	</div>
 
-	<TreeTable data={tableData} name={tableName} bind:parentActiveRow={activeRow} />
+	<TreeTable data={tableData} name={tableName} bind:parentActiveRow={activeRow} bind:query />
 </div>
 
 {#if confirmModals.active == 'deleteSnapshot' || confirmModals.active == 'deleteFilesystem'}

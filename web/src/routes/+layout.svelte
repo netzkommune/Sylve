@@ -12,6 +12,7 @@
 	import { hostname } from '$lib/stores/basic';
 	import '$lib/utils/i18n';
 	import { preloadIcons } from '$lib/utils/icons';
+	import { addTabulatorFilters } from '$lib/utils/table';
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
 	import { ModeWatcher } from 'mode-watcher';
 	import { onMount, tick } from 'svelte';
@@ -41,6 +42,7 @@
 	});
 
 	onMount(async () => {
+		addTabulatorFilters();
 		const faviconEl = document.getElementById('favicon');
 		if (faviconEl) {
 			const darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;

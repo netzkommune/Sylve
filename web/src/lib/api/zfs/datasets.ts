@@ -1,5 +1,10 @@
 import { APIResponseSchema, type APIResponse } from '$lib/types/common';
-import { DatasetSchema, type Dataset } from '$lib/types/zfs/dataset';
+import {
+	DatasetSchema,
+	PeriodicSnapshotSchema,
+	type Dataset,
+	type PeriodicSnapshot
+} from '$lib/types/zfs/dataset';
 
 import { apiRequest } from '$lib/utils/http';
 
@@ -7,9 +12,13 @@ export async function getDatasets(): Promise<Dataset[]> {
 	return await apiRequest('/zfs/datasets', DatasetSchema.array(), 'GET');
 }
 
-export async function deleteSnapshot(snapshot: Dataset): Promise<APIResponse> {
+export async function deleteSnapshot(
+	snapshot: Dataset,
+	recursive: boolean = false
+): Promise<APIResponse> {
+	const param = recursive ? '?recursive=true' : '';
 	return await apiRequest(
-		`/zfs/datasets/snapshot/${snapshot.properties.guid}`,
+		`/zfs/datasets/snapshot/${snapshot.properties.guid}${param}`,
 		APIResponseSchema,
 		'DELETE'
 	);
@@ -25,6 +34,26 @@ export async function createSnapshot(
 		recursive: recursive,
 		guid: dataset.properties.guid
 	});
+}
+
+export async function getPeriodicSnapshots(): Promise<PeriodicSnapshot[]> {
+	return await apiRequest('/zfs/datasets/snapshot/periodic', PeriodicSnapshotSchema.array(), 'GET');
+}
+
+export async function createPeriodicSnapshot(
+	dataset: Dataset,
+	recursive: boolean,
+	interval: number
+): Promise<APIResponse> {
+	return await apiRequest('/zfs/datasets/snapshot/periodic', APIResponseSchema, 'POST', {
+		guid: dataset.properties.guid,
+		recursive: recursive,
+		interval: interval
+	});
+}
+
+export async function deletePeriodicSnapshot(guid: string): Promise<APIResponse> {
+	return await apiRequest(`/zfs/datasets/snapshot/periodic/${guid}`, APIResponseSchema, 'DELETE');
 }
 
 export async function createFileSystem(

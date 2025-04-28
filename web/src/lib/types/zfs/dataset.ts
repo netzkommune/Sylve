@@ -92,6 +92,15 @@ export const DatasetSchema = z.object({
 		.partial()
 });
 
+export const PeriodicSnapshotSchema = z.object({
+	id: z.number(),
+	guid: z.string(),
+	recursive: z.boolean(),
+	interval: z.number(),
+	createdAt: z.coerce.date().optional(),
+	lastRunAt: z.coerce.date().optional()
+});
+
 export const GroupedByPoolSchema = z.object({
 	name: z.string(),
 	pool: ZpoolSchema,
@@ -102,3 +111,4 @@ export const GroupedByPoolSchema = z.object({
 
 export type Dataset = z.infer<typeof DatasetSchema>;
 export type GroupedByPool = z.infer<typeof GroupedByPoolSchema>;
+export type PeriodicSnapshot = z.infer<typeof PeriodicSnapshotSchema>;

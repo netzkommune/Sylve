@@ -9,6 +9,7 @@
 package startup
 
 import (
+	"context"
 	"os"
 	serviceInterfaces "sylve/internal/interfaces/services"
 	infoServiceInterfaces "sylve/internal/interfaces/services/info"
@@ -54,6 +55,7 @@ func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface)
 
 	go s.Info.Cron()
 	go s.ZFS.Cron()
+	go s.ZFS.StartSnapshotScheduler(context.Background())
 
 	return nil
 }

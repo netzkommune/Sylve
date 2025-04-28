@@ -65,6 +65,18 @@ definitions:
     - name
     - parent
     type: object
+  internal_handlers_zfs.CreatePeriodicSnapshotJobRequest:
+    properties:
+      guid:
+        type: string
+      interval:
+        type: integer
+      recursive:
+        type: boolean
+    required:
+    - guid
+    - interval
+    type: object
   internal_handlers_zfs.CreateSnapshotRequest:
     properties:
       guid:
@@ -90,6 +102,15 @@ definitions:
     required:
     - name
     - parent
+    type: object
+  internal_handlers_zfs.RollbackSnapshotRequest:
+    properties:
+      destroyMoreRecent:
+        type: boolean
+      guid:
+        type: string
+    required:
+    - guid
     type: object
   internal_handlers_zfs.ZpoolListResponse:
     properties:
@@ -158,6 +179,19 @@ definitions:
       data:
         items:
           $ref: '#/definitions/sylve_internal_db_models_info.Note'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-array_sylve_internal_db_models_zfs_PeriodicSnapshot:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models_zfs.PeriodicSnapshot'
         type: array
       error:
         type: string
@@ -313,6 +347,21 @@ definitions:
         type: string
       updateAt:
         type: string
+    type: object
+  sylve_internal_db_models_zfs.PeriodicSnapshot:
+    properties:
+      createdAt:
+        type: string
+      guid:
+        type: string
+      id:
+        type: integer
+      interval:
+        type: integer
+      lastRunAt:
+        type: string
+      recursive:
+        type: boolean
     type: object
   sylve_internal_interfaces_services_disk.Disk:
     properties:
@@ -1178,14 +1227,14 @@ paths:
     post:
       consumes:
       - application/json
-      description: Create a ZFS filesystem
+      description: Create a ZFS snapshot
       parameters:
-      - description: Create Filesystem Request
+      - description: Create Snapshot Request
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers_zfs.CreateFilesystemRequest'
+          $ref: '#/definitions/internal_handlers_zfs.CreateSnapshotRequest'
       produces:
       - application/json
       responses:
@@ -1203,7 +1252,7 @@ paths:
             $ref: '#/definitions/sylve_internal.APIResponse-any'
       security:
       - BearerAuth: []
-      summary: Create a ZFS filesystem
+      summary: Create a ZFS snapshot
       tags:
       - ZFS
   /zfs/datasets/snapshot/{guid}:
@@ -1231,6 +1280,117 @@ paths:
       security:
       - BearerAuth: []
       summary: Delete a ZFS snapshot
+      tags:
+      - ZFS
+  /zfs/datasets/snapshot/periodic:
+    get:
+      consumes:
+      - application/json
+      description: Get all periodic ZFS snapshots jobs
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_internal_db_models_zfs_PeriodicSnapshot'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Get all periodic ZFS snapshot jobs
+      tags:
+      - ZFS
+    post:
+      consumes:
+      - application/json
+      description: Create a periodic ZFS snapshot job
+      parameters:
+      - description: Create Periodic Snapshot Job Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_zfs.CreatePeriodicSnapshotJobRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Create a periodic ZFS snapshot job
+      tags:
+      - ZFS
+  /zfs/datasets/snapshot/periodic/{guid}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a periodic ZFS snapshot
+      parameters:
+      - description: Periodic Snapshot GUID
+        in: path
+        name: guid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Delete a periodic ZFS snapshot
+      tags:
+      - ZFS
+  /zfs/datasets/snapshot/rollback:
+    post:
+      consumes:
+      - application/json
+      description: Rollback to a ZFS snapshot
+      parameters:
+      - description: Rollback Snapshot Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_zfs.RollbackSnapshotRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Rollback to a ZFS snapshot
       tags:
       - ZFS
   /zfs/datasets/volume:

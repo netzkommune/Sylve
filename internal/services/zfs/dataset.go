@@ -9,11 +9,15 @@
 package zfs
 
 import (
+	"context"
 	"fmt"
 	"os"
+	zfsModels "sylve/internal/db/models/zfs"
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
+	"sylve/internal/logger"
 	"sylve/pkg/utils"
 	"sylve/pkg/zfs"
+	"time"
 )
 
 func (s *Service) GetDatasets() ([]zfsServiceInterfaces.Dataset, error) {
@@ -44,7 +48,37 @@ func (s *Service) GetDatasets() ([]zfsServiceInterfaces.Dataset, error) {
 	return results, nil
 }
 
-func (s *Service) DeleteSnapshot(guid string) error {
+func (s *Service) GetDatasetByGUID(guid string) (*zfsServiceInterfaces.Dataset, error) {
+	datasets, err := zfs.Datasets("")
+	if err != nil {
+		return nil, err
+	}
+
+	for _, dataset := range datasets {
+		properties, err := dataset.GetAllProperties()
+		if err != nil {
+			return nil, err
+		}
+
+		for _, v := range properties {
+			if v == guid {
+				propMap := make(map[string]string, len(properties))
+				for k, v := range properties {
+					propMap[k] = v
+				}
+
+				return &zfsServiceInterfaces.Dataset{
+					Dataset:    *dataset,
+					Properties: propMap,
+				}, nil
+			}
+		}
+	}
+
+	return nil, fmt.Errorf("dataset with guid %s not found", guid)
+}
+
+func (s *Service) DeleteSnapshot(guid string, recursive bool) error {
 	datasets, err := zfs.Snapshots("")
 
 	if err != nil {
@@ -59,7 +93,13 @@ func (s *Service) DeleteSnapshot(guid string) error {
 
 		for _, v := range properties {
 			if v == guid {
-				err := dataset.Destroy(zfs.DestroyDefault)
+				var err error
+
+				if recursive {
+					err = dataset.Destroy(zfs.DestroyRecursive)
+				} else {
+					err = dataset.Destroy(zfs.DestroyDefault)
+				}
 
 				if err != nil {
 					return err
@@ -106,6 +146,120 @@ func (s *Service) CreateSnapshot(guid string, name string, recursive bool) error
 	}
 
 	return fmt.Errorf("dataset with guid %s not found", guid)
+}
+
+func (s *Service) GetPeriodicSnapshots() ([]zfsModels.PeriodicSnapshot, error) {
+	var snapshots []zfsModels.PeriodicSnapshot
+
+	if err := s.DB.Find(&snapshots).Error; err != nil {
+		return nil, err
+	}
+
+	return snapshots, nil
+}
+
+func (s *Service) AddPeriodicSnapshot(guid string, recursive bool, interval int) error {
+	dataset, err := s.GetDatasetByGUID(guid)
+	if err != nil {
+		return err
+	}
+
+	properties, err := dataset.GetAllProperties()
+	if err != nil {
+		return err
+	}
+
+	for k, v := range properties {
+		if k == "guid" && v == guid {
+			snapshot := zfsModels.PeriodicSnapshot{
+				GUID:      guid,
+				Recursive: recursive,
+				Interval:  interval,
+			}
+
+			if err := s.DB.Create(&snapshot).Error; err != nil {
+				return err
+			}
+
+			return nil
+		}
+	}
+
+	return fmt.Errorf("dataset with guid %s not found", guid)
+}
+
+func (s *Service) DeletePeriodicSnapshot(guid string) error {
+	var snapshot zfsModels.PeriodicSnapshot
+
+	if err := s.DB.Where("guid = ?", guid).First(&snapshot).Error; err != nil {
+		return err
+	}
+
+	if err := s.DB.Delete(&snapshot).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Service) StartSnapshotScheduler(ctx context.Context) {
+	ticker := time.NewTicker(30 * time.Second)
+
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				var snapshots []zfsModels.PeriodicSnapshot
+				if err := s.DB.Find(&snapshots).Error; err != nil {
+					logger.L.Debug().Err(err).Msg("Failed to load snapshots")
+					continue
+				}
+
+				now := time.Now()
+
+				for _, snap := range snapshots {
+					if snap.LastRunAt.IsZero() || now.Sub(snap.LastRunAt).Seconds() >= float64(snap.Interval) {
+						// fmt.Printf("Running snapshot for %s\n", snap.GUID)
+						// logger.L.Debug().Msgf("Running snapshot for %s", snap.GUID)
+						allSets, err := zfs.Snapshots("")
+						if err != nil {
+							logger.L.Debug().Err(err).Msgf("Failed to get snapshots for %s", snap.GUID)
+							continue
+						}
+
+						name := now.Format("2006-01-02-15-04")
+						dataset, err := s.GetDatasetByGUID(snap.GUID)
+
+						if err != nil {
+							logger.L.Debug().Err(err).Msgf("Failed to get dataset for %s", snap.GUID)
+							continue
+						}
+
+						for _, v := range allSets {
+							if v.Name == dataset.Name+"@"+name {
+								logger.L.Debug().Msgf("Snapshot %s already exists", name)
+								continue
+							}
+						}
+
+						if err := s.CreateSnapshot(snap.GUID, name, snap.Recursive); err != nil {
+							logger.L.Debug().Err(err).Msgf("Failed to create snapshot for %s", snap.GUID)
+							continue
+						}
+
+						if err := s.DB.Model(&snap).Update("LastRunAt", now).Error; err != nil {
+							logger.L.Debug().Err(err).Msgf("Failed to update LastRunAt for %d", snap.ID)
+						}
+
+						logger.L.Debug().Msgf("Snapshot %s created successfully", name)
+					}
+				}
+			case <-ctx.Done():
+				ticker.Stop()
+				return
+			}
+		}
+	}()
 }
 
 func (s *Service) CreateFilesystem(name string, props map[string]string) error {

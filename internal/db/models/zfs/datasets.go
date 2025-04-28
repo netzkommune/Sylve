@@ -7,3 +7,14 @@
 // under sponsorship from the FreeBSD Foundation.
 
 package zfsModels
+
+import "time"
+
+type PeriodicSnapshot struct {
+	ID        uint      `gorm:"primaryKey" json:"id"`
+	GUID      string    `gorm:"uniqueIndex:uniq_dataset_guid" json:"guid"`
+	Recursive bool      `json:"recursive"`
+	Interval  int       `json:"interval"`
+	CreatedAt time.Time `gorm:"autoCreateTime" json:"createdAt,omitempty"`
+	LastRunAt time.Time `json:"lastRunAt,omitempty"`
+}

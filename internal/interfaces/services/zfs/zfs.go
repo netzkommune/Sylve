@@ -8,7 +8,11 @@
 
 package zfsServiceInterfaces
 
-import infoModels "sylve/internal/db/models/info"
+import (
+	"context"
+	infoModels "sylve/internal/db/models/info"
+	zfsModels "sylve/internal/db/models/zfs"
+)
 
 type ZfsServiceInterface interface {
 	GetTotalIODelayHisorical() ([]infoModels.IODelay, error)
@@ -18,7 +22,12 @@ type ZfsServiceInterface interface {
 
 	CreateSnapshot(guid string, name string, recursive bool) error
 	RollbackSnapshot(guid string, destroyMoreRecent bool) error
-	DeleteSnapshot(guid string) error
+	DeleteSnapshot(guid string, recursive bool) error
+
+	GetPeriodicSnapshots() ([]zfsModels.PeriodicSnapshot, error)
+	AddPeriodicSnapshot(guid string, recursive bool, interval int) error
+	DeletePeriodicSnapshot(guid string) error
+	StartSnapshotScheduler(ctx context.Context)
 
 	CreateFilesystem(name string, props map[string]string) error
 	DeleteFilesystem(guid string) error

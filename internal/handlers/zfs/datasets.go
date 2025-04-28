@@ -11,6 +11,7 @@ package zfsHandlers
 import (
 	"net/http"
 	"sylve/internal"
+	zfsModels "sylve/internal/db/models/zfs"
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
 	"sylve/internal/services/zfs"
 
@@ -21,6 +22,12 @@ type CreateSnapshotRequest struct {
 	GUID      string `json:"guid" binding:"required"`
 	Name      string `json:"name" binding:"required"`
 	Recursive bool   `json:"recursive"`
+}
+
+type CreatePeriodicSnapshotJobRequest struct {
+	GUID      string `json:"guid" binding:"required"`
+	Recursive bool   `json:"recursive"`
+	Interval  int    `json:"interval" binding:"required"`
 }
 
 type CreateFilesystemRequest struct {
@@ -85,7 +92,16 @@ func GetDatasets(zfsSerice *zfs.Service) gin.HandlerFunc {
 func DeleteSnapshot(zfsService *zfs.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		guid := c.Param("guid")
-		err := zfsService.DeleteSnapshot(guid)
+		recursive := c.Query("recursive")
+		var r bool
+
+		if recursive == "" {
+			r = false
+		} else if recursive == "true" {
+			r = true
+		}
+
+		err := zfsService.DeleteSnapshot(guid, r)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
@@ -152,6 +168,17 @@ func CreateSnapshot(zfsService *zfs.Service) gin.HandlerFunc {
 	}
 }
 
+// @Summary Rollback to a ZFS snapshot
+// @Description Rollback to a ZFS snapshot
+// @Tags ZFS
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body RollbackSnapshotRequest true "Rollback Snapshot Request"
+// @Success 200 {object} internal.APIResponse[any] "OK"
+// @Failure 400 {object} internal.APIResponse[any] "Bad Request"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /zfs/datasets/snapshot/rollback [post]
 func RollbackSnapshot(zfsService *zfs.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var request RollbackSnapshotRequest
@@ -185,7 +212,117 @@ func RollbackSnapshot(zfsService *zfs.Service) gin.HandlerFunc {
 	}
 }
 
-// @Router /zfs/datasets/snapshot [post]
+// @Summary Get all periodic ZFS snapshot jobs
+// @Description Get all periodic ZFS snapshots jobs
+// @Tags ZFS
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} internal.APIResponse[[]zfsModels.PeriodicSnapshot] "OK"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /zfs/datasets/snapshot/periodic [get]
+func GetPeriodicSnapshots(zfsService *zfs.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		snapshots, err := zfsService.GetPeriodicSnapshots()
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[[]zfsModels.PeriodicSnapshot]{
+			Status:  "success",
+			Message: "periodic_snapshots",
+			Error:   "",
+			Data:    snapshots,
+		})
+	}
+}
+
+// @Summary Create a periodic ZFS snapshot job
+// @Description Create a periodic ZFS snapshot job
+// @Tags ZFS
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body CreatePeriodicSnapshotJobRequest true "Create Periodic Snapshot Job Request"
+// @Success 200 {object} internal.APIResponse[any] "OK"
+// @Failure 400 {object} internal.APIResponse[any] "Bad Request"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /zfs/datasets/snapshot/periodic [post]
+func CreatePeriodicSnapshot(zfsService *zfs.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var request CreatePeriodicSnapshotJobRequest
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		err := zfsService.AddPeriodicSnapshot(request.GUID, request.Recursive, request.Interval)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "created_periodic_snapshot",
+			Error:   "",
+			Data:    nil,
+		})
+	}
+}
+
+// @Summary Delete a periodic ZFS snapshot
+// @Description Delete a periodic ZFS snapshot
+// @Tags ZFS
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param guid path string true "Periodic Snapshot GUID"
+// @Success 200 {object} internal.APIResponse[any] "OK"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /zfs/datasets/snapshot/periodic/{guid} [delete]
+func DeletePeriodicSnapshot(zfsService *zfs.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		guid := c.Param("guid")
+		err := zfsService.DeletePeriodicSnapshot(guid)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "deleted_periodic_snapshot",
+			Error:   "",
+			Data:    nil,
+		})
+	}
+}
+
 // @Summary Create a ZFS filesystem
 // @Description Create a ZFS filesystem
 // @Tags ZFS

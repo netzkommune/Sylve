@@ -71,11 +71,14 @@ definitions:
         type: string
       interval:
         type: integer
+      prefix:
+        type: string
       recursive:
         type: boolean
     required:
     - guid
     - interval
+    - prefix
     type: object
   internal_handlers_zfs.CreateSnapshotRequest:
     properties:
@@ -292,6 +295,17 @@ definitions:
       status:
         type: string
     type: object
+  sylve_internal.APIResponse-sylve_pkg_network_iface_Interface:
+    properties:
+      data:
+        $ref: '#/definitions/sylve_pkg_network_iface.Interface'
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
   sylve_internal_db_models_info.AuditLog:
     properties:
       action:
@@ -359,6 +373,8 @@ definitions:
       interval:
         type: integer
       lastRunAt:
+        type: string
+      prefix:
         type: string
       recursive:
         type: boolean
@@ -559,6 +575,116 @@ definitions:
         type: array
     required:
     - name
+    type: object
+  sylve_pkg_network_iface.Capabilities:
+    properties:
+      enabled:
+        $ref: '#/definitions/sylve_pkg_network_iface.Flags'
+      supported:
+        $ref: '#/definitions/sylve_pkg_network_iface.Flags'
+    type: object
+  sylve_pkg_network_iface.Flags:
+    properties:
+      desc:
+        items:
+          type: string
+        type: array
+      raw:
+        type: integer
+    type: object
+  sylve_pkg_network_iface.IPv4:
+    properties:
+      broadcast:
+        items:
+          type: integer
+        type: array
+      ip:
+        items:
+          type: integer
+        type: array
+      netmask:
+        type: string
+    type: object
+  sylve_pkg_network_iface.IPv6:
+    properties:
+      autoConf:
+        type: boolean
+      deprecated:
+        type: boolean
+      detached:
+        type: boolean
+      ip:
+        items:
+          type: integer
+        type: array
+      lifeTimes:
+        properties:
+          preferred:
+            type: integer
+          valid:
+            type: integer
+        type: object
+      prefixLength:
+        type: integer
+      scopeId:
+        type: integer
+    type: object
+  sylve_pkg_network_iface.Interface:
+    properties:
+      capabilities:
+        $ref: '#/definitions/sylve_pkg_network_iface.Capabilities'
+      driver:
+        type: string
+      ether:
+        type: string
+      flags:
+        $ref: '#/definitions/sylve_pkg_network_iface.Flags'
+      ipv4:
+        items:
+          $ref: '#/definitions/sylve_pkg_network_iface.IPv4'
+        type: array
+      ipv6:
+        items:
+          $ref: '#/definitions/sylve_pkg_network_iface.IPv6'
+        type: array
+      media:
+        $ref: '#/definitions/sylve_pkg_network_iface.Media'
+      metric:
+        type: integer
+      mtu:
+        type: integer
+      name:
+        type: string
+      nd6:
+        $ref: '#/definitions/sylve_pkg_network_iface.ND6'
+    type: object
+  sylve_pkg_network_iface.Media:
+    properties:
+      mode:
+        type: string
+      options:
+        items:
+          type: string
+        type: array
+      rawActive:
+        type: integer
+      rawCurrent:
+        type: integer
+      status:
+        type: string
+      subtype:
+        type: string
+      type:
+        type: string
+    type: object
+  sylve_pkg_network_iface.ND6:
+    properties:
+      desc:
+        items:
+          type: string
+        type: array
+      raw:
+        type: integer
     type: object
   sylve_pkg_zfs.RW:
     properties:
@@ -952,23 +1078,23 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get the basic information about the system
+      description: List all network interfaces on the system
       produces:
       - application/json
       responses:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/sylve_internal.APIResponse-sylve_internal_interfaces_services_info_BasicInfo'
+            $ref: '#/definitions/sylve_internal.APIResponse-sylve_pkg_network_iface_Interface'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/sylve_internal.APIResponse-any'
       security:
       - BearerAuth: []
-      summary: Get Basic Info
+      summary: List Network Interfaces
       tags:
-      - Info
+      - Network
   /info/cpu:
     get:
       consumes:

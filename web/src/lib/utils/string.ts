@@ -9,6 +9,7 @@
  */
 
 import { getIcon, loadIcon } from '@iconify/svelte';
+import { customRandom, nanoid } from 'nanoid';
 import { Mnemonic } from './vendor/mnemonic';
 
 export function capitalizeFirstLetter(str: string, firstOnly: boolean = false): string {
@@ -58,4 +59,31 @@ export async function iconToSVG(icon: string): Promise<string> {
 	}
 
 	return ''; // Ensure the function always returns a string
+}
+
+function seedRandom(seed: string): () => number {
+	let h = 2166136261 >>> 0;
+	for (let i = 0; i < seed.length; i++) {
+		h ^= seed.charCodeAt(i);
+		h = Math.imul(h, 16777619);
+	}
+	let state = h;
+
+	return function () {
+		state = (state * 1664525 + 1013904223) >>> 0;
+		return (state >>> 0) / 4294967296;
+	};
+}
+
+export function generateNanoId(seed?: string): string {
+	if (seed) {
+		const rng = seedRandom(seed);
+		const customNanoId = customRandom('abcdefghijklmnopqrstuvwxyz', 10, (size) => {
+			return new Uint8Array(size).map(() => 256 * rng());
+		});
+
+		return customNanoId();
+	}
+
+	return nanoid(10);
 }

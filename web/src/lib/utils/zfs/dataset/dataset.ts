@@ -27,3 +27,15 @@ export function groupByPool(
 
 	return grouped;
 }
+
+export function getDatasetByGUID(
+	datasets: Dataset[] | undefined,
+	guid: string
+): Dataset | undefined {
+	if (!datasets) {
+		return undefined;
+	}
+
+	const dataset = datasets.find((dataset) => dataset.properties.guid === guid);
+	return dataset;
+}

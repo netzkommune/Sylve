@@ -32,6 +32,29 @@ export function secondsToHoursAgo(seconds: number | undefined): string {
 	return formatDistance(fromUnixTime(seconds), new Date(), { addSuffix: true });
 }
 
+export function dateToAgo(date: Date | string): string {
+	if (typeof date === 'string' && date.length > 4 && parseInt(date.substring(0, 4)) < 1999) {
+		return 'Never';
+	}
+
+	if (typeof date === 'string') {
+		date = parseISO(date);
+	}
+
+	const now = new Date();
+	const diff = Math.abs(now.getTime() - date.getTime());
+
+	if (diff < 1000 * 60) {
+		return 'Just now';
+	} else if (diff < 1000 * 60 * 60) {
+		return formatDistance(date, now, { addSuffix: true });
+	} else if (diff < 1000 * 60 * 60 * 24) {
+		return formatDistance(date, now, { addSuffix: true });
+	} else {
+		return format(date, 'MMM dd, yyyy');
+	}
+}
+
 export function convertDbTime(time: string): string {
 	try {
 		const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;

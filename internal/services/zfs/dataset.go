@@ -158,7 +158,7 @@ func (s *Service) GetPeriodicSnapshots() ([]zfsModels.PeriodicSnapshot, error) {
 	return snapshots, nil
 }
 
-func (s *Service) AddPeriodicSnapshot(guid string, recursive bool, interval int) error {
+func (s *Service) AddPeriodicSnapshot(guid string, prefix string, recursive bool, interval int) error {
 	dataset, err := s.GetDatasetByGUID(guid)
 	if err != nil {
 		return err
@@ -173,6 +173,7 @@ func (s *Service) AddPeriodicSnapshot(guid string, recursive bool, interval int)
 		if k == "guid" && v == guid {
 			snapshot := zfsModels.PeriodicSnapshot{
 				GUID:      guid,
+				Prefix:    prefix,
 				Recursive: recursive,
 				Interval:  interval,
 			}
@@ -209,29 +210,27 @@ func (s *Service) StartSnapshotScheduler(ctx context.Context) {
 		for {
 			select {
 			case <-ticker.C:
-				var snapshots []zfsModels.PeriodicSnapshot
-				if err := s.DB.Find(&snapshots).Error; err != nil {
-					logger.L.Debug().Err(err).Msg("Failed to load snapshots")
+				var snapshotJobs []zfsModels.PeriodicSnapshot
+				if err := s.DB.Find(&snapshotJobs).Error; err != nil {
+					logger.L.Debug().Err(err).Msg("Failed to load snapshotJobs")
 					continue
 				}
 
 				now := time.Now()
 
-				for _, snap := range snapshots {
-					if snap.LastRunAt.IsZero() || now.Sub(snap.LastRunAt).Seconds() >= float64(snap.Interval) {
-						// fmt.Printf("Running snapshot for %s\n", snap.GUID)
-						// logger.L.Debug().Msgf("Running snapshot for %s", snap.GUID)
+				for _, job := range snapshotJobs {
+					if job.LastRunAt.IsZero() || now.Sub(job.LastRunAt).Seconds() >= float64(job.Interval) {
 						allSets, err := zfs.Snapshots("")
 						if err != nil {
-							logger.L.Debug().Err(err).Msgf("Failed to get snapshots for %s", snap.GUID)
+							logger.L.Debug().Err(err).Msgf("Failed to get snapshots for %s", job.GUID)
 							continue
 						}
 
-						name := now.Format("2006-01-02-15-04")
-						dataset, err := s.GetDatasetByGUID(snap.GUID)
+						name := job.Prefix + "-" + now.Format("2006-01-02-15-04")
+						dataset, err := s.GetDatasetByGUID(job.GUID)
 
 						if err != nil {
-							logger.L.Debug().Err(err).Msgf("Failed to get dataset for %s", snap.GUID)
+							logger.L.Debug().Err(err).Msgf("Failed to get dataset for %s", job.GUID)
 							continue
 						}
 
@@ -242,13 +241,13 @@ func (s *Service) StartSnapshotScheduler(ctx context.Context) {
 							}
 						}
 
-						if err := s.CreateSnapshot(snap.GUID, name, snap.Recursive); err != nil {
-							logger.L.Debug().Err(err).Msgf("Failed to create snapshot for %s", snap.GUID)
+						if err := s.CreateSnapshot(job.GUID, name, job.Recursive); err != nil {
+							logger.L.Debug().Err(err).Msgf("Failed to create snapshot for %s", job.GUID)
 							continue
 						}
 
-						if err := s.DB.Model(&snap).Update("LastRunAt", now).Error; err != nil {
-							logger.L.Debug().Err(err).Msgf("Failed to update LastRunAt for %d", snap.ID)
+						if err := s.DB.Model(&job).Update("LastRunAt", now).Error; err != nil {
+							logger.L.Debug().Err(err).Msgf("Failed to update LastRunAt for %d", job.ID)
 						}
 
 						logger.L.Debug().Msgf("Snapshot %s created successfully", name)

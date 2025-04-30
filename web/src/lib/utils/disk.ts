@@ -204,7 +204,6 @@ export function generateTableData(disks: Disk[]): { rows: Row[]; columns: Column
 					}
 				}
 
-				// console.log(`Disk not found: ${value}`);
 				if (value.match(/p\d+$/)) {
 					return renderWithIcon('ant-design:partition-outlined', value);
 				}
@@ -246,7 +245,15 @@ export function generateTableData(disks: Disk[]): { rows: Row[]; columns: Column
 		},
 		{
 			field: 'wearOut',
-			title: getTranslation('disk.wearout', 'Wearout')
+			title: getTranslation('disk.wearout', 'Wearout'),
+			formatter: (cell: CellComponent) => {
+				const value = cell.getValue();
+				if (!isNaN(value)) {
+					return `${value} %`;
+				}
+
+				return value;
+			}
 		}
 	];
 

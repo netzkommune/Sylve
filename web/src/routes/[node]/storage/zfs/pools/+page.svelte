@@ -4,6 +4,8 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
+	import CustomCheckbox from '$lib/components/ui/custom-input/checkbox.svelte';
+	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
@@ -1000,30 +1002,23 @@
 			<Tabs.Content class="mt-0" value="tab-devices">
 				<Card.Root class="border-none pb-4">
 					<Card.Content class="flex gap-4 p-4 !pb-0">
-						<div class="flex-1 space-y-1">
-							<Label for="name">Name</Label>
-							<Input
-								type="text"
-								id="name"
-								placeholder="tank"
-								bind:value={modal.name}
-								autocomplete="off"
-							/>
-						</div>
-						<div class="flex-1 space-y-1">
-							<Label for="vdev_count"
-								>{capitalizeFirstLetter(
-									getTranslation('common.virtual', 'Virtual')
-								)}{capitalizeFirstLetter(getTranslation('common.devices', 'Devices'))}</Label
-							>
-							<Input
-								type="number"
-								id="vdev_count"
-								placeholder="1"
-								min={1}
-								bind:value={modal.vdevCount}
-							/>
-						</div>
+						<CustomValueInput
+							label={capitalizeFirstLetter(getTranslation('common.name', 'Name'))}
+							placeholder="tank"
+							bind:value={modal.name}
+							classes="flex-1 space-y-1"
+						/>
+
+						<CustomValueInput
+							label="{capitalizeFirstLetter(
+								getTranslation('common.virtual', 'Virtual')
+							)}{capitalizeFirstLetter(getTranslation('common.devices', 'Devices'))}"
+							placeholder="1"
+							bind:value={modal.vdevCount}
+							classes="flex-1 space-y-1"
+							type="number"
+						></CustomValueInput>
+
 						<div class="flex-1 space-y-1">
 							<Label class="w-24 whitespace-nowrap text-sm" for="raid"
 								>{capitalizeFirstLetter(
@@ -1129,46 +1124,28 @@
 							</div>
 
 							<div transition:slide class="grid grid-cols-1 items-center gap-4 md:grid-cols-3">
-								<div class="flex flex-col space-y-1">
-									<Label for="mountPoint" class="text-sm font-medium">Mount Point</Label>
-									<Input
-										type="text"
-										id="mountPoint"
-										placeholder="/tank"
-										bind:value={modal.mountPoint}
-									/>
-								</div>
+								<CustomValueInput
+									type="text"
+									label={capitalizeFirstLetter(
+										getTranslation('zfs.pool.mount_point', 'Mount Point')
+									)}
+									placeholder="/tank"
+									bind:value={modal.mountPoint}
+									classes="flex-1 space-y-1"
+								></CustomValueInput>
 
 								<div class="col-span-2 flex items-center gap-6 md:mt-4">
-									<div class="flex items-center gap-2">
-										<Checkbox
-											id="forceCreate"
-											bind:checked={modal.forceCreate}
-											aria-labelledby="forceCreate-label"
-										/>
-										<Label
-											id="forceCreate-label"
-											for="forceCreate"
-											class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-										>
-											Force Create
-										</Label>
-									</div>
+									<CustomCheckbox
+										label="Force Create"
+										bind:checked={modal.forceCreate}
+										classes="flex items-center gap-2"
+									></CustomCheckbox>
 
-									<div class="flex items-center gap-2">
-										<Checkbox
-											id="advanced"
-											bind:checked={modal.advanced}
-											aria-labelledby="advanced-label"
-										/>
-										<Label
-											id="advanced-label"
-											for="advanced"
-											class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-										>
-											Advanced
-										</Label>
-									</div>
+									<CustomCheckbox
+										label="Advanced"
+										bind:checked={modal.advanced}
+										classes="flex items-center gap-2"
+									></CustomCheckbox>
 								</div>
 							</div>
 						</div>

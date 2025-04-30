@@ -77,6 +77,7 @@
 	},
 	"zfs": {
 		"pool": {
+			"pool": "pool",
 			"pool_not_found": "Pool not found",
 			"pool_deleted": "Pool deleted",
 			"pool_created": "Pool created",
@@ -118,7 +119,8 @@
 			"no_available_partitions": "No available partitions",
 			"create_zfs_pool": "Create ZFS Pool",
 			"create_pool": "create pool",
-			"scrub_pool": "scrub pool"
+			"scrub_pool": "scrub pool",
+			"mount_point": "Mount Point"
 		},
 		"datasets": {
 			"filesystem_already_exists": "filesystem already exists",
@@ -166,7 +168,8 @@
 		"virtual": "virtual",
 		"filesystem": "filesystem",
 		"volume": "volume",
-		"deleted": "deleted"
+		"deleted": "deleted",
+		"prefix": "prefix"
 	},
 	"validation_errors": {
 		"failed validation: min": "too small"

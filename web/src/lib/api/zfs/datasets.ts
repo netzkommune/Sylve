@@ -42,11 +42,13 @@ export async function getPeriodicSnapshots(): Promise<PeriodicSnapshot[]> {
 
 export async function createPeriodicSnapshot(
 	dataset: Dataset,
+	prefix: string,
 	recursive: boolean,
 	interval: number
 ): Promise<APIResponse> {
 	return await apiRequest('/zfs/datasets/snapshot/periodic', APIResponseSchema, 'POST', {
 		guid: dataset.properties.guid,
+		prefix: prefix,
 		recursive: recursive,
 		interval: interval
 	});

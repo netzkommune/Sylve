@@ -26,6 +26,7 @@ type CreateSnapshotRequest struct {
 
 type CreatePeriodicSnapshotJobRequest struct {
 	GUID      string `json:"guid" binding:"required"`
+	Prefix    string `json:"prefix" binding:"required"`
 	Recursive bool   `json:"recursive"`
 	Interval  int    `json:"interval" binding:"required"`
 }
@@ -268,7 +269,7 @@ func CreatePeriodicSnapshot(zfsService *zfs.Service) gin.HandlerFunc {
 			return
 		}
 
-		err := zfsService.AddPeriodicSnapshot(request.GUID, request.Recursive, request.Interval)
+		err := zfsService.AddPeriodicSnapshot(request.GUID, request.Prefix, request.Recursive, request.Interval)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{

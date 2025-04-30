@@ -95,10 +95,11 @@ export const DatasetSchema = z.object({
 export const PeriodicSnapshotSchema = z.object({
 	id: z.number(),
 	guid: z.string(),
+	prefix: z.string(),
 	recursive: z.boolean(),
 	interval: z.number(),
 	createdAt: z.coerce.date().optional(),
-	lastRunAt: z.coerce.date().optional()
+	lastRunAt: z.coerce.date()
 });
 
 export const GroupedByPoolSchema = z.object({

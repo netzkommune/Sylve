@@ -25,7 +25,7 @@ type ZfsServiceInterface interface {
 	DeleteSnapshot(guid string, recursive bool) error
 
 	GetPeriodicSnapshots() ([]zfsModels.PeriodicSnapshot, error)
-	AddPeriodicSnapshot(guid string, recursive bool, interval int) error
+	AddPeriodicSnapshot(guid string, prefix string, recursive bool, interval int) error
 	DeletePeriodicSnapshot(guid string) error
 	StartSnapshotScheduler(ctx context.Context)
 

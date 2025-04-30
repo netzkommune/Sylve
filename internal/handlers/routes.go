@@ -18,6 +18,7 @@ import (
 	diskHandlers "sylve/internal/handlers/disk"
 	infoHandlers "sylve/internal/handlers/info"
 	"sylve/internal/handlers/middleware"
+	networkHandlers "sylve/internal/handlers/network"
 	zfsHandlers "sylve/internal/handlers/zfs"
 	authService "sylve/internal/services/auth"
 	diskService "sylve/internal/services/disk"
@@ -126,6 +127,12 @@ func RegisterRoutes(r *gin.Engine,
 		disk.POST("/initialize-gpt", diskHandlers.InitializeGPT(diskService, infoService))
 		disk.POST("/create-partitions", diskHandlers.CreatePartition(infoService))
 		disk.POST("/delete-partition", diskHandlers.DeletePartition(infoService))
+	}
+
+	network := api.Group("/network")
+	network.Use(middleware.EnsureAuthenticated(authService))
+	{
+		network.GET("/interface", networkHandlers.ListInterfaces())
 	}
 
 	auth := api.Group("/auth")

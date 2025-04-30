@@ -32,6 +32,17 @@
 			href: `/${node}/notes`
 		},
 		{
+			label: 'network',
+			icon: 'mdi:network',
+			children: [
+				{
+					label: 'interfaces',
+					icon: 'carbon:network-interface',
+					href: `/${node}/network/interfaces`
+				}
+			]
+		},
+		{
 			label: 'storage',
 			icon: 'mdi:storage',
 			children: [

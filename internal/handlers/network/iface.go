@@ -1,0 +1,41 @@
+package networkHandlers
+
+import (
+	"net/http"
+	"sylve/internal"
+
+	iface "sylve/pkg/network/iface"
+
+	"github.com/gin-gonic/gin"
+)
+
+// @Summary List Network Interfaces
+// @Description List all network interfaces on the system
+// @Tags Network
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} internal.APIResponse[iface.Interface] "Success"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /info/basic [get]
+func ListInterfaces() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		interfaces, err := iface.List()
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[[]*iface.Interface]{
+			Status:  "success",
+			Message: "interfaces_list",
+			Error:   "",
+			Data:    interfaces,
+		})
+	}
+}

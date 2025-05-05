@@ -1,9 +1,10 @@
 import type { APIResponse } from '$lib/types/common';
 import type { Column, Row } from '$lib/types/components/tree-table';
+import type { Disk } from '$lib/types/disk/disk';
 import type { Zpool } from '$lib/types/zfs/pool';
 import { getTranslation } from '../i18n';
 import { generateNumberFromString } from '../numbers';
-import { sizeFormatter } from '../table';
+import { renderWithIcon, sizeFormatter } from '../table';
 
 export const raidTypeArr = [
 	{
@@ -33,7 +34,10 @@ export const raidTypeArr = [
 	}
 ];
 
-export function generateTableData(pools: Zpool[]): {
+export function generateTableData(
+	pools: Zpool[],
+	disks: Disk[]
+): {
 	rows: Row[];
 	columns: Column[];
 } {
@@ -46,7 +50,36 @@ export function generateTableData(pools: Zpool[]): {
 		},
 		{
 			field: 'name',
-			title: 'Name'
+			title: 'Name',
+			formatter: (cell) => {
+				const value = cell.getValue();
+
+				console.log(disks);
+
+				if (isPool(pools, value)) {
+					return renderWithIcon('bi:hdd-stack-fill', value);
+				}
+
+				if (value.match(/p\d+$/)) {
+					return renderWithIcon('ant-design:partition-outlined', value);
+				}
+
+				if (value.startsWith('/dev/')) {
+					const nameOnly = value.replace('/dev/', '');
+					const disk = disks.find((disk) => disk.device === nameOnly);
+					if (disk) {
+						if (disk.type === 'HDD') {
+							return renderWithIcon('mdi:harddisk', value);
+						} else if (disk.type === 'SSD') {
+							return renderWithIcon('icon-park-outline:ssd', value);
+						} else if (disk.type === 'NVMe') {
+							return renderWithIcon('bi:nvme', value, 'rotate-90');
+						}
+					}
+				}
+
+				return `<span class="whitespace-nowrap">${value}</span>`;
+			}
 		},
 		{
 			field: 'size',

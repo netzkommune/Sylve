@@ -879,7 +879,7 @@ $rangeHeaderTextHighlightBackground: #000000 !default; //header text color when 
 		vertical-align: middle;
 		white-space: nowrap;
 		overflow: hidden;
-		text-overflow: ellipsis;
+		// text-overflow: ellipsis;
 		outline: none;
 
 		&.tabulator-row-header {

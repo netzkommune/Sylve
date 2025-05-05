@@ -173,7 +173,7 @@
 	let pools = $derived($results[1].data as Zpool[]);
 	let useableDisks = $derived(zpoolUseableDisks(disks, pools));
 	let useablePartitions = $derived(zpoolUseablePartitions(disks, pools));
-	let tableData = $derived(generateTableData(pools));
+	let tableData = $derived(generateTableData(pools, disks));
 	let sPool = $derived(pools.find((p) => p.name === activeRow?.name)?.status as Zpool['status']);
 	let sPoolSpares = $derived(
 		pools.find((p) => p.name === activeRow?.name)?.spares as Zpool['spares']

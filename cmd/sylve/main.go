@@ -28,6 +28,7 @@ import (
 	"sylve/internal/services/auth"
 	"sylve/internal/services/disk"
 	"sylve/internal/services/info"
+	"sylve/internal/services/network"
 	"sylve/internal/services/zfs"
 
 	"github.com/gin-contrib/gzip"
@@ -47,6 +48,7 @@ func main() {
 	iS := serviceRegistry.InfoService
 	zS := serviceRegistry.ZfsService
 	dS := serviceRegistry.DiskService
+	nS := serviceRegistry.NetworkService
 
 	err := sS.Initialize(aS.(*auth.Service))
 	if err != nil {
@@ -71,6 +73,7 @@ func main() {
 		iS.(*info.Service),
 		zS.(*zfs.Service),
 		dS.(*disk.Service),
+		nS.(*network.Service),
 	)
 
 	tlsConfig, err := aS.GetSylveCertificate()

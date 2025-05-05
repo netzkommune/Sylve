@@ -13,6 +13,7 @@ import (
 	"os"
 	serviceInterfaces "sylve/internal/interfaces/services"
 	infoServiceInterfaces "sylve/internal/interfaces/services/info"
+	networkServiceInterfaces "sylve/internal/interfaces/services/network"
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
 
 	"gorm.io/gorm"
@@ -21,18 +22,21 @@ import (
 var _ serviceInterfaces.StartupServiceInterface = (*Service)(nil)
 
 type Service struct {
-	DB   *gorm.DB
-	Info infoServiceInterfaces.InfoServiceInterface
-	ZFS  zfsServiceInterfaces.ZfsServiceInterface
+	DB      *gorm.DB
+	Info    infoServiceInterfaces.InfoServiceInterface
+	ZFS     zfsServiceInterfaces.ZfsServiceInterface
+	Network networkServiceInterfaces.NetworkServiceInterface
 }
 
 func NewStartupService(db *gorm.DB,
 	info infoServiceInterfaces.InfoServiceInterface,
-	zfs zfsServiceInterfaces.ZfsServiceInterface) serviceInterfaces.StartupServiceInterface {
+	zfs zfsServiceInterfaces.ZfsServiceInterface,
+	network networkServiceInterfaces.NetworkServiceInterface) serviceInterfaces.StartupServiceInterface {
 	return &Service{
-		DB:   db,
-		Info: info,
-		ZFS:  zfs,
+		DB:      db,
+		Info:    info,
+		ZFS:     zfs,
+		Network: network,
 	}
 }
 
@@ -56,6 +60,8 @@ func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface)
 	go s.Info.Cron()
 	go s.ZFS.Cron()
 	go s.ZFS.StartSnapshotScheduler(context.Background())
+
+	s.Network.ParseToDB()
 
 	return nil
 }

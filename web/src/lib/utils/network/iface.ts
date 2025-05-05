@@ -18,6 +18,10 @@ export function generateTableData(interfaces: Iface[]): {
 			title: 'Name'
 		},
 		{
+			field: 'description',
+			title: 'Description'
+		},
+		{
 			field: 'ether',
 			title: 'MAC Address',
 			formatter: (cell: CellComponent) => {
@@ -51,12 +55,13 @@ export function generateTableData(interfaces: Iface[]): {
 	const rows: Row[] = [];
 	for (const iface of interfaces) {
 		const row: Row = {
-			id: generateNumberFromString(iface.name),
-			ether: iface.ether,
+			id: iface.id,
+			ether: iface.interface.ether,
 			name: iface.name,
+			description: iface.interface.description,
 			metric: iface.metric,
 			mtu: iface.mtu,
-			media: iface.media
+			media: iface.interface.media
 		};
 
 		rows.push(row);

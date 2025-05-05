@@ -223,6 +223,7 @@ type Interface struct {
 	Metric       int          `json:"metric"`
 	Capabilities Capabilities `json:"capabilities"`
 	Driver       string       `json:"driver"`
+	Description  string       `json:"description"`
 
 	IPv4 []IPv4 `json:"ipv4"`
 	IPv6 []IPv6 `json:"ipv6"`
@@ -258,7 +259,8 @@ func (iface *Interface) String() string {
 	for _, a := range iface.IPv4 {
 		sb.WriteString(fmt.Sprintf("\tinet %s", a.IP))
 		if a.Netmask != "" {
-			sb.WriteString(fmt.Sprintf(" netmask %s", net.IP(a.Netmask).String()))
+			// sb.WriteString(fmt.Sprintf(" netmask %s", net.IP(a.Netmask).String()))
+			sb.WriteString(fmt.Sprintf(" netmask %s", a.Netmask))
 		}
 		if a.Broadcast != nil {
 			sb.WriteString(fmt.Sprintf(" broadcast %s", a.Broadcast.String()))
@@ -650,7 +652,62 @@ func getDriverName(iface string) string {
 	return value
 }
 
+func getDeviceDesc(iface string) string {
+	if strings.HasPrefix(iface, "lo") {
+		return "Loopback"
+	}
+
+	re := regexp.MustCompile(`^([a-zA-Z]+)(\d+)$`)
+	matches := re.FindStringSubmatch(iface)
+	if len(matches) != 3 {
+		return ""
+	}
+	driver := matches[1]
+	unit := matches[2]
+
+	key := fmt.Sprintf("dev.%s.%s.%%desc", driver, unit)
+	value, err := sysctl.GetString(key)
+	if err != nil {
+		return ""
+	}
+
+	value = strings.TrimRight(value, "\x00")
+
+	return value
+}
+
 func List() ([]*Interface, error) {
+	var addrs *C.struct_ifaddrs
+	if C.getifaddrs(&addrs) != 0 {
+		return nil, fmt.Errorf("getifaddrs failed")
+	}
+	defer C.freeifaddrs(addrs)
+
+	seen := make(map[string]bool)
+	var result []*Interface
+
+	for a := addrs; a != nil; a = a.ifa_next {
+		if a.ifa_addr == nil {
+			continue
+		}
+
+		name := C.GoString(a.ifa_name)
+		if seen[name] {
+			continue
+		}
+		seen[name] = true
+
+		iface, err := Get(name)
+		if err != nil {
+			continue // silently skip bad interfaces
+		}
+		result = append(result, iface)
+	}
+
+	return result, nil
+}
+
+func Get(name string) (*Interface, error) {
 	fd6 := C.socket(C.AF_INET6, C.SOCK_DGRAM, 0)
 	if fd6 < 0 {
 		return nil, fmt.Errorf("socket(AF_INET6) failed")
@@ -663,31 +720,29 @@ func List() ([]*Interface, error) {
 	}
 	defer C.freeifaddrs(addrs)
 
-	byName := map[string]*Interface{}
-
+	var iface *Interface
 	for a := addrs; a != nil; a = a.ifa_next {
 		if a.ifa_addr == nil {
 			continue
 		}
 
-		name := C.GoString(a.ifa_name)
+		ifaceName := C.GoString(a.ifa_name)
+		if ifaceName != name {
+			continue
+		}
 
-		iface, ok := byName[name]
-		if !ok {
+		if iface == nil {
 			var err error
 			iface, err = getInterfaceInfo(name)
 			if err != nil {
-				continue
+				return nil, err
 			}
-			byName[name] = iface
+			iface.Driver = getDriverName(name)
+			iface.Description = getDeviceDesc(name)
 		}
 
 		cname := C.CString(name)
 		defer C.free(unsafe.Pointer(cname))
-
-		if iface.Driver == "" {
-			iface.Driver = getDriverName(name)
-		}
 
 		switch a.ifa_addr.sa_family {
 		case C.AF_INET:
@@ -739,15 +794,7 @@ func List() ([]*Interface, error) {
 			var caddr C.struct_in6_addr
 			C.memcpy(unsafe.Pointer(&caddr), unsafe.Pointer(&addr), C.sizeof_struct_in6_addr)
 
-			var flags Flags
-
 			raw := C.get_in6_flags(fd6, cname, caddr, C.uint32_t(scopeID))
-
-			if raw < 0 {
-				break
-			}
-
-			flags.Raw = uint32(raw)
 
 			plTime := C.uint32_t(0)
 			vlTime := C.uint32_t(0)
@@ -759,10 +806,11 @@ func List() ([]*Interface, error) {
 				ScopeID:      scopeID,
 			}
 
-			if flags.Raw >= 0 {
-				ipv6.AutoConf = flags.Raw&C.IN6_IFF_AUTOCONF != 0
-				ipv6.Detached = flags.Raw&C.IN6_IFF_DETACHED != 0
-				ipv6.Deprecated = flags.Raw&C.IN6_IFF_DEPRECATED != 0
+			if raw >= 0 {
+				flags := uint32(raw)
+				ipv6.AutoConf = flags&C.IN6_IFF_AUTOCONF != 0
+				ipv6.Detached = flags&C.IN6_IFF_DETACHED != 0
+				ipv6.Deprecated = flags&C.IN6_IFF_DEPRECATED != 0
 			}
 
 			ipv6.LifeTimes.Preferred = uint32(plTime)
@@ -779,10 +827,9 @@ func List() ([]*Interface, error) {
 		}
 	}
 
-	var result []*Interface
-	for _, iface := range byName {
-		result = append(result, iface)
+	if iface == nil {
+		return nil, fmt.Errorf("interface %s not found", name)
 	}
 
-	return result, nil
+	return iface, nil
 }

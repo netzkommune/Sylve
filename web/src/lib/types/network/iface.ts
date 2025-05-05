@@ -1,8 +1,29 @@
+import { options } from 'marked';
 import { z } from 'zod';
 
 export const FlagsSchema = z.object({
 	raw: z.number(),
 	desc: z.array(z.string()).default([])
+});
+
+export const IPv4RCSchema = z.object({
+	id: z.number(),
+	interfaceId: z.number(),
+	protocol: z.string(),
+	address: z.string().nullable().optional(),
+	netmask: z.string().nullable().optional(),
+	options: z.string().default(''),
+	isAlias: z.boolean().default(false)
+});
+
+export const IPv6RCSchema = z.object({
+	id: z.number(),
+	interfaceId: z.number(),
+	protocol: z.string(),
+	address: z.string().nullable().optional(),
+	options: z.string().default(''),
+	prefixLength: z.number().nullable().optional(),
+	isAlias: z.boolean().default(false)
 });
 
 export const IPv4Schema = z.object({
@@ -36,21 +57,31 @@ export const MediaSchema = z.object({
 
 export const ND6Schema = FlagsSchema;
 
-export const IfaceSchema = z.object({
+export const IfaceDetailSchema = z.object({
 	name: z.string(),
-	ether: z.string().default(''),
+	ether: z.string(),
 	flags: FlagsSchema,
-	mtu: z.number().default(0),
-	metric: z.number().default(0),
 	capabilities: z.object({
 		enabled: FlagsSchema,
 		supported: FlagsSchema
 	}),
 	driver: z.string().default(''),
+	description: z.string().default(''),
 	ipv4: z.array(IPv4Schema).default([]),
 	ipv6: z.array(IPv6Schema).default([]),
 	media: MediaSchema.nullable().optional(),
 	nd6: ND6Schema.nullable().optional()
+});
+
+export const IfaceSchema = z.object({
+	id: z.number(),
+	name: z.string(),
+	mac: z.string(),
+	mtu: z.number().default(0),
+	metric: z.number().default(0),
+	ipv4s: z.array(IPv4RCSchema).default([]),
+	ipv6s: z.array(IPv6RCSchema).default([]),
+	interface: IfaceDetailSchema
 });
 
 export type Iface = z.infer<typeof IfaceSchema>;

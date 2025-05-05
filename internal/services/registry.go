@@ -12,10 +12,12 @@ import (
 	serviceInterfaces "sylve/internal/interfaces/services"
 	diskServiceInterfaces "sylve/internal/interfaces/services/disk"
 	infoServiceInterfaces "sylve/internal/interfaces/services/info"
+	networkServiceInterfaces "sylve/internal/interfaces/services/network"
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
 	"sylve/internal/services/auth"
 	"sylve/internal/services/disk"
 	"sylve/internal/services/info"
+	"sylve/internal/services/network"
 	"sylve/internal/services/startup"
 	"sylve/internal/services/zfs"
 
@@ -28,6 +30,7 @@ type ServiceRegistry struct {
 	InfoService    infoServiceInterfaces.InfoServiceInterface
 	ZfsService     zfsServiceInterfaces.ZfsServiceInterface
 	DiskService    diskServiceInterfaces.DiskServiceInterface
+	NetworkService networkServiceInterfaces.NetworkServiceInterface
 }
 
 func NewService[T any](db *gorm.DB, dependencies ...interface{}) interface{} {
@@ -37,13 +40,16 @@ func NewService[T any](db *gorm.DB, dependencies ...interface{}) interface{} {
 	case *startup.Service:
 		infoService := dependencies[0].(infoServiceInterfaces.InfoServiceInterface)
 		zfsService := dependencies[1].(zfsServiceInterfaces.ZfsServiceInterface)
-		return startup.NewStartupService(db, infoService, zfsService)
+		networkService := dependencies[2].(networkServiceInterfaces.NetworkServiceInterface)
+		return startup.NewStartupService(db, infoService, zfsService, networkService)
 	case *info.Service:
 		return info.NewInfoService(db)
 	case *zfs.Service:
 		return zfs.NewZfsService(db)
 	case *disk.Service:
 		return disk.NewDiskService(db, dependencies[0].(zfsServiceInterfaces.ZfsServiceInterface))
+	case *network.Service:
+		return network.NewNetworkService(db)
 	default:
 		return nil
 	}
@@ -53,12 +59,14 @@ func NewServiceRegistry(db *gorm.DB) *ServiceRegistry {
 	authService := NewService[auth.Service](db)
 	infoService := NewService[info.Service](db)
 	zfsService := NewService[zfs.Service](db)
+	networkService := NewService[network.Service](db)
 
 	return &ServiceRegistry{
 		AuthService:    authService.(serviceInterfaces.AuthServiceInterface),
-		StartupService: NewService[startup.Service](db, infoService, zfsService).(*startup.Service),
+		StartupService: NewService[startup.Service](db, infoService, zfsService, networkService).(*startup.Service),
 		InfoService:    infoService.(infoServiceInterfaces.InfoServiceInterface),
 		ZfsService:     zfsService.(zfsServiceInterfaces.ZfsServiceInterface),
 		DiskService:    NewService[disk.Service](db, zfsService).(*disk.Service),
+		NetworkService: networkService.(networkServiceInterfaces.NetworkServiceInterface),
 	}
 }

@@ -23,6 +23,7 @@ import (
 	authService "sylve/internal/services/auth"
 	diskService "sylve/internal/services/disk"
 	infoService "sylve/internal/services/info"
+	networkService "sylve/internal/services/network"
 	zfsService "sylve/internal/services/zfs"
 )
 
@@ -52,6 +53,7 @@ func RegisterRoutes(r *gin.Engine,
 	infoService *infoService.Service,
 	zfsService *zfsService.Service,
 	diskService *diskService.Service,
+	networkService *networkService.Service,
 ) {
 	api := r.Group("/api")
 
@@ -132,7 +134,8 @@ func RegisterRoutes(r *gin.Engine,
 	network := api.Group("/network")
 	network.Use(middleware.EnsureAuthenticated(authService))
 	{
-		network.GET("/interface", networkHandlers.ListInterfaces())
+		network.GET("/interface", networkHandlers.ListInterfaces(networkService))
+		network.POST("/interface/ipv4", networkHandlers.IPv4Config(networkService))
 	}
 
 	auth := api.Group("/auth")

@@ -12,6 +12,7 @@ import (
 	"sylve/internal"
 	"sylve/internal/db/models"
 	infoModels "sylve/internal/db/models/info"
+	networkModels "sylve/internal/db/models/network"
 	zfsModels "sylve/internal/db/models/zfs"
 	"sylve/internal/logger"
 	"sylve/pkg/utils"
@@ -44,6 +45,7 @@ func SetupDatabase(cfg *internal.SylveConfig, isTest bool) *gorm.DB {
 	db.Exec("PRAGMA journal_mode=WAL")
 
 	err = db.AutoMigrate(
+		&models.System{},
 		&models.User{},
 		&models.Token{},
 		&models.SystemSecrets{},
@@ -54,6 +56,10 @@ func SetupDatabase(cfg *internal.SylveConfig, isTest bool) *gorm.DB {
 		&infoModels.AuditLog{},
 
 		&zfsModels.PeriodicSnapshot{},
+
+		&networkModels.NetworkInterface{},
+		&networkModels.IPv4{},
+		&networkModels.IPv6{},
 	)
 
 	if err != nil {

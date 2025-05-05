@@ -54,8 +54,6 @@ export function generateTableData(
 			formatter: (cell) => {
 				const value = cell.getValue();
 
-				console.log(disks);
-
 				if (isPool(pools, value)) {
 					return renderWithIcon('bi:hdd-stack-fill', value);
 				}

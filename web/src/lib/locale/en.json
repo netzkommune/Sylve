@@ -22,6 +22,7 @@
 		"network": "Network",
 		"storage": "Storage",
 		"certificates": "Certificates",
+		"interfaces": "Interfaces",
 		"firewall": "Firewall",
 		"disks": "Disks",
 		"zfs": "ZFS",

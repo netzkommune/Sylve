@@ -26,6 +26,9 @@ package iface
 #include <netinet6/in6_var.h>
 #include <net/if_media.h>
 #include <netinet6/nd6.h>
+#include <sys/sockio.h>
+#include <errno.h>
+#include <net/if_bridgevar.h>
 
 #ifndef SIOCGIFAFLAG_IN6
 #define SIOCGIFAFLAG_IN6 _IOWR('i', 73, struct in6_ifreq)
@@ -38,6 +41,32 @@ package iface
 #ifndef SIOCGIFINFO_IN6
 #define SIOCGIFINFO_IN6 _IOWR('i', 108, struct in6_ndireq)
 #endif
+
+static int
+get_stp_op_params(int fd, const char *ifname, struct ifbropreq *opr)
+{
+    struct ifdrv dr;
+
+    memset(&dr, 0, sizeof(dr));
+    strncpy(dr.ifd_name, ifname, IFNAMSIZ-1);
+    dr.ifd_cmd  = BRDGPARAM;
+    dr.ifd_len  = sizeof(*opr);
+    dr.ifd_data = opr;
+
+    return ioctl(fd, SIOCGDRVSPEC, &dr);
+}
+
+static int
+get_bridge_param(int fd, const char *ifname, int cmd, struct ifbrparam *bp)
+{
+    struct ifdrv dr;
+    memset(&dr, 0, sizeof(dr));
+    strncpy(dr.ifd_name, ifname, IFNAMSIZ-1);
+    dr.ifd_cmd  = cmd;
+    dr.ifd_len  = sizeof(*bp);
+    dr.ifd_data = bp;
+    return ioctl(fd, SIOCGDRVSPEC, &dr);
+}
 
 static void set_ifname(char *dst, const char *src) {
 	strncpy(dst, src, IFNAMSIZ);
@@ -85,8 +114,6 @@ static void get_lifetimes(int fd, const char *name, struct in6_addr addr, uint32
 	*pltime = ifr6.ifr_ifru.ifru_lifetime.ia6t_pltime;
 	*vltime = ifr6.ifr_ifru.ifru_lifetime.ia6t_vltime;
 }
-
-
 
 #ifndef SIOCGIFXFLAGS
 #define SIOCGIFXFLAGS 0xc0206925
@@ -151,15 +178,34 @@ static void* get_broadaddr(struct ifaddrs* a) {
 	return a->ifa_broadaddr;
 }
 
+int is_bridge(const char *ifname) {
+    int sock = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sock < 0) {
+        return -1;
+    }
+
+    struct ifreq ifr;
+    struct if_data ifd;
+
+    memset(&ifr, 0, sizeof(ifr));
+    strlcpy(ifr.ifr_name, ifname, sizeof(ifr.ifr_name));
+    // Point the kernel at our local if_data buffer:
+    ifr.ifr_data = (caddr_t)&ifd;
+
+    if (ioctl(sock, SIOCGIFDATA, &ifr) < 0) {
+        close(sock);
+        return -1;
+    }
+
+    close(sock);
+
+    return (ifd.ifi_type == IFT_BRIDGE) ? 1 : 0;
+}
+
 static uint32_t get_mtu(const struct ifreq *ifr)    { return ifr->ifr_mtu; }
 static uint32_t get_metric(const struct ifreq *ifr) { return ifr->ifr_metric; }
 
-// static int get_drivername(const char *ifname, char *out, size_t outlen) {
-// 	char key[128];
-// 	snprintf(key, sizeof(key), "dev.%s.0.%s", ifname, "%%driver");
-
-// 	return sysctlbyname(key, out, &outlen, NULL, 0) == 0 ? 0 : -1;
-// }
+static int get_errno(void) { return errno; }
 */
 import "C"
 
@@ -215,6 +261,15 @@ type ND6 struct {
 	Flags
 }
 
+type STP struct {
+	Priority  int    `json:"priority"`
+	HelloTime int    `json:"hellotime"`
+	FwdDelay  int    `json:"fwddelay"`
+	MaxAge    int    `json:"maxage"`
+	HoldCnt   int    `json:"holdcnt"`
+	Proto     string `json:"proto"`
+}
+
 type Interface struct {
 	Name         string       `json:"name"`
 	Ether        string       `json:"ether"`
@@ -224,6 +279,10 @@ type Interface struct {
 	Capabilities Capabilities `json:"capabilities"`
 	Driver       string       `json:"driver"`
 	Description  string       `json:"description"`
+	BridgeID     string       `json:"bridgeId"`
+	STP          *STP         `json:"stp"`
+	MaxAddr      int          `json:"maxaddr"`
+	Timeout      int          `json:"timeout"`
 
 	IPv4 []IPv4 `json:"ipv4"`
 	IPv6 []IPv6 `json:"ipv6"`
@@ -236,7 +295,7 @@ type Interface struct {
 func (iface *Interface) String() string {
 	var sb strings.Builder
 
-	sb.WriteString(fmt.Sprintf("%s: flags=%07x<%s> metric %d mtu %d\n",
+	sb.WriteString(fmt.Sprintf("%s: flags=%x<%s> metric %d mtu %d\n",
 		iface.Name,
 		iface.Flags.Raw,
 		strings.Join(iface.Flags.Desc, ","),
@@ -314,6 +373,12 @@ func (iface *Interface) String() string {
 			iface.ND6.Raw,
 			strings.Join(iface.ND6.Desc, ","),
 		))
+	}
+
+	if iface.STP != nil {
+		sb.WriteString(fmt.Sprintf("\tid %s priority %d hellotime %d fwddelay %d\n", iface.BridgeID, iface.STP.Priority, iface.STP.HelloTime, iface.STP.FwdDelay))
+
+		sb.WriteString(fmt.Sprintf("\tmaxage %d holdcnt %d proto %s maxaddr %d timeout %d\n", iface.STP.MaxAge, iface.STP.HoldCnt, iface.STP.Proto, iface.MaxAddr, iface.Timeout))
 	}
 
 	return sb.String()
@@ -427,6 +492,19 @@ func knownFlagMask() uint32 {
 		0x800 | 0x1000 | 0x2000 | 0x4000 | 0x8000 | 0x01000000
 }
 
+func parseSTPProto(p uint8) string {
+	switch p {
+	case 0:
+		return "stp"
+	case 1:
+		return "-"
+	case 2:
+		return "rstp"
+	default:
+		return fmt.Sprintf("%d", p)
+	}
+}
+
 func getInterfaceInfo(name string) (*Interface, error) {
 	fd := C.socket(C.AF_INET, C.SOCK_DGRAM, 0)
 	if fd < 0 {
@@ -439,7 +517,13 @@ func getInterfaceInfo(name string) (*Interface, error) {
 
 	var flags Flags
 
-	flags.Raw = uint32(C.get_combined_flags(fd, cname)) & knownFlagMask()
+	raw := uint32(C.get_combined_flags(fd, cname))
+	if C.is_bridge(cname) != 0 {
+		bridgeMask := uint32(C.IFF_BROADCAST) | uint32(C.IFF_SIMPLEX) | uint32(C.IFF_MULTICAST)
+		flags.Raw = raw & bridgeMask
+	} else {
+		flags.Raw = raw & knownFlagMask()
+	}
 
 	if flags.Raw == 0 {
 		return nil, fmt.Errorf("get_combined_flags failed for %s", name)
@@ -480,6 +564,42 @@ func getInterfaceInfo(name string) (*Interface, error) {
 	}
 
 	iface.Media = getMediaInfo(fd, name)
+
+	if C.is_bridge(cname) != 0 {
+		// fetch STP operational parameters via SIOCSDRVSPEC/BRDGPARAM
+		var opr C.struct_ifbropreq
+		ret := C.get_stp_op_params(fd, cname, &opr)
+
+		if ret >= 0 {
+			raw := uint64(opr.ifbop_bridgeid)
+			var idBytes [6]byte
+			for i := 0; i < 6; i++ {
+				shift := uint((5 - i) * 8)
+				idBytes[i] = byte((raw >> shift) & 0xff)
+			}
+
+			iface.STP = &STP{
+				Priority:  int(opr.ifbop_priority),
+				HelloTime: int(opr.ifbop_hellotime),
+				FwdDelay:  int(opr.ifbop_fwddelay),
+				MaxAge:    int(opr.ifbop_maxage),
+				HoldCnt:   int(opr.ifbop_holdcount),
+				Proto:     parseSTPProto(uint8(opr.ifbop_protocol)),
+			}
+
+			iface.BridgeID = net.HardwareAddr(idBytes[:]).String()
+		}
+
+		var bp C.struct_ifbrparam
+		if C.get_bridge_param(fd, cname, C.BRDGGCACHE, &bp) >= 0 {
+			raw := *(*C.uint32_t)(unsafe.Pointer(&bp.ifbrp_ifbrpu[0]))
+			iface.MaxAddr = int(raw)
+		}
+		if C.get_bridge_param(fd, cname, C.BRDGGTO, &bp) >= 0 {
+			raw := *(*C.uint32_t)(unsafe.Pointer(&bp.ifbrp_ifbrpu[0]))
+			iface.Timeout = int(raw)
+		}
+	}
 
 	return iface, nil
 }

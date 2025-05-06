@@ -103,14 +103,6 @@ static void get_lifetimes(int fd, const char *name, struct in6_addr addr, uint32
 	*vltime = ifr6.ifr_ifru.ifru_lifetime.ia6t_vltime;
 }
 
-#ifndef SIOCGIFXFLAGS
-#define SIOCGIFXFLAGS 0xc0206925
-#endif
-
-#ifndef SIOCGIFCAP
-#define SIOCGIFCAP 0xc028692f
-#endif
-
 static uint32_t get_flagshigh(const struct ifreq *req) {
 	union {
 		const struct sockaddr *sa;
@@ -126,7 +118,7 @@ static void get_capabilities(int fd, const char* name, uint32_t *enabled, uint32
 	memset(&req, 0, sizeof(req));
 	strncpy(req.ifr_name, name, IFNAMSIZ - 1);
 
-	if (ioctl(fd, SIOCGIFCAP, &req) < 0) {
+	if (ioctl(fd, SIOCGIFCAPNV, &req) < 0) {
 		*enabled = 0;
 		*supported = 0;
 		return;
@@ -140,21 +132,24 @@ static int ioctl_wrap(int fd, unsigned long req, void *arg) {
     return ioctl(fd, req, arg);
 }
 
-static uint64_t get_combined_flags(int fd, const char* name) {
-	struct ifreq req;
-	memset(&req, 0, sizeof(req));
-	strncpy(req.ifr_name, name, IFNAMSIZ - 1);
+static uint64_t
+get_combined_flags(int fd, const char *name)
+{
+    struct ifreq ifr;
+    uint32_t low = 0, high = 0;
 
-	if (ioctl(fd, SIOCGIFFLAGS, &req) < 0)
+    memset(&ifr, 0, sizeof(ifr));
+    strlcpy(ifr.ifr_name, name, sizeof(ifr.ifr_name));
+
+    if (ioctl(fd, SIOCGIFFLAGS, &ifr) < 0) {
 		return 0;
+	}
 
-	uint32_t low = req.ifr_flags;
-	uint32_t high = 0;
-	ioctl(fd, SIOCGIFXFLAGS, &req);
-	high = get_flagshigh(&req);
+    low = ifr.ifr_flags;
 
-	return ((uint64_t)high << 32) | low;
+    return ((uint64_t)high << 32) | low;
 }
+
 
 static int get_media_info(int fd, const char *name, struct ifmediareq *ifmr) {
 	memset(ifmr, 0, sizeof(struct ifmediareq));
@@ -280,6 +275,29 @@ type Interface struct {
 	ND6 ND6 `json:"nd6"`
 }
 
+type FlagDescriptor struct {
+	Mask uint32
+	Name string
+}
+
+func parseFlags(flags uint32, descriptors []FlagDescriptor) ([]string, uint32) {
+	var descriptions []string
+	remaining := flags
+
+	for _, desc := range descriptors {
+		if flags&desc.Mask != 0 {
+			descriptions = append(descriptions, desc.Name)
+			remaining &^= desc.Mask
+		}
+	}
+
+	if remaining != 0 {
+		descriptions = append(descriptions, fmt.Sprintf("UNKNOWN_0x%x", remaining))
+	}
+
+	return descriptions, remaining
+}
+
 func (iface *Interface) String() string {
 	var sb strings.Builder
 
@@ -299,9 +317,9 @@ func (iface *Interface) String() string {
 		sb.WriteString(fmt.Sprintf("\toptions=%x<%s>\n", iface.Capabilities.Enabled.Raw, strings.Join(iface.Capabilities.Enabled.Desc, ",")))
 	}
 
-	// if iface.Capabilities.Supported.Raw != 0 {
-	// 	sb.WriteString(fmt.Sprintf("\tcapabilities=%x<%s>\n", iface.Capabilities.Supported.Raw, strings.Join(iface.Capabilities.Supported.Desc, ",")))
-	// }
+	if iface.Capabilities.Supported.Raw != 0 {
+		sb.WriteString(fmt.Sprintf("\tcapabilities=%x<%s>\n", iface.Capabilities.Supported.Raw, strings.Join(iface.Capabilities.Supported.Desc, ",")))
+	}
 
 	for _, a := range iface.IPv4 {
 		sb.WriteString(fmt.Sprintf("\tinet %s", a.IP))
@@ -372,107 +390,90 @@ func (iface *Interface) String() string {
 	return sb.String()
 }
 
-func parseFlagsDesc(fl uint32) []string {
-	const (
-		IFF_UP          = 0x1
-		IFF_BROADCAST   = 0x2
-		IFF_LOOPBACK    = 0x8
-		IFF_POINTOPOINT = 0x10
-		IFF_RUNNING     = 0x40
-		IFF_NOARP       = 0x80
-		IFF_PROMISC     = 0x100
-		IFF_ALLMULTI    = 0x200
-		IFF_OACTIVE     = 0x400
-		IFF_SIMPLEX     = 0x800
-		IFF_LINK0       = 0x1000
-		IFF_LINK1       = 0x2000
-		IFF_LINK2       = 0x4000
-		IFF_MULTICAST   = 0x8000
-		IFF_LOWER_UP    = 0x01000000
-	)
-
-	tests := []struct {
-		mask uint32
-		name string
-	}{
-		{IFF_UP, "UP"},
-		{IFF_BROADCAST, "BROADCAST"},
-		{IFF_LOOPBACK, "LOOPBACK"},
-		{IFF_POINTOPOINT, "POINTOPOINT"},
-		{IFF_RUNNING, "RUNNING"},
-		{IFF_NOARP, "NOARP"},
-		{IFF_PROMISC, "PROMISC"},
-		{IFF_ALLMULTI, "ALLMULTI"},
-		{IFF_OACTIVE, "OACTIVE"},
-		{IFF_SIMPLEX, "SIMPLEX"},
-		{IFF_LINK0, "LINK0"},
-		{IFF_LINK1, "LINK1"},
-		{IFF_LINK2, "LINK2"},
-		{IFF_MULTICAST, "MULTICAST"},
-		{IFF_LOWER_UP, "LOWER_UP"},
-	}
-
-	var out []string
-	for _, t := range tests {
-		if fl&t.mask != 0 {
-			out = append(out, t.name)
+func getSysctlProperty(iface, prop string) string {
+	if strings.HasPrefix(iface, "lo") {
+		if prop == "driver" {
+			return "lo"
 		}
+		return "Loopback"
 	}
-	return out
+
+	re := regexp.MustCompile(`^([a-zA-Z]+)(\d+)$`)
+	matches := re.FindStringSubmatch(iface)
+	if len(matches) != 3 {
+		return ""
+	}
+
+	key := fmt.Sprintf("dev.%s.%s.%%%s", matches[1], matches[2], prop)
+	value, err := sysctl.GetString(key)
+	if err != nil {
+		return ""
+	}
+
+	return strings.TrimRight(value, "\x00")
+}
+
+func parseFlagsDesc(fl uint32) []string {
+	descriptors := []FlagDescriptor{
+		{Mask: 0x1, Name: "UP"},
+		{Mask: 0x2, Name: "BROADCAST"},
+		{Mask: 0x8, Name: "LOOPBACK"},
+		{Mask: 0x10, Name: "POINTOPOINT"},
+		{Mask: 0x40, Name: "RUNNING"},
+		{Mask: 0x80, Name: "NOARP"},
+		{Mask: 0x100, Name: "PROMISC"},
+		{Mask: 0x200, Name: "ALLMULTI"},
+		{Mask: 0x400, Name: "OACTIVE"},
+		{Mask: 0x800, Name: "SIMPLEX"},
+		{Mask: 0x1000, Name: "LINK0"},
+		{Mask: 0x2000, Name: "LINK1"},
+		{Mask: 0x4000, Name: "LINK2"},
+		{Mask: 0x8000, Name: "MULTICAST"},
+		{Mask: 0x01000000, Name: "LOWER_UP"},
+	}
+
+	descriptions, _ := parseFlags(fl, descriptors)
+	return descriptions
 }
 
 func parseCapabilitiesDesc(caps uint32) []string {
-	flags := []struct {
-		mask uint32
-		name string
-	}{
-		{1 << 0, "RXCSUM"},
-		{1 << 1, "TXCSUM"},
-		{1 << 2, "NETCONS"},
-		{1 << 3, "VLAN_MTU"},
-		{1 << 4, "VLAN_HWTAGGING"},
-		{1 << 5, "JUMBO_MTU"},
-		{1 << 6, "POLLING"},
-		{1 << 7, "VLAN_HWCSUM"},
-		{1 << 8, "TSO4"},
-		{1 << 9, "TSO6"},
-		{1 << 10, "LRO"},
-		{1 << 11, "WOL_UCAST"},
-		{1 << 12, "WOL_MCAST"},
-		{1 << 13, "WOL_MAGIC"},
-		{1 << 14, "TOE4"},
-		{1 << 15, "TOE6"},
-		{1 << 16, "VLAN_HWFILTER"},
-		{1 << 17, "NV"},
-		{1 << 18, "VLAN_HWTSO"},
-		{1 << 19, "LINKSTATE"},
-		{1 << 20, "NETMAP"},
-		{1 << 21, "RXCSUM_IPV6"},
-		{1 << 22, "TXCSUM_IPV6"},
-		{1 << 23, "HWSTATS"},
-		{1 << 24, "TXRTLMT"},
-		{1 << 25, "HWRXTSTMP"},
-		{1 << 26, "MEXTPG"},
-		{1 << 27, "TXTLS4"},
-		{1 << 28, "TXTLS6"},
-		{1 << 29, "VXLAN_HWCSUM"},
-		{1 << 30, "VXLAN_HWTSO"},
-		{1 << 31, "TXTLS_RTLMT"},
+	descriptors := []FlagDescriptor{
+		{Mask: 1 << 0, Name: "RXCSUM"},
+		{Mask: 1 << 1, Name: "TXCSUM"},
+		{Mask: 1 << 2, Name: "NETCONS"},
+		{Mask: 1 << 3, Name: "VLAN_MTU"},
+		{Mask: 1 << 4, Name: "VLAN_HWTAGGING"},
+		{Mask: 1 << 5, Name: "JUMBO_MTU"},
+		{Mask: 1 << 6, Name: "POLLING"},
+		{Mask: 1 << 7, Name: "VLAN_HWCSUM"},
+		{Mask: 1 << 8, Name: "TSO4"},
+		{Mask: 1 << 9, Name: "TSO6"},
+		{Mask: 1 << 10, Name: "LRO"},
+		{Mask: 1 << 11, Name: "WOL_UCAST"},
+		{Mask: 1 << 12, Name: "WOL_MCAST"},
+		{Mask: 1 << 13, Name: "WOL_MAGIC"},
+		{Mask: 1 << 14, Name: "TOE4"},
+		{Mask: 1 << 15, Name: "TOE6"},
+		{Mask: 1 << 16, Name: "VLAN_HWFILTER"},
+		{Mask: 1 << 17, Name: "NV"},
+		{Mask: 1 << 18, Name: "VLAN_HWTSO"},
+		{Mask: 1 << 19, Name: "LINKSTATE"},
+		{Mask: 1 << 20, Name: "NETMAP"},
+		{Mask: 1 << 21, Name: "RXCSUM_IPV6"},
+		{Mask: 1 << 22, Name: "TXCSUM_IPV6"},
+		{Mask: 1 << 23, Name: "HWSTATS"},
+		{Mask: 1 << 24, Name: "TXRTLMT"},
+		{Mask: 1 << 25, Name: "HWRXTSTMP"},
+		{Mask: 1 << 26, Name: "MEXTPG"},
+		{Mask: 1 << 27, Name: "TXTLS4"},
+		{Mask: 1 << 28, Name: "TXTLS6"},
+		{Mask: 1 << 29, Name: "VXLAN_HWCSUM"},
+		{Mask: 1 << 30, Name: "VXLAN_HWTSO"},
+		{Mask: 1 << 31, Name: "TXTLS_RTLMT"},
 	}
 
-	var out []string
-	for _, f := range flags {
-		if caps&f.mask == f.mask {
-			out = append(out, f.name)
-			caps &^= f.mask
-		}
-	}
-
-	if caps != 0 {
-		out = append(out, fmt.Sprintf("UNKNOWN_0x%x", caps))
-	}
-
-	return out
+	descriptions, _ := parseFlags(caps, descriptors)
+	return descriptions
 }
 
 func knownFlagMask() uint32 {
@@ -506,12 +507,7 @@ func getInterfaceInfo(name string) (*Interface, error) {
 	var flags Flags
 
 	raw := uint32(C.get_combined_flags(fd, cname))
-	if C.is_bridge(cname) != 0 {
-		bridgeMask := uint32(C.IFF_BROADCAST) | uint32(C.IFF_SIMPLEX) | uint32(C.IFF_MULTICAST)
-		flags.Raw = raw & bridgeMask
-	} else {
-		flags.Raw = raw & knownFlagMask()
-	}
+	flags.Raw = raw & knownFlagMask()
 
 	if flags.Raw == 0 {
 		return nil, fmt.Errorf("get_combined_flags failed for %s", name)
@@ -736,54 +732,6 @@ func parseND6Options(flags uint32) []string {
 	return out
 }
 
-func getDriverName(iface string) string {
-	if strings.HasPrefix(iface, "lo") {
-		return "lo"
-	}
-
-	re := regexp.MustCompile(`^([a-zA-Z]+)(\d+)$`)
-	matches := re.FindStringSubmatch(iface)
-	if len(matches) != 3 {
-		return ""
-	}
-	driver := matches[1]
-	unit := matches[2]
-
-	key := fmt.Sprintf("dev.%s.%s.%%driver", driver, unit)
-	value, err := sysctl.GetString(key)
-	if err != nil {
-		return ""
-	}
-
-	value = strings.TrimRight(value, "\x00")
-
-	return value
-}
-
-func getDeviceDesc(iface string) string {
-	if strings.HasPrefix(iface, "lo") {
-		return "Loopback"
-	}
-
-	re := regexp.MustCompile(`^([a-zA-Z]+)(\d+)$`)
-	matches := re.FindStringSubmatch(iface)
-	if len(matches) != 3 {
-		return ""
-	}
-	driver := matches[1]
-	unit := matches[2]
-
-	key := fmt.Sprintf("dev.%s.%s.%%desc", driver, unit)
-	value, err := sysctl.GetString(key)
-	if err != nil {
-		return ""
-	}
-
-	value = strings.TrimRight(value, "\x00")
-
-	return value
-}
-
 func List() ([]*Interface, error) {
 	var addrs *C.struct_ifaddrs
 	if C.getifaddrs(&addrs) != 0 {
@@ -845,8 +793,8 @@ func Get(name string) (*Interface, error) {
 			if err != nil {
 				return nil, err
 			}
-			iface.Driver = getDriverName(name)
-			iface.Description = getDeviceDesc(name)
+			iface.Driver = getSysctlProperty(name, "driver")
+			iface.Description = getSysctlProperty(name, "desc")
 		}
 
 		cname := C.CString(name)

@@ -30,18 +30,6 @@ package iface
 #include <errno.h>
 #include <net/if_bridgevar.h>
 
-#ifndef SIOCGIFAFLAG_IN6
-#define SIOCGIFAFLAG_IN6 _IOWR('i', 73, struct in6_ifreq)
-#endif
-
-#ifndef SIOCGIFALIFETIME_IN6
-#define SIOCGIFALIFETIME_IN6 _IOWR('i', 74, struct in6_ifreq)
-#endif
-
-#ifndef SIOCGIFINFO_IN6
-#define SIOCGIFINFO_IN6 _IOWR('i', 108, struct in6_ndireq)
-#endif
-
 static int
 get_stp_op_params(int fd, const char *ifname, struct ifbropreq *opr)
 {

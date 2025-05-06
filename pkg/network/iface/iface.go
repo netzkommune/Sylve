@@ -113,12 +113,16 @@ static uint32_t get_flagshigh(const struct ifreq *req) {
 	return *pun.u32;
 }
 
+#ifndef SIOCGIFCAP
+#define SIOCGIFCAP 1
+#endif
+
 static void get_capabilities(int fd, const char* name, uint32_t *enabled, uint32_t *supported) {
 	struct ifreq req;
 	memset(&req, 0, sizeof(req));
 	strncpy(req.ifr_name, name, IFNAMSIZ - 1);
 
-	if (ioctl(fd, SIOCGIFCAPNV, &req) < 0) {
+	if (ioctl(fd, SIOCGIFCAP, &req) < 0) {
 		*enabled = 0;
 		*supported = 0;
 		return;

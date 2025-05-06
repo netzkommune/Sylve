@@ -67,8 +67,8 @@ export const IfaceDetailSchema = z.object({
 	}),
 	driver: z.string().default(''),
 	description: z.string().default(''),
-	ipv4: z.array(IPv4Schema).default([]),
-	ipv6: z.array(IPv6Schema).default([]),
+	ipv4: z.array(IPv4Schema).default([]).nullable().optional(),
+	ipv6: z.array(IPv6Schema).default([]).nullable().optional(),
 	media: MediaSchema.nullable().optional(),
 	nd6: ND6Schema.nullable().optional()
 });

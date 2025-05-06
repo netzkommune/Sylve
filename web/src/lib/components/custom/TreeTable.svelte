@@ -97,8 +97,13 @@
 				dataTreeChildIndent: 16,
 				dataTree: true,
 				dataTreeChildField: 'children',
+				dataTreeStartExpanded: [true, false],
+				persistenceID: name,
+				paginationMode: 'local',
 				persistence: {
-					sort: true
+					sort: true,
+					page: true,
+					filter: true
 				},
 				placeholder: 'No data available',
 				pagination: true,

@@ -218,6 +218,34 @@ get_bridge_members(int fd, const char *ifname, struct ifbifconf *bifc)
 
 
 
+static int
+get_interface_groups(int fd, const char *ifname,
+                     struct ifg_req **out_req, int *out_cnt)
+{
+    struct ifgroupreq ifgr;
+    memset(&ifgr, 0, sizeof(ifgr));
+    strncpy(ifgr.ifgr_name, ifname, IFNAMSIZ-1);
+
+    if (ioctl(fd, SIOCGIFGROUP, &ifgr) < 0)
+        return -1;
+
+    int len = ifgr.ifgr_len;
+    struct ifg_req *buf = malloc(len);
+    if (buf == NULL)
+        return -1;
+
+    ifgr.ifgr_groups = buf;
+    ifgr.ifgr_len    = len;
+    if (ioctl(fd, SIOCGIFGROUP, &ifgr) < 0) {
+        free(buf);
+        return -1;
+    }
+
+    *out_req = buf;
+    *out_cnt = len / sizeof(*buf);
+    return 0;
+}
+
 static uint32_t get_mtu(const struct ifreq *ifr)    { return ifr->ifr_mtu; }
 static uint32_t get_metric(const struct ifreq *ifr) { return ifr->ifr_metric; }
 
@@ -231,7 +259,6 @@ import (
 	"regexp"
 	"strings"
 	"sylve/pkg/utils/sysctl"
-	"syscall"
 	"unsafe"
 )
 
@@ -315,6 +342,7 @@ type Interface struct {
 	MaxAddr       int            `json:"maxaddr"`
 	Timeout       int            `json:"timeout"`
 	BridgeMembers []BridgeMember `json:"bridgeMembers"`
+	Groups        []string
 
 	IPv4 []IPv4 `json:"ipv4"`
 	IPv6 []IPv6 `json:"ipv6"`
@@ -422,13 +450,6 @@ func (iface *Interface) String() string {
 		sb.WriteString(fmt.Sprintf("\tstatus: %s\n", iface.Media.Status))
 	}
 
-	if iface.ND6.Raw != 0 {
-		sb.WriteString(fmt.Sprintf("\tnd6 options=%x<%s>\n",
-			iface.ND6.Raw,
-			strings.Join(iface.ND6.Desc, ","),
-		))
-	}
-
 	if iface.STP != nil {
 		sb.WriteString(fmt.Sprintf("\tid %s priority %d hellotime %d fwddelay %d\n", iface.BridgeID, iface.STP.Priority, iface.STP.HelloTime, iface.STP.FwdDelay))
 		sb.WriteString(fmt.Sprintf("\tmaxage %d holdcnt %d proto %s maxaddr %d timeout %d\n", iface.STP.MaxAge, iface.STP.HoldCnt, iface.STP.Proto, iface.MaxAddr, iface.Timeout))
@@ -440,8 +461,21 @@ func (iface *Interface) String() string {
 			sb.WriteString(fmt.Sprintf("\tmember: %s flags=%x<%s>\n", member.Name, member.Flags.Raw, strings.Join(member.Flags.Desc, ",")))
 			sb.WriteString(fmt.Sprintf("\t\tifmaxaddr %d port %d priority %d path cost %d\n", member.IfMaxAddr, member.Port, member.Priority, member.PathCost))
 		}
-	} else {
-		sb.WriteString("\tno members\n")
+	}
+
+	if len(iface.Groups) > 0 {
+		sb.WriteString(fmt.Sprintf("\tgroups: %s\n", strings.Join(iface.Groups, ",")))
+	}
+
+	if iface.Driver != "" {
+		sb.WriteString(fmt.Sprintf("\tdrivername: %s\n", iface.Driver))
+	}
+
+	if iface.ND6.Raw != 0 {
+		sb.WriteString(fmt.Sprintf("\tnd6 options=%x<%s>\n",
+			iface.ND6.Raw,
+			strings.Join(iface.ND6.Desc, ","),
+		))
 	}
 
 	return sb.String()
@@ -567,64 +601,68 @@ func parseBridgeFlags(f uint32) []string {
 }
 
 func getInterfaceInfo(name string) (*Interface, error) {
-	fd := C.socket(C.AF_INET, C.SOCK_DGRAM, 0)
-	if fd < 0 {
-		return nil, fmt.Errorf("socket failed")
+	fd4 := C.socket(C.AF_INET, C.SOCK_DGRAM, 0)
+	if fd4 < 0 {
+		return nil, fmt.Errorf("socket(AF_INET) failed")
 	}
-	defer C.close(fd)
+	defer C.close(fd4)
+
+	fd6 := C.socket(C.AF_INET6, C.SOCK_DGRAM, 0)
+	if fd6 < 0 {
+		return nil, fmt.Errorf("socket(AF_INET6) failed")
+	}
+	defer C.close(fd6)
 
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
 
-	var flags Flags
-
-	raw := uint32(C.get_combined_flags(fd, cname))
-	flags.Raw = raw & knownFlagMask()
-
-	if flags.Raw == 0 {
-		return nil, fmt.Errorf("get_combined_flags failed for %s", name)
+	var nd6 ND6
+	if flags := C.get_nd6_flags(fd6, cname); flags >= 0 {
+		nd6.Raw = uint32(flags)
+		nd6.Desc = parseND6Options(nd6.Raw)
 	}
 
-	flags.Desc = parseFlagsDesc(flags.Raw)
+	raw := uint32(C.get_combined_flags(fd4, cname))
+	known := raw & knownFlagMask()
+	if known == 0 {
+		return nil, fmt.Errorf("get_combined_flags failed for %s", name)
+	}
+	flagDesc := parseFlagsDesc(known)
 
 	var req C.struct_ifreq
 	C.strncpy(&req.ifr_name[0], cname, C.IFNAMSIZ-1)
 
-	mtu := 0
-	metric := 0
-
-	if C.ioctl_wrap(fd, C.SIOCGIFMTU, unsafe.Pointer(&req)) >= 0 {
+	mtu, metric := 0, 0
+	if C.ioctl_wrap(fd4, C.SIOCGIFMTU, unsafe.Pointer(&req)) >= 0 {
 		mtu = int(C.get_mtu(&req))
 	}
-
-	if C.ioctl_wrap(fd, C.SIOCGIFMETRIC, unsafe.Pointer(&req)) >= 0 {
+	if C.ioctl_wrap(fd4, C.SIOCGIFMETRIC, unsafe.Pointer(&req)) >= 0 {
 		metric = int(C.get_metric(&req))
 	}
 
-	var capEnabled, capSupported C.uint32_t
-	C.get_capabilities(fd, cname, &capEnabled, &capSupported)
-
-	var capabilities Capabilities
-	capabilities.Enabled.Raw = uint32(capEnabled)
-	capabilities.Enabled.Desc = parseCapabilitiesDesc(capabilities.Enabled.Raw)
-
-	capabilities.Supported.Raw = uint32(capSupported)
-	capabilities.Supported.Desc = parseCapabilitiesDesc(capabilities.Supported.Raw)
+	var capEn, capSu C.uint32_t
+	C.get_capabilities(fd4, cname, &capEn, &capSu)
+	capabilities := Capabilities{
+		Enabled:   Flags{Raw: uint32(capEn), Desc: parseCapabilitiesDesc(uint32(capEn))},
+		Supported: Flags{Raw: uint32(capSu), Desc: parseCapabilitiesDesc(uint32(capSu))},
+	}
 
 	iface := &Interface{
 		Name:         name,
-		Flags:        flags,
+		Flags:        Flags{Raw: known, Desc: flagDesc},
 		MTU:          mtu,
 		Metric:       metric,
 		Capabilities: capabilities,
+		ND6:          nd6,
 	}
 
-	iface.Media = getMediaInfo(fd, name)
+	iface.Media = getMediaInfo(fd4, name)
 
 	if C.is_bridge(cname) != 0 {
-		var opr C.struct_ifbropreq
+		iface.Driver = "bridge"
 
-		if C.get_stp_op_params(fd, cname, &opr) >= 0 {
+		var opr C.struct_ifbropreq
+		if C.get_stp_op_params(fd4, cname, &opr) >= 0 {
 			rawBridge := uint64(opr.ifbop_bridgeid)
 			var baddr [6]byte
 			for i := 0; i < 6; i++ {
@@ -632,7 +670,6 @@ func getInterfaceInfo(name string) (*Interface, error) {
 				baddr[i] = byte((rawBridge >> shift) & 0xff)
 			}
 			iface.BridgeID = net.HardwareAddr(baddr[:]).String()
-
 			iface.STP = &STP{
 				Priority:  int(opr.ifbop_priority),
 				HelloTime: int(opr.ifbop_hellotime),
@@ -641,14 +678,12 @@ func getInterfaceInfo(name string) (*Interface, error) {
 				HoldCnt:   int(opr.ifbop_holdcount),
 				Proto:     parseSTPProto(uint8(opr.ifbop_protocol)),
 			}
-
 			rawRoot := uint64(opr.ifbop_designated_root)
 			var raddr [6]byte
 			for i := 0; i < 6; i++ {
 				shift := uint((5 - i) * 8)
 				raddr[i] = byte((rawRoot >> shift) & 0xff)
 			}
-
 			iface.STP.RootID = net.HardwareAddr(raddr[:]).String()
 			iface.STP.RootPriority = int(rawRoot >> 48)
 			iface.STP.RootPathCost = int(opr.ifbop_root_path_cost)
@@ -656,56 +691,54 @@ func getInterfaceInfo(name string) (*Interface, error) {
 		}
 
 		var bp C.struct_ifbrparam
-		if C.get_bridge_param(fd, cname, C.BRDGGCACHE, &bp) >= 0 {
+		if C.get_bridge_param(fd4, cname, C.BRDGGCACHE, &bp) >= 0 {
 			raw := *(*C.uint32_t)(unsafe.Pointer(&bp.ifbrp_ifbrpu[0]))
 			iface.MaxAddr = int(raw)
 		}
-		if C.get_bridge_param(fd, cname, C.BRDGGTO, &bp) >= 0 {
+		if C.get_bridge_param(fd4, cname, C.BRDGGTO, &bp) >= 0 {
 			raw := *(*C.uint32_t)(unsafe.Pointer(&bp.ifbrp_ifbrpu[0]))
 			iface.Timeout = int(raw)
 		}
 
-		// --- fetch bridge members ---
 		var bifc C.struct_ifbifconf
-		ret := C.get_bridge_members(fd, cname, &bifc)
+		if C.get_bridge_members(fd4, cname, &bifc) == 0 {
+			unionPtr := unsafe.Pointer(&bifc.ifbic_ifbicu[0])
+			bufPtr := *(*unsafe.Pointer)(unionPtr)
+			defer C.free(bufPtr)
 
-		if ret < 0 {
-			// grab the C errno
-			errno := syscall.Errno(C.get_errno())
-			// print it for debugging
-			fmt.Printf("get_bridge_members returned %d, errno=%d (%s)\n",
-				ret, errno, errno)
-			return nil, fmt.Errorf("get_bridge_members failed for %s: %v", name, errno)
-		}
-
-		// Extract the allocated buffer pointer from the union
-		unionPtr := unsafe.Pointer(&bifc.ifbic_ifbicu[0])
-		bufPtr := *(*unsafe.Pointer)(unionPtr)
-		defer C.free(bufPtr)
-
-		// Compute how many struct ifbreq entries we got
-		elemSize := unsafe.Sizeof(C.struct_ifbreq{})
-		count := int(bifc.ifbic_len) / int(elemSize)
-
-		// Pull out the pointer-to-array of C.struct_ifbreq
-		reqPtr := *(**C.struct_ifbreq)(unionPtr)
-		// Build a Go slice header backed by that C array
-		entries := (*[1 << 28]C.struct_ifbreq)(unsafe.Pointer(reqPtr))[:count:count]
-
-		for _, entry := range entries {
-			raw := uint32(entry.ifbr_ifsflags)
-			member := BridgeMember{
-				Name:      C.GoString(&entry.ifbr_ifsname[0]),
-				Flags:     Flags{Raw: raw, Desc: parseBridgeFlags(raw)},
-				IfMaxAddr: int(entry.ifbr_addrmax),
-				State:     int(entry.ifbr_state),
-				Priority:  int(entry.ifbr_priority),
-				Port:      int(entry.ifbr_portno),
-				PathCost:  int(entry.ifbr_path_cost),
+			elemSize := unsafe.Sizeof(C.struct_ifbreq{})
+			count := int(bifc.ifbic_len) / int(elemSize)
+			reqPtr := *(**C.struct_ifbifreq)(unionPtr)
+			entries := (*[1 << 28]C.struct_ifbreq)(unsafe.Pointer(reqPtr))[:count:count]
+			for _, entry := range entries {
+				rawFlags := uint32(entry.ifbr_ifsflags)
+				member := BridgeMember{
+					Name:      C.GoString(&entry.ifbr_ifsname[0]),
+					Flags:     Flags{Raw: rawFlags, Desc: parseBridgeFlags(rawFlags)},
+					IfMaxAddr: int(entry.ifbr_addrmax),
+					State:     int(entry.ifbr_state),
+					Priority:  int(entry.ifbr_priority),
+					Port:      int(entry.ifbr_portno),
+					PathCost:  int(entry.ifbr_path_cost),
+				}
+				iface.BridgeMembers = append(iface.BridgeMembers, member)
 			}
-			iface.BridgeMembers = append(iface.BridgeMembers, member)
 		}
+	}
 
+	var grpPtr *C.struct_ifg_req
+	var grpCount C.int
+	if C.get_interface_groups(fd4, cname, &grpPtr, &grpCount) == 0 {
+		defer C.free(unsafe.Pointer(grpPtr))
+		cnt := int(grpCount)
+		elemSize := unsafe.Sizeof(*grpPtr)
+		for i := 0; i < cnt; i++ {
+			entryPtr := unsafe.Pointer(uintptr(unsafe.Pointer(grpPtr)) + uintptr(i)*elemSize)
+			grp := C.GoString((*C.char)(entryPtr))
+			if grp != "all" {
+				iface.Groups = append(iface.Groups, grp)
+			}
+		}
 	}
 
 	return iface, nil
@@ -949,15 +982,6 @@ func Get(name string) (*Interface, error) {
 			})
 
 		case C.AF_INET6:
-			if iface.ND6.Raw == 0 {
-				var nd6req C.struct_in6_ndireq
-				C.set_ifname(&nd6req.ifname[0], cname)
-				if C.ioctl_wrap(fd6, C.SIOCGIFINFO_IN6, unsafe.Pointer(&nd6req)) >= 0 {
-					iface.ND6.Raw = uint32(nd6req.ndi.flags)
-					iface.ND6.Desc = parseND6Options(iface.ND6.Raw)
-				}
-			}
-
 			sa := (*C.struct_sockaddr_in6)(unsafe.Pointer(a.ifa_addr))
 			ip := net.IP(C.GoBytes(unsafe.Pointer(&sa.sin6_addr), 16))
 

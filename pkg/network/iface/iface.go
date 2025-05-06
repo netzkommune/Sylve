@@ -172,7 +172,7 @@ int is_bridge(const char *ifname) {
 
     memset(&ifr, 0, sizeof(ifr));
     strlcpy(ifr.ifr_name, ifname, sizeof(ifr.ifr_name));
-    // Point the kernel at our local if_data buffer:
+
     ifr.ifr_data = (caddr_t)&ifd;
 
     if (ioctl(sock, SIOCGIFDATA, &ifr) < 0) {
@@ -184,6 +184,39 @@ int is_bridge(const char *ifname) {
 
     return (ifd.ifi_type == IFT_BRIDGE) ? 1 : 0;
 }
+
+static int
+get_bridge_members(int fd, const char *ifname, struct ifbifconf *bifc)
+{
+    struct ifdrv dr;
+
+    memset(bifc, 0, sizeof(*bifc));
+    memset(&dr, 0, sizeof(dr));
+
+
+    strlcpy(dr.ifd_name, ifname, IFNAMSIZ);
+    dr.ifd_cmd  = BRDGGIFS;
+    dr.ifd_len  = sizeof(*bifc);
+    dr.ifd_data = bifc;
+    if (ioctl(fd, SIOCGDRVSPEC, &dr) < 0)
+        return -1;
+
+
+    bifc->ifbic_buf = malloc(bifc->ifbic_len);
+    if (bifc->ifbic_buf == NULL)
+        return -1;
+
+    dr.ifd_len  = sizeof(*bifc);
+    dr.ifd_data = bifc;
+    if (ioctl(fd, SIOCGDRVSPEC, &dr) < 0) {
+        free(bifc->ifbic_buf);
+        return -1;
+    }
+
+    return 0;
+}
+
+
 
 static uint32_t get_mtu(const struct ifreq *ifr)    { return ifr->ifr_mtu; }
 static uint32_t get_metric(const struct ifreq *ifr) { return ifr->ifr_metric; }
@@ -198,6 +231,7 @@ import (
 	"regexp"
 	"strings"
 	"sylve/pkg/utils/sysctl"
+	"syscall"
 	"unsafe"
 )
 
@@ -245,27 +279,42 @@ type ND6 struct {
 }
 
 type STP struct {
+	Priority     int    `json:"priority"`
+	HelloTime    int    `json:"hellotime"`
+	FwdDelay     int    `json:"fwddelay"`
+	MaxAge       int    `json:"maxage"`
+	HoldCnt      int    `json:"holdcnt"`
+	Proto        string `json:"proto"`
+	RootID       string `json:"rootId"`
+	RootPriority int    `json:"rootPriority"`
+	RootPathCost int    `json:"ifcost"`
+	RootPort     int    `json:"port"`
+}
+
+type BridgeMember struct {
+	Name      string `json:"name"`
+	Flags     Flags  `json:"flags"`
+	IfMaxAddr int    `json:"ifmaxaddr"`
+	State     int    `json:"state"`
 	Priority  int    `json:"priority"`
-	HelloTime int    `json:"hellotime"`
-	FwdDelay  int    `json:"fwddelay"`
-	MaxAge    int    `json:"maxage"`
-	HoldCnt   int    `json:"holdcnt"`
-	Proto     string `json:"proto"`
+	Port      int    `json:"port"`
+	PathCost  int    `json:"pathCost"`
 }
 
 type Interface struct {
-	Name         string       `json:"name"`
-	Ether        string       `json:"ether"`
-	Flags        Flags        `json:"flags"`
-	MTU          int          `json:"mtu"`
-	Metric       int          `json:"metric"`
-	Capabilities Capabilities `json:"capabilities"`
-	Driver       string       `json:"driver"`
-	Description  string       `json:"description"`
-	BridgeID     string       `json:"bridgeId"`
-	STP          *STP         `json:"stp"`
-	MaxAddr      int          `json:"maxaddr"`
-	Timeout      int          `json:"timeout"`
+	Name          string         `json:"name"`
+	Ether         string         `json:"ether"`
+	Flags         Flags          `json:"flags"`
+	MTU           int            `json:"mtu"`
+	Metric        int            `json:"metric"`
+	Capabilities  Capabilities   `json:"capabilities"`
+	Driver        string         `json:"driver"`
+	Description   string         `json:"description"`
+	BridgeID      string         `json:"bridgeId"`
+	STP           *STP           `json:"stp"`
+	MaxAddr       int            `json:"maxaddr"`
+	Timeout       int            `json:"timeout"`
+	BridgeMembers []BridgeMember `json:"bridgeMembers"`
 
 	IPv4 []IPv4 `json:"ipv4"`
 	IPv6 []IPv6 `json:"ipv6"`
@@ -324,7 +373,6 @@ func (iface *Interface) String() string {
 	for _, a := range iface.IPv4 {
 		sb.WriteString(fmt.Sprintf("\tinet %s", a.IP))
 		if a.Netmask != "" {
-			// sb.WriteString(fmt.Sprintf(" netmask %s", net.IP(a.Netmask).String()))
 			sb.WriteString(fmt.Sprintf(" netmask %s", a.Netmask))
 		}
 		if a.Broadcast != nil {
@@ -383,8 +431,17 @@ func (iface *Interface) String() string {
 
 	if iface.STP != nil {
 		sb.WriteString(fmt.Sprintf("\tid %s priority %d hellotime %d fwddelay %d\n", iface.BridgeID, iface.STP.Priority, iface.STP.HelloTime, iface.STP.FwdDelay))
-
 		sb.WriteString(fmt.Sprintf("\tmaxage %d holdcnt %d proto %s maxaddr %d timeout %d\n", iface.STP.MaxAge, iface.STP.HoldCnt, iface.STP.Proto, iface.MaxAddr, iface.Timeout))
+		sb.WriteString(fmt.Sprintf("\troot id %s priority %d ifcost %d port %d\n", iface.STP.RootID, iface.STP.RootPriority, iface.STP.RootPathCost, iface.STP.RootPort))
+	}
+
+	if len(iface.BridgeMembers) > 0 {
+		for _, member := range iface.BridgeMembers {
+			sb.WriteString(fmt.Sprintf("\tmember: %s flags=%x<%s>\n", member.Name, member.Flags.Raw, strings.Join(member.Flags.Desc, ",")))
+			sb.WriteString(fmt.Sprintf("\t\tifmaxaddr %d port %d priority %d path cost %d\n", member.IfMaxAddr, member.Port, member.Priority, member.PathCost))
+		}
+	} else {
+		sb.WriteString("\tno members\n")
 	}
 
 	return sb.String()
@@ -494,6 +551,21 @@ func parseSTPProto(p uint8) string {
 	}
 }
 
+func parseBridgeFlags(f uint32) []string {
+	var bridgeFlagDesc = []FlagDescriptor{
+		{Mask: C.IFBIF_LEARNING, Name: "LEARNING"},
+		{Mask: C.IFBIF_DISCOVER, Name: "DISCOVER"},
+		{Mask: C.IFBIF_STP, Name: "STP"},
+		{Mask: C.IFBIF_SPAN, Name: "SPAN"},
+		{Mask: C.IFBIF_STICKY, Name: "STICKY"},
+		{Mask: C.IFBIF_BSTP_AUTOEDGE, Name: "AUTOEDGE"},
+		{Mask: C.IFBIF_BSTP_AUTOPTP, Name: "AUTOPTP"},
+	}
+
+	desc, _ := parseFlags(f, bridgeFlagDesc)
+	return desc
+}
+
 func getInterfaceInfo(name string) (*Interface, error) {
 	fd := C.socket(C.AF_INET, C.SOCK_DGRAM, 0)
 	if fd < 0 {
@@ -550,17 +622,16 @@ func getInterfaceInfo(name string) (*Interface, error) {
 	iface.Media = getMediaInfo(fd, name)
 
 	if C.is_bridge(cname) != 0 {
-		// fetch STP operational parameters via SIOCSDRVSPEC/BRDGPARAM
 		var opr C.struct_ifbropreq
-		ret := C.get_stp_op_params(fd, cname, &opr)
 
-		if ret >= 0 {
-			raw := uint64(opr.ifbop_bridgeid)
-			var idBytes [6]byte
+		if C.get_stp_op_params(fd, cname, &opr) >= 0 {
+			rawBridge := uint64(opr.ifbop_bridgeid)
+			var baddr [6]byte
 			for i := 0; i < 6; i++ {
 				shift := uint((5 - i) * 8)
-				idBytes[i] = byte((raw >> shift) & 0xff)
+				baddr[i] = byte((rawBridge >> shift) & 0xff)
 			}
+			iface.BridgeID = net.HardwareAddr(baddr[:]).String()
 
 			iface.STP = &STP{
 				Priority:  int(opr.ifbop_priority),
@@ -571,7 +642,17 @@ func getInterfaceInfo(name string) (*Interface, error) {
 				Proto:     parseSTPProto(uint8(opr.ifbop_protocol)),
 			}
 
-			iface.BridgeID = net.HardwareAddr(idBytes[:]).String()
+			rawRoot := uint64(opr.ifbop_designated_root)
+			var raddr [6]byte
+			for i := 0; i < 6; i++ {
+				shift := uint((5 - i) * 8)
+				raddr[i] = byte((rawRoot >> shift) & 0xff)
+			}
+
+			iface.STP.RootID = net.HardwareAddr(raddr[:]).String()
+			iface.STP.RootPriority = int(rawRoot >> 48)
+			iface.STP.RootPathCost = int(opr.ifbop_root_path_cost)
+			iface.STP.RootPort = int(opr.ifbop_root_port) & 0xfff
 		}
 
 		var bp C.struct_ifbrparam
@@ -583,6 +664,48 @@ func getInterfaceInfo(name string) (*Interface, error) {
 			raw := *(*C.uint32_t)(unsafe.Pointer(&bp.ifbrp_ifbrpu[0]))
 			iface.Timeout = int(raw)
 		}
+
+		// --- fetch bridge members ---
+		var bifc C.struct_ifbifconf
+		ret := C.get_bridge_members(fd, cname, &bifc)
+
+		if ret < 0 {
+			// grab the C errno
+			errno := syscall.Errno(C.get_errno())
+			// print it for debugging
+			fmt.Printf("get_bridge_members returned %d, errno=%d (%s)\n",
+				ret, errno, errno)
+			return nil, fmt.Errorf("get_bridge_members failed for %s: %v", name, errno)
+		}
+
+		// Extract the allocated buffer pointer from the union
+		unionPtr := unsafe.Pointer(&bifc.ifbic_ifbicu[0])
+		bufPtr := *(*unsafe.Pointer)(unionPtr)
+		defer C.free(bufPtr)
+
+		// Compute how many struct ifbreq entries we got
+		elemSize := unsafe.Sizeof(C.struct_ifbreq{})
+		count := int(bifc.ifbic_len) / int(elemSize)
+
+		// Pull out the pointer-to-array of C.struct_ifbreq
+		reqPtr := *(**C.struct_ifbreq)(unionPtr)
+		// Build a Go slice header backed by that C array
+		entries := (*[1 << 28]C.struct_ifbreq)(unsafe.Pointer(reqPtr))[:count:count]
+
+		for _, entry := range entries {
+			raw := uint32(entry.ifbr_ifsflags)
+			member := BridgeMember{
+				Name:      C.GoString(&entry.ifbr_ifsname[0]),
+				Flags:     Flags{Raw: raw, Desc: parseBridgeFlags(raw)},
+				IfMaxAddr: int(entry.ifbr_addrmax),
+				State:     int(entry.ifbr_state),
+				Priority:  int(entry.ifbr_priority),
+				Port:      int(entry.ifbr_portno),
+				PathCost:  int(entry.ifbr_path_cost),
+			}
+			iface.BridgeMembers = append(iface.BridgeMembers, member)
+		}
+
 	}
 
 	return iface, nil
@@ -755,7 +878,7 @@ func List() ([]*Interface, error) {
 
 		iface, err := Get(name)
 		if err != nil {
-			continue // silently skip bad interfaces
+			continue
 		}
 		result = append(result, iface)
 	}

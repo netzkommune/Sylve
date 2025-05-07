@@ -16,7 +16,6 @@ else
     echo "✅ FreeBSD version: $(freebsd-version)"
 fi
 
-# Check for Node.js and npm
 if command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1; then
     NODE_VERSION=$(node -v)
     NPM_VERSION=$(npm -v)
@@ -43,6 +42,14 @@ else
     exit 1
 fi
 
+if command -v virsh >/dev/null 2>&1; then
+    VIRSH_VERSION=$(virsh --version)
+    echo "✅ virsh found: $VIRSH_VERSION"
+else
+    echo "❌ Error: virsh is required but not found. Install using 'pkg install libvirt'"
+    exit 1
+fi
+
 RC_CONF="/etc/rc.conf"
 
 if grep -q '^smartd_enable="YES"' "$RC_CONF"; then
@@ -56,6 +63,34 @@ if grep -q '^linux_enable="YES"' "$RC_CONF"; then
     echo "✅ Linux compatibility mode is enabled in rc.conf"
 else
     echo "❌ Error: Linux compatibility mode is not enabled in rc.conf. Add 'linux_enable=\"YES\"' to enable it."
+    exit 1
+fi
+
+if grep -q '^libvirtd_enable="YES"' "$RC_CONF"; then
+    echo "✅ libvirtd is enabled in rc.conf"
+else
+    echo "❌ Error: libvirtd is not enabled in rc.conf. Add 'libvirtd_enable=\"YES\"' to enable it."
+    exit 1
+fi
+
+if grep -q '^vmm_load="YES"' "$RC_CONF"; then
+    echo "✅ vmm is enabled in rc.conf"
+else
+    echo "❌ Error: vmm is not enabled in rc.conf. Add 'vmm_load=\"YES\"' to enable it."
+    exit 1
+fi
+
+if grep -q '^if_bridge_load="YES"' "$RC_CONF"; then
+    echo "✅ if_bridge is enabled in rc.conf"
+else
+    echo "❌ Error: if_bridge is not enabled in rc.conf. Add 'if_bridge_load=\"YES\"' to enable it."
+    exit 1
+fi
+
+if grep -q '^nmdm_load="YES"' "$RC_CONF"; then
+    echo "✅ nmdm is enabled in rc.conf"
+else
+    echo "❌ Error: nmdm is not enabled in rc.conf. Add 'nmdm_load=\"YES\"' to enable it."
     exit 1
 fi
 

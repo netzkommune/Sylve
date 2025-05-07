@@ -27,6 +27,7 @@ Running Sylve is pretty easy, but sylve depends on some packages that you can in
 | ------------- | ------------ | -------- | -------- | ------------------------------------------------ |
 | smartmontools | 7.4_2        | No       | No       | Disk health monitoring                           |
 | tmux          | 3.2          | No       | No       | Terminal multiplexer, used for the (web) console |
+| libvirt       | 11.1.0       | No       | No       | Virtualization API, used for Bhyve               |
 
 We also need to enable some services in order to run Sylve, you can drop these into `/etc/rc.conf` if you don't have it already:
 
@@ -36,6 +37,10 @@ ntpd_sync_on_start="YES" # Optional
 smartd_enable="YES"
 zfs_enable="YES"
 linux_enable="YES"
+libvirtd_enable="YES"
+vmm_load="YES"
+if_bridge_load="YES"
+nmdm_load="YES"
 ```
 
 # Installation
@@ -45,6 +50,7 @@ linux_enable="YES"
 ```sh
 git clone https://github.com/AlchemillaHQ/Sylve.git
 cd Sylve
+./scripts/check_deps.sh # Optional, but recommended
 make
 ```
 

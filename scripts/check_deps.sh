@@ -2,97 +2,51 @@
 
 echo "=== Checking system dependencies for Sylve ==="
 
-OS=$(uname)
-if [ "$OS" != "FreeBSD" ]; then
+if [ "$(uname)" != "FreeBSD" ]; then
     echo "❌ Error: This script must be run on FreeBSD."
     exit 1
 fi
 echo "✅ OS Check: Running on FreeBSD."
 
 RELEASE=$(freebsd-version | cut -d '.' -f 1)
-if [ "$RELEASE" != "14" ]; then
-    echo "⚠️ Error: This script is intended for FreeBSD 14.0. Detected version: $(freebsd-version)"
+if [ "$RELEASE" -lt 14 ]; then
+    echo "⚠️ Error: This script requires FreeBSD 14.0 or newer. Detected version: $(freebsd-version)"
+    exit 1
 else
     echo "✅ FreeBSD version: $(freebsd-version)"
 fi
 
-if command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1; then
-    NODE_VERSION=$(node -v)
-    NPM_VERSION=$(npm -v)
-    echo "✅ Node.js found: $NODE_VERSION"
-    echo "✅ npm found: $NPM_VERSION"
-else
-    echo "❌ Error: Node.js and npm are required but not found. Install using 'pkg install npm-20'"
-    exit 1
-fi
+check_command() {
+    if command -v "$1" >/dev/null 2>&1; then
+        echo "✅ $1 found: $($2)"
+    else
+        echo "❌ Error: $1 is required but not found. Install using '$3'"
+        exit 1
+    fi
+}
 
-if command -v go >/dev/null 2>&1; then
-    GO_VERSION=$(go version)
-    echo "✅ Go found: $GO_VERSION"
-else
-    echo "❌ Error: Golang is required but not found. Install using 'pkg install go'"
-    exit 1
-fi
-
-if command -v tmux >/dev/null 2>&1; then
-    TMUX_VERSION=$(tmux -V)
-    echo "✅ tmux found: $TMUX_VERSION"
-else
-    echo "❌ Error: tmux is required but not found. Install using 'pkg install tmux'"
-    exit 1
-fi
-
-if command -v virsh >/dev/null 2>&1; then
-    VIRSH_VERSION=$(virsh --version)
-    echo "✅ virsh found: $VIRSH_VERSION"
-else
-    echo "❌ Error: virsh is required but not found. Install using 'pkg install libvirt'"
-    exit 1
-fi
+check_command node "node -v" "pkg install npm-20"
+check_command npm "npm -v" "pkg install npm-20"
+check_command go "go version" "pkg install go"
+check_command tmux "tmux -V" "pkg install tmux"
+check_command virsh "virsh --version" "pkg install libvirt"
 
 RC_CONF="/etc/rc.conf"
+check_rcconf() {
+    if grep -q "^$1=\"YES\"" "$RC_CONF"; then
+        echo "✅ $1 is enabled in rc.conf"
+    else
+        echo "❌ Error: $1 is not enabled in rc.conf. Add '$1=\"YES\"' to enable it."
+        exit 1
+    fi
+}
 
-if grep -q '^smartd_enable="YES"' "$RC_CONF"; then
-    echo "✅ smartd is enabled in rc.conf"
-else
-    echo "❌ Error: smartd is not enabled in rc.conf. Add 'smartd_enable=\"YES\"' to enable it."
-    exit 1
-fi
-
-if grep -q '^linux_enable="YES"' "$RC_CONF"; then
-    echo "✅ Linux compatibility mode is enabled in rc.conf"
-else
-    echo "❌ Error: Linux compatibility mode is not enabled in rc.conf. Add 'linux_enable=\"YES\"' to enable it."
-    exit 1
-fi
-
-if grep -q '^libvirtd_enable="YES"' "$RC_CONF"; then
-    echo "✅ libvirtd is enabled in rc.conf"
-else
-    echo "❌ Error: libvirtd is not enabled in rc.conf. Add 'libvirtd_enable=\"YES\"' to enable it."
-    exit 1
-fi
-
-if grep -q '^vmm_load="YES"' "$RC_CONF"; then
-    echo "✅ vmm is enabled in rc.conf"
-else
-    echo "❌ Error: vmm is not enabled in rc.conf. Add 'vmm_load=\"YES\"' to enable it."
-    exit 1
-fi
-
-if grep -q '^if_bridge_load="YES"' "$RC_CONF"; then
-    echo "✅ if_bridge is enabled in rc.conf"
-else
-    echo "❌ Error: if_bridge is not enabled in rc.conf. Add 'if_bridge_load=\"YES\"' to enable it."
-    exit 1
-fi
-
-if grep -q '^nmdm_load="YES"' "$RC_CONF"; then
-    echo "✅ nmdm is enabled in rc.conf"
-else
-    echo "❌ Error: nmdm is not enabled in rc.conf. Add 'nmdm_load=\"YES\"' to enable it."
-    exit 1
-fi
+check_rcconf smartd_enable
+check_rcconf linux_enable
+check_rcconf libvirtd_enable
+check_rcconf vmm_load
+check_rcconf if_bridge_load
+check_rcconf nmdm_load
 
 echo "=== Dependency check completed ==="
 echo

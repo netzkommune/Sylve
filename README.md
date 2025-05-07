@@ -23,11 +23,12 @@ These only apply to the development version of Sylve, the production version wil
 
 Running Sylve is pretty easy, but sylve depends on some packages that you can install using `pkg` or the corresponding port to that package. Here's a list of what you'd need:
 
-| Dep           | Min. version | Vendored | Optional | Purpose                                          |
-| ------------- | ------------ | -------- | -------- | ------------------------------------------------ |
-| smartmontools | 7.4_2        | No       | No       | Disk health monitoring                           |
-| tmux          | 3.2          | No       | No       | Terminal multiplexer, used for the (web) console |
-| libvirt       | 11.1.0       | No       | No       | Virtualization API, used for Bhyve               |
+| Dep            | Min. version | Vendored | Optional | Purpose                                          |
+| -------------- | ------------ | -------- | -------- | ------------------------------------------------ |
+| smartmontools  | 7.4_2        | No       | No       | Disk health monitoring                           |
+| tmux           | 3.2          | No       | No       | Terminal multiplexer, used for the (web) console |
+| libvirt        | 11.1.0       | No       | No       | Virtualization API, used for Bhyve               |
+| bhyve-firmware | 1.0_2        | No       | No       | Collection of Firmware for bhyve                 |
 
 We also need to enable some services in order to run Sylve, you can drop these into `/etc/rc.conf` if you don't have it already:
 
@@ -42,6 +43,8 @@ vmm_load="YES"
 if_bridge_load="YES"
 nmdm_load="YES"
 ```
+
+Please reboot your system after enabling these services.
 
 # Installation
 

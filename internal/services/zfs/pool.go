@@ -85,5 +85,27 @@ func (s *Service) CreatePool(pool zfsServiceInterfaces.Zpool) error {
 		return fmt.Errorf("zpool_create_failed: %v", err)
 	}
 
+	if err := s.Libvirt.CreateStoragePool(pool.Name); err != nil {
+		return fmt.Errorf("libvirt_create_pool_failed: %v", err)
+	}
+
+	return nil
+}
+
+func (s *Service) DeletePool(poolName string) error {
+	err := zfs.DestroyPool(poolName)
+
+	if err != nil {
+		return err
+	}
+
+	if err := s.Libvirt.DeleteStoragePool(poolName); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Service) SyncToLibvirt() error {
 	return nil
 }

@@ -17,6 +17,7 @@ import (
 type ZfsServiceInterface interface {
 	GetTotalIODelayHisorical() ([]infoModels.IODelay, error)
 	CreatePool(Zpool) error
+	DeletePool(poolName string) error
 
 	GetDatasets() ([]Dataset, error)
 
@@ -31,6 +32,8 @@ type ZfsServiceInterface interface {
 
 	CreateFilesystem(name string, props map[string]string) error
 	DeleteFilesystem(guid string) error
+
+	SyncLibvirt() error
 
 	Cron()
 }

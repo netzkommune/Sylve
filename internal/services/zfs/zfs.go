@@ -11,7 +11,9 @@ package zfs
 import (
 	"sylve/internal/db"
 	infoModels "sylve/internal/db/models/info"
+	libvirtServiceInterfaces "sylve/internal/interfaces/services/libvirt"
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
+	"sylve/internal/logger"
 	"sylve/pkg/zfs"
 	"time"
 
@@ -21,12 +23,14 @@ import (
 var _ zfsServiceInterfaces.ZfsServiceInterface = (*Service)(nil)
 
 type Service struct {
-	DB *gorm.DB
+	DB      *gorm.DB
+	Libvirt libvirtServiceInterfaces.LibvirtServiceInterface
 }
 
-func NewZfsService(db *gorm.DB) zfsServiceInterfaces.ZfsServiceInterface {
+func NewZfsService(db *gorm.DB, libvirt libvirtServiceInterfaces.LibvirtServiceInterface) zfsServiceInterfaces.ZfsServiceInterface {
 	return &Service{
-		DB: db,
+		DB:      db,
+		Libvirt: libvirt,
 	}
 }
 
@@ -44,4 +48,38 @@ func (s *Service) Cron() {
 	for range ticker.C {
 		s.StoreStats()
 	}
+}
+
+func (s *Service) SyncLibvirt() error {
+	zfsPools, err := zfs.ListZpools()
+
+	if err != nil {
+		return err
+	}
+
+	lvPools, err := s.Libvirt.ListStoragePools()
+
+	if err != nil {
+		return err
+	}
+
+	for _, pool := range zfsPools {
+		exists := false
+		for _, lvPool := range lvPools {
+			if pool.Name == lvPool.Source {
+				exists = true
+				break
+			}
+		}
+
+		if !exists {
+			err := s.Libvirt.CreateStoragePool(pool.Name)
+			if err != nil {
+				logger.L.Error().Err(err).Msgf("Failed to create storage pool %s in libvirt", pool.Name)
+				return err
+			}
+		}
+	}
+
+	return nil
 }

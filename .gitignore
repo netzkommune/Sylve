@@ -10,3 +10,4 @@ package-lock.json
 package.json
 !web/package.json
 !web/package-lock.json
+cmd/dont-move/

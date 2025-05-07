@@ -231,7 +231,7 @@ func DeletePool(infoService *info.Service, zfsSerice *zfs.Service) gin.HandlerFu
 		name := c.Param("name")
 
 		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("zfs.pool.delete_pool|-|%s", name), "started")
-		err := zfsUtils.DestroyPool(name)
+		err := zfsSerice.DeletePool(name)
 		if err != nil {
 			if strings.HasPrefix(err.Error(), "error_getting_pool") {
 				c.JSON(http.StatusNotFound, internal.APIResponse[any]{

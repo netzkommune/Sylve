@@ -24,7 +24,6 @@ type AuthServiceInterface interface {
 	ValidateToken(tokenString string) (CustomClaims, error)
 	ClearExpiredJWTTokens()
 	InitSecret(name string, shaRounds int) error
-
 	AuthenticatePAM(username, password string) (bool, error)
 
 	GetSylveCertificate() (*tls.Config, error)

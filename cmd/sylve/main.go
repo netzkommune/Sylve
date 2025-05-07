@@ -51,6 +51,7 @@ func main() {
 	nS := serviceRegistry.NetworkService
 
 	err := sS.Initialize(aS.(*auth.Service))
+
 	if err != nil {
 		logger.L.Fatal().Err(err).Msg("Failed to initialize at startup")
 	} else {

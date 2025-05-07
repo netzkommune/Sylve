@@ -8,10 +8,16 @@
 	}
 
 	const { containerClass, data }: Data = $props();
-
-	$inspect(data);
+	$inspect(`data: `, data);
 </script>
 
 <div class={containerClass}>
-	<PieChart {data} key="label" value="value" c="color" renderContext="svg" />
+	<PieChart
+		{data}
+		key="label"
+		value="value"
+		cRange={data.map((d) => d.color)}
+		renderContext="svg"
+		legend
+	/>
 </div>

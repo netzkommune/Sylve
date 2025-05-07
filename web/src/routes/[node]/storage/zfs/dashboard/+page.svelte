@@ -122,6 +122,8 @@
 			}
 		};
 	});
+
+	$inspect(pieCharts.poolUsage);
 </script>
 
 {#snippet card(type: string)}
@@ -152,8 +154,10 @@
 	</div>
 
 	{#if pools.length > 0}
-		<div class="mt-3 w-1/2">
-			<Card.Root>
+		<div
+			class="mt-3 flex h-[310px] min-h-[200px] w-[400px] min-w-[280px] resize flex-col overflow-auto"
+		>
+			<Card.Root class="flex flex-1 flex-col ">
 				<Card.Header>
 					<Card.Title class="mb-[-100px]">
 						<div class="flex w-full items-center justify-between">
@@ -168,14 +172,15 @@
 								data={comboBoxes.poolUsage.data}
 								classes=""
 								placeholder="Select a pool"
+								width="w-48"
 							/>
 						</div>
 					</Card.Title>
 				</Card.Header>
 
-				<Card.Content class="mb-[-10px]">
-					<div class="mt-4">
-						<PieChart containerClass="h-[310px] w-full rounded" data={pieCharts.poolUsage.data} />
+				<Card.Content class="flex-1 overflow-hidden">
+					<div class="mt-4 h-full">
+						<PieChart containerClass="h-full w-full rounded" data={pieCharts.poolUsage.data} />
 					</div>
 				</Card.Content>
 			</Card.Root>

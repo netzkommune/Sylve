@@ -15,6 +15,7 @@
 		placeholder?: string;
 		disabled?: boolean;
 		classes?: string;
+		width?: string;
 	}
 
 	let {
@@ -25,7 +26,8 @@
 		onValueChange = () => {},
 		placeholder = '',
 		disabled = false,
-		classes = 'space-y-1'
+		classes = 'space-y-1',
+		width = 'w-1/2'
 	}: Props = $props();
 
 	let search = $state('');
@@ -73,7 +75,7 @@
 			</Button>
 		</Popover.Trigger>
 
-		<Popover.Content class="w-1/2 p-0">
+		<Popover.Content class="{width} p-0">
 			<Command.Root shouldFilter={false}>
 				<Command.Input bind:value={search} placeholder={placeholder || 'Search...'} />
 				<Command.Empty>No data</Command.Empty>

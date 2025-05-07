@@ -171,10 +171,10 @@
 		{/each}
 	</div>
 
-	<div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+	<div class="flex flex-wrap gap-4">
 		{#if pools.length > 0}
 			<div
-				class="mt-3 flex h-[310px] min-h-[200px] w-[400px] min-w-[280px] resize flex-col overflow-auto"
+				class="mt-3 flex h-[310px] min-h-[200px] w-[300px] min-w-[280px] resize flex-col overflow-auto"
 			>
 				<Card.Root class="flex flex-1 flex-col ">
 					<Card.Header>
@@ -211,7 +211,7 @@
 			</div>
 
 			<div
-				class="mt-3 flex h-[310px] min-h-[200px] w-[400px] min-w-[280px] resize flex-col overflow-auto"
+				class="mt-3 flex h-[310px] min-h-[270px] w-[722px] min-w-[425px] resize flex-col overflow-auto"
 			>
 				<Card.Root class="flex flex-1 flex-col ">
 					<Card.Header>

@@ -223,6 +223,10 @@
 							? 'bg-muted-foreground/40 dark:bg-muted-foreground/25 '
 							: 'border-muted-foreground/25 hover:bg-muted-foreground/25 border-x border-t'}"
 						onclick={() => visiblityAction('tab-select', tab.id)}
+						onkeydown={(e) =>
+							(e.key === 'Enter' || e.key === ' ') && visiblityAction('tab-select', tab.id)}
+						role="button"
+						tabindex="0"
 					>
 						<span class="mr-2 whitespace-nowrap text-sm">{tab.title}</span>
 						{#if tabsCount > 1}

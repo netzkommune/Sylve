@@ -7,7 +7,7 @@
 	import { isTokenValid, login } from '$lib/api/auth';
 	import Login from '$lib/components/custom/Login.svelte';
 	import Throbber from '$lib/components/custom/Throbber.svelte';
-	import Shell from '$lib/components/Skeleton/Shell.svelte';
+	import Shell from '$lib/components/skeleton/Shell.svelte';
 	import { store as token } from '$lib/stores/auth';
 	import { hostname } from '$lib/stores/basic';
 	import '$lib/utils/i18n';

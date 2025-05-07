@@ -36,4 +36,15 @@ export interface PieChartData {
 	color: string;
 }
 
+export interface SeriesData {
+	name: string;
+	value: number;
+}
+
+export interface SeriesDataWithBaseline {
+	name: string;
+	baseline: number;
+	value: number;
+}
+
 export type APIResponse = z.infer<typeof APIResponseSchema>;

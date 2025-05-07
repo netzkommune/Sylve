@@ -1,6 +1,7 @@
-import type { APIResponse, PieChartData } from '$lib/types/common';
+import type { APIResponse, PieChartData, SeriesDataWithBaseline } from '$lib/types/common';
 import type { Column, Row } from '$lib/types/components/tree-table';
 import type { Disk } from '$lib/types/disk/disk';
+import type { Dataset } from '$lib/types/zfs/dataset';
 import type { Zpool } from '$lib/types/zfs/pool';
 import { getTranslation } from '../i18n';
 import { generateNumberFromString } from '../numbers';
@@ -320,4 +321,42 @@ export function getPoolUsagePieData(pools: Zpool[], pool: string): PieChartData[
 			color: 'hsla(120, 50%, 50%, 0.5)'
 		}
 	];
+}
+
+export function getDatasetCompressionHist(
+	pool: string,
+	datasets: Dataset[]
+): SeriesDataWithBaseline[] {
+	const results: SeriesDataWithBaseline[] = [];
+	const related = datasets.filter(
+		(dataset) => dataset.name.startsWith(pool + '/') || dataset.name === pool
+	);
+
+	for (const dataset of related) {
+		const used = dataset.used || dataset.properties?.used;
+		const logicalUsed = dataset.logicalused || dataset.properties?.logicalused;
+
+		if (typeof used === 'number' && typeof logicalUsed === 'number' && logicalUsed > 0) {
+			if (dataset.name.includes('/')) {
+				results.push({
+					name: dataset.name,
+					baseline: logicalUsed,
+					value: used
+				});
+			}
+		}
+	}
+
+	results.sort((a, b) => {
+		if (a.baseline !== b.baseline) {
+			return b.baseline - a.baseline;
+		}
+
+		const ratioA = a.value / a.baseline;
+		const ratioB = b.value / b.baseline;
+
+		return ratioB - ratioA;
+	});
+
+	return results;
 }

@@ -16,6 +16,7 @@
 		disabled?: boolean;
 		classes?: string;
 		width?: string;
+		disallowEmpty?: boolean;
 	}
 
 	let {
@@ -27,7 +28,8 @@
 		placeholder = '',
 		disabled = false,
 		classes = 'space-y-1',
-		width = 'w-1/2'
+		width = 'w-1/2',
+		disallowEmpty = false
 	}: Props = $props();
 
 	let search = $state('');
@@ -41,7 +43,7 @@
 	});
 
 	function selectItem(val: string) {
-		if (value === val) {
+		if (value === val && !disallowEmpty) {
 			value = '';
 			onValueChange('');
 		} else {

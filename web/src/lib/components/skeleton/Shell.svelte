@@ -3,8 +3,8 @@
 	import * as Resizable from '$lib/components/ui/resizable';
 
 	import Terminal from '$lib/components/custom/Terminal.svelte';
-	import BottomPanel from '$lib/components/Skeleton/BottomPanel.svelte';
-	import LeftPanel from '$lib/components/Skeleton/LeftPanel.svelte';
+	import BottomPanel from '$lib/components/skeleton/BottomPanel.svelte';
+	import LeftPanel from '$lib/components/skeleton/LeftPanel.svelte';
 	interface Props {
 		children?: import('svelte').Snippet;
 	}

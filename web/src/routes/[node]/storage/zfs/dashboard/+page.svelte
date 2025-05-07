@@ -1,15 +1,17 @@
 <script lang="ts">
 	import { getDatasets } from '$lib/api/zfs/datasets';
 	import { getPools } from '$lib/api/zfs/pool';
+	import BarChart from '$lib/components/custom/BarChart.svelte';
 	import PieChart from '$lib/components/custom/PieChart.svelte';
 	import * as Card from '$lib/components/ui/card';
 	import CustomComboBox from '$lib/components/ui/custom-input/combobox.svelte';
 	import type { Dataset } from '$lib/types/zfs/dataset';
 	import type { Zpool } from '$lib/types/zfs/pool';
 	import { updateCache } from '$lib/utils/http';
-	import { getPoolUsagePieData } from '$lib/utils/zfs/pool';
+	import { getDatasetCompressionHist, getPoolUsagePieData } from '$lib/utils/zfs/pool';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
+	import humanFormat from 'human-format';
 
 	interface Data {
 		pools: Zpool[];
@@ -112,6 +114,14 @@
 				value: pool.name,
 				label: pool.name
 			}))
+		},
+		datasetCompression: {
+			open: false,
+			value: pools[0]?.name || '',
+			data: pools.map((pool) => ({
+				value: pool.name,
+				label: pool.name
+			}))
 		}
 	});
 
@@ -123,7 +133,15 @@
 		};
 	});
 
-	$inspect(pieCharts.poolUsage);
+	let histograms = $derived.by(() => {
+		return {
+			compression: {
+				data: getDatasetCompressionHist(comboBoxes.datasetCompression.value, datasets)
+			}
+		};
+	});
+
+	// $inspect(histograms);
 </script>
 
 {#snippet card(type: string)}
@@ -153,37 +171,88 @@
 		{/each}
 	</div>
 
-	{#if pools.length > 0}
-		<div
-			class="mt-3 flex h-[310px] min-h-[200px] w-[400px] min-w-[280px] resize flex-col overflow-auto"
-		>
-			<Card.Root class="flex flex-1 flex-col ">
-				<Card.Header>
-					<Card.Title class="mb-[-100px]">
-						<div class="flex w-full items-center justify-between">
-							<div class="flex items-center">
-								<Icon icon="mdi:data-usage" class="mr-2" />
-								<span class="text-sm font-bold md:text-lg xl:text-xl">Pool Usage</span>
+	<div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+		{#if pools.length > 0}
+			<div
+				class="mt-3 flex h-[310px] min-h-[200px] w-[400px] min-w-[280px] resize flex-col overflow-auto"
+			>
+				<Card.Root class="flex flex-1 flex-col ">
+					<Card.Header>
+						<Card.Title class="mb-[-100px]">
+							<div class="flex w-full items-center justify-between">
+								<div class="flex items-center">
+									<Icon icon="mdi:data-usage" class="mr-2" />
+									<span class="text-sm font-bold md:text-lg xl:text-xl">Pool Usage</span>
+								</div>
+								<CustomComboBox
+									bind:open={comboBoxes.poolUsage.open}
+									label=""
+									bind:value={comboBoxes.poolUsage.value}
+									data={comboBoxes.poolUsage.data}
+									classes=""
+									placeholder="Select a pool"
+									width="w-48"
+									disallowEmpty={true}
+								/>
 							</div>
-							<CustomComboBox
-								bind:open={comboBoxes.poolUsage.open}
-								label=""
-								bind:value={comboBoxes.poolUsage.value}
-								data={comboBoxes.poolUsage.data}
-								classes=""
-								placeholder="Select a pool"
-								width="w-48"
+						</Card.Title>
+					</Card.Header>
+
+					<Card.Content class="flex-1 overflow-hidden">
+						<div class="mt-4 flex h-full items-center justify-center">
+							<PieChart
+								containerClass="h-full w-full rounded"
+								data={pieCharts.poolUsage.data}
+								formatter={'size-formatter'}
 							/>
 						</div>
-					</Card.Title>
-				</Card.Header>
+					</Card.Content>
+				</Card.Root>
+			</div>
 
-				<Card.Content class="flex-1 overflow-hidden">
-					<div class="mt-4 h-full">
-						<PieChart containerClass="h-full w-full rounded" data={pieCharts.poolUsage.data} />
-					</div>
-				</Card.Content>
-			</Card.Root>
-		</div>
-	{/if}
+			<div
+				class="mt-3 flex h-[310px] min-h-[200px] w-[400px] min-w-[280px] resize flex-col overflow-auto"
+			>
+				<Card.Root class="flex flex-1 flex-col ">
+					<Card.Header>
+						<Card.Title class="mb-[-100px]">
+							<div class="flex w-full items-center justify-between">
+								<div class="flex items-center">
+									<Icon icon="mdi:data-usage" class="mr-2" />
+									<span class="text-sm font-bold md:text-lg xl:text-xl">Dataset Compression</span>
+								</div>
+								<CustomComboBox
+									bind:open={comboBoxes.datasetCompression.open}
+									label=""
+									bind:value={comboBoxes.datasetCompression.value}
+									data={comboBoxes.datasetCompression.data}
+									classes=""
+									placeholder="Select a pool"
+									width="w-48"
+									disallowEmpty={true}
+								/>
+							</div>
+						</Card.Title>
+					</Card.Header>
+
+					<Card.Content class="flex-1 overflow-hidden">
+						<div class="mt-4 flex h-full items-center justify-center">
+							{#if histograms.compression.data.length === 0}
+								<p class="text-sm font-semibold text-gray-500">No data available</p>
+							{:else}
+								<BarChart
+									containerClass="h-full w-full rounded"
+									data={histograms.compression.data}
+									colors={{
+										baseline: 'hsla(60, 50%, 50%, 0.5)',
+										value: 'hsla(120, 50%, 50%, 0.5)'
+									}}
+								/>
+							{/if}
+						</div>
+					</Card.Content>
+				</Card.Root>
+			</div>
+		{/if}
+	</div>
 </div>

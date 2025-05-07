@@ -51,7 +51,6 @@
 			ws.addEventListener('message', onMessage);
 			ws.send(new TextEncoder().encode('\x02' + JSON.stringify({ kill: sessionId })));
 
-			// Timeout after 2 seconds
 			setTimeout(() => {
 				ws?.removeEventListener('message', onMessage);
 				resolve(false);
@@ -99,9 +98,6 @@
 			ws.onclose = () => {
 				if (!currentTab) return;
 				adze.info(`Terminal WebSocket disconnected for tab ${currentTab?.id}`);
-				if (terminal) {
-					terminal.write('\x1b[31mDisconnected from server.\x1b[0m\r\n');
-				}
 			};
 		} catch (e) {
 			adze.error('Failed to connect to terminal WebSocket', { error: e });

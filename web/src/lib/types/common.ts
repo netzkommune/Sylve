@@ -30,4 +30,10 @@ export interface HistoricalData {
 	[key: string]: number | string | Date;
 }
 
+export interface PieChartData {
+	label: string;
+	value: number;
+	color: string;
+}
+
 export type APIResponse = z.infer<typeof APIResponseSchema>;

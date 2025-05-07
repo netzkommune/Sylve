@@ -1,4 +1,4 @@
-import type { APIResponse } from '$lib/types/common';
+import type { APIResponse, PieChartData } from '$lib/types/common';
 import type { Column, Row } from '$lib/types/components/tree-table';
 import type { Disk } from '$lib/types/disk/disk';
 import type { Zpool } from '$lib/types/zfs/pool';
@@ -303,4 +303,21 @@ export function parsePoolActionError(error: APIResponse): string {
 	}
 
 	return '';
+}
+
+export function getPoolUsagePieData(pools: Zpool[], pool: string): PieChartData[] {
+	const poolData = pools.find((p) => p.name === pool);
+
+	return [
+		{
+			label: 'Used',
+			value: poolData?.allocated || 0,
+			color: 'hsla(0, 50%, 50%, 0.5)'
+		},
+		{
+			label: 'Free',
+			value: poolData?.free || 0,
+			color: 'hsla(120, 50%, 50%, 0.5)'
+		}
+	];
 }

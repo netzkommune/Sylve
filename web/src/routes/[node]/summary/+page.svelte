@@ -14,6 +14,7 @@
 	import type { CPUInfo, CPUInfoHistorical } from '$lib/types/info/cpu';
 	import type { RAMInfo } from '$lib/types/info/ram';
 	import type { IODelay, IODelayHistorical } from '$lib/types/zfs/pool';
+	import { updateCache } from '$lib/utils/http';
 	import { getTranslation } from '$lib/utils/i18n';
 	import { bytesToHumanReadable, floatToNDecimals } from '$lib/utils/numbers';
 	import { secondsToHoursAgo } from '$lib/utils/time';
@@ -40,56 +41,80 @@
 			queryFn: getBasicInfo,
 			refetchInterval: 1000,
 			keepPreviousData: true,
-			initialData: data.basicInfo
+			initialData: data.basicInfo,
+			onSuccess: (data: BasicInfo) => {
+				updateCache('basicInfo', data);
+			}
 		},
 		{
 			queryKey: ['cpuInfo'],
 			queryFn: getCPUInfo,
 			refetchInterval: 1000,
 			keepPreviousData: true,
-			initialData: data.cpuInfo
+			initialData: data.cpuInfo,
+			onSuccess: (data: CPUInfo | CPUInfoHistorical) => {
+				updateCache('cpuInfo', data as CPUInfo);
+			}
 		},
 		{
 			queryKey: ['ramInfo'],
 			queryFn: getRAMInfo,
 			refetchInterval: 1000,
 			keepPreviousData: true,
-			initialData: data.ramInfo
+			initialData: data.ramInfo,
+			onSuccess: (data: RAMInfo) => {
+				updateCache('ramInfo', data);
+			}
 		},
 		{
 			queryKey: ['swapInfo'],
 			queryFn: getSwapInfo,
 			refetchInterval: 1000,
 			keepPreviousData: true,
-			initialData: data.swapInfo
+			initialData: data.swapInfo,
+			onSuccess: (data: RAMInfo) => {
+				updateCache('swapInfo', data);
+			}
 		},
 		{
 			queryKey: ['ioDelay'],
 			queryFn: getIODelay,
 			refetchInterval: 1000,
 			keepPreviousData: true,
-			initialData: data.ioDelay
+			initialData: data.ioDelay,
+			onSuccess: (data: IODelay | IODelayHistorical) => {
+				updateCache('ioDelay', data as IODelay);
+			}
 		},
 		{
 			queryKey: ['totalDiskUsage'],
 			queryFn: getTotalDiskUsage,
 			refetchInterval: 1000,
 			keepPreviousData: true,
-			initialData: data.totalDiskUsage
+			initialData: data.totalDiskUsage,
+			onSuccess: (data: number) => {
+				updateCache('totalDiskUsage', data);
+			}
 		},
 		{
 			queryKey: ['cpuInfoHistorical'],
 			queryFn: getCPUInfo,
 			refetchInterval: 1000,
 			keepPreviousData: true,
-			initialData: data.cpuInfoHistorical
+			initialData: data.cpuInfoHistorical,
+			onSuccess: (data: CPUInfo | CPUInfoHistorical) => {
+				updateCache('cpuInfoHistorical', data as CPUInfoHistorical);
+			}
 		},
 		{
 			queryKey: ['ioDelayHistorical'],
 			queryFn: getIODelay,
 			refetchInterval: 1000,
 			keepPreviousData: true,
-			initialData: data.ioDelayHistorical
+			initialData: data.ioDelayHistorical,
+			onSuccess: (data: IODelay | IODelayHistorical) => {
+				updateCache('ioDelayHistorical', data as IODelayHistorical);
+			}
 		}
 	]);
 

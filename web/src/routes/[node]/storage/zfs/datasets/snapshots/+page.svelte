@@ -7,25 +7,19 @@
 		getPeriodicSnapshots
 	} from '$lib/api/zfs/datasets';
 	import { getPools } from '$lib/api/zfs/pool';
-	import AlertDialogModal from '$lib/components/custom/AlertDialog.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import Search from '$lib/components/custom/TreeTable/Search.svelte';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
-	import * as Command from '$lib/components/ui/command/index.js';
 	import CustomCheckbox from '$lib/components/ui/custom-input/checkbox.svelte';
 	import CustomComboBox from '$lib/components/ui/custom-input/combobox.svelte';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
-	import Input from '$lib/components/ui/input/input.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
-	import * as Popover from '$lib/components/ui/popover/index.js';
-	import * as Select from '$lib/components/ui/select/index.js';
 	import ViewSnapshotJobs from '$lib/components/zfs/ViewSnapshotJobs.svelte';
 	import type { Row } from '$lib/types/components/tree-table';
 	import type { Dataset, GroupedByPool, PeriodicSnapshot } from '$lib/types/zfs/dataset';
 	import type { Zpool } from '$lib/types/zfs/pool';
-	import { cn } from '$lib/utils';
 	import { getTranslation } from '$lib/utils/i18n';
 	import { capitalizeFirstLetter } from '$lib/utils/string';
 	import { groupByPool } from '$lib/utils/zfs/dataset/dataset';
@@ -33,7 +27,6 @@
 	import { generateTableData } from '$lib/utils/zfs/dataset/snapshot';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
-	import { tick } from 'svelte';
 	import toast from 'svelte-french-toast';
 
 	interface Data {

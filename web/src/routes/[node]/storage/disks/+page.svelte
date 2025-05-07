@@ -11,7 +11,7 @@
 	import { type Disk, type Partition } from '$lib/types/disk/disk';
 	import type { Zpool } from '$lib/types/zfs/pool';
 	import { diskSpaceAvailable, generateTableData, parseSMART } from '$lib/utils/disk';
-	import { handleAPIError } from '$lib/utils/http';
+	import { handleAPIError, updateCache } from '$lib/utils/http';
 	import { getTranslation } from '$lib/utils/i18n';
 	import { capitalizeFirstLetter } from '$lib/utils/string';
 	import Icon from '@iconify/svelte';
@@ -34,7 +34,10 @@
 			},
 			refetchInterval: 1000,
 			keepPreviousData: true,
-			initialData: data.disks
+			initialData: data.disks,
+			onSuccess: (data: Disk[]) => {
+				updateCache('disks', data);
+			}
 		},
 		{
 			queryKey: ['poolList'],
@@ -43,7 +46,10 @@
 			},
 			refetchInterval: 1000,
 			keepPreviousData: true,
-			initialData: data.pools
+			initialData: data.pools,
+			onSuccess: (data: Zpool[]) => {
+				updateCache('pools', data);
+			}
 		}
 	]);
 

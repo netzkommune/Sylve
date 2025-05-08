@@ -23,7 +23,6 @@
 	}
 
 	let { data, name, parentActiveRow = $bindable(), query = $bindable() }: Props = $props();
-	let mouseOverRow = $state(false);
 	let tableInitialized = $state(false);
 
 	function selectParentActiveRow(row: RowComponent) {
@@ -37,6 +36,10 @@
 		}
 	}
 
+	function hashData(data: any) {
+		return JSON.stringify(data).length.toString();
+	}
+
 	$effect(() => {
 		if (data.rows) {
 			untrack(async () => {
@@ -44,7 +47,7 @@
 					return;
 				}
 
-				if (data.rows.length === 0 || mouseOverRow) {
+				if (data.rows.length === 0) {
 					if (data.rows.length === 0) {
 						table?.clearData();
 					}
@@ -59,7 +62,7 @@
 						expanded: row.isTreeExpanded()
 					})) || [];
 
-				await table?.replaceData(pruneEmptyChildren(data.rows));
+				await table?.updateData(pruneEmptyChildren(data.rows));
 
 				selectedIds.forEach((id) => {
 					const row = findRow(table?.getRows() || [], id);
@@ -122,14 +125,6 @@
 
 		table?.on('rowDblClick', function (event: UIEvent, row: RowComponent) {
 			selectParentActiveRow(row);
-		});
-
-		table?.on('rowMouseEnter', function (e, row) {
-			mouseOverRow = true;
-		});
-
-		table?.on('rowMouseLeave', function (e, row) {
-			mouseOverRow = false;
 		});
 
 		table?.on('tableBuilt', function () {

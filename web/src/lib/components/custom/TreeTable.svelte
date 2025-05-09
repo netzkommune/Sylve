@@ -36,10 +36,6 @@
 		}
 	}
 
-	function hashData(data: any) {
-		return JSON.stringify(data).length.toString();
-	}
-
 	$effect(() => {
 		if (data.rows) {
 			untrack(async () => {
@@ -100,7 +96,7 @@
 				dataTreeChildIndent: 16,
 				dataTree: true,
 				dataTreeChildField: 'children',
-				dataTreeStartExpanded: [true, false],
+				dataTreeStartExpanded: true,
 				persistenceID: name,
 				paginationMode: 'local',
 				persistence: {

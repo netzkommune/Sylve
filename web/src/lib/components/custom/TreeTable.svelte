@@ -24,6 +24,7 @@
 
 	let { data, name, parentActiveRow = $bindable(), query = $bindable() }: Props = $props();
 	let tableInitialized = $state(false);
+	let scroll = $state([0, 0]);
 
 	function selectParentActiveRow(row: RowComponent) {
 		const expandedRow = row.getData();
@@ -58,7 +59,7 @@
 						expanded: row.isTreeExpanded()
 					})) || [];
 
-				await table?.updateData(pruneEmptyChildren(data.rows));
+				await table?.replaceData(pruneEmptyChildren(data.rows));
 
 				selectedIds.forEach((id) => {
 					const row = findRow(table?.getRows() || [], id);
@@ -125,6 +126,21 @@
 
 		table?.on('tableBuilt', function () {
 			tableInitialized = true;
+		});
+
+		table?.on('scrollVertical', function (top) {
+			scroll = [top, scroll[1]];
+		});
+
+		table?.on('scrollHorizontal', function (left) {
+			scroll = [scroll[0], left];
+		});
+
+		table?.on('renderComplete', () => {
+			const container = document.querySelector('.tabulator-tableholder') as HTMLDivElement;
+			if (container) {
+				container.scrollTop = scroll[0];
+			}
 		});
 	});
 

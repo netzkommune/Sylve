@@ -21,6 +21,7 @@
 	import type { Row } from '$lib/types/components/tree-table';
 	import { type Dataset } from '$lib/types/zfs/dataset';
 	import type { Zpool } from '$lib/types/zfs/pool';
+	import { updateCache } from '$lib/utils/http';
 	import { getTranslation } from '$lib/utils/i18n';
 	import { isValidSize } from '$lib/utils/numbers';
 	import { capitalizeFirstLetter, generatePassword } from '$lib/utils/string';
@@ -49,7 +50,10 @@
 			},
 			refetchInterval: 1000,
 			keepPreviousData: false,
-			initialData: data.pools
+			initialData: data.pools,
+			onSuccess: (data: Zpool[]) => {
+				updateCache('pools', data);
+			}
 		},
 		{
 			queryKey: ['datasetList'],
@@ -58,7 +62,10 @@
 			},
 			refetchInterval: 1000,
 			keepPreviousData: false,
-			initialData: data.datasets
+			initialData: data.datasets,
+			onSuccess: (data: Dataset[]) => {
+				updateCache('datasets', data);
+			}
 		}
 	]);
 

@@ -40,6 +40,15 @@
 	console.log($results[0].data as Iface[]);
 </script>
 
+{#snippet button(type: string)}
+	{#if type === 'view'}
+		<Button size="sm" class="h-6">
+			<Icon icon="gg:add" class="mr-1 h-4 w-4" />
+			{capitalizeFirstLetter(getTranslation('common.new', 'New'))}
+		</Button>
+	{/if}
+{/snippet}
+
 <div class="flex h-full w-full flex-col">
 	<div class="flex h-10 w-full items-center gap-2 border p-2">
 		<Search bind:query />

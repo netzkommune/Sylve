@@ -48,7 +48,7 @@ export const IPv6Schema = z.object({
 export const MediaSchema = z.object({
 	type: z.string(),
 	subtype: z.string(),
-	options: z.array(z.string()).default([]),
+	options: z.array(z.string()).nullable().default([]),
 	mode: z.string(),
 	rawCurrent: z.number(),
 	rawActive: z.number(),

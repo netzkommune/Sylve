@@ -47,6 +47,8 @@ export async function apiRequest<T extends z.ZodType>(
 			if (parsedResult.success) {
 				return parsedResult.data;
 			} else {
+				// console.log('Validation Error', parsedResult.error);
+				adze.withEmoji.warn('Zod Validation Error', parsedResult.error);
 				return getDefaultValue(schema, apiResponse.data);
 			}
 		}

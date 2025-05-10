@@ -140,6 +140,7 @@
 			const container = document.querySelector('.tabulator-tableholder') as HTMLDivElement;
 			if (container) {
 				container.scrollTop = scroll[0];
+				container.scrollLeft = scroll[1];
 			}
 		});
 	});

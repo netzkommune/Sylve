@@ -13,3 +13,17 @@ func IsValidMTU(mtu int) bool {
 func IsValidIP(ip string) bool {
 	return net.ParseIP(ip) != nil
 }
+
+func IsValidVLAN(vlan int) bool {
+	return vlan >= 0 && vlan <= 4095
+}
+
+func IsValidIPv4CIDR(cidr string) bool {
+	ip, _, err := net.ParseCIDR(cidr)
+
+	if err != nil {
+		return false
+	}
+
+	return ip.To4() != nil
+}

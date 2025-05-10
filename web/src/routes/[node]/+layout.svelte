@@ -39,6 +39,11 @@
 					label: 'interfaces',
 					icon: 'carbon:network-interface',
 					href: `/${node}/network/interfaces`
+				},
+				{
+					label: 'switches',
+					icon: 'clarity:network-switch-line',
+					href: `/${node}/network/switches`
 				}
 			]
 		},

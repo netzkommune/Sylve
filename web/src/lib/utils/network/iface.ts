@@ -55,13 +55,13 @@ export function generateTableData(interfaces: Iface[]): {
 	const rows: Row[] = [];
 	for (const iface of interfaces) {
 		const row: Row = {
-			id: iface.id,
-			ether: iface.interface.ether,
+			id: generateNumberFromString(iface.ether),
+			ether: iface.ether,
 			name: iface.name,
-			description: iface.interface.description,
+			description: iface.description,
 			metric: iface.metric,
 			mtu: iface.mtu,
-			media: iface.interface.media
+			media: iface.media
 		};
 
 		rows.push(row);

@@ -1,4 +1,3 @@
-import { options } from 'marked';
 import { z } from 'zod';
 
 export const FlagsSchema = z.object({
@@ -57,10 +56,12 @@ export const MediaSchema = z.object({
 
 export const ND6Schema = FlagsSchema;
 
-export const IfaceDetailSchema = z.object({
+export const IfaceSchema = z.object({
 	name: z.string(),
 	ether: z.string(),
 	flags: FlagsSchema,
+	mtu: z.number().nullable().optional(),
+	metric: z.number().nullable().optional(),
 	capabilities: z.object({
 		enabled: FlagsSchema,
 		supported: FlagsSchema
@@ -71,17 +72,6 @@ export const IfaceDetailSchema = z.object({
 	ipv6: z.array(IPv6Schema).default([]).nullable().optional(),
 	media: MediaSchema.nullable().optional(),
 	nd6: ND6Schema.nullable().optional()
-});
-
-export const IfaceSchema = z.object({
-	id: z.number(),
-	name: z.string(),
-	mac: z.string(),
-	mtu: z.number().default(0),
-	metric: z.number().default(0),
-	ipv4s: z.array(IPv4RCSchema).default([]),
-	ipv6s: z.array(IPv6RCSchema).default([]),
-	interface: IfaceDetailSchema
 });
 
 export type Iface = z.infer<typeof IfaceSchema>;

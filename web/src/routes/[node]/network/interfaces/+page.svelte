@@ -52,10 +52,6 @@
 <div class="flex h-full w-full flex-col">
 	<div class="flex h-10 w-full items-center gap-2 border p-2">
 		<Search bind:query />
-		<Button size="sm" class="h-6">
-			<Icon icon="gg:add" class="mr-1 h-4 w-4" />
-			{capitalizeFirstLetter(getTranslation('common.new', 'New'))}
-		</Button>
 	</div>
 
 	<TreeTable

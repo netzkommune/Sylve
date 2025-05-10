@@ -50,6 +50,12 @@
 				class="bg-primary ml-1 w-full text-sm leading-4 focus:outline-none"
 				in:slide={{ duration: 250, easing: cubicOut, axis: 'x' }}
 				out:fade={{ duration: 150 }}
+				on:keydown={(e) => {
+					if (e.key === 'Escape') {
+						query = '';
+						expanded = false;
+					}
+				}}
 			/>
 		{/if}
 	</div>

@@ -31,7 +31,8 @@
 		"file_systems": "Filesystems",
 		"notifications": "Notifications",
 		"volumes": "Volumes",
-		"snapshots": "Snapshots"
+		"snapshots": "Snapshots",
+		"switches": "Switches"
 	},
 	"summary": {
 		"CPU_s": "CPU(s)",

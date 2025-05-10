@@ -250,6 +250,47 @@ get_interface_groups(int fd, const char *ifname,
     return 0;
 }
 
+
+// Allocate and return a malloc()’d C‐string containing the
+// interface description, or NULL on error or if empty.
+static char *
+get_ifdescr(int sock, const char *ifname)
+{
+    struct ifreq ifr;
+    char *buf = NULL;
+    size_t buflen = 128;
+
+    // initial alloc
+    buf = malloc(buflen);
+    if (buf == NULL)
+        return NULL;
+
+    strncpy(ifr.ifr_name, ifname, IFNAMSIZ-1);
+    ifr.ifr_buffer.buffer = buf;
+    ifr.ifr_buffer.length = buflen;
+
+    for (;;) {
+        if (ioctl(sock, SIOCGIFDESCR, &ifr) < 0) {
+            free(buf);
+            return NULL;
+        }
+        // if the kernel wrote into our buffer pointer, we're done
+        if (ifr.ifr_buffer.buffer == buf) {
+            if (strlen(buf) > 0)
+                return buf;
+            free(buf);
+            return NULL;
+        }
+        // otherwise it grew the buffer: reallocate and retry
+        buflen = ifr.ifr_buffer.length;
+        buf = realloc(buf, buflen);
+        if (buf == NULL)
+            return NULL;
+        ifr.ifr_buffer.buffer = buf;
+        ifr.ifr_buffer.length = buflen;
+    }
+}
+
 static uint32_t get_mtu(const struct ifreq *ifr)    { return ifr->ifr_mtu; }
 static uint32_t get_metric(const struct ifreq *ifr) { return ifr->ifr_metric; }
 
@@ -340,6 +381,7 @@ type Interface struct {
 	Metric        int            `json:"metric"`
 	Capabilities  Capabilities   `json:"capabilities"`
 	Driver        string         `json:"driver"`
+	Model         string         `json:"model"`
 	Description   string         `json:"description"`
 	BridgeID      string         `json:"bridgeId"`
 	STP           *STP           `json:"stp"`
@@ -392,6 +434,14 @@ func (iface *Interface) String() string {
 
 	if iface.Ether != "" {
 		sb.WriteString(fmt.Sprintf("\tether %s\n", iface.Ether))
+	}
+
+	if iface.Description != "" {
+		sb.WriteString(fmt.Sprintf("\tdescription: %s\n", iface.Description))
+	}
+
+	if iface.Model != "" {
+		sb.WriteString(fmt.Sprintf("\\model: %s\n", iface.Model))
 	}
 
 	if iface.Capabilities.Enabled.Raw != 0 {
@@ -626,6 +676,14 @@ func getInterfaceInfo(name string) (*Interface, error) {
 		nd6.Desc = parseND6Options(nd6.Raw)
 	}
 
+	actDesc := ""
+
+	cDesc := C.get_ifdescr(fd4, cname)
+	if cDesc != nil {
+		actDesc = C.GoString(cDesc)
+		C.free(unsafe.Pointer(cDesc))
+	}
+
 	raw := uint32(C.get_combined_flags(fd4, cname))
 	known := raw & knownFlagMask()
 	if known == 0 {
@@ -658,6 +716,7 @@ func getInterfaceInfo(name string) (*Interface, error) {
 		Metric:       metric,
 		Capabilities: capabilities,
 		ND6:          nd6,
+		Description:  actDesc,
 	}
 
 	iface.Media = getMediaInfo(fd4, name)
@@ -954,7 +1013,6 @@ func Get(name string) (*Interface, error) {
 				return nil, err
 			}
 			iface.Driver = getSysctlProperty(name, "driver")
-			iface.Description = getSysctlProperty(name, "desc")
 		}
 
 		cname := C.CString(name)

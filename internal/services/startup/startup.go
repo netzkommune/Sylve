@@ -73,7 +73,5 @@ func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface)
 	go s.ZFS.Cron()
 	go s.ZFS.StartSnapshotScheduler(context.Background())
 
-	s.Network.ParseToDB()
-
 	return nil
 }

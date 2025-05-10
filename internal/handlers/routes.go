@@ -135,7 +135,12 @@ func RegisterRoutes(r *gin.Engine,
 	network.Use(middleware.EnsureAuthenticated(authService))
 	{
 		network.GET("/interface", networkHandlers.ListInterfaces(networkService))
-		network.POST("/interface/ipv4", networkHandlers.IPv4Config(networkService))
+		// network.POST("/interface/ipv4", networkHandlers.IPv4Config(networkService))
+
+		network.GET("/switch", networkHandlers.ListSwitches(networkService))
+
+		network.POST("/switch/standard", networkHandlers.CreateStandardSwitch(networkService))
+		network.DELETE("/switch/standard/:id", networkHandlers.DeleteStandardSwitch(networkService))
 	}
 
 	auth := api.Group("/auth")

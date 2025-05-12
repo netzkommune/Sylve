@@ -1,4 +1,4 @@
-import { createSwitch, deleteSwitch, getSwitches } from '$lib/api/network/switch';
+import { createSwitch, deleteSwitch, getSwitches, updateSwitch } from '$lib/api/network/switch';
 
 export async function load() {
 	// const cacheDuration = 1000 * 60000;
@@ -8,13 +8,12 @@ export async function load() {
 	// return {
 	//     interfaces
 	// };
-
-	const switches = await getSwitches();
-	console.log(switches);
-
-	// const created = await createSwitch('test', 1280, 0, '', false, ['re0']);
+	// const switches = await getSwitches();
+	// console.log(switches);
+	// const created = await createSwitch('offline', 1280, 0, '', false, ['em0']);
 	// console.log(created);
-
-	// const deleted = await deleteSwitch(1);
+	// const updated = await updateSwitch(4, 'public', 1500, 337, '', false, ['em0']);
+	// console.log(updated);
+	// const deleted = await deleteSwitch(4);
 	// console.log(deleted);
 }

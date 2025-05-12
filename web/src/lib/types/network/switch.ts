@@ -12,6 +12,7 @@ export const StandardSwitchSchema = z.object({
 	mtu: z.number(),
 	vlan: z.number(),
 	private: z.boolean(),
+	address: z.string(),
 	ports: array(NetworkPortSchema).optional()
 });
 

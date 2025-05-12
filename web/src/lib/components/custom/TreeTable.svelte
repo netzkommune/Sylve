@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Column, Row } from '$lib/types/components/tree-table';
-	import { matchAny } from '$lib/utils/table';
+	import { hasRowsChanged, matchAny } from '$lib/utils/table';
 	import { findRow, getAllRows, pruneEmptyChildren } from '$lib/utils/tree-table';
 	import { onMount, untrack } from 'svelte';
 	import {
@@ -59,7 +59,9 @@
 						expanded: row.isTreeExpanded()
 					})) || [];
 
-				await table?.replaceData(pruneEmptyChildren(data.rows));
+				if (hasRowsChanged(table, data.rows)) {
+					await table?.replaceData(pruneEmptyChildren(data.rows));
+				}
 
 				selectedIds.forEach((id) => {
 					const row = findRow(table?.getRows() || [], id);

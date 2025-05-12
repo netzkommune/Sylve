@@ -141,6 +141,7 @@ func RegisterRoutes(r *gin.Engine,
 
 		network.POST("/switch/standard", networkHandlers.CreateStandardSwitch(networkService))
 		network.DELETE("/switch/standard/:id", networkHandlers.DeleteStandardSwitch(networkService))
+		network.PUT("/switch/standard", networkHandlers.UpdateStandardSwitch(networkService))
 	}
 
 	auth := api.Group("/auth")

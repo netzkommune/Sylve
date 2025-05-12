@@ -37,7 +37,7 @@
 	}
 </script>
 
-<Dialog.Root bind:open>
+<Dialog.Root bind:open closeOnOutsideClick={false}>
 	<Dialog.Content class="flex max-h-[80vh] w-[90%] flex-col gap-0 overflow-hidden p-3 lg:max-w-4xl">
 		<div class="flex items-center justify-between">
 			<h2 class="ml-2 text-lg font-semibold">{titles.main}</h2>

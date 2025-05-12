@@ -11,6 +11,7 @@ package utils
 import (
 	"crypto/rand"
 	"crypto/sha256"
+	"encoding/binary"
 	"encoding/hex"
 	"fmt"
 	"hash/fnv"
@@ -24,6 +25,8 @@ import (
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
+
+const Base62Chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 
 func FNVHash(s string) uint64 {
 	hasher := fnv.New64a()
@@ -260,4 +263,19 @@ func Contains(slice []string, val string) bool {
 		}
 	}
 	return false
+}
+
+func EncodeBase62(num uint64, length int) string {
+	res := make([]byte, length)
+	for i := length - 1; i >= 0; i-- {
+		res[i] = Base62Chars[num%62]
+		num /= 62
+	}
+	return string(res)
+}
+
+func ShortHash(input string) string {
+	hash := sha256.Sum256([]byte(input))
+	num := binary.BigEndian.Uint64(hash[:8]) >> 16
+	return EncodeBase62(num, 8)
 }

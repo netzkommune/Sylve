@@ -18,8 +18,20 @@ export function generateTableData(interfaces: Iface[]): {
 			title: 'Name'
 		},
 		{
+			field: 'model',
+			title: 'Model'
+		},
+		{
 			field: 'description',
-			title: 'Description'
+			title: 'Description',
+			formatter: (cell: CellComponent) => {
+				const value = cell.getValue();
+				if (value) {
+					return value;
+				}
+
+				return '-';
+			}
 		},
 		{
 			field: 'ether',
@@ -54,10 +66,17 @@ export function generateTableData(interfaces: Iface[]): {
 
 	const rows: Row[] = [];
 	for (const iface of interfaces) {
+		if (iface.groups) {
+			if (iface.groups.includes('bridge')) {
+				continue;
+			}
+		}
+
 		const row: Row = {
 			id: generateNumberFromString(iface.ether),
 			ether: iface.ether,
 			name: iface.name,
+			model: iface.model,
 			description: iface.description,
 			metric: iface.metric,
 			mtu: iface.mtu,

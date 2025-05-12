@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const FlagsSchema = z.object({
 	raw: z.number(),
-	desc: z.array(z.string()).default([])
+	desc: z.array(z.string()).nullable().default([])
 });
 
 export const IPv4RCSchema = z.object({
@@ -67,11 +67,13 @@ export const IfaceSchema = z.object({
 		supported: FlagsSchema
 	}),
 	driver: z.string().default(''),
+	model: z.string().default(''),
 	description: z.string().default(''),
 	ipv4: z.array(IPv4Schema).default([]).nullable().optional(),
 	ipv6: z.array(IPv6Schema).default([]).nullable().optional(),
 	media: MediaSchema.nullable().optional(),
-	nd6: ND6Schema.nullable().optional()
+	nd6: ND6Schema.nullable().optional(),
+	groups: z.array(z.string()).default([]).nullable().optional()
 });
 
 export type Iface = z.infer<typeof IfaceSchema>;

@@ -27,3 +27,7 @@ func IsValidIPv4CIDR(cidr string) bool {
 
 	return ip.To4() != nil
 }
+
+func BridgeIfName(name string) string {
+	return ShortHash("syl" + name)
+}

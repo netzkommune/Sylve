@@ -388,7 +388,7 @@ type Interface struct {
 	MaxAddr       int            `json:"maxaddr"`
 	Timeout       int            `json:"timeout"`
 	BridgeMembers []BridgeMember `json:"bridgeMembers"`
-	Groups        []string
+	Groups        []string       `json:"groups"`
 
 	IPv4 []IPv4 `json:"ipv4"`
 	IPv6 []IPv6 `json:"ipv6"`
@@ -441,7 +441,7 @@ func (iface *Interface) String() string {
 	}
 
 	if iface.Model != "" {
-		sb.WriteString(fmt.Sprintf("\\model: %s\n", iface.Model))
+		sb.WriteString(fmt.Sprintf("\tmodel: %s\n", iface.Model))
 	}
 
 	if iface.Capabilities.Enabled.Raw != 0 {
@@ -1013,6 +1013,7 @@ func Get(name string) (*Interface, error) {
 				return nil, err
 			}
 			iface.Driver = getSysctlProperty(name, "driver")
+			iface.Model = getSysctlProperty(name, "desc")
 		}
 
 		cname := C.CString(name)

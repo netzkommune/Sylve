@@ -172,7 +172,8 @@
 		"filesystem": "filesystem",
 		"volume": "volume",
 		"deleted": "deleted",
-		"prefix": "prefix"
+		"prefix": "prefix",
+		"details": "details"
 	},
 	"validation_errors": {
 		"failed validation: min": "too small"

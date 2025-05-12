@@ -8,6 +8,7 @@
  * under sponsorship from the FreeBSD Foundation.
  */
 
+import type { Row } from '$lib/types/components/tree-table';
 import humanFormat, { type ScaleLike } from 'human-format';
 import {
 	TabulatorFull,
@@ -129,4 +130,41 @@ export function matchAny(data: any, filterParams: any): boolean {
 	}
 
 	return recursiveMatch(data);
+}
+
+function cleanChildren(row: any): any {
+	if (Array.isArray(row.children)) {
+		row.children = row.children.map(cleanChildren);
+		row.children = row.children.filter((child: null) => child != null);
+
+		if (row.children.length === 0) {
+			delete row.children;
+		}
+	} else {
+		delete row.children;
+	}
+
+	return row;
+}
+
+export function hasRowsChanged(table: Tabulator | null, newData: Row[]): boolean {
+	if (!table) {
+		return true;
+	}
+
+	const currentData = table.getData();
+	if (currentData.length !== newData.length) {
+		return true;
+	}
+
+	for (let i = 0; i < currentData.length; i++) {
+		const currentRow = cleanChildren({ ...currentData[i] });
+		const newRow = cleanChildren({ ...newData[i] });
+
+		if (JSON.stringify(currentRow) !== JSON.stringify(newRow)) {
+			return true;
+		}
+	}
+
+	return false;
 }

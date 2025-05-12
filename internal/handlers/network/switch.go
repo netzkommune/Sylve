@@ -24,6 +24,11 @@ type CreateStandardSwitchRequest struct {
 	Ports   []string `json:"ports" binding:"required"`
 }
 
+type UpdateStandardSwitchRequest struct {
+	ID int `json:"id" binding:"required"`
+	CreateStandardSwitchRequest
+}
+
 // @Summary List Network Switches
 // @Description List all network switches on the system
 // @Tags Network
@@ -97,7 +102,7 @@ func CreateStandardSwitch(networkService *network.Service) gin.HandlerFunc {
 			*request.Private = false
 		}
 
-		err := networkService.NewStandardSwitch(request.Name, request.MTU, request.VLAN, request.Address, request.Ports)
+		err := networkService.NewStandardSwitch(request.Name, request.MTU, request.VLAN, request.Address, request.Ports, *request.Private)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 				Status:  "error",
@@ -155,6 +160,60 @@ func DeleteStandardSwitch(networkService *network.Service) gin.HandlerFunc {
 		c.JSON(http.StatusOK, internal.APIResponse[any]{
 			Status:  "success",
 			Message: "switch_deleted",
+			Error:   "",
+			Data:    nil,
+		})
+	}
+}
+
+// @Summary Update a Standard Switch
+// @Description Update a standard switch by ID
+// @Tags Network
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Switch ID"
+// @Param request body UpdateStandardSwitchRequest true "Update Standard Switch Request"
+// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /network/switch [put]
+func UpdateStandardSwitch(networkService *network.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var request UpdateStandardSwitchRequest
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		if request.VLAN < 0 {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_vlan",
+				Error:   fmt.Sprintf("vlan_must_be_positive_or_zero"),
+				Data:    nil,
+			})
+			return
+		}
+
+		err := networkService.EditStandardSwitch(request.ID, request.Name, request.MTU, request.VLAN, request.Address, request.Ports, *request.Private)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "failed_to_update_switch",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "switch_updated",
 			Error:   "",
 			Data:    nil,
 		})

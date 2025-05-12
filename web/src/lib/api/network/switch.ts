@@ -29,3 +29,25 @@ export async function createSwitch(
 export async function deleteSwitch(id: number): Promise<APIResponse> {
 	return await apiRequest(`/network/switch/standard/${id}`, APIResponseSchema, 'DELETE');
 }
+
+export async function updateSwitch(
+	id: number,
+	name: string,
+	mtu: number,
+	vlan: number,
+	address: string,
+	privateSw: boolean,
+	ports: string[]
+): Promise<APIResponse> {
+	const body = {
+		id,
+		name,
+		mtu,
+		vlan,
+		address,
+		private: privateSw,
+		ports
+	};
+
+	return await apiRequest('/network/switch/standard', APIResponseSchema, 'PUT', body);
+}

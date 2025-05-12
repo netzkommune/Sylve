@@ -17,7 +17,7 @@ import (
 	"sylve/internal/logger"
 	"sylve/pkg/utils"
 
-	"github.com/glebarez/sqlite"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	gormLogger "gorm.io/gorm/logger"
 )
@@ -42,7 +42,8 @@ func SetupDatabase(cfg *internal.SylveConfig, isTest bool) *gorm.DB {
 	}
 
 	db.Exec("PRAGMA foreign_keys = ON")
-	db.Exec("PRAGMA journal_mode=WAL")
+	db.Exec("PRAGMA journal_mode = WAL")
+	db.Exec("PRAGMA synchronous = NORMAL")
 
 	err = db.AutoMigrate(
 		&models.System{},
@@ -57,8 +58,8 @@ func SetupDatabase(cfg *internal.SylveConfig, isTest bool) *gorm.DB {
 
 		&zfsModels.PeriodicSnapshot{},
 
-		&networkModels.NetworkPort{},
 		&networkModels.StandardSwitch{},
+		&networkModels.NetworkPort{},
 	)
 
 	if err != nil {

@@ -10,6 +10,7 @@ package startup
 
 import (
 	"context"
+	"fmt"
 	"os"
 	serviceInterfaces "sylve/internal/interfaces/services"
 	infoServiceInterfaces "sylve/internal/interfaces/services/info"
@@ -72,6 +73,12 @@ func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface)
 	go s.Info.Cron()
 	go s.ZFS.Cron()
 	go s.ZFS.StartSnapshotScheduler(context.Background())
+
+	err := s.Network.SyncStandardSwitches()
+
+	if err != nil {
+		fmt.Println("Error syncing standard switches:", err)
+	}
 
 	return nil
 }

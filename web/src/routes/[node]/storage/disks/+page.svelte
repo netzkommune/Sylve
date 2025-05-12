@@ -31,7 +31,7 @@
 			queryFn: async () => {
 				return await listDisks();
 			},
-			refetchInterval: 1000,
+			refetchInterval: 2000,
 			keepPreviousData: true,
 			initialData: data.disks,
 			onSuccess: (data: Disk[]) => {

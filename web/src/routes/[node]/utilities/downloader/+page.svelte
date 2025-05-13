@@ -96,6 +96,13 @@
 		}
 
 		if (activeRows && activeRows.length > 1) {
+			for (const row of activeRows) {
+				if (row.type !== '-') {
+					modalState.isBulkDelete = false;
+					modalState.title = '';
+					return;
+				}
+			}
 			modalState.isBulkDelete = true;
 			modalState.title = `${activeRows.length} ${capitalizeFirstLetter(getTranslation('common.downloads', 'Downloads'))}`;
 		}

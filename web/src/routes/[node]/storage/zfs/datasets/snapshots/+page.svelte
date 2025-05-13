@@ -67,7 +67,8 @@
 		}
 	]);
 
-	let activeRow: Row | null = $state(null);
+	let activeRows: Row[] | null = $state(null);
+	let activeRow: Row | null = $derived(activeRows ? (activeRows[0] as Row) : ({} as Row));
 	let grouped: GroupedByPool[] = $derived(groupByPool($results[0].data, $results[1].data));
 	let pools: Zpool[] = $derived($results[0].data || []);
 	let periodicSnapshots: PeriodicSnapshot[] = $derived($results[2].data || []);
@@ -329,7 +330,13 @@
 		{@render button('view-periodics')}
 	</div>
 
-	<TreeTable data={tableData} name={tableName} bind:parentActiveRow={activeRow} bind:query />
+	<TreeTable
+		data={tableData}
+		name={tableName}
+		bind:parentActiveRow={activeRows}
+		bind:query
+		multipleSelect={false}
+	/>
 </div>
 
 {#if confirmModals.active === 'createSnapshot'}

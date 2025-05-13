@@ -53,7 +53,8 @@
 	]);
 
 	let disks = $derived($results[0].data as Disk[]);
-	let activeRow: Row | null = $state(null);
+	let activeRows: Row[] | null = $state(null);
+	let activeRow: Row | null = $derived(activeRows ? (activeRows[0] as Row) : ({} as Row));
 	let { rows, columns } = $derived(generateTableData(disks));
 
 	let wipeModal = $state({
@@ -302,7 +303,8 @@
 			columns: columns
 		}}
 		name={'tt-disks'}
-		bind:parentActiveRow={activeRow}
+		bind:parentActiveRow={activeRows}
+		multipleSelect={false}
 		bind:query
 	/>
 </div>

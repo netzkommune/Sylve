@@ -3,11 +3,9 @@
 	import { createPool, deletePool, getPools, replaceDevice, scrubPool } from '$lib/api/zfs/pool';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card/index.js';
-	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import CustomCheckbox from '$lib/components/ui/custom-input/checkbox.svelte';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
@@ -92,7 +90,9 @@
 		}
 	]);
 
-	let activeRow: Row | null = $state(null);
+	let activeRows: Row[] | null = $state(null);
+	let activeRow: Row | null = $derived(activeRows ? (activeRows[0] as Row) : ({} as Row));
+
 	let replaceInProgress: boolean = $state(false);
 	let scrubInProgress: boolean = $state(false);
 	let raidTypes = $state(raidTypeArr);
@@ -724,11 +724,11 @@
 </script>
 
 {#snippet button(type: string)}
-	{#if activeRow !== null}
+	{#if activeRow && Object.keys(activeRow).length > 0}
 		{#if type === 'pool-status'}
 			{#if isPool(pools, activeRow.name)}
 				<Button
-					on:click={() => {
+					onclick={() => {
 						confirmModals.active = 'statusPool';
 						confirmModals.statusPool.open = true;
 						confirmModals.statusPool.title = activeRow?.name;
@@ -747,7 +747,7 @@
 		{#if type === 'pool-scrub'}
 			{#if isPool(pools, activeRow.name)}
 				<Button
-					on:click={async () => {
+					onclick={async () => {
 						const response = await scrubPool(activeRow?.name);
 						if (response.status === 'error') {
 							toast.error(parsePoolActionError(response), {
@@ -775,7 +775,7 @@
 		{#if type === 'pool-delete'}
 			{#if isPool(pools, activeRow.name)}
 				<Button
-					on:click={() => {
+					onclick={() => {
 						confirmModals.active = 'deletePool';
 						confirmModals.deletePool.open = true;
 						confirmModals.deletePool.title = activeRow?.name;
@@ -800,7 +800,7 @@
 		{#if type === 'replace-device'}
 			{#if isReplaceableDevice(pools, activeRow.name)}
 				<Button
-					on:click={() => {
+					onclick={() => {
 						confirmModals.active = 'replaceDevice';
 						confirmModals.replaceDevice.open = true;
 						confirmModals.replaceDevice.title = activeRow?.name;
@@ -960,7 +960,7 @@
 <div class="flex h-full w-full flex-col">
 	<div class="flex h-10 w-full items-center gap-2 border p-2">
 		<Search bind:query />
-		<Button on:click={() => (modal.open = !modal.open)} size="sm" class="h-6">
+		<Button onclick={() => (modal.open = !modal.open)} size="sm" class="h-6">
 			<Icon icon="gg:add" class="mr-1 h-4 w-4" />
 			{capitalizeFirstLetter(getTranslation('common.new', 'New'))}
 		</Button>
@@ -971,7 +971,13 @@
 		{@render button('replace-device')}
 	</div>
 
-	<TreeTable data={tableData} name="tt-zfsPool" bind:parentActiveRow={activeRow} bind:query />
+	<TreeTable
+		data={tableData}
+		name="tt-zfsPool"
+		bind:parentActiveRow={activeRows}
+		bind:query
+		multipleSelect={false}
+	/>
 </div>
 
 <Dialog.Root bind:open={modal.open} closeOnOutsideClick={false}>

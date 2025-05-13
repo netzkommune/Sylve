@@ -139,10 +139,8 @@ func RegisterRoutes(r *gin.Engine,
 	network.Use(middleware.EnsureAuthenticated(authService))
 	{
 		network.GET("/interface", networkHandlers.ListInterfaces(networkService))
-		// network.POST("/interface/ipv4", networkHandlers.IPv4Config(networkService))
 
 		network.GET("/switch", networkHandlers.ListSwitches(networkService))
-
 		network.POST("/switch/standard", networkHandlers.CreateStandardSwitch(networkService))
 		network.DELETE("/switch/standard/:id", networkHandlers.DeleteStandardSwitch(networkService))
 		network.PUT("/switch/standard", networkHandlers.UpdateStandardSwitch(networkService))
@@ -151,8 +149,10 @@ func RegisterRoutes(r *gin.Engine,
 	utilities := api.Group("/utilities")
 	utilities.Use(middleware.EnsureAuthenticated(authService))
 	{
-		utilities.POST("/download", utilitiesHandlers.DownloadFile(utilitiesService))
+		utilities.POST("/downloads", utilitiesHandlers.DownloadFile(utilitiesService))
 		utilities.GET("/downloads", utilitiesHandlers.ListDownloads(utilitiesService))
+		utilities.DELETE("/downloads/:id", utilitiesHandlers.DeleteDownload(utilitiesService))
+		utilities.POST("/downloads/bulk-delete", utilitiesHandlers.BulkDeleteDownload(utilitiesService))
 	}
 
 	auth := api.Group("/auth")

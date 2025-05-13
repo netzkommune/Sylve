@@ -130,23 +130,66 @@ func (s *Service) SyncDownloadProgress() error {
 	return nil
 }
 
-func (s *Service) RemoveDownload(uuid string) error {
+func (s *Service) DeleteDownload(id int) error {
 	var download utilitiesModels.Downloads
-	if err := s.DB.Where("uuid = ?", uuid).First(&download).Error; err != nil {
-		logger.L.Error().Msgf("Failed to find download: %v", err)
+	if err := s.DB.Where("id = ?", id).First(&download).Error; err != nil {
+		logger.L.Debug().Msgf("Failed to find download: %v", err)
 		return err
+	}
+
+	if download.Type == "torrent" {
+		torrent := s.BTTClient.GetTorrent(download.UUID)
+		if torrent != nil {
+			if err := s.BTTClient.RemoveTorrent(download.UUID); err != nil {
+				logger.L.Debug().Msgf("Failed to remove torrent: %v", err)
+				return err
+			}
+		}
 	}
 
 	for _, file := range download.Files {
 		if err := s.DB.Delete(&file).Error; err != nil {
-			logger.L.Error().Msgf("Failed to delete downloaded file: %v", err)
+			logger.L.Debug().Msgf("Failed to delete downloaded file: %v", err)
 			return err
 		}
 	}
 
 	if err := s.DB.Delete(&download).Error; err != nil {
-		logger.L.Error().Msgf("Failed to delete download: %v", err)
+		logger.L.Debug().Msgf("Failed to delete download: %v", err)
 		return err
+	}
+
+	return nil
+}
+
+func (s *Service) BulkDeleteDownload(ids []int) error {
+	var downloads []utilitiesModels.Downloads
+	if err := s.DB.Where("id IN ?", ids).Find(&downloads).Error; err != nil {
+		return err
+	}
+
+	for _, download := range downloads {
+		if download.Type == "torrent" {
+			torrent := s.BTTClient.GetTorrent(download.UUID)
+			if torrent != nil {
+				if err := s.BTTClient.RemoveTorrent(download.UUID); err != nil {
+					logger.L.Debug().Msgf("Failed to remove torrent: %v", err)
+					return err
+				}
+			}
+		}
+
+		for _, file := range download.Files {
+			if err := s.DB.Delete(&file).Error; err != nil {
+				logger.L.Debug().Msgf("Failed to delete downloaded file: %v", err)
+				return err
+			}
+		}
+
+		if err := s.DB.Delete(&download).Error; err != nil {
+			logger.L.Debug().Msgf("Failed to delete download: %v", err)
+			return err
+		}
 	}
 
 	return nil

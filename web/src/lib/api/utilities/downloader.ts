@@ -7,7 +7,17 @@ export async function getDownloads(): Promise<Download[]> {
 }
 
 export async function startDownload(url: string): Promise<APIResponse> {
-	return await apiRequest('/utilities/download', APIResponseSchema, 'POST', {
+	return await apiRequest('/utilities/downloads', APIResponseSchema, 'POST', {
 		url
+	});
+}
+
+export async function deleteDownload(id: number): Promise<APIResponse> {
+	return await apiRequest(`/utilities/downloads/${id}`, APIResponseSchema, 'DELETE');
+}
+
+export async function bulkDeleteDownloads(ids: number[]): Promise<APIResponse> {
+	return await apiRequest('/utilities/downloads/bulk-delete', APIResponseSchema, 'POST', {
+		ids
 	});
 }

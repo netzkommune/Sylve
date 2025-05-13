@@ -38,7 +38,7 @@
 	>
 		<button
 			class="flex h-6 w-6 min-w-[1.5rem] shrink-0 items-center justify-center"
-			on:click={toggleSearch}
+			onclick={toggleSearch}
 		>
 			<Icon icon="mdi:magnify" class="h-5 w-5" />
 		</button>
@@ -52,7 +52,7 @@
 				class="bg-primary ml-1 w-full text-sm leading-4 focus:outline-none"
 				in:slide={{ duration: 250, easing: cubicOut, axis: 'x' }}
 				out:fade={{ duration: 150 }}
-				on:keydown={(e) => {
+				onkeydown={(e) => {
 					if (e.key === 'Escape') {
 						query = '';
 						expanded = false;

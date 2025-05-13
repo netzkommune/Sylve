@@ -64,26 +64,27 @@
 		rows: Row[];
 		columns: Column[];
 	} = $derived(generateTableData(grouped));
-	let activeRow: Row | null = $state(null);
+	let activeRows: Row[] | null = $state(null);
+	let activeRow: Row | null = $derived(activeRows ? (activeRows[0] as Row) : ({} as Row));
+
 	let activePool: Zpool | null = $derived.by(() => {
 		const pool = $results[0].data?.find((pool) => pool.name === activeRow?.name);
 		return pool ?? null;
 	});
 
 	let activeVolume: Dataset | null = $derived.by(() => {
-		const volume = $results[1].data?.find(
-			(volume) => volume.name === activeRow?.name && volume.type === 'volume'
-		);
+		if (activePool) return null;
+		const volumes = $results[1].data?.filter((volume) => volume.type === 'volume');
+		const volume = volumes?.find((volume) => volume.name.endsWith(activeRow?.name));
 		return volume ?? null;
 	});
 
 	let activeSnapshot: Dataset | null = $derived.by(() => {
+		if (activePool) return null;
 		const snapshots = $results[1].data?.filter((snapshot) => snapshot.type === 'snapshot');
 		const snapshot = snapshots?.find((snapshot) => snapshot.name.endsWith(activeRow?.name));
 		return snapshot ?? null;
 	});
-
-	// $inspect(activeSnapshot);
 
 	type props = {
 		checksum: string;
@@ -377,7 +378,13 @@
 		{@render button('delete-volume')}
 	</div>
 
-	<TreeTable data={table} name={tableName} bind:parentActiveRow={activeRow} bind:query />
+	<TreeTable
+		data={table}
+		name={tableName}
+		bind:parentActiveRow={activeRows}
+		bind:query
+		multipleSelect={false}
+	/>
 </div>
 
 {#snippet simpleSlect(prop: keyof props, label: string, placeholder: string)}

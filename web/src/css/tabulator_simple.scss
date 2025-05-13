@@ -59,6 +59,7 @@
 		}
 
 		.tabulator-cell {
+			height: auto !important;
 			&:last-of-type {
 				border-right: none;
 			}

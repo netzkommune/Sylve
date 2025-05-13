@@ -14,13 +14,18 @@ export function generateTableData(data: Download[]): { rows: Row[]; columns: Col
 			visible: false
 		},
 		{
+			field: 'uuid',
+			title: 'UUID',
+			visible: false
+		},
+		{
 			field: 'name',
 			title: 'Name',
 			formatter: (cell: CellComponent) => {
 				const value = cell.getValue();
 				const row = cell.getRow();
 				const data = row.getData();
-				if (data.children && data.children.length > 0) {
+				if (data.type !== '-') {
 					if (data.type === 'torrent') {
 						return renderWithIcon('mdi:magnet', value);
 					} else if (data.type === 'ddl') {
@@ -69,6 +74,7 @@ export function generateTableData(data: Download[]): { rows: Row[]; columns: Col
 	for (const download of data) {
 		const row: Row = {
 			id: download.id,
+			uuid: download.uuid,
 			name: download.name,
 			size: download.size,
 			type: download.type,
@@ -79,8 +85,10 @@ export function generateTableData(data: Download[]): { rows: Row[]; columns: Col
 		for (const file of download.files) {
 			const childRow: Row = {
 				id: generateNumberFromString(file.id + 'file'),
+				uuid: '-',
 				name: file.name,
 				size: file.size,
+				type: '-',
 				children: [],
 				progress: '-'
 			};

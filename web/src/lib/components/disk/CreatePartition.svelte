@@ -173,7 +173,7 @@
 								<Table.Cell class="text-right">{humanFormat(partition.size)}</Table.Cell>
 								<Table.Cell class="text-right">-</Table.Cell>
 								<Table.Cell class="text-right">
-									<Button variant="ghost" class="h-8" on:click={() => removePartition(index)}>
+									<Button variant="ghost" class="h-8" onclick={() => removePartition(index)}>
 										<Icon icon="gg:trash" class="h-4 w-4" />
 									</Button>
 								</Table.Cell>
@@ -219,7 +219,7 @@
 					<Button
 						variant="outline"
 						class="h-8 whitespace-nowrap"
-						on:click={addPartition}
+						onclick={addPartition}
 						disabled={currentPartition <= 0}
 					>
 						{#if remainingSpace > 0}
@@ -243,9 +243,9 @@
 				<div class="text-muted-foreground mt-2 text-sm">
 					Remaining space: {humanFormat(remainingSpace)}
 				</div>
-				<Button variant="outline" class="h-8" on:click={() => close()}>Cancel</Button>
+				<Button variant="outline" class="h-8" onclick={() => close()}>Cancel</Button>
 				{#if newPartitions.length > 0}
-					<Button variant="outline" class="h-8" on:click={savePartitions}>Save Partitions</Button>
+					<Button variant="outline" class="h-8" onclick={savePartitions}>Save Partitions</Button>
 				{/if}
 			</div>
 		</Dialog.Footer>

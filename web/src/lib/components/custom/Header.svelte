@@ -53,7 +53,7 @@
 			{/if}
 			<p class="font-normal tracking-[.45em]">SYLVE</p>
 		</div>
-		<form class="ml-auto flex-1 sm:flex-initial">
+		<!-- <form class="ml-auto flex-1 sm:flex-initial">
 			<div class="relative">
 				<Icon icon="ic:sharp-search" class="absolute left-2.5 top-1.5 h-4 w-4" />
 				<Input
@@ -62,7 +62,7 @@
 					class="h-7 pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
 				/>
 			</div>
-		</form>
+		</form> -->
 	</nav>
 	<Sheet.Root>
 		<Sheet.Trigger asChild let:builder>
@@ -79,29 +79,29 @@
 					<p class="font-normal tracking-[.45em]">SYLVE</p>
 				</div>
 				<p class="mt-4 whitespace-nowrap">Virtual Environment 0.0.1</p>
-				<Button size="sm" class="mt-4 h-8 bg-neutral-600 text-white hover:bg-neutral-700">
+				<!-- <Button size="sm" class="mt-4 h-8 bg-neutral-600 text-white hover:bg-neutral-700">
 					<Icon icon="material-symbols-light:mail-outline-sharp" class="mr-2 h-4 w-4" />
 					Documentation
-				</Button>
-				<CreateDialog
+				</Button> -->
+				<!-- <CreateDialog
 					title="Create: Virtual Machine"
 					tabs={vmTabs}
 					icon="material-symbols:monitor-outline-rounded"
 					buttonText="Create VM"
 					buttonClass="h-8 mt-4"
-				/>
-				<CreateDialog
+				/> -->
+				<!-- <CreateDialog
 					title="Create: Jail"
 					tabs={ctTabs}
 					icon="ph:cube-fill"
 					buttonText="Create Jail"
 					buttonClass="h-8 mt-4"
-				/>
+				/> -->
 			</nav>
 		</Sheet.Content>
 	</Sheet.Root>
 	<div class="flex w-full items-center justify-end gap-2 md:ml-auto">
-		<div class="relative lg:hidden">
+		<!-- <div class="relative lg:hidden">
 			<Icon
 				icon="ic:sharp-search"
 				class="text-muted-foreground absolute left-2.5 top-1.5 h-4 w-4"
@@ -111,7 +111,7 @@
 				placeholder="Search products..."
 				class="h-7 pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
 			/>
-		</div>
+		</div> -->
 
 		<!-- desktop view -->
 		<div class="hidden items-center gap-2 lg:inline-flex">
@@ -131,12 +131,12 @@
 				{/if}
 			</Button>
 
-			<Button size="sm" class="h-6">
+			<!-- <Button size="sm" class="h-6">
 				<Icon icon="material-symbols:mail-outline" class="mr-2 h-5 w-5" />
 				Documentation
-			</Button>
+			</Button> -->
 
-			<CreateDialog
+			<!-- <CreateDialog
 				title="Create: Virtual Machine"
 				tabs={vmTabs}
 				icon="material-symbols:monitor-outline-rounded"
@@ -150,7 +150,7 @@
 				icon="tabler:prison"
 				buttonText="Create Jail"
 				buttonClass="h-6"
-			/>
+			/> -->
 		</div>
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild let:builder>
@@ -170,7 +170,7 @@
 					{#each menuItems as { icon, label, shortcut }}
 						<DropdownMenu.Item
 							class="cursor-pointer"
-							on:click={() => label === 'Color Theme' && toggleMode()}
+							onclick={() => label === 'Color Theme' && toggleMode()}
 						>
 							<Icon {icon} class="mr-2 h-4 w-4" />
 							<span>{label}</span>

@@ -71,7 +71,9 @@
 
 	let grouped = $derived(groupByPool($results[0].data, $results[1].data));
 	let tableData = $derived(generateTableData(grouped));
-	let activeRow: Row | null = $state(null);
+	let activeRows: Row[] | null = $state(null);
+	let activeRow: Row | null = $derived(activeRows ? (activeRows[0] as Row) : ({} as Row));
+
 	let activeDataset: Dataset | null = $derived.by(() => {
 		if (activeRow) {
 			for (const dataset of grouped) {
@@ -328,7 +330,7 @@
 {#snippet button(type: string)}
 	{#if type === 'rollback-snapshot' && activeDataset?.type === 'snapshot'}
 		<Button
-			on:click={async () => {
+			onclick={async () => {
 				if (activeDataset) {
 					confirmModals.active = 'rollbackSnapshot';
 					confirmModals.parent = 'snapshot';
@@ -346,7 +348,7 @@
 
 	{#if type === 'delete-snapshot' && activeDataset?.type === 'snapshot'}
 		<Button
-			on:click={async () => {
+			onclick={async () => {
 				if (activeDataset) {
 					confirmModals.active = 'deleteSnapshot';
 					confirmModals.parent = 'snapshot';
@@ -363,7 +365,7 @@
 
 	{#if type === 'create-snapshot' && activeDataset?.type === 'filesystem'}
 		<Button
-			on:click={async () => {
+			onclick={async () => {
 				if (activeDataset) {
 					confirmModals.active = 'createSnapshot';
 					confirmModals.parent = 'filesystem';
@@ -380,7 +382,7 @@
 
 	{#if type === 'delete-filesystem' && activeDataset?.type === 'filesystem' && activeDataset?.name.includes('/')}
 		<Button
-			on:click={async () => {
+			onclick={async () => {
 				if (activeDataset) {
 					confirmModals.active = 'deleteFilesystem';
 					confirmModals.parent = 'filesystem';
@@ -400,7 +402,7 @@
 	<div class="flex h-10 w-full items-center gap-2 border p-2">
 		<Search bind:query />
 		<Button
-			on:click={() => {
+			onclick={() => {
 				confirmModals.active = 'createFilesystem';
 				confirmModals.parent = 'filesystem';
 				confirmModals.createFilesystem.open = true;
@@ -418,7 +420,13 @@
 		{@render button('delete-filesystem')}
 	</div>
 
-	<TreeTable data={tableData} name={tableName} bind:parentActiveRow={activeRow} bind:query />
+	<TreeTable
+		data={tableData}
+		name={tableName}
+		bind:parentActiveRow={activeRows}
+		multipleSelect={false}
+		bind:query
+	/>
 </div>
 
 {#if confirmModals.active == 'deleteSnapshot' || confirmModals.active == 'deleteFilesystem'}

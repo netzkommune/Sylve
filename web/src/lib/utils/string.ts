@@ -9,6 +9,8 @@
  */
 
 import { getIcon, loadIcon } from '@iconify/svelte';
+import isCidr from 'is-cidr';
+import { isIP, isIPv4 } from 'is-ip';
 import { customRandom, nanoid } from 'nanoid';
 import { Mnemonic } from './vendor/mnemonic';
 
@@ -86,4 +88,43 @@ export function generateNanoId(seed?: string): string {
 	}
 
 	return nanoid(10);
+}
+
+export function isValidSwitchName(name: string): boolean {
+	const regex = /^[a-zA-Z0-9-_]+$/;
+	return regex.test(name);
+}
+
+export function isValidIPv4(ip: string, cidr: boolean = false): boolean {
+	try {
+		if (cidr && isCidr.v4(ip)) {
+			return true;
+		}
+
+		if (!cidr && isIPv4(ip)) {
+			return true;
+		}
+
+		return false;
+	} catch (e) {
+		console.log(e);
+		return false;
+	}
+}
+
+export function isValidIPv6(ip: string, cidr: boolean = false): boolean {
+	try {
+		if (cidr && isCidr.v6(ip)) {
+			return true;
+		}
+
+		if (!cidr && isIP(ip)) {
+			return true;
+		}
+
+		return false;
+	} catch (e) {
+		console.log(e);
+		return false;
+	}
 }

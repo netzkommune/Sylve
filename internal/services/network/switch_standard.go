@@ -25,6 +25,7 @@ func (s *Service) NewStandardSwitch(
 	mtu int,
 	vlan int,
 	address string,
+	address6 string,
 	ports []string,
 	private bool,
 ) error {
@@ -55,6 +56,7 @@ func (s *Service) NewStandardSwitch(
 		MTU:        mtu,
 		VLAN:       vlan,
 		Address:    address,
+		Address6:   address6,
 		BridgeName: utils.ShortHash("vm-" + name),
 		Private:    private,
 	}
@@ -85,6 +87,7 @@ func (s *Service) EditStandardSwitch(
 	mtu int,
 	vlan int,
 	address string,
+	address6 string,
 	ports []string,
 	private bool,
 ) error {
@@ -126,6 +129,7 @@ func (s *Service) EditStandardSwitch(
 	sw.MTU = mtu
 	sw.VLAN = vlan
 	sw.Address = address
+	sw.Address6 = address6
 	sw.BridgeName = newBridge
 	sw.Private = private
 
@@ -251,6 +255,12 @@ func createBridge(br string, sw networkModels.StandardSwitch) error {
 		}
 	}
 
+	if sw.Address6 != "" {
+		if _, err := utils.RunCommand("ifconfig", br, "inet6", sw.Address6); err != nil {
+			return fmt.Errorf("failed_to_set_bridge_address6: %v", err)
+		}
+	}
+
 	for _, port := range sw.Ports {
 		if err := configurePort(br, port.Name, sw.VLAN, sw.MTU); err != nil {
 			return fmt.Errorf("failed_to_configure_port %s: %v", port.Name, err)
@@ -273,6 +283,12 @@ func updateBridge(br string, sw networkModels.StandardSwitch) error {
 	if sw.Address != "" {
 		if _, err := utils.RunCommand("ifconfig", br, "inet", sw.Address); err != nil {
 			return fmt.Errorf("failed_to_set_bridge_address: %v", err)
+		}
+	}
+
+	if sw.Address6 != "" {
+		if _, err := utils.RunCommand("ifconfig", br, "inet6", sw.Address6); err != nil {
+			return fmt.Errorf("failed_to_set_bridge_address6: %v", err)
 		}
 	}
 

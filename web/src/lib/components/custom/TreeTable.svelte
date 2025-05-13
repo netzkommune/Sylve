@@ -18,72 +18,62 @@
 			columns: Column[];
 		};
 		name: string;
-		parentActiveRow?: Row | null;
+		parentActiveRow?: Row[] | null;
 		query?: string;
+		multipleSelect?: boolean;
 	}
 
-	let { data, name, parentActiveRow = $bindable(), query = $bindable() }: Props = $props();
+	let {
+		data,
+		name,
+		parentActiveRow = $bindable([]),
+		query = $bindable(),
+		multipleSelect = true
+	}: Props = $props();
+
 	let tableInitialized = $state(false);
 	let scroll = $state([0, 0]);
+	let aboutToClick = $state(false);
 
-	function selectParentActiveRow(row: RowComponent) {
-		const expandedRow = row.getData();
-		for (const column of data.columns) {
-			parentActiveRow = {
-				...parentActiveRow,
-				[`${column.field}`]: expandedRow[column.field],
-				id: expandedRow.id ?? parentActiveRow?.id ?? 0
-			};
+	function updateParentActiveRows() {
+		if (tableInitialized) {
+			parentActiveRow = table?.getSelectedRows().map((r) => r.getData() as Row) || [];
 		}
 	}
 
 	$effect(() => {
 		if (data.rows) {
 			untrack(async () => {
-				if (query && query !== '') {
-					return;
-				}
+				if (query && query !== '') return;
 
 				if (data.rows.length === 0) {
-					if (data.rows.length === 0) {
-						table?.clearData();
-					}
-
+					table?.clearData();
 					return;
 				}
 
 				const selectedIds = table?.getSelectedRows().map((row) => row.getData().id) || [];
-				const treeExpands =
-					getAllRows(table?.getRows() || []).map((row) => ({
-						id: row.getData().id,
-						expanded: row.isTreeExpanded()
-					})) || [];
+				const treeExpands = getAllRows(table?.getRows() || []).map((row) => ({
+					id: row.getData().id,
+					expanded: row.isTreeExpanded()
+				}));
 
-				if (hasRowsChanged(table, data.rows)) {
+				if (hasRowsChanged(table, data.rows) && !aboutToClick) {
 					await table?.replaceData(pruneEmptyChildren(data.rows));
 				}
 
 				selectedIds.forEach((id) => {
 					const row = findRow(table?.getRows() || [], id);
+					if (row) row.select();
+				});
+
+				treeExpands.forEach((treeExpand) => {
+					const row = findRow(table?.getRows() || [], treeExpand.id);
 					if (row) {
-						row.select();
-						selectParentActiveRow(row);
+						treeExpand.expanded ? row.treeExpand() : row.treeCollapse();
 					}
 				});
 
-				treeExpands?.forEach((treeExpand) => {
-					if (treeExpand.expanded) {
-						const row = findRow(table?.getRows() || [], treeExpand.id);
-						if (row) {
-							row.treeExpand();
-						}
-					} else {
-						const row = findRow(table?.getRows() || [], treeExpand.id);
-						if (row) {
-							row.treeCollapse();
-						}
-					}
-				});
+				updateParentActiveRows();
 			});
 		}
 	});
@@ -95,7 +85,7 @@
 				reactiveData: true,
 				columns: data.columns as ColumnDefinition[],
 				layout: 'fitColumns',
-				selectableRows: 1,
+				selectableRows: multipleSelect ? true : 1,
 				dataTreeChildIndent: 16,
 				dataTree: true,
 				dataTreeChildField: 'children',
@@ -114,27 +104,30 @@
 			});
 		}
 
-		table?.on('rowSelected', function (row: RowComponent) {
-			selectParentActiveRow(row);
+		table?.on('rowSelected', updateParentActiveRows);
+		table?.on('rowDeselected', updateParentActiveRows);
+
+		table?.on('rowDblClick', (_event: UIEvent, row: RowComponent) => {
+			row.toggleSelect();
 		});
 
-		table?.on('rowDeselected', function (row: RowComponent) {
-			parentActiveRow = null;
-		});
-
-		table?.on('rowDblClick', function (event: UIEvent, row: RowComponent) {
-			selectParentActiveRow(row);
-		});
-
-		table?.on('tableBuilt', function () {
+		table?.on('tableBuilt', () => {
 			tableInitialized = true;
+
+			document.querySelector('.tabulator-footer')?.addEventListener('mouseover', () => {
+				aboutToClick = true;
+			});
+
+			document.querySelector('.tabulator-footer')?.addEventListener('mouseout', () => {
+				aboutToClick = false;
+			});
 		});
 
-		table?.on('scrollVertical', function (top) {
+		table?.on('scrollVertical', (top) => {
 			scroll = [top, scroll[1]];
 		});
 
-		table?.on('scrollHorizontal', function (left) {
+		table?.on('scrollHorizontal', (left) => {
 			scroll = [scroll[0], left];
 		});
 
@@ -153,7 +146,7 @@
 				table.clearFilter(true);
 				return;
 			}
-			table.setFilter(matchAny, { query: query });
+			table.setFilter(matchAny, { query });
 		}
 	}
 

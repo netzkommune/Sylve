@@ -9,32 +9,34 @@
 	interface Props {
 		open: boolean;
 		label: string;
-		value: string;
+		value: string | string[];
 		data: { value: string; label: string }[];
-		onValueChange?: (value: string) => void;
+		onValueChange?: (value: string | string[]) => void;
 		placeholder?: string;
 		disabled?: boolean;
 		classes?: string;
 		width?: string;
 		disallowEmpty?: boolean;
+		multiple?: boolean;
 	}
 
 	let {
 		open = $bindable(false),
 		label = '',
-		value = $bindable(''),
 		data = [],
 		onValueChange = () => {},
 		placeholder = '',
 		disabled = false,
 		classes = 'space-y-1',
 		width = 'w-1/2',
-		disallowEmpty = false
+		disallowEmpty = false,
+		multiple = false,
+		value = $bindable(multiple ? [] : '')
 	}: Props = $props();
 
 	let search = $state('');
-	let lowerCaseLabel = $state(label.toLowerCase());
-	let filteredData = $derived.by(() => {
+
+	const filteredData = $derived.by(() => {
 		if (!search) return data;
 		const q = search.toLowerCase();
 		return data.filter(
@@ -43,25 +45,42 @@
 	});
 
 	function selectItem(val: string) {
-		if (value === val && !disallowEmpty) {
-			value = '';
-			onValueChange('');
+		if (multiple) {
+			// start with a fresh array copy
+			const arr = Array.isArray(value) ? [...value] : [];
+			const idx = arr.indexOf(val);
+			if (idx >= 0) {
+				arr.splice(idx, 1);
+			} else {
+				arr.push(val);
+			}
+			value = arr;
+			onValueChange(arr);
+			// keep open=true so you can pick more
 		} else {
-			value = val;
-			onValueChange(val);
+			if (value === val && !disallowEmpty) {
+				value = '';
+				onValueChange('');
+			} else {
+				value = val;
+				onValueChange(val);
+			}
+			open = false;
 		}
 		search = '';
-		open = false;
 	}
 
-	let selectedLabel = $derived.by(() => {
-		const selected = data.find((item) => item.value === value);
-		return selected ? selected.label : '';
+	const selectedLabels = $derived.by(() => {
+		const vals = multiple ? (Array.isArray(value) ? value : []) : value ? [value] : [];
+
+		return data.filter((d) => vals.includes(d.value)).map((d) => d.label);
 	});
 </script>
 
 <div class={classes}>
-	<Label class="w-24 whitespace-nowrap text-sm" for={lowerCaseLabel}>{label}</Label>
+	<Label class="w-24 whitespace-nowrap text-sm" for={label.toLowerCase()}>
+		{label}
+	</Label>
 	<Popover.Root bind:open>
 		<Popover.Trigger asChild let:builder>
 			<Button
@@ -69,11 +88,23 @@
 				variant="outline"
 				role="combobox"
 				aria-expanded={open}
-				class="w-full justify-between"
+				class="w-full flex-wrap justify-between gap-1"
 				{disabled}
 			>
-				{selectedLabel || placeholder}
-				<Icon icon="lucide:chevrons-up-down" class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+				{#if selectedLabels.length > 0}
+					{#each selectedLabels as lbl, i}
+						<span
+							class={multiple
+								? 'bg-secondary/100 rounded px-2 py-0.5 text-sm'
+								: 'rounded px-2 text-sm'}
+						>
+							{lbl}
+						</span>
+					{/each}
+				{:else}
+					<span class="opacity-50">{placeholder}</span>
+				{/if}
+				<Icon icon="lucide:chevrons-up-down" class="ml-auto h-4 w-4 shrink-0 opacity-50" />
 			</Button>
 		</Popover.Trigger>
 
@@ -87,13 +118,22 @@
 							<Command.Item
 								value={element.value}
 								onSelect={() => selectItem(element.value)}
-								onkeydown={(e) => {
+								on:keydown={(e) => {
 									if (e.key === 'Enter') selectItem(element.value);
 								}}
 							>
 								<Icon
 									icon="lucide:check"
-									class={cn('mr-2 h-4 w-4', value !== element.value && 'text-transparent')}
+									class={cn(
+										'mr-2 h-4 w-4',
+										multiple
+											? Array.isArray(value) && value.includes(element.value)
+												? 'opacity-100'
+												: 'opacity-0'
+											: value === element.value
+												? 'opacity-100'
+												: 'opacity-0'
+									)}
 								/>
 								{element.label}
 							</Command.Item>

@@ -1,6 +1,7 @@
 import { APIResponseSchema, type APIResponse } from '$lib/types/common';
 import { NoteSchema, NotesSchema, type Note, type Notes } from '$lib/types/info/notes';
 import { apiRequest } from '$lib/utils/http';
+import { z } from 'zod';
 
 async function notesRequest(
 	endpoint: string,
@@ -10,7 +11,7 @@ async function notesRequest(
 	let schema;
 
 	if (method === 'GET') {
-		schema = NotesSchema;
+		schema = z.array(NoteSchema);
 	} else if (method === 'POST') {
 		schema = NoteSchema;
 	} else {
@@ -33,4 +34,8 @@ export const updateNote = async (
 	content: string
 ): Promise<APIResponse> => {
 	return (await notesRequest(`/info/notes/${id}`, 'PUT', { title, content })) as APIResponse;
+};
+
+export const deleteNotes = async (ids: number[]): Promise<APIResponse> => {
+	return (await notesRequest('/info/notes/bulk-delete', 'POST', { ids })) as APIResponse;
 };

@@ -15,6 +15,7 @@ import (
 	"sylve/internal/config"
 	"sylve/internal/db/models"
 	"sylve/pkg/crypto"
+	"sylve/pkg/utils"
 )
 
 func (s *Service) GetSylveCertificate() (*tls.Config, error) {
@@ -50,7 +51,13 @@ func (s *Service) GetSylveCertificate() (*tls.Config, error) {
 
 	if len(certPEM) == 0 || len(keyPEM) == 0 {
 		var err error
-		certPEM, keyPEM, err = crypto.GenerateSelfSignedCertificate()
+		uuid, err := utils.GetSystemUUID()
+
+		if err != nil {
+			return nil, fmt.Errorf("failed to get system UUID: %w", err)
+		}
+
+		certPEM, keyPEM, err = crypto.GenerateDeterministicCertificate([]byte(uuid))
 		if err != nil {
 			return nil, fmt.Errorf("failed to generate self-signed certificate: %w", err)
 		}

@@ -10,8 +10,10 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"sylve/internal"
 )
 
@@ -53,12 +55,31 @@ func SetupDataPath() error {
 		ParsedConfig.DataPath = "./data"
 	}
 
-	if _, err := os.Stat(ParsedConfig.DataPath); os.IsNotExist(err) {
-		err := os.Mkdir(ParsedConfig.DataPath, 0755)
-		if err != nil {
-			return err
+	dirs := []string{
+		ParsedConfig.DataPath,
+		filepath.Join(ParsedConfig.DataPath, "downloads"),
+		filepath.Join(ParsedConfig.DataPath, "downloads", "torrents"),
+	}
+
+	for _, dir := range dirs {
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			return fmt.Errorf("failed to create directory %s: %w", dir, err)
 		}
 	}
 
 	return nil
+}
+
+func GetDownloadsPath(dType string) string {
+	if ParsedConfig == nil {
+		return "./data/downloads"
+	}
+
+	if dType == "torrents" {
+		return filepath.Join(ParsedConfig.DataPath, "downloads", "torrents")
+	} else if dType == "torrent.db" {
+		return filepath.Join(ParsedConfig.DataPath, "downloads", "torrents", "torrent.db")
+	}
+
+	return filepath.Join(ParsedConfig.DataPath, "downloads")
 }

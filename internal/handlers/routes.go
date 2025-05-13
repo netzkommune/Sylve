@@ -19,11 +19,13 @@ import (
 	infoHandlers "sylve/internal/handlers/info"
 	"sylve/internal/handlers/middleware"
 	networkHandlers "sylve/internal/handlers/network"
+	utilitiesHandlers "sylve/internal/handlers/utilities"
 	zfsHandlers "sylve/internal/handlers/zfs"
 	authService "sylve/internal/services/auth"
 	diskService "sylve/internal/services/disk"
 	infoService "sylve/internal/services/info"
 	networkService "sylve/internal/services/network"
+	utilitiesService "sylve/internal/services/utilities"
 	zfsService "sylve/internal/services/zfs"
 )
 
@@ -54,6 +56,7 @@ func RegisterRoutes(r *gin.Engine,
 	zfsService *zfsService.Service,
 	diskService *diskService.Service,
 	networkService *networkService.Service,
+	utilitiesService *utilitiesService.Service,
 ) {
 	api := r.Group("/api")
 
@@ -81,6 +84,7 @@ func RegisterRoutes(r *gin.Engine,
 			notes.POST("", infoHandlers.NotesHandler(infoService))
 			notes.DELETE("/:id", infoHandlers.NotesHandler(infoService))
 			notes.PUT("/:id", infoHandlers.NotesHandler(infoService))
+			notes.POST("/bulk-delete", infoHandlers.NotesHandler(infoService))
 		}
 
 		info.GET("/audit-logs", infoHandlers.AuditLogs(infoService))
@@ -142,6 +146,13 @@ func RegisterRoutes(r *gin.Engine,
 		network.POST("/switch/standard", networkHandlers.CreateStandardSwitch(networkService))
 		network.DELETE("/switch/standard/:id", networkHandlers.DeleteStandardSwitch(networkService))
 		network.PUT("/switch/standard", networkHandlers.UpdateStandardSwitch(networkService))
+	}
+
+	utilities := api.Group("/utilities")
+	utilities.Use(middleware.EnsureAuthenticated(authService))
+	{
+		utilities.POST("/download", utilitiesHandlers.DownloadFile(utilitiesService))
+		utilities.GET("/downloads", utilitiesHandlers.ListDownloads(utilitiesService))
 	}
 
 	auth := api.Group("/auth")

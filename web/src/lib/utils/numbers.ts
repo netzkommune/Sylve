@@ -68,3 +68,11 @@ export function parseFlexibleTimeToSeconds(input: string) {
 	const totalDays = years * 365 + months * 30 + days;
 	return totalDays * 86400 + hours * 3600 + minutes * 60 + seconds;
 }
+
+export function isValidMTU(mtu: number): boolean {
+	return mtu >= 68 && mtu <= 65535;
+}
+
+export function isValidVLAN(vlan: number): boolean {
+	return vlan >= 0 && vlan <= 4095;
+}

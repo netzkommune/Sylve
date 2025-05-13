@@ -10,11 +10,9 @@ export interface Column {
 	field: string;
 	title: string;
 	visible?: boolean;
-	formatter?: (
-		cell: CellComponent,
-		formatterParams: FormatterParams,
-		onRendered: EmptyCallback
-	) => void;
+	formatter?:
+		| ((cell: CellComponent, formatterParams: FormatterParams, onRendered: EmptyCallback) => void)
+		| string;
 }
 
 export type ExpandedRows = Record<number, boolean>;

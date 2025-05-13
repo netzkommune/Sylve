@@ -28,6 +28,15 @@ func NewInfoService(db *gorm.DB) infoServiceInterfaces.InfoServiceInterface {
 	}
 }
 
+func (s *Service) GetNoteByID(id int) (infoModels.Note, error) {
+	var note infoModels.Note
+	err := s.DB.First(&note, id).Error
+	if err != nil {
+		return infoModels.Note{}, err
+	}
+	return note, nil
+}
+
 func (s *Service) GetNotes() ([]infoModels.Note, error) {
 	var notes []infoModels.Note
 	err := s.DB.Find(&notes).Error
@@ -47,6 +56,28 @@ func (s *Service) DeleteNoteByID(id int) error {
 		return errors.New("record not found")
 	}
 	return result.Error
+}
+
+func (s *Service) BulkDeleteNotes(ids []int) error {
+	tx := s.DB.Begin()
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	if err := tx.Delete(&infoModels.Note{}, ids).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return err
+	}
+
+	if tx.RowsAffected == 0 {
+		return errors.New("no records found")
+	}
+
+	return nil
 }
 
 func (s *Service) UpdateNoteByID(id int, title, note string) error {

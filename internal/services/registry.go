@@ -14,6 +14,7 @@ import (
 	infoServiceInterfaces "sylve/internal/interfaces/services/info"
 	libvirtServiceInterfaces "sylve/internal/interfaces/services/libvirt"
 	networkServiceInterfaces "sylve/internal/interfaces/services/network"
+	utilitiesServiceInterfaces "sylve/internal/interfaces/services/utilities"
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
 	"sylve/internal/services/auth"
 	"sylve/internal/services/disk"
@@ -21,19 +22,21 @@ import (
 	"sylve/internal/services/libvirt"
 	"sylve/internal/services/network"
 	"sylve/internal/services/startup"
+	"sylve/internal/services/utilities"
 	"sylve/internal/services/zfs"
 
 	"gorm.io/gorm"
 )
 
 type ServiceRegistry struct {
-	AuthService    serviceInterfaces.AuthServiceInterface
-	StartupService serviceInterfaces.StartupServiceInterface
-	InfoService    infoServiceInterfaces.InfoServiceInterface
-	ZfsService     zfsServiceInterfaces.ZfsServiceInterface
-	DiskService    diskServiceInterfaces.DiskServiceInterface
-	NetworkService networkServiceInterfaces.NetworkServiceInterface
-	LibvirtService libvirtServiceInterfaces.LibvirtServiceInterface
+	AuthService      serviceInterfaces.AuthServiceInterface
+	StartupService   serviceInterfaces.StartupServiceInterface
+	InfoService      infoServiceInterfaces.InfoServiceInterface
+	ZfsService       zfsServiceInterfaces.ZfsServiceInterface
+	DiskService      diskServiceInterfaces.DiskServiceInterface
+	NetworkService   networkServiceInterfaces.NetworkServiceInterface
+	LibvirtService   libvirtServiceInterfaces.LibvirtServiceInterface
+	UtilitiesService utilitiesServiceInterfaces.UtilitiesServiceInterface
 }
 
 func NewService[T any](db *gorm.DB, dependencies ...interface{}) interface{} {
@@ -45,7 +48,8 @@ func NewService[T any](db *gorm.DB, dependencies ...interface{}) interface{} {
 		zfsService := dependencies[1].(zfsServiceInterfaces.ZfsServiceInterface)
 		networkService := dependencies[2].(networkServiceInterfaces.NetworkServiceInterface)
 		libvirtService := dependencies[3].(libvirtServiceInterfaces.LibvirtServiceInterface)
-		return startup.NewStartupService(db, infoService, zfsService, networkService, libvirtService)
+		utilitiesService := dependencies[4].(utilitiesServiceInterfaces.UtilitiesServiceInterface)
+		return startup.NewStartupService(db, infoService, zfsService, networkService, libvirtService, utilitiesService)
 	case *info.Service:
 		return info.NewInfoService(db)
 	case *zfs.Service:
@@ -56,6 +60,8 @@ func NewService[T any](db *gorm.DB, dependencies ...interface{}) interface{} {
 		return network.NewNetworkService(db)
 	case *libvirt.Service:
 		return libvirt.NewLibvirtService(db)
+	case *utilitiesServiceInterfaces.UtilitiesServiceInterface:
+		return utilities.NewUtilitiesService(db)
 	default:
 		return nil
 	}
@@ -67,14 +73,16 @@ func NewServiceRegistry(db *gorm.DB) *ServiceRegistry {
 	networkService := NewService[network.Service](db)
 	libvirtService := NewService[libvirt.Service](db)
 	zfsService := NewService[zfs.Service](db, libvirtService)
+	utilitiesService := NewService[utilitiesServiceInterfaces.UtilitiesServiceInterface](db)
 
 	return &ServiceRegistry{
-		AuthService:    authService.(serviceInterfaces.AuthServiceInterface),
-		StartupService: NewService[startup.Service](db, infoService, zfsService, networkService, libvirtService).(*startup.Service),
-		InfoService:    infoService.(infoServiceInterfaces.InfoServiceInterface),
-		ZfsService:     zfsService.(*zfs.Service),
-		DiskService:    NewService[disk.Service](db, zfsService).(*disk.Service),
-		NetworkService: networkService.(networkServiceInterfaces.NetworkServiceInterface),
-		LibvirtService: libvirtService.(libvirtServiceInterfaces.LibvirtServiceInterface),
+		AuthService:      authService.(serviceInterfaces.AuthServiceInterface),
+		StartupService:   NewService[startup.Service](db, infoService, zfsService, networkService, libvirtService, utilitiesService).(*startup.Service),
+		InfoService:      infoService.(infoServiceInterfaces.InfoServiceInterface),
+		ZfsService:       zfsService.(*zfs.Service),
+		DiskService:      NewService[disk.Service](db, zfsService).(*disk.Service),
+		NetworkService:   networkService.(networkServiceInterfaces.NetworkServiceInterface),
+		LibvirtService:   libvirtService.(libvirtServiceInterfaces.LibvirtServiceInterface),
+		UtilitiesService: utilitiesService.(utilitiesServiceInterfaces.UtilitiesServiceInterface),
 	}
 }

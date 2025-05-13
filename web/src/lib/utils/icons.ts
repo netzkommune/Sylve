@@ -19,7 +19,13 @@ const icons = [
 	'mdi:harddisk',
 	'bi:nvme',
 	'icon-park-outline:ssd',
-	'ant-design:partition-outlined'
+	'ant-design:partition-outlined',
+	'mdi:magnet',
+	'mdi:download',
+	'mdi:file',
+	'mingcute:file-fill',
+	'line-md:downloading-loop',
+	'lets-icons:check-fill'
 ];
 
 export async function preloadIcons() {

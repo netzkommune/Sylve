@@ -15,5 +15,5 @@ type Note struct {
 	Title     string    `json:"title"`
 	Content   string    `json:"content"`
 	CreatedAt time.Time `gorm:"autoCreateTime" json:"createdAt,omitempty"`
-	UpdateAt  time.Time `gorm:"autoUpdateTime" json:"updateAt,omitempty"`
+	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"updatedAt,omitempty"`
 }

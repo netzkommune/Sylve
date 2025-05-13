@@ -16,12 +16,13 @@ type ListSwitchResponse struct {
 }
 
 type CreateStandardSwitchRequest struct {
-	Name    string   `json:"name" binding:"required"`
-	MTU     int      `json:"mtu" binding:"required"`
-	VLAN    int      `json:"vlan"`
-	Address string   `json:"address"`
-	Private *bool    `json:"private" binding:"required"`
-	Ports   []string `json:"ports" binding:"required"`
+	Name     string   `json:"name" binding:"required"`
+	MTU      int      `json:"mtu" binding:"required"`
+	VLAN     int      `json:"vlan"`
+	Address  string   `json:"address"`
+	Address6 string   `json:"address6"`
+	Private  *bool    `json:"private" binding:"required"`
+	Ports    []string `json:"ports" binding:"required"`
 }
 
 type UpdateStandardSwitchRequest struct {
@@ -102,7 +103,7 @@ func CreateStandardSwitch(networkService *network.Service) gin.HandlerFunc {
 			*request.Private = false
 		}
 
-		err := networkService.NewStandardSwitch(request.Name, request.MTU, request.VLAN, request.Address, request.Ports, *request.Private)
+		err := networkService.NewStandardSwitch(request.Name, request.MTU, request.VLAN, request.Address, request.Address6, request.Ports, *request.Private)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 				Status:  "error",
@@ -200,7 +201,7 @@ func UpdateStandardSwitch(networkService *network.Service) gin.HandlerFunc {
 			return
 		}
 
-		err := networkService.EditStandardSwitch(request.ID, request.Name, request.MTU, request.VLAN, request.Address, request.Ports, *request.Private)
+		err := networkService.EditStandardSwitch(request.ID, request.Name, request.MTU, request.VLAN, request.Address, request.Address6, request.Ports, *request.Private)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 				Status:  "error",

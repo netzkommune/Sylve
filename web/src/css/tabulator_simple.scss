@@ -175,7 +175,7 @@
 
 	@media (hover: hover) and (pointer: fine) {
 		&.tabulator-selectable:hover {
-			@apply bg-background hover:bg-muted;
+			// @apply bg-background hover:bg-muted;
 			cursor: pointer;
 		}
 	}
@@ -194,7 +194,7 @@
 
 	@media (hover: hover) and (pointer: fine) {
 		&.tabulator-selectable:hover {
-			@apply bg-background hover:bg-muted;
+			// @apply bg-background hover:bg-muted;
 			cursor: pointer;
 		}
 	}

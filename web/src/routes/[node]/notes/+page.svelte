@@ -1,37 +1,54 @@
 <script lang="ts">
-	import { createNote, deleteNote, updateNote } from '$lib/api/info/notes';
+	import { createNote, deleteNote, deleteNotes, getNotes, updateNote } from '$lib/api/info/notes';
 	import AlertDialog from '$lib/components/custom/AlertDialog.svelte';
+	import TreeTable from '$lib/components/custom/TreeTable.svelte';
+	import Search from '$lib/components/custom/TreeTable/Search.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { Label } from '$lib/components/ui/label/index.js';
 	import ScrollArea from '$lib/components/ui/scroll-area/scroll-area.svelte';
-	import * as Table from '$lib/components/ui/table/index.js';
-	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import type { APIResponse } from '$lib/types/common';
-	import type { Note, Notes } from '$lib/types/info/notes';
-	import { handleValidationErrors, isAPIResponse } from '$lib/utils/http';
+	import type { Row } from '$lib/types/components/tree-table';
+	import type { Note } from '$lib/types/info/notes';
+	import { handleValidationErrors, isAPIResponse, updateCache } from '$lib/utils/http';
+	import { getTranslation } from '$lib/utils/i18n';
+	import { generateTableData, markdownToTailwindHTML } from '$lib/utils/info/notes';
+	import { capitalizeFirstLetter } from '$lib/utils/string';
 	import Icon from '@iconify/svelte';
-	import { marked } from 'marked';
+	import { useQueries } from '@sveltestack/svelte-query';
 	import toast from 'svelte-french-toast';
 
 	interface Data {
-		notes: Notes;
+		notes: Note[];
 	}
 
 	let { data }: { data: Data } = $props();
+	const results = useQueries([
+		{
+			queryKey: ['notes'],
+			queryFn: async () => {
+				return (await getNotes()) as Note[];
+			},
+			refetchInterval: 1000,
+			keepPreviousData: true,
+			initialData: data.notes,
+			onSuccess: (data: Note[]) => {
+				updateCache('notes', data);
+			}
+		}
+	]);
 
-	let tableData = $state(data.notes);
+	let notes: Note[] = $derived($results[0].data as Note[]);
 	let modalState = $state({
 		title: '',
 		content: '',
 		isOpen: false,
 		isEditMode: false,
-		isDeleteOpen: false
+		isDeleteOpen: false,
+		isBulkDeleteOpen: false
 	});
 
 	let selectedId: number | null = $state(null);
-	let toRemove: Note | null = $state(null);
 
 	function handleNote(note?: Note, editMode: boolean = true, reset: boolean = false) {
 		if (reset) {
@@ -40,6 +57,9 @@
 			selectedId = null;
 			modalState.isEditMode = false;
 			modalState.isOpen = false;
+			modalState.isDeleteOpen = false;
+			modalState.isBulkDeleteOpen = false;
+			activeRow = null;
 		} else {
 			modalState.title = note?.title || '';
 			modalState.content = note?.content || '';
@@ -51,63 +71,155 @@
 
 	async function saveNote() {
 		if (!modalState.title.trim() || !modalState.content.trim()) return;
-
-		const noteData = { title: modalState.title, content: modalState.content };
-		let result: APIResponse | Note;
-
 		if (modalState.isEditMode && selectedId !== null) {
-			result = await updateNote(selectedId, noteData.title, noteData.content);
-			if (isAPIResponse(result) && result.status === 'success') {
-				tableData = [
-					...tableData.map((note) => (note.id === selectedId ? { ...note, ...noteData } : note))
-				];
-			}
-		} else {
-			result = await createNote(noteData.title, noteData.content);
-			if (!isAPIResponse(result)) {
-				tableData = [...tableData, result];
-			}
-		}
-
-		if (isAPIResponse(result) && result.status === 'error') {
-			handleValidationErrors(result, 'notes');
-		} else {
-			handleNote(undefined, false, true);
-		}
-	}
-
-	async function handleRemoveNote(id?: number, confirm: boolean = false) {
-		if (!confirm) {
-			selectedId = id as number;
-			toRemove = tableData.find((note) => note.id === id) || null;
-			modalState.isDeleteOpen = true;
-		} else {
-			const response = (await deleteNote(selectedId as number)) as APIResponse;
+			const response = await updateNote(selectedId, modalState.title, modalState.content);
 			if (response.status === 'success') {
-				tableData = tableData.filter((note) => note.id !== selectedId);
+				toast.success(
+					`${capitalizeFirstLetter(getTranslation('notes.note', 'Note'))} ${modalState.title} ${getTranslation('common.updated', 'updated')}`,
+					{ position: 'bottom-center' }
+				);
+				handleNote(undefined, false, true);
 			} else {
-				toast.error(response.message || 'Failed to delete note', {
-					position: 'bottom-center'
-				});
+				handleValidationErrors(response, 'notes');
 			}
-			modalState.isDeleteOpen = false;
+		} else {
+			const response = await createNote(modalState.title, modalState.content);
+			if ((response as Note).id) {
+				toast.success(
+					`${capitalizeFirstLetter(getTranslation('notes.note', 'Note'))} ${modalState.title} ${getTranslation('common.created', 'created')}`,
+					{ position: 'bottom-center' }
+				);
+				handleNote(undefined, false, true);
+			}
+
+			if ((response as APIResponse).status) {
+				handleValidationErrors(response as APIResponse, 'notes');
+			}
 		}
 	}
+
+	function viewNote(id: number | string | undefined) {
+		const note = notes.find((note) => note.id === id);
+		if (note) {
+			modalState.title = note.title;
+			modalState.content = note.content;
+			modalState.isEditMode = false;
+			modalState.isOpen = true;
+		}
+	}
+
+	function handleDelete(id: number | string | undefined) {
+		const note = notes.find((note) => note.id === id);
+		if (note) {
+			modalState.title = note.title;
+			modalState.content = note.content;
+			modalState.isEditMode = false;
+			modalState.isDeleteOpen = true;
+		}
+	}
+
+	function handleBulkDelete(ids: number[]) {
+		const notesToDelete = notes.filter((note) => ids.includes(note.id));
+		if (notesToDelete.length > 0) {
+			modalState.title = `${notesToDelete.length} ${getTranslation('notes.notes', 'notes')}`;
+			modalState.isBulkDeleteOpen = true;
+		}
+	}
+
+	let tableName = 'tt-notes';
+	let tableData = $derived(generateTableData(notes));
+	let activeRow: Row[] | null = $state(null);
+	let query: string = $state('');
 </script>
 
+{#snippet button(type: string)}
+	{#if activeRow !== null && activeRow.length === 1}
+		{#if type === 'view-note'}
+			<Button
+				on:click={() => activeRow && viewNote(activeRow[0]?.id)}
+				size="sm"
+				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+			>
+				<Icon icon="mdi:eye" class="mr-1 h-4 w-4" />
+				{capitalizeFirstLetter(getTranslation('common.view', 'View'))}
+			</Button>
+		{/if}
+
+		{#if type === 'delete-note'}
+			<Button
+				on:click={() => activeRow && handleDelete(activeRow[0]?.id)}
+				size="sm"
+				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+			>
+				<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
+				{capitalizeFirstLetter(getTranslation('common.delete', 'Delete'))}
+			</Button>
+		{/if}
+
+		{#if type === 'edit-note'}
+			<Button
+				on:click={() => {
+					const note = notes.find((note) => activeRow && note.id === activeRow[0]?.id);
+					handleNote(note, true);
+				}}
+				size="sm"
+				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+			>
+				<Icon icon="mdi:note-edit" class="mr-1 h-4 w-4" />
+				{capitalizeFirstLetter(getTranslation('common.edit', 'Edit'))}
+			</Button>
+		{/if}
+	{/if}
+
+	{#if activeRow !== null && activeRow.length > 1}
+		{#if type === 'bulk-delete-note'}
+			<Button
+				on:click={() => {
+					const ids = activeRow?.map((row) => row.id) || [];
+					handleBulkDelete(ids as number[]);
+				}}
+				size="sm"
+				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+			>
+				<Icon icon="material-symbols:delete-sweep" class="mr-1 h-4 w-4" />
+				{capitalizeFirstLetter(getTranslation('common.bulk', 'Bulk'))}
+				{capitalizeFirstLetter(getTranslation('common.delete', 'Delete'))}
+			</Button>
+		{/if}
+	{/if}
+{/snippet}
+
 <div class="flex h-full w-full flex-col">
-	<div class="flex h-10 w-full items-center border-b p-2">
+	<div class="flex h-10 w-full items-center gap-2 border p-2">
+		<Search bind:query />
+
 		<Button onclick={() => handleNote()} size="sm" class="h-6  ">
-			<Icon icon="gg:add" class="mr-1 h-4 w-4" /> New
+			<Icon icon="gg:add" class="mr-1 h-4 w-4" />
+			{capitalizeFirstLetter(getTranslation('common.new', 'New'))}
 		</Button>
+
+		{@render button('view-note')}
+		{@render button('edit-note')}
+		{@render button('delete-note')}
+		{@render button('bulk-delete-note')}
 	</div>
 
-	<Dialog.Root bind:open={modalState.isOpen}>
+	<Dialog.Root bind:open={modalState.isOpen} closeOnOutsideClick={false}>
 		<Dialog.Content class="w-[80%] gap-0 overflow-hidden p-3 lg:max-w-3xl">
-			<div class="flex items-center justify-between py-2">
+			<div class="flex items-center justify-between py-1 pb-2">
 				<Dialog.Header class="flex-1">
 					<Dialog.Title>
-						{modalState.isEditMode ? (selectedId ? 'Edit Note' : 'New Note') : 'View Note'}
+						<div class="flex items-center gap-2">
+							<Icon icon={modalState.isEditMode ? 'mdi:note-edit' : 'mdi:note'} class="h-5 w-5" />
+							<span
+								>{modalState.isEditMode
+									? selectedId
+										? capitalizeFirstLetter(getTranslation('common.edit', 'Edit'))
+										: capitalizeFirstLetter(getTranslation('common.new', 'New'))
+									: capitalizeFirstLetter(getTranslation('common.view', 'View'))}
+								{capitalizeFirstLetter(getTranslation('notes.note', 'Note'))}</span
+							>
+						</div>
 					</Dialog.Title>
 				</Dialog.Header>
 				<div class="flex items-center gap-0.5">
@@ -115,51 +227,63 @@
 						size="sm"
 						variant="ghost"
 						class="h-8"
+						title={capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}
 						on:click={() => {
 							modalState.title = '';
 							modalState.content = '';
 						}}
 					>
 						<Icon icon="radix-icons:reset" class="h-4 w-4" />
-						<span class="sr-only">Reset</span>
+						<span class="sr-only"
+							>{capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}</span
+						>
 					</Button>
-					<Dialog.Close
-						class="flex h-5 w-5 items-center justify-center rounded-sm opacity-70 transition-opacity hover:opacity-100"
+					<Button
+						size="sm"
+						variant="ghost"
+						class="h-8"
+						title={capitalizeFirstLetter(getTranslation('common.close', 'Close'))}
+						on:click={() => {
+							modalState.isOpen = false;
+							modalState.title = '';
+							modalState.content = '';
+						}}
 					>
-						<Icon icon="material-symbols:close-rounded" class="h-5 w-5" />
-					</Dialog.Close>
+						<Icon icon="material-symbols:close-rounded" class="h-4 w-4" />
+						<span class="sr-only"
+							>{capitalizeFirstLetter(getTranslation('common.close', 'Close'))}</span
+						>
+					</Button>
 				</div>
 			</div>
 
-			<div>
-				<Label for="title">Title</Label>
-				<div class="p-1">
-					<Input
-						type="text"
-						id="title"
-						bind:value={modalState.title}
-						class="mt-2"
-						placeholder="Enter title"
-						disabled={!modalState.isEditMode}
-					/>
-				</div>
-			</div>
+			<CustomValueInput
+				label={capitalizeFirstLetter(getTranslation('common.name', 'Name'))}
+				placeholder="Post Upgrade Summary"
+				bind:value={modalState.title}
+				classes="flex-1 space-y-1"
+			/>
 
 			<div class="mt-2">
-				<Label for="content">Content</Label>
-				<ScrollArea orientation="vertical" class="h-96">
+				<ScrollArea orientation="vertical" class="h-full">
 					{#if modalState.isEditMode}
 						<div class="p-1">
-							<Textarea
+							<CustomValueInput
+								label={capitalizeFirstLetter(getTranslation('common.name', 'Name'))}
+								placeholder="Content"
 								bind:value={modalState.content}
-								class="mt-2 h-[360px] w-full"
-								placeholder="Write in Markdown format"
+								classes="flex-1 space-y-1"
+								type="textarea"
 							/>
 						</div>
 					{:else}
 						<div class="p-1">
+							<label
+								class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+								>{capitalizeFirstLetter(getTranslation('common.content', 'Content'))}</label
+							>
 							<article class="prose lg:prose-xl">
-								{@html marked(modalState.content)}
+								{@html markdownToTailwindHTML(modalState.content)}
 							</article>
 						</div>
 					{/if}
@@ -167,86 +291,57 @@
 			</div>
 
 			<Dialog.Footer class="flex justify-end">
-				<div class="flex w-full items-center justify-between gap-2 px-3 py-2">
-					<Button type="submit" size="sm" class="h-7">Help</Button>
-
-					<div class="flex gap-2">
-						<Dialog.Close>
-							<Button
-								variant="outline"
-								class="h-7"
-								on:click={() => handleNote(undefined, false, true)}>Cancel</Button
-							>
-						</Dialog.Close>
-						{#if modalState.isEditMode}
-							<Button
-								onclick={saveNote}
-								type="submit"
-								size="sm"
-								class="h-7 w-16 bg-blue-600 text-white hover:bg-blue-700"
-							>
-								Ok
-							</Button>
-						{/if}
-					</div>
+				<div class="flex w-full items-center justify-end gap-2 px-1 py-2">
+					{#if modalState.isEditMode}
+						<Button onclick={saveNote} type="submit" size="sm"
+							>{capitalizeFirstLetter(getTranslation('common.save', 'Save'))}</Button
+						>
+					{/if}
 				</div>
 			</Dialog.Footer>
 		</Dialog.Content>
 	</Dialog.Root>
 
 	<div class="flex h-full flex-col overflow-hidden">
-		<Table.Root class="w-full table-fixed border-collapse">
-			<Table.Header class="sticky top-0 z-[50] bg-background">
-				<Table.Row>
-					<Table.Head class="h-10 px-4 py-2">Title</Table.Head>
-					<Table.Head class="h-10 px-4 py-2">Content</Table.Head>
-					<Table.Head class="h-10 px-4 py-2"></Table.Head>
-				</Table.Row>
-			</Table.Header>
-
-			<Table.Body class="flex-grow overflow-auto pb-32">
-				{#each tableData as data}
-					<Table.Row>
-						<Table.Cell class="h-10 px-4 py-2">{data.title}</Table.Cell>
-						<Table.Cell class="h-10 truncate px-4 py-2">
-							{data.content}
-						</Table.Cell>
-						<Table.Cell class="flex h-10 gap-2 px-4 py-2">
-							<Button
-								size="sm"
-								variant="ghost"
-								class="h-8"
-								on:click={() => handleNote(data, false)}
-							>
-								<Icon icon="mdi-light:eye" class="h-4 w-4" />
-							</Button>
-							<Button size="sm" variant="ghost" class="h-8" on:click={() => handleNote(data, true)}>
-								<Icon icon="mingcute:edit-line" class="h-4 w-4" />
-							</Button>
-							<Button
-								size="sm"
-								variant="ghost"
-								class="h-8"
-								on:click={() => handleRemoveNote(data.id)}
-							>
-								<Icon icon="gg:trash" class="h-4 w-4" />
-							</Button>
-						</Table.Cell>
-					</Table.Row>
-				{/each}
-			</Table.Body>
-		</Table.Root>
+		<TreeTable data={tableData} name={tableName} bind:parentActiveRow={activeRow} bind:query />
 	</div>
 
 	<AlertDialog
 		open={modalState.isDeleteOpen}
-		names={{ parent: 'note', element: toRemove?.title || '' }}
+		names={{ parent: 'note', element: modalState?.title || '' }}
 		actions={{
-			onConfirm: () => {
-				handleRemoveNote(undefined, true);
+			onConfirm: async () => {
+				const id = activeRow ? activeRow[0]?.id : null;
+				const result = await deleteNote(id as number);
+				if (isAPIResponse(result) && result.status === 'success') {
+					handleNote(undefined, false, true);
+				} else {
+					handleValidationErrors(result as APIResponse, 'notes');
+				}
 			},
 			onCancel: () => {
 				modalState.isDeleteOpen = false;
+			}
+		}}
+	></AlertDialog>
+
+	<AlertDialog
+		open={modalState.isBulkDeleteOpen}
+		names={{ parent: '', element: modalState?.title || '' }}
+		actions={{
+			onConfirm: async () => {
+				const ids = activeRow
+					? activeRow.map((row) => (typeof row.id === 'number' ? row.id : parseInt(row.id)))
+					: [];
+				const result = await deleteNotes(ids);
+				if (isAPIResponse(result) && result.status === 'success') {
+					handleNote(undefined, false, true);
+				} else {
+					handleValidationErrors(result as APIResponse, 'notes');
+				}
+			},
+			onCancel: () => {
+				modalState.isBulkDeleteOpen = false;
 			}
 		}}
 	></AlertDialog>

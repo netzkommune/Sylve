@@ -8,11 +8,10 @@
 	import { type Iface } from '$lib/types/network/iface';
 	import { updateCache } from '$lib/utils/http';
 	import { getTranslation } from '$lib/utils/i18n';
-	import { generateTableData } from '$lib/utils/network/iface';
+	import { generateTableData, getCleanIfaceData } from '$lib/utils/network/iface';
 	import { capitalizeFirstLetter } from '$lib/utils/string';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
-	import { Description } from 'formsnap';
 
 	interface Data {
 		interfaces: Iface[];
@@ -36,7 +35,7 @@
 	]);
 
 	let tableData = $derived(generateTableData($results[0].data as Iface[]));
-	let activeRow: Row | null = $state(null);
+	let activeRow: Row[] | null = $state(null);
 	let query: string = $state('');
 	let viewModal = $state({
 		title: '',
@@ -55,57 +54,22 @@
 	function viewInterface(iface: string) {
 		const ifaceData = $results[0].data?.find((i: Iface) => i.name === iface);
 		if (ifaceData) {
-			viewModal.KV = {
-				Name: ifaceData.name,
-				Description: ifaceData.description || '-',
-				Model: ifaceData.model,
-				'MAC Address': ifaceData.ether || '-',
-				MTU: ifaceData.mtu,
-				Metric: ifaceData.metric,
-				Flags: {
-					Raw: ifaceData.flags.raw,
-					Description: ifaceData.flags.desc?.join(', ')
-				},
-				'Enabled Capabilties': {
-					Raw: ifaceData.capabilities.enabled.raw,
-					Description: ifaceData.capabilities.enabled.desc?.join(', ')
-				},
-				'Supported Capabilities': {
-					Raw: ifaceData.capabilities.supported.raw,
-					Description: ifaceData.capabilities.supported.desc?.join(', ')
-				}
-			};
-
-			if (ifaceData.media !== null && ifaceData.media !== undefined) {
-				viewModal.KV = {
-					...viewModal.KV,
-					'Media Options': {
-						Status: ifaceData.media.status,
-						Type: ifaceData.media.type,
-						'Sub Type': ifaceData.media.subtype,
-						Mode: ifaceData.media.mode,
-						Options: ifaceData.media.options?.join(', ') || '-'
-					}
-				};
-			}
-
+			viewModal.KV = getCleanIfaceData(ifaceData);
 			viewModal.title = `${capitalizeFirstLetter(getTranslation('common.details', 'Details'))} - ${ifaceData.name}`;
 			viewModal.open = true;
 		}
 	}
-
-	console.log($results[0].data as Iface[]);
 </script>
 
 {#snippet button(type: string)}
-	{#if type === 'view' && activeRow !== null}
+	{#if type === 'view' && activeRow !== null && activeRow.length > 0}
 		<Button
-			on:click={() => viewInterface(activeRow?.name)}
+			on:click={() => activeRow !== null && viewInterface(activeRow[0]?.name)}
 			size="sm"
-			class="h-6 bg-muted-foreground/40 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:bg-muted dark:text-white"
+			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
 			<Icon icon="mdi:eye" class="mr-1 h-4 w-4" />
-			View
+			{capitalizeFirstLetter(getTranslation('common.view', 'View'))}
 		</Button>
 	{/if}
 {/snippet}
@@ -118,6 +82,7 @@
 
 	<KvTableModal
 		titles={{
+			icon: 'carbon:network-interface',
 			main: viewModal.title,
 			key: viewModal.key,
 			value: viewModal.value
@@ -131,6 +96,7 @@
 	<TreeTable
 		data={tableData}
 		name="tt-networkInterfaces"
+		multipleSelect={false}
 		bind:parentActiveRow={activeRow}
 		bind:query
 	/>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
+	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import { generateNanoId } from '$lib/utils/string';
 	import type { FullAutoFill } from 'svelte/elements';
 
@@ -27,5 +28,10 @@
 
 <div class={classes}>
 	<Label for={nanoId}>{label}</Label>
-	<Input {type} id={nanoId} {placeholder} {autocomplete} bind:value />
+
+	{#if type === 'textarea'}
+		<Textarea id={nanoId} {placeholder} {autocomplete} bind:value />
+	{:else}
+		<Input {type} id={nanoId} {placeholder} {autocomplete} bind:value />
+	{/if}
 </div>

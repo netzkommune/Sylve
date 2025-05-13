@@ -96,8 +96,15 @@
 			]
 		},
 		{
-			label: 'notifications',
-			icon: 'mdi:notifications'
+			label: 'utilities',
+			icon: 'mdi:tools',
+			children: [
+				{
+					label: 'downloader',
+					icon: 'material-symbols:download',
+					href: `/${node}/utilities/downloader`
+				}
+			]
 		}
 	]);
 

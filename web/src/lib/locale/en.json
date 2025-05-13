@@ -32,7 +32,9 @@
 		"notifications": "Notifications",
 		"volumes": "Volumes",
 		"snapshots": "Snapshots",
-		"switches": "Switches"
+		"switches": "Switches",
+		"utilities": "Utilities",
+		"downloader": "Downloader"
 	},
 	"summary": {
 		"CPU_s": "CPU(s)",
@@ -46,9 +48,14 @@
 		"io_delay": "I/O Delay"
 	},
 	"notes": {
-		"note": "Note",
-		"note_l": "note",
-		"title": "Title"
+		"note": "note",
+		"notes": "notes",
+		"title": "title",
+		"content": "content",
+		"created": "note created",
+		"updated": "note updated",
+		"delete": "note deleted",
+		"bulk_delete": "notes deleted"
 	},
 	"disk": {
 		"smart": "S.M.A.R.T.",
@@ -74,6 +81,19 @@
 		"model": "Model",
 		"serial": "Serial",
 		"wearout": "Wearout"
+	},
+	"network": {
+		"switch": {},
+		"mtu": "MTU",
+		"vlan": "VLAN",
+		"ipv4": "IPv4",
+		"ipv6": "IPv6",
+		"model": "model",
+		"mac_address": "MAC address",
+		"enabled_capabilities": "enabled capabilities",
+		"supported_capabilities": "supported capabilities",
+		"media_options": "media options",
+		"sub_type": "sub type"
 	},
 	"partition": {
 		"create": "Create Partition"
@@ -173,7 +193,21 @@
 		"volume": "volume",
 		"deleted": "deleted",
 		"prefix": "prefix",
-		"details": "details"
+		"details": "details",
+		"updated": "updated",
+		"view": "view",
+		"edit": "edit",
+		"reset": "reset",
+		"close": "close",
+		"OK": "OK",
+		"save": "save",
+		"bulk": "bulk",
+		"ID": "ID",
+		"id": "id",
+		"description": "description",
+		"raw": "raw",
+		"mode": "mode",
+		"search": "search"
 	},
 	"validation_errors": {
 		"failed validation: min": "too small"

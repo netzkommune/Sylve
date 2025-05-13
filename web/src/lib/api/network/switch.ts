@@ -11,6 +11,7 @@ export async function createSwitch(
 	mtu: number,
 	vlan: number,
 	address: string,
+	address6: string,
 	privateSw: boolean,
 	ports: string[]
 ): Promise<APIResponse> {
@@ -19,6 +20,7 @@ export async function createSwitch(
 		mtu,
 		vlan,
 		address,
+		address6,
 		private: privateSw,
 		ports
 	};

@@ -1,0 +1,98 @@
+import type { Column, Row } from '$lib/types/components/tree-table';
+import type { Download } from '$lib/types/utilities/downloader';
+import humanFormat from 'human-format';
+import type { CellComponent } from 'tabulator-tables';
+import { getTranslation } from '../i18n';
+import { generateNumberFromString } from '../numbers';
+import { renderWithIcon } from '../table';
+
+export function generateTableData(data: Download[]): { rows: Row[]; columns: Column[] } {
+	const columns: Column[] = [
+		{
+			field: 'id',
+			title: 'ID',
+			visible: false
+		},
+		{
+			field: 'name',
+			title: 'Name',
+			formatter: (cell: CellComponent) => {
+				const value = cell.getValue();
+				const row = cell.getRow();
+				const data = row.getData();
+				if (data.children && data.children.length > 0) {
+					if (data.type === 'torrent') {
+						return renderWithIcon('mdi:magnet', value);
+					} else if (data.type === 'ddl') {
+						return renderWithIcon('mdi:download', value);
+					} else {
+						return renderWithIcon('mdi:file', value);
+					}
+				}
+
+				return renderWithIcon('mdi:file', value);
+			}
+		},
+		{
+			field: 'size',
+			title: getTranslation('disk.size', 'Size'),
+			formatter: (cell: CellComponent) => {
+				return humanFormat(cell.getValue());
+			}
+		},
+		{
+			field: 'type',
+			title: 'Type',
+			visible: false
+		},
+		{
+			field: 'progress',
+			title: 'Progress',
+			formatter: (cell: CellComponent) => {
+				const value = cell.getValue();
+
+				if (value === '-') {
+					return '-';
+				}
+
+				if (value >= 0 && value < 100) {
+					return renderWithIcon('line-md:downloading-loop', `${value} %`);
+				}
+
+				return renderWithIcon('lets-icons:check-fill', '100 %');
+			}
+		}
+	];
+
+	const rows: Row[] = [];
+
+	for (const download of data) {
+		const row: Row = {
+			id: download.id,
+			name: download.name,
+			size: download.size,
+			type: download.type,
+			progress: download.progress,
+			children: []
+		};
+
+		for (const file of download.files) {
+			const childRow: Row = {
+				id: generateNumberFromString(file.id + 'file'),
+				name: file.name,
+				size: file.size,
+				children: [],
+				progress: '-'
+			};
+
+			row.children?.push(childRow);
+		}
+
+		rows.push(row);
+	}
+
+	return {
+		rows: rows,
+		columns: columns
+	};
+}

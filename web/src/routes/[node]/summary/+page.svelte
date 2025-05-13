@@ -276,7 +276,8 @@
 				<Card.Root class="w-full">
 					<Card.Header>
 						<Card.Title>
-							<div class="flex items-center justify-between space-x-2">
+							<div class="flex items-center space-x-2">
+								<Icon icon="solar:cpu-bold" class="h-5 w-5" />
 								<p>{getTranslation('summary.cpu_usage', 'CPU Usage')}</p>
 							</div>
 						</Card.Title>

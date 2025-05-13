@@ -16,6 +16,7 @@ type InfoServiceInterface interface {
 	GetRAMInfo() (ramInfo RAMInfo, err error)
 	GetSwapInfo() (swapInfo SwapInfo, err error)
 
+	GetNoteByID(id int) (infoModels.Note, error)
 	GetNotes() ([]infoModels.Note, error)
 	AddNote(title, note string) (infoModels.Note, error)
 	DeleteNoteByID(id int) error

@@ -279,3 +279,19 @@ func ShortHash(input string) string {
 	num := binary.BigEndian.Uint64(hash[:8]) >> 16
 	return EncodeBase62(num, 8)
 }
+
+func JoinStrings(slice []string, sep string) string {
+	if len(slice) == 0 {
+		return ""
+	}
+	if len(slice) == 1 {
+		return slice[0]
+	}
+	var sb strings.Builder
+	sb.WriteString(slice[0])
+	for _, s := range slice[1:] {
+		sb.WriteString(sep)
+		sb.WriteString(s)
+	}
+	return sb.String()
+}

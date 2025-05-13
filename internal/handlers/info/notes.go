@@ -9,7 +9,9 @@
 package infoHandlers
 
 import (
+	"fmt"
 	"net/http"
+	"strings"
 	"sylve/internal"
 	infoModels "sylve/internal/db/models/info"
 	"sylve/internal/services/info"
@@ -24,13 +26,22 @@ type NoteRequest struct {
 	Content string `json:"content" binding:"required,min=3"`
 }
 
+type BulkDeleteRequest struct {
+	IDs []int `json:"ids" binding:"required"`
+}
+
 func NotesHandler(infoService *info.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		switch c.Request.Method {
 		case http.MethodGet:
 			handleGetNotes(c, infoService)
 		case http.MethodPost:
-			handlePostNotes(c, infoService)
+			if strings.HasSuffix(c.Request.URL.Path, "bulk-delete") {
+				handleBulkDeleteNotes(c, infoService)
+				return
+			} else {
+				handlePostNotes(c, infoService)
+			}
 		case http.MethodDelete:
 			handleDeleteNoteByID(c, infoService)
 		case http.MethodPut:
@@ -99,6 +110,7 @@ func handlePostNotes(c *gin.Context, infoService *info.Service) {
 		return
 	}
 
+	id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("notes.created|-|%s", req.Title), "started")
 	note, err := infoService.AddNote(req.Title, req.Content)
 
 	if err != nil {
@@ -108,6 +120,8 @@ func handlePostNotes(c *gin.Context, infoService *info.Service) {
 			Error:   err.Error(),
 			Data:    nil,
 		})
+
+		infoService.EndAuditLog(id, "failed")
 		return
 	}
 
@@ -117,6 +131,8 @@ func handlePostNotes(c *gin.Context, infoService *info.Service) {
 		Error:   "",
 		Data:    note,
 	})
+
+	infoService.EndAuditLog(id, "success")
 }
 
 // @Summary Delete a note by ID
@@ -143,8 +159,23 @@ func handleDeleteNoteByID(c *gin.Context, infoService *info.Service) {
 		return
 	}
 
+	note, err := infoService.GetNoteByID(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+			Status:  "error",
+			Message: "note_fetch_failed",
+			Error:   err.Error(),
+			Data:    nil,
+		})
+
+		return
+	}
+
+	aid := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("notes.delete|-|%s", note.Title), "started")
 	err = infoService.DeleteNoteByID(id)
 	if err != nil {
+		infoService.EndAuditLog(aid, "failed")
+
 		if err.Error() == "record not found" {
 			c.JSON(http.StatusNotFound, internal.APIResponse[any]{
 				Status:  "error",
@@ -172,6 +203,8 @@ func handleDeleteNoteByID(c *gin.Context, infoService *info.Service) {
 		Error:   "",
 		Data:    nil,
 	})
+
+	infoService.EndAuditLog(aid, "success")
 }
 
 // @Summary Update a note by ID
@@ -218,8 +251,22 @@ func handleUpdateNoteByID(c *gin.Context, infoService *info.Service) {
 		return
 	}
 
+	note, err := infoService.GetNoteByID(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+			Status:  "error",
+			Message: "note_fetch_failed",
+			Error:   err.Error(),
+			Data:    nil,
+		})
+
+		return
+	}
+
+	aid := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("notes.update|-|%s", note.Title), "started")
 	err = infoService.UpdateNoteByID(id, req.Title, req.Content)
 	if err != nil {
+		infoService.EndAuditLog(aid, "failed")
 		c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 			Status:  "error",
 			Message: "note_update_failed",
@@ -235,4 +282,50 @@ func handleUpdateNoteByID(c *gin.Context, infoService *info.Service) {
 		Error:   "",
 		Data:    nil,
 	})
+	infoService.EndAuditLog(aid, "success")
+}
+
+// @Summary Bulk delete notes
+// @Description Delete multiple notes from the database by their IDs
+// @Tags Info
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Failure 400 {object} internal.APIResponse[any] "Invalid note IDs"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /info/notes/bulk-delete [post]
+func handleBulkDeleteNotes(c *gin.Context, infoService *info.Service) {
+	var req BulkDeleteRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+			Status:  "error",
+			Message: "invalid_request_payload",
+			Error:   "validation_error",
+			Data:    nil,
+		})
+		return
+	}
+
+	aid := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("notes.bulk_delete|-|%v", req.IDs), "started")
+	err := infoService.BulkDeleteNotes(req.IDs)
+	if err != nil {
+		infoService.EndAuditLog(aid, "failed")
+		c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+			Status:  "error",
+			Message: "bulk_delete_failed",
+			Error:   err.Error(),
+			Data:    nil,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, internal.APIResponse[any]{
+		Status:  "success",
+		Message: "notes_bulk_deleted",
+		Error:   "",
+		Data:    nil,
+	})
+	infoService.EndAuditLog(aid, "success")
 }

@@ -13,6 +13,7 @@ import (
 	"sylve/internal/db/models"
 	infoModels "sylve/internal/db/models/info"
 	networkModels "sylve/internal/db/models/network"
+	utilitiesModels "sylve/internal/db/models/utilities"
 	zfsModels "sylve/internal/db/models/zfs"
 	"sylve/internal/logger"
 	"sylve/pkg/utils"
@@ -60,6 +61,9 @@ func SetupDatabase(cfg *internal.SylveConfig, isTest bool) *gorm.DB {
 
 		&networkModels.StandardSwitch{},
 		&networkModels.NetworkPort{},
+
+		&utilitiesModels.DownloadedFile{},
+		&utilitiesModels.Downloads{},
 	)
 
 	if err != nil {

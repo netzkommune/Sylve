@@ -10,13 +10,15 @@ package startup
 
 import (
 	"context"
-	"fmt"
 	"os"
 	serviceInterfaces "sylve/internal/interfaces/services"
 	infoServiceInterfaces "sylve/internal/interfaces/services/info"
 	libvirtServiceInterfaces "sylve/internal/interfaces/services/libvirt"
 	networkServiceInterfaces "sylve/internal/interfaces/services/network"
+	utilitiesServiceInterfaces "sylve/internal/interfaces/services/utilities"
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
+	"sylve/internal/logger"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -24,24 +26,27 @@ import (
 var _ serviceInterfaces.StartupServiceInterface = (*Service)(nil)
 
 type Service struct {
-	DB      *gorm.DB
-	Info    infoServiceInterfaces.InfoServiceInterface
-	ZFS     zfsServiceInterfaces.ZfsServiceInterface
-	Network networkServiceInterfaces.NetworkServiceInterface
-	Libvirt libvirtServiceInterfaces.LibvirtServiceInterface
+	DB        *gorm.DB
+	Info      infoServiceInterfaces.InfoServiceInterface
+	ZFS       zfsServiceInterfaces.ZfsServiceInterface
+	Network   networkServiceInterfaces.NetworkServiceInterface
+	Libvirt   libvirtServiceInterfaces.LibvirtServiceInterface
+	Utilities utilitiesServiceInterfaces.UtilitiesServiceInterface
 }
 
 func NewStartupService(db *gorm.DB,
 	info infoServiceInterfaces.InfoServiceInterface,
 	zfs zfsServiceInterfaces.ZfsServiceInterface,
 	network networkServiceInterfaces.NetworkServiceInterface,
-	libvirt libvirtServiceInterfaces.LibvirtServiceInterface) serviceInterfaces.StartupServiceInterface {
+	libvirt libvirtServiceInterfaces.LibvirtServiceInterface,
+	utiliies utilitiesServiceInterfaces.UtilitiesServiceInterface) serviceInterfaces.StartupServiceInterface {
 	return &Service{
-		DB:      db,
-		Info:    info,
-		ZFS:     zfs,
-		Network: network,
-		Libvirt: libvirt,
+		DB:        db,
+		Info:      info,
+		ZFS:       zfs,
+		Network:   network,
+		Libvirt:   libvirt,
+		Utilities: utiliies,
 	}
 }
 
@@ -77,8 +82,19 @@ func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface)
 	err := s.Network.SyncStandardSwitches()
 
 	if err != nil {
-		fmt.Println("Error syncing standard switches:", err)
+		logger.L.Error().Msgf("Error syncing standard switches: %v", err)
 	}
+
+	go func() {
+		for {
+			err := s.Utilities.SyncDownloadProgress()
+			if err != nil {
+				logger.L.Fatal().Msgf("Failed to sync progress for downloads: %v", err)
+			}
+
+			time.Sleep(5 * time.Second)
+		}
+	}()
 
 	return nil
 }

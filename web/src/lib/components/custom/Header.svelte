@@ -78,7 +78,7 @@
 					<img src="/logo/white.svg" alt="Sylve Logo" class="h-6 w-auto max-w-[100px]" />
 					<p class="font-normal tracking-[.45em]">SYLVE</p>
 				</div>
-				<p class="mt-4 whitespace-nowrap">Virtual Environment 8.2.7</p>
+				<p class="mt-4 whitespace-nowrap">Virtual Environment 0.0.1</p>
 				<Button size="sm" class="mt-4 h-8 bg-neutral-600 text-white hover:bg-neutral-700">
 					<Icon icon="material-symbols-light:mail-outline-sharp" class="mr-2 h-4 w-4" />
 					Documentation
@@ -104,7 +104,7 @@
 		<div class="relative lg:hidden">
 			<Icon
 				icon="ic:sharp-search"
-				class="absolute left-2.5 top-1.5 h-4 w-4 text-muted-foreground"
+				class="text-muted-foreground absolute left-2.5 top-1.5 h-4 w-4"
 			/>
 			<Input
 				type="search"
@@ -157,7 +157,7 @@
 				<Button
 					builders={[builder]}
 					variant="outline"
-					class="flex h-7 items-center gap-1 rounded-md border border-border"
+					class="border-border flex h-7 items-center gap-1 rounded-md border"
 					><Icon icon="mdi:user" class="h-4 w-4" /> Root <Icon
 						icon="famicons:chevron-down"
 						class="h-4 w-4"

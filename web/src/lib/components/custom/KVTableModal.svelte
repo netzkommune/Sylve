@@ -7,6 +7,7 @@
 	interface Props {
 		open: boolean;
 		titles: {
+			icon?: string;
 			main: string;
 			key: string;
 			value: string;
@@ -40,7 +41,13 @@
 <Dialog.Root bind:open closeOnOutsideClick={false}>
 	<Dialog.Content class="flex max-h-[80vh] w-[90%] flex-col gap-0 overflow-hidden p-3 lg:max-w-4xl">
 		<div class="flex items-center justify-between">
-			<h2 class="ml-2 text-lg font-semibold">{titles.main}</h2>
+			<div class="flex items-center">
+				{#if titles.icon}
+					<Icon icon={titles.icon} class="h-6 w-6" />
+				{/if}
+				<h2 class="ml-2 text-lg font-semibold">{titles.main}</h2>
+			</div>
+
 			<Dialog.Close
 				class="flex h-6 w-6 items-center justify-center rounded-sm opacity-70 transition-opacity hover:opacity-100"
 				onclick={actions.close}
@@ -77,7 +84,7 @@
 						{#each Object.entries(KV) as [key, value]}
 							{#if typeof value === 'object' && value !== null && !Array.isArray(value)}
 								<Table.Row>
-									<Table.Cell class="h-10 px-1 py-2 font-medium">
+									<Table.Cell class="h-10 w-1/2 whitespace-nowrap px-1 py-2 font-medium">
 										<button
 											class="flex w-full items-center gap-1 text-left"
 											onclick={() => toggleObjectExpansion(key)}

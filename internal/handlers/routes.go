@@ -171,8 +171,13 @@ func RegisterRoutes(r *gin.Engine,
 			log.Fatalln("Initialization of embed folder failed:", err)
 		} else {
 			r.Use(static.Serve("/", staticFiles))
+
 			r.NoRoute(func(c *gin.Context) {
-				c.FileFromFS("200.html", staticFiles)
+				c.FileFromFS("index.html", staticFiles)
+			})
+
+			r.GET("/", func(c *gin.Context) {
+				c.FileFromFS("index.html", staticFiles)
 			})
 		}
 	}

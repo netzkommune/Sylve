@@ -3,7 +3,7 @@
 
 	let darkMode = $state(false);
 	onMount(() => {
-		darkMode = localStorage.getItem('mode-watcher-mode') === 'dark';
+		darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
 	});
 </script>
 

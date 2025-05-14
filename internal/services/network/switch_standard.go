@@ -211,19 +211,37 @@ func (s *Service) EditStandardSwitch(
 }
 
 func (s *Service) SyncStandardSwitches(sw *networkModels.StandardSwitch, action string) error {
-	if action == "create" {
+	s.syncMutex.Lock()
+	defer s.syncMutex.Unlock()
+
+	switch action {
+	case "sync":
+		var switches []networkModels.StandardSwitch
+		if err := s.DB.Preload("Ports").Find(&switches).Error; err != nil {
+			return fmt.Errorf("db_error_checking_switches: %v", err)
+		}
+		for _, switchObj := range switches {
+			if err := deleteStandardBridge(switchObj); err != nil {
+				return fmt.Errorf("sync_standard_switches: failed_to_delete: %v", err)
+			}
+		}
+		for _, switchObj := range switches {
+			if err := createStandardBridge(switchObj); err != nil {
+				return fmt.Errorf("sync_standard_switches: failed_to_create: %v", err)
+			}
+		}
+
+	case "create":
 		if err := createStandardBridge(*sw); err != nil {
 			return err
 		}
-	}
 
-	if action == "delete" {
+	case "delete":
 		if err := deleteStandardBridge(*sw); err != nil {
 			return err
 		}
-	}
 
-	if action == "edit" {
+	case "edit":
 		var newSw networkModels.StandardSwitch
 		if err := s.DB.Preload("Ports").First(&newSw, sw.ID).Error; err != nil {
 			return fmt.Errorf("switch_not_found")
@@ -276,43 +294,9 @@ func createStandardBridge(sw networkModels.StandardSwitch) error {
 		}
 	}
 
-	// Configure Each Port
 	for _, port := range sw.Ports {
-		// Set MTU on port if bridge has MTU
-		if sw.MTU > 0 {
-			if _, err := utils.RunCommand("ifconfig", port.Name, "mtu", strconv.Itoa(sw.MTU)); err != nil {
-				return fmt.Errorf("create_standard_bridge: failed_to_set_port_mtu: %v", err)
-			}
-		}
-
-		if sw.VLAN > 0 {
-			vif := fmt.Sprintf("%s.%d", port.Name, sw.VLAN)
-
-			// Create VLAN interface if it doesn't exist
-			if _, err := utils.RunCommand("ifconfig", vif); err != nil {
-				args := []string{
-					"vlan", "create",
-					"vlandev", port.Name,
-					"vlan", strconv.Itoa(sw.VLAN),
-					"descr", fmt.Sprintf("svm-vlan/%s/%s", sw.BridgeName, vif),
-					"name", vif,
-					"group", "svm-vlan",
-					"up",
-				}
-
-				if _, err := utils.RunCommand("ifconfig", args...); err != nil {
-					return fmt.Errorf("create_standard_bridge: failed to create VLAN iface %s: %v", vif, err)
-				}
-			}
-
-			if _, err := utils.RunCommand("ifconfig", sw.BridgeName, "addm", vif, "up"); err != nil {
-				return fmt.Errorf("create_standard_bridge: failed to add %s to bridge %s: %v", vif, sw.BridgeName, err)
-			}
-		} else {
-			// Port without VLAN, just add it to bridge
-			if _, err := utils.RunCommand("ifconfig", sw.BridgeName, "addm", port.Name, "up"); err != nil {
-				return fmt.Errorf("create_standard_bridge: failed to add %s to bridge %s: %v", port.Name, sw.BridgeName, err)
-			}
+		if err := addBridgeMember(sw.BridgeName, port.Name, sw.MTU, sw.VLAN); err != nil {
+			return fmt.Errorf("create_standard_bridge: %v", err)
 		}
 	}
 
@@ -320,55 +304,98 @@ func createStandardBridge(sw networkModels.StandardSwitch) error {
 }
 
 func editStandardBridge(oldSw, newSw networkModels.StandardSwitch) error {
-	ifaceObj, err := iface.Get(oldSw.BridgeName)
+	br := oldSw.BridgeName
 
+	// 1) snapshot existing members
+	ifaceObj, err := iface.Get(br)
 	if err != nil {
-		return fmt.Errorf("edit_standard_bridge: get %s: %v", oldSw.BridgeName, err)
+		return fmt.Errorf("edit_standard_bridge: get %s: %v", br, err)
 	}
-
-	var originalBM []string
+	var original []string
 	for _, m := range ifaceObj.BridgeMembers {
-		originalBM = append(originalBM, m.Name)
+		original = append(original, m.Name)
 	}
 
-	if _, err := utils.RunCommand("ifconfig", oldSw.BridgeName, "destroy"); err != nil {
-		return fmt.Errorf("edit_standard_bridge: failed to destroy %s: %v", oldSw.BridgeName, err)
+	// 2) build sets of old & new DB ports (incl. VLAN ifaces)
+	oldSet := make(map[string]bool, len(oldSw.Ports)*2)
+	for _, p := range oldSw.Ports {
+		oldSet[p.Name] = true
+		if oldSw.VLAN > 0 {
+			oldSet[fmt.Sprintf("%s.%d", p.Name, oldSw.VLAN)] = true
+		}
+	}
+	newSet := make(map[string]bool, len(newSw.Ports)*2)
+	for _, p := range newSw.Ports {
+		newSet[p.Name] = true
+		if newSw.VLAN > 0 {
+			newSet[fmt.Sprintf("%s.%d", p.Name, newSw.VLAN)] = true
+		}
 	}
 
-	var oldPorts []string
-	for _, port := range oldSw.Ports {
-		oldPorts = append(oldPorts, port.Name)
+	// 3) remove only the *old* DB ports (and their VLAN sub-ifs)
+	for _, p := range oldSw.Ports {
+		if err := removeBridgeMember(br, p.Name, oldSw.VLAN); err != nil {
+			return fmt.Errorf("edit_standard_bridge: remove old port %s: %v", p.Name, err)
+		}
 	}
 
-	var taps []string
-
-	for _, m := range originalBM {
-		if !utils.Contains(oldPorts, m) {
-			oIfaceObj, err := iface.Get(m)
-			if err != nil {
-				return fmt.Errorf("edit_standard_bridge: get %s: %v", m, err)
+	// 4) reconfigure bridge in place
+	if _, err := utils.RunCommand("ifconfig", br, "descr", newSw.Name); err != nil {
+		return fmt.Errorf("edit_standard_bridge: set descr: %v", err)
+	}
+	if oldSw.MTU != newSw.MTU && newSw.MTU > 0 {
+		if _, err := utils.RunCommand("ifconfig", br, "mtu", strconv.Itoa(newSw.MTU)); err != nil {
+			return fmt.Errorf("edit_standard_bridge: set mtu: %v", err)
+		}
+	}
+	// IPv4
+	if oldSw.Address != newSw.Address {
+		if oldSw.Address != "" {
+			if _, err := utils.RunCommand("ifconfig", br, "inet", oldSw.Address, "delete"); err != nil {
+				return fmt.Errorf("edit_standard_bridge: del old inet: %v", err)
 			}
-
-			if strings.Contains(oIfaceObj.Driver, "tap") || utils.Contains(oIfaceObj.Groups, "tap") {
-				taps = append(taps, m)
-				continue
+		}
+		if newSw.Address != "" {
+			if _, err := utils.RunCommand("ifconfig", br, "inet", newSw.Address); err != nil {
+				return fmt.Errorf("edit_standard_bridge: set inet: %v", err)
 			}
-
-			if _, err := utils.RunCommand("ifconfig", m, "destroy"); err != nil {
-				return fmt.Errorf("edit_standard_bridge: failed to destroy %s: %v", m, err)
+		}
+	}
+	// IPv6
+	if oldSw.Address6 != newSw.Address6 {
+		if oldSw.Address6 != "" {
+			if _, err := utils.RunCommand("ifconfig", br, "inet6", oldSw.Address6, "delete"); err != nil {
+				return fmt.Errorf("edit_standard_bridge: del old inet6: %v", err)
+			}
+		}
+		if newSw.Address6 != "" {
+			if _, err := utils.RunCommand("ifconfig", br, "inet6", newSw.Address6); err != nil {
+				return fmt.Errorf("edit_standard_bridge: set inet6: %v", err)
 			}
 		}
 	}
 
-	err = createStandardBridge(newSw)
-
-	if err != nil {
-		return fmt.Errorf("edit_standard_bridge: create %s: %v", newSw.BridgeName, err)
+	// 5) add the *new* DB ports (and VLAN sub-ifs)
+	for _, p := range newSw.Ports {
+		if err := addBridgeMember(br, p.Name, newSw.MTU, newSw.VLAN); err != nil {
+			return fmt.Errorf("edit_standard_bridge: add port %s: %v", p.Name, err)
+		}
 	}
 
-	for _, tap := range taps {
-		if _, err := utils.RunCommand("ifconfig", newSw.BridgeName, "addm", tap); err != nil {
-			return fmt.Errorf("edit_standard_bridge: failed to add %s to bridge %s: %v", tap, newSw.BridgeName, err)
+	// 6) re-attach only non-DB members (e.g. taps), skip old/new DB ports
+	for _, m := range original {
+		if oldSet[m] || newSet[m] {
+			continue
+		}
+
+		oif, err := iface.Get(m)
+		if err != nil {
+			continue
+		}
+		if strings.Contains(oif.Driver, "tap") || utils.Contains(oif.Groups, "tap") {
+			if _, err := utils.RunCommand("ifconfig", br, "addm", m, "up"); err != nil {
+				return fmt.Errorf("edit_standard_bridge: re-add tap %s: %v", m, err)
+			}
 		}
 	}
 
@@ -377,7 +404,7 @@ func editStandardBridge(oldSw, newSw networkModels.StandardSwitch) error {
 
 func deleteStandardBridge(sw networkModels.StandardSwitch) error {
 	if _, err := utils.RunCommand("ifconfig", sw.BridgeName, "destroy"); err != nil {
-		if !strings.Contains(err.Error(), "not found") {
+		if !strings.Contains(err.Error(), "does not exist") {
 			return fmt.Errorf("delete_standard_bridge: failed_to_destroy: %v", err)
 		}
 	}
@@ -391,5 +418,62 @@ func deleteStandardBridge(sw networkModels.StandardSwitch) error {
 		}
 	}
 
+	return nil
+}
+
+func addBridgeMember(br, portName string, mtu, vlan int) error {
+	// set port MTU
+	if mtu > 0 {
+		if _, err := utils.RunCommand("ifconfig", portName, "mtu", strconv.Itoa(mtu)); err != nil {
+			return fmt.Errorf("set mtu for %s: %v", portName, err)
+		}
+	}
+	if vlan > 0 {
+		vif := fmt.Sprintf("%s.%d", portName, vlan)
+		// create VLAN iface if missing
+		if _, err := utils.RunCommand("ifconfig", vif); err != nil {
+			args := []string{
+				"vlan", "create",
+				"vlandev", portName,
+				"vlan", strconv.Itoa(vlan),
+				"descr", fmt.Sprintf("svm-vlan/%s/%s", br, vif),
+				"name", vif,
+				"group", "svm-vlan",
+				"up",
+			}
+			if _, err := utils.RunCommand("ifconfig", args...); err != nil {
+				return fmt.Errorf("create vlan %s: %v", vif, err)
+			}
+		}
+		// add VLAN iface to bridge
+		if _, err := utils.RunCommand("ifconfig", br, "addm", vif, "up"); err != nil {
+			return fmt.Errorf("add vlan %s: %v", vif, err)
+		}
+	} else {
+		// add plain port to bridge
+		if _, err := utils.RunCommand("ifconfig", br, "addm", portName, "up"); err != nil {
+			return fmt.Errorf("add port %s: %v", portName, err)
+		}
+	}
+	return nil
+}
+
+func removeBridgeMember(br, portName string, vlan int) error {
+	if vlan > 0 {
+		vif := fmt.Sprintf("%s.%d", portName, vlan)
+		// remove from bridge
+		if _, err := utils.RunCommand("ifconfig", br, "deletem", vif); err != nil {
+			return fmt.Errorf("remove vlan member %s: %v", vif, err)
+		}
+		// destroy VLAN iface
+		if _, err := utils.RunCommand("ifconfig", vif, "destroy"); err != nil {
+			return fmt.Errorf("destroy vlan iface %s: %v", vif, err)
+		}
+	} else {
+		// remove plain port
+		if _, err := utils.RunCommand("ifconfig", br, "deletem", portName); err != nil {
+			return fmt.Errorf("remove port member %s: %v", portName, err)
+		}
+	}
 	return nil
 }

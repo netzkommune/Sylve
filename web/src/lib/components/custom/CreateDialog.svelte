@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
+	import CustomComboBox from '$lib/components/ui/custom-input/combobox.svelte';
+	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
@@ -24,6 +26,8 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
+	import { getTranslation } from '$lib/utils/i18n';
+	import { capitalizeFirstLetter } from '$lib/utils/string';
 
 	const fruits = [
 		{ value: 'apple', label: 'Apple' },
@@ -32,6 +36,11 @@
 		{ value: 'grapes', label: 'Grapes' },
 		{ value: 'pineapple', label: 'Pineapple' }
 	];
+
+	let createModal = $state({
+		name: '',
+		vmId: ''
+	});
 </script>
 
 <Dialog.Root>
@@ -71,54 +80,31 @@
 					><ScrollArea orientation="vertical" class="h-96 w-full  ">
 						{#if value === 'vm_general'}
 							<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-								<div class="flex flex-col items-start gap-1">
-									<Label class="w-24 whitespace-nowrap text-sm" for="terms">Node:</Label>
-									<Select.Root>
-										<Select.Trigger class="h-8 ">
-											<Select.Value placeholder="Select a fruit" />
-										</Select.Trigger>
-										<Select.Content>
-											<Select.Group>
-												<Select.Label>Fruits</Select.Label>
-												{#each fruits as fruit}
-													<Select.Item value={fruit.value} label={fruit.label}
-														>{fruit.label}</Select.Item
-													>
-												{/each}
-											</Select.Group>
-										</Select.Content>
-										<Select.Input name="favoriteFruit" />
-									</Select.Root>
-								</div>
+								<CustomValueInput
+									label={capitalizeFirstLetter(getTranslation('common.name', 'Name'))}
+									placeholder="public"
+									bind:value={createModal.name}
+									classes="flex-1 space-y-1"
+								/>
 
-								<div class="flex flex-col items-start gap-1">
-									<Label class="w-24 whitespace-nowrap text-sm" for="terms">VM ID:</Label>
-									<Input class="h-8" type="number" id="vm_id" placeholder="email" />
-								</div>
+								<CustomValueInput
+									label={capitalizeFirstLetter(getTranslation('common.VM_ID', 'VM ID'))}
+									placeholder="100"
+									bind:value={createModal.vmId}
+									classes="flex-1 space-y-1"
+									type="number"
+								/>
 
-								<div class="flex flex-col items-start gap-1">
-									<Label class="w-24 whitespace-nowrap text-sm" for="terms">Name:</Label>
-									<Input class="h-8" type="text" id="name" placeholder="email" />
-								</div>
-								<div class="flex flex-col items-start gap-1">
-									<Label class="w-24 whitespace-nowrap text-sm" for="terms">Resource Pool:</Label>
-									<Select.Root>
-										<Select.Trigger class="h-8 ">
-											<Select.Value placeholder="Select a fruit" />
-										</Select.Trigger>
-										<Select.Content>
-											<Select.Group>
-												<Select.Label>Fruits</Select.Label>
-												{#each fruits as fruit}
-													<Select.Item value={fruit.value} label={fruit.label}
-														>{fruit.label}</Select.Item
-													>
-												{/each}
-											</Select.Group>
-										</Select.Content>
-										<Select.Input name="favoriteFruit" />
-									</Select.Root>
-								</div>
+								<!-- <CustomComboBox
+                                    bind:open={comboBoxes.ports.open}
+                                    label={capitalizeFirstLetter(getTranslation('network.ports', 'Ports'))}
+                                    bind:value={comboBoxes.ports.value}
+                                    data={generateComboboxOptions(useablePorts)}
+                                    classes="flex-1 space-y-1"
+                                    placeholder="Select ports"
+                                    multiple={true}
+                                    width="w-3/4"
+                                ></CustomComboBox> -->
 							</div>
 						{:else if value === 'ct_general'}
 							<div class="grid grid-cols-1 gap-4 md:grid-cols-2">

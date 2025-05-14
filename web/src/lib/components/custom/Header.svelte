@@ -142,7 +142,9 @@
 				icon="material-symbols:monitor-outline-rounded"
 				buttonText="Create VM"
 				buttonClass="h-6"
-			/>
+			/> -->
+
+			<!--
 
 			<CreateDialog
 				title="Create: Jail"

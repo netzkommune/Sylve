@@ -73,10 +73,10 @@ export function deleteRowByFieldValue(tableId: string, field: string, value: str
 export const renderWithIcon = (iconKey: string, suffix: string, extraClass?: string) => {
 	const icon = iconCache[iconKey] || '';
 	return `
-                        <div class="inline-flex items-start gap-1 pr-8">
-                <span class="shrink-0 ${extraClass || ''}">${icon}</span>
-                <span class="break-all whitespace-normal overflow-hidden">${suffix}</span>
-               </div>
+                        <span class="gap-1 w-full  ">
+                            <span class="shrink-0 ${extraClass || ''}">${icon}</span>
+                            <span class="">${suffix}</span>
+                        </span>
                     `.trim();
 };
 

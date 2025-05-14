@@ -1,7 +1,6 @@
 package networkHandlers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"sylve/internal"
@@ -17,8 +16,8 @@ type ListSwitchResponse struct {
 
 type CreateStandardSwitchRequest struct {
 	Name     string   `json:"name" binding:"required"`
-	MTU      int      `json:"mtu" binding:"required"`
-	VLAN     int      `json:"vlan"`
+	MTU      *int     `json:"mtu"`
+	VLAN     *int     `json:"vlan"`
 	Address  string   `json:"address"`
 	Address6 string   `json:"address6"`
 	Private  *bool    `json:"private" binding:"required"`
@@ -26,8 +25,13 @@ type CreateStandardSwitchRequest struct {
 }
 
 type UpdateStandardSwitchRequest struct {
-	ID int `json:"id" binding:"required"`
-	CreateStandardSwitchRequest
+	ID       int      `json:"id" binding:"required"`
+	MTU      *int     `json:"mtu"`
+	VLAN     *int     `json:"vlan"`
+	Address  string   `json:"address"`
+	Address6 string   `json:"address6"`
+	Private  *bool    `json:"private" binding:"required"`
+	Ports    []string `json:"ports" binding:"required"`
 }
 
 // @Summary List Network Switches
@@ -89,13 +93,33 @@ func CreateStandardSwitch(networkService *network.Service) gin.HandlerFunc {
 			return
 		}
 
-		if request.VLAN < 0 {
-			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
-				Status:  "error",
-				Message: "invalid_vlan",
-				Error:   fmt.Sprintf("vlan_must_be_positive_or_zero"),
-				Data:    nil,
-			})
+		mtu := 0
+		vlan := 0
+
+		if request.VLAN != nil {
+			if *request.VLAN < 0 {
+				c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+					Status:  "error",
+					Message: "invalid_vlan",
+					Error:   "vlan_must_be_positive_or_zero",
+					Data:    nil,
+				})
+				return
+			}
+			vlan = *request.VLAN
+		}
+
+		if request.MTU != nil {
+			if *request.MTU < 0 {
+				c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+					Status:  "error",
+					Message: "invalid_mtu",
+					Error:   "mtu_must_be_positive_or_zero",
+					Data:    nil,
+				})
+				return
+			}
+			mtu = *request.MTU
 		}
 
 		if request.Private == nil {
@@ -103,7 +127,7 @@ func CreateStandardSwitch(networkService *network.Service) gin.HandlerFunc {
 			*request.Private = false
 		}
 
-		err := networkService.NewStandardSwitch(request.Name, request.MTU, request.VLAN, request.Address, request.Address6, request.Ports, *request.Private)
+		err := networkService.NewStandardSwitch(request.Name, mtu, vlan, request.Address, request.Address6, request.Ports, *request.Private)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 				Status:  "error",
@@ -191,17 +215,36 @@ func UpdateStandardSwitch(networkService *network.Service) gin.HandlerFunc {
 			return
 		}
 
-		if request.VLAN < 0 {
-			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
-				Status:  "error",
-				Message: "invalid_vlan",
-				Error:   fmt.Sprintf("vlan_must_be_positive_or_zero"),
-				Data:    nil,
-			})
-			return
+		mtu := 0
+		vlan := 0
+
+		if request.MTU != nil {
+			if *request.MTU < 0 {
+				c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+					Status:  "error",
+					Message: "invalid_mtu",
+					Error:   "mtu_must_be_positive_or_zero",
+					Data:    nil,
+				})
+				return
+			}
+			mtu = *request.MTU
 		}
 
-		err := networkService.EditStandardSwitch(request.ID, request.Name, request.MTU, request.VLAN, request.Address, request.Address6, request.Ports, *request.Private)
+		if request.VLAN != nil {
+			if *request.VLAN < 0 {
+				c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+					Status:  "error",
+					Message: "invalid_vlan",
+					Error:   "vlan_must_be_positive_or_zero",
+					Data:    nil,
+				})
+				return
+			}
+			vlan = *request.VLAN
+		}
+
+		err := networkService.EditStandardSwitch(request.ID, mtu, vlan, request.Address, request.Address6, request.Ports, *request.Private)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 				Status:  "error",

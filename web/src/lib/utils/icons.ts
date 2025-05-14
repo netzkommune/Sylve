@@ -25,7 +25,12 @@ const icons = [
 	'mdi:file',
 	'mingcute:file-fill',
 	'line-md:downloading-loop',
-	'lets-icons:check-fill'
+	'lets-icons:check-fill',
+	'material-symbols-light:private-connectivity-outline',
+	'material-symbols:public',
+	'clarity:network-switch-line',
+	'ic:baseline-loop',
+	'mdi:ethernet'
 ];
 
 export async function preloadIcons() {

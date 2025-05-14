@@ -1,6 +1,9 @@
 import type { Column, Row } from '$lib/types/components/tree-table';
 import type { SwitchList } from '$lib/types/network/switch';
 import type { CellComponent } from 'tabulator-tables';
+import { getTranslation } from '../i18n';
+import { capitalizeFirstLetter } from '../string';
+import { renderWithIcon } from '../table';
 
 export function generateTableData(
 	switches: SwitchList | undefined,
@@ -13,11 +16,23 @@ export function generateTableData(
 		{
 			field: 'id',
 			visible: false,
-			title: 'ID'
+			title: getTranslation('common.ID', 'ID')
 		},
 		{
 			field: 'name',
-			title: 'Name'
+			title: capitalizeFirstLetter(getTranslation('common.name', 'Name')),
+			formatter(cell: CellComponent) {
+				const value = cell.getValue();
+				const row = cell.getRow();
+				const data = row.getData();
+				const pSw = data.private || false;
+
+				if (pSw) {
+					return renderWithIcon('material-symbols-light:private-connectivity-outline', value);
+				}
+
+				return renderWithIcon('material-symbols:public', value);
+			}
 		},
 		{
 			field: 'ports',
@@ -33,19 +48,24 @@ export function generateTableData(
 		},
 		{
 			field: 'mtu',
-			title: 'MTU'
+			title: getTranslation('network.MTU', 'MTU')
 		},
 		{
 			field: 'vlan',
-			title: 'VLAN'
+			title: getTranslation('network.VLAN', 'VLAN')
 		},
 		{
 			field: 'ipv4',
-			title: 'IPv4'
+			title: getTranslation('network.ipv4', 'IPv4')
 		},
 		{
 			field: 'ipv6',
-			title: 'IPv6'
+			title: getTranslation('network.ipv6', 'IPv6')
+		},
+		{
+			field: 'private',
+			title: getTranslation('common.private', 'Private'),
+			visible: false
 		}
 	];
 
@@ -53,7 +73,11 @@ export function generateTableData(
 
 	if (switches && switches[type]) {
 		for (const sw of switches[type]) {
-			console.log(sw);
+			const portsOnly =
+				sw.ports?.map((port) => {
+					return port.name;
+				}) || [];
+
 			rows.push({
 				id: sw.id,
 				name: sw.name,
@@ -61,7 +85,9 @@ export function generateTableData(
 				vlan: sw.vlan || '-',
 				ipv4: sw.address || '-',
 				ipv6: sw.address6 || '-',
-				ports: sw.ports
+				ports: sw.ports,
+				private: sw.private,
+				portsOnly: portsOnly
 			});
 		}
 	}

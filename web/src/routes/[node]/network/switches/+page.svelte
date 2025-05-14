@@ -1,17 +1,18 @@
 <script lang="ts">
 	import { getInterfaces } from '$lib/api/network/iface';
-	import { createSwitch, getSwitches } from '$lib/api/network/switch';
+	import { createSwitch, deleteSwitch, getSwitches, updateSwitch } from '$lib/api/network/switch';
+	import AlertDialog from '$lib/components/custom/AlertDialog.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import Search from '$lib/components/custom/TreeTable/Search.svelte';
-	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import CustomCheckbox from '$lib/components/ui/custom-input/checkbox.svelte';
 	import CustomComboBox from '$lib/components/ui/custom-input/combobox.svelte';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import type { Row } from '$lib/types/components/tree-table';
 	import type { Iface } from '$lib/types/network/iface';
 	import type { SwitchList } from '$lib/types/network/switch';
-	import { updateCache } from '$lib/utils/http';
+	import { isAPIResponse, updateCache } from '$lib/utils/http';
 	import { getTranslation } from '$lib/utils/i18n';
 	import { generateComboboxOptions } from '$lib/utils/input';
 	import { generateTableData } from '$lib/utils/network/switch';
@@ -60,9 +61,6 @@
 		}
 	]);
 
-	// console.log('Interfaces', $results[0].data);
-	// console.log('Switches', $results[1].data);
-
 	const interfaces = $derived($results[0].data);
 	const switches = $derived($results[1].data);
 
@@ -96,12 +94,23 @@
 	});
 
 	let confirmModals = $state({
-		active: '' as 'newSwitch' | 'deleteSwitch',
+		active: '' as 'newSwitch' | 'editSwitch' | 'deleteSwitch',
 		newSwitch: {
 			open: false,
 			name: '',
 			mtu: '',
-			vlan: '0',
+			vlan: '',
+			address: '',
+			address6: '',
+			private: false,
+			ports: [] as string[]
+		},
+		editSwitch: {
+			oldName: '',
+			open: false,
+			name: '',
+			mtu: '',
+			vlan: '',
 			address: '',
 			address6: '',
 			private: false,
@@ -115,16 +124,32 @@
 	});
 
 	let comboBoxes = $state({
-		switches: {
+		ports: {
 			open: false,
 			value: []
 		}
 	});
 
 	async function confirmAction() {
-		if (confirmModals.active === 'newSwitch') {
-			if (!isValidSwitchName(confirmModals.newSwitch.name)) {
-				toast.error('Invalid switch name', {
+		if (confirmModals.active === 'newSwitch' || confirmModals.active === 'editSwitch') {
+			const activeModal = confirmModals[confirmModals.active];
+			if (!isValidSwitchName(activeModal.name)) {
+				toast.error(
+					getTranslation('network.switch.errors.invalid_switch_name', 'Invalid switch name'),
+					{
+						position: 'bottom-center'
+					}
+				);
+
+				return;
+			}
+
+			if (
+				activeModal.mtu !== '' &&
+				activeModal.mtu !== null &&
+				!isValidMTU(parseInt(activeModal.mtu))
+			) {
+				toast.error(getTranslation('network.switch.errors.invalid_mtu', 'Invalid MTU'), {
 					position: 'bottom-center'
 				});
 
@@ -132,59 +157,168 @@
 			}
 
 			if (
-				confirmModals.newSwitch.mtu !== '' &&
-				!isValidMTU(parseInt(confirmModals.newSwitch.mtu))
+				activeModal.vlan !== '' &&
+				activeModal.vlan !== null &&
+				!isValidVLAN(parseInt(activeModal.vlan))
 			) {
-				toast.error('Invalid MTU', {
+				toast.error(getTranslation('network.switch.errors.invalid_vlan', 'Invalid VLAN'), {
 					position: 'bottom-center'
 				});
 
 				return;
 			}
 
-			if (
-				confirmModals.newSwitch.vlan !== '' &&
-				!isValidVLAN(parseInt(confirmModals.newSwitch.vlan))
-			) {
-				toast.error('Invalid VLAN', {
-					position: 'bottom-center'
-				});
-
+			if (activeModal.address !== '' && !isValidIPv4(activeModal.address, true)) {
+				toast.error(
+					getTranslation('network.switch.errors.invalid_ipv4_cidr', 'Invalid IPv4 CIDR'),
+					{
+						position: 'bottom-center'
+					}
+				);
 				return;
 			}
 
-			if (
-				confirmModals.newSwitch.address !== '' &&
-				!isValidIPv4(confirmModals.newSwitch.address, true)
-			) {
-				toast.error('Invalid IPv4 CIDR', {
-					position: 'bottom-center'
-				});
+			if (activeModal.address6 !== '' && !isValidIPv6(activeModal.address6, true)) {
+				toast.error(
+					getTranslation('network.switch.errors.invalid_ipv6_cidr', 'Invalid IPv6 CIDR'),
+					{
+						position: 'bottom-center'
+					}
+				);
 				return;
 			}
 
-			if (
-				confirmModals.newSwitch.address6 !== '' &&
-				!isValidIPv6(confirmModals.newSwitch.address6, true)
-			) {
-				toast.error('Invalid IPv6 CIDR', {
-					position: 'bottom-center'
-				});
-				return;
+			if (confirmModals.active === 'newSwitch') {
+				const created = await createSwitch(
+					activeModal.name,
+					parseInt(activeModal.mtu),
+					parseInt(activeModal.vlan),
+					activeModal.address,
+					activeModal.address6,
+					activeModal.private,
+					comboBoxes.ports.value
+				);
+
+				if (isAPIResponse(created) && created.status === 'success') {
+					let message = `${capitalizeFirstLetter(getTranslation('network.switch.switch', 'Switch'))} ${confirmModals.newSwitch.name} ${getTranslation('common.created', 'created')}`;
+					toast.success(message, {
+						position: 'bottom-center'
+					});
+				} else {
+					toast.error(
+						getTranslation('network.switch.errors.create_switch', 'Error creating switch'),
+						{
+							position: 'bottom-center'
+						}
+					);
+				}
+			} else {
+				const edited = await updateSwitch(
+					activeRow?.id as number,
+					parseInt(activeModal.mtu),
+					parseInt(activeModal.vlan),
+					activeModal.address,
+					activeModal.address6,
+					activeModal.private,
+					comboBoxes.ports.value
+				);
+
+				if (isAPIResponse(edited) && edited.status === 'success') {
+					let message = `${capitalizeFirstLetter(getTranslation('network.switch.switch', 'Switch'))} ${confirmModals.editSwitch.name} ${getTranslation('common.updated', 'updated')}`;
+					toast.success(message, {
+						position: 'bottom-center'
+					});
+				} else {
+					toast.error(
+						getTranslation('network.switch.errors.update_switch', 'Error updating switch'),
+						{
+							position: 'bottom-center'
+						}
+					);
+				}
 			}
 
-			const created = await createSwitch(
-				confirmModals.newSwitch.name,
-				parseInt(confirmModals.newSwitch.mtu),
-				parseInt(confirmModals.newSwitch.vlan),
-				confirmModals.newSwitch.address,
-				confirmModals.newSwitch.address6,
-				confirmModals.newSwitch.private,
-				comboBoxes.switches.value
-			);
+			resetModal(true);
 		}
 	}
+
+	let tableData = $derived(generateTableData(switches, 'standard'));
+	let activeRows: Row[] | null = $state(null);
+	let activeRow: Row | null = $derived(activeRows ? (activeRows[0] as Row) : ({} as Row));
+
+	function handleDelete() {
+		if (activeRow && Object.keys(activeRow).length > 0) {
+			confirmModals.active = 'deleteSwitch';
+			confirmModals.deleteSwitch.open = true;
+			confirmModals.deleteSwitch.name = activeRow.name;
+			confirmModals.deleteSwitch.id = activeRow.id as number;
+		}
+	}
+
+	function handleEdit() {
+		if (activeRow && Object.keys(activeRow).length > 0) {
+			confirmModals.active = 'editSwitch';
+			confirmModals.editSwitch.open = true;
+			confirmModals.editSwitch.oldName = activeRow.name;
+			confirmModals.editSwitch.name = activeRow.name;
+			confirmModals.editSwitch.mtu = activeRow.mtu as string;
+			confirmModals.editSwitch.vlan = activeRow.vlan === '-' ? '' : (activeRow.vlan as string);
+			confirmModals.editSwitch.address = activeRow.ipv4 === '-' ? '' : activeRow.ipv4;
+			confirmModals.editSwitch.address6 = activeRow.ipv6 === '-' ? '' : activeRow.ipv6;
+			confirmModals.editSwitch.private = (activeRow.private as boolean) || false;
+
+			comboBoxes.ports.value = activeRow.ports.map((port: { name: string }) => port.name);
+		}
+	}
+
+	function resetModal(close: boolean = true) {
+		if (close) {
+			confirmModals.newSwitch.open = false;
+			confirmModals.deleteSwitch.open = false;
+			confirmModals.editSwitch.open = false;
+		}
+
+		confirmModals.newSwitch.name = '';
+		confirmModals.newSwitch.mtu = '';
+		confirmModals.newSwitch.vlan = '';
+		confirmModals.newSwitch.address = '';
+		confirmModals.newSwitch.address6 = '';
+		confirmModals.newSwitch.private = false;
+
+		confirmModals.editSwitch.name = '';
+		confirmModals.editSwitch.mtu = '';
+		confirmModals.editSwitch.vlan = '';
+		confirmModals.editSwitch.address = '';
+		confirmModals.editSwitch.address6 = '';
+		confirmModals.editSwitch.private = false;
+
+		comboBoxes.ports.value = [];
+	}
 </script>
+
+{#snippet button(type: string)}
+	{#if activeRow && Object.keys(activeRow).length > 0}
+		{#if type === 'edit'}
+			<Button
+				on:click={handleEdit}
+				size="sm"
+				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+			>
+				<Icon icon="mdi:pencil" class="mr-1 h-4 w-4" />
+				{capitalizeFirstLetter(getTranslation('common.edit', 'Edit'))}
+			</Button>
+		{:else if type === 'delete'}
+			<Button
+				on:click={handleDelete}
+				size="sm"
+				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+			>
+				<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
+				{capitalizeFirstLetter(getTranslation('common.delete', 'Delete'))}
+			</Button>
+		{/if}
+	{/if}
+{/snippet}
 
 <div class="flex h-full w-full flex-col">
 	<div class="flex h-10 w-full items-center gap-2 border p-2">
@@ -200,44 +334,83 @@
 			<Icon icon="gg:add" class="mr-1 h-4 w-4" />
 			{capitalizeFirstLetter(getTranslation('common.new', 'New'))}
 		</Button>
+
+		{@render button('edit')}
+		{@render button('delete')}
 	</div>
 
-	<TreeTable name="tt-switches" data={generateTableData(switches, 'standard')} />
+	<TreeTable
+		name="tt-switches"
+		data={tableData}
+		bind:parentActiveRow={activeRows}
+		multipleSelect={false}
+	/>
 </div>
 
-{#if confirmModals.active === 'newSwitch'}
+{#if confirmModals.active === 'newSwitch' || confirmModals.active === 'editSwitch'}
 	<Dialog.Root
 		bind:open={confirmModals[confirmModals.active].open}
 		closeOnOutsideClick={false}
 		closeOnEscape={false}
 	>
 		<Dialog.Content>
-			<div class="flex items-center justify-between px-1 py-3">
+			<div class="flex items-center justify-between px-1 py-1">
 				<Dialog.Header>
 					<Dialog.Title>
 						<div class="flex items-center">
 							<Icon icon="clarity:network-switch-line" class="mr-2 h-6 w-6" />
-							New Switch
+							{#if confirmModals.active === 'editSwitch'}
+								{capitalizeFirstLetter(getTranslation('common.edit', 'Edit'))}
+								{capitalizeFirstLetter(getTranslation('network.switch.switch', 'Switch'))}
+								{'- ' + confirmModals.editSwitch.oldName}
+							{:else}
+								{capitalizeFirstLetter(getTranslation('common.new', 'New'))}
+								{capitalizeFirstLetter(getTranslation('network.switch.switch', 'Switch'))}
+							{/if}
 						</div>
 					</Dialog.Title>
 				</Dialog.Header>
 
-				<Dialog.Close
-					class="flex h-5 w-5 items-center justify-center rounded-sm opacity-70 transition-opacity hover:opacity-100"
-					onclick={() => {
-						confirmModals.newSwitch.open = false;
-					}}
-				>
-					<Icon icon="material-symbols:close-rounded" class="h-5 w-5" />
-				</Dialog.Close>
+				<div class="flex items-center gap-0.5">
+					<Button
+						size="sm"
+						variant="ghost"
+						class="h-8"
+						title={capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}
+						onclick={() => resetModal(false)}
+					>
+						<Icon icon="radix-icons:reset" class="h-4 w-4" onclick={() => resetModal(false)} />
+						<span class="sr-only"
+							>{capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}</span
+						>
+					</Button>
+					<Button
+						size="sm"
+						variant="ghost"
+						class="h-8"
+						title={capitalizeFirstLetter(getTranslation('common.close', 'Close'))}
+						onclick={() => resetModal(true)}
+					>
+						<Icon
+							icon="material-symbols:close-rounded"
+							class="h-4 w-4"
+							onclick={() => resetModal(true)}
+						/>
+						<span class="sr-only"
+							>{capitalizeFirstLetter(getTranslation('common.close', 'Close'))}</span
+						>
+					</Button>
+				</div>
 			</div>
 
-			<CustomValueInput
-				label={capitalizeFirstLetter(getTranslation('common.name', 'Name'))}
-				placeholder="public"
-				bind:value={confirmModals[confirmModals.active].name}
-				classes="flex-1 space-y-1"
-			/>
+			{#if confirmModals.active === 'newSwitch'}
+				<CustomValueInput
+					label={capitalizeFirstLetter(getTranslation('common.name', 'Name'))}
+					placeholder="public"
+					bind:value={confirmModals[confirmModals.active].name}
+					classes="flex-1 space-y-1"
+				/>
+			{/if}
 
 			<div class="flex gap-4">
 				<CustomValueInput
@@ -273,34 +446,83 @@
 				/>
 			</div>
 
-			<CustomComboBox
-				bind:open={comboBoxes.switches.open}
-				label="Ports"
-				bind:value={comboBoxes.switches.value}
-				data={generateComboboxOptions(useablePorts)}
-				classes="flex-1 space-y-1"
-				placeholder="Select ports"
-				multiple={true}
-				width="w-3/4"
-			></CustomComboBox>
+			{#if confirmModals.active === 'newSwitch'}
+				<CustomComboBox
+					bind:open={comboBoxes.ports.open}
+					label={capitalizeFirstLetter(getTranslation('network.ports', 'Ports'))}
+					bind:value={comboBoxes.ports.value}
+					data={generateComboboxOptions(useablePorts)}
+					classes="flex-1 space-y-1"
+					placeholder="Select ports"
+					multiple={true}
+					width="w-3/4"
+				></CustomComboBox>
+			{:else}
+				<CustomComboBox
+					bind:open={comboBoxes.ports.open}
+					label={capitalizeFirstLetter(getTranslation('network.ports', 'Ports'))}
+					bind:value={comboBoxes.ports.value}
+					data={generateComboboxOptions(useablePorts, activeRow?.portsOnly)}
+					classes="flex-1 space-y-1"
+					placeholder="Select ports"
+					multiple={true}
+					width="w-3/4"
+				></CustomComboBox>
+			{/if}
 
 			<CustomCheckbox
-				label="Private"
+				label={capitalizeFirstLetter(getTranslation('common.private', 'Private'))}
 				bind:checked={confirmModals[confirmModals.active].private}
 				classes="flex items-center gap-2"
 			></CustomCheckbox>
 
 			<Dialog.Footer class="flex justify-between gap-2 py-3">
 				<div class="flex gap-2">
-					<Button
-						variant="default"
-						class="h-8 bg-blue-600 text-white hover:bg-blue-700"
-						onclick={() => confirmAction()}
-					>
-						{capitalizeFirstLetter(getTranslation('common.create', 'Create'))}
-					</Button>
+					{#if confirmModals.active === 'editSwitch'}
+						<Button onclick={confirmAction} type="submit" size="sm"
+							>{capitalizeFirstLetter(getTranslation('common.save', 'Save'))}</Button
+						>
+					{:else}
+						<Button onclick={confirmAction} type="submit" size="sm"
+							>{capitalizeFirstLetter(getTranslation('common.create', 'Create'))}</Button
+						>
+					{/if}
 				</div>
 			</Dialog.Footer>
 		</Dialog.Content>
 	</Dialog.Root>
 {/if}
+
+<AlertDialog
+	open={confirmModals.deleteSwitch.open}
+	names={{ parent: 'switch', element: confirmModals.deleteSwitch.name }}
+	actions={{
+		onConfirm: async () => {
+			const result = await deleteSwitch(confirmModals.deleteSwitch.id);
+			if (isAPIResponse(result) && result.status === 'success') {
+				let message = `${capitalizeFirstLetter(getTranslation('network.switch.switch', 'Switch'))} ${confirmModals.deleteSwitch.name} ${getTranslation('common.deleted', 'deleted')}`;
+				toast.success(message, {
+					position: 'bottom-center'
+				});
+			} else {
+				toast.error(
+					getTranslation('network.switch.errors.delete_switch', 'Error deleting switch'),
+					{
+						position: 'bottom-center'
+					}
+				);
+			}
+
+			activeRows = null;
+
+			confirmModals.deleteSwitch.open = false;
+			confirmModals.deleteSwitch.name = '';
+			confirmModals.deleteSwitch.id = 0;
+		},
+		onCancel: () => {
+			confirmModals.deleteSwitch.open = false;
+			confirmModals.deleteSwitch.name = '';
+			confirmModals.deleteSwitch.id = 0;
+		}
+	}}
+></AlertDialog>

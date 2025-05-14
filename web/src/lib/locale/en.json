@@ -83,7 +83,19 @@
 		"wearout": "Wearout"
 	},
 	"network": {
-		"switch": {},
+		"switch": {
+			"switch": "switch",
+			"errors": {
+				"invalid_switch_name": "Invalid switch name",
+				"invalid_mtu": "Invalid MTU",
+				"invalid_vlan": "Invalid VLAN",
+				"invalid_ipv4_cidr": "Invalid IPv4 CIDR",
+				"delete_switch": "Error deleting switch",
+				"create_switch": "Error creating switch",
+				"update_switch": "Error updating switch"
+			}
+		},
+		"ports": "ports",
 		"mtu": "MTU",
 		"vlan": "VLAN",
 		"ipv4": "IPv4",
@@ -207,7 +219,9 @@
 		"description": "description",
 		"raw": "raw",
 		"mode": "mode",
-		"search": "search"
+		"search": "search",
+		"private": "private",
+		"content": "content"
 	},
 	"validation_errors": {
 		"failed validation: min": "too small"

@@ -4,6 +4,7 @@ import type { CellComponent } from 'tabulator-tables';
 import { getTranslation } from '../i18n';
 import { generateNumberFromString } from '../numbers';
 import { capitalizeFirstLetter } from '../string';
+import { renderWithIcon } from '../table';
 
 export function generateTableData(interfaces: Iface[]): {
 	rows: Row[];
@@ -17,7 +18,23 @@ export function generateTableData(interfaces: Iface[]): {
 		},
 		{
 			field: 'name',
-			title: 'Name'
+			title: 'Name',
+			formatter(cell: CellComponent) {
+				const value = cell.getValue();
+				const row = cell.getRow();
+				const data = row.getData();
+
+				if (data.isBridge) {
+					const name = data.description || value;
+					return renderWithIcon('clarity:network-switch-line', name);
+				}
+
+				if (value === 'lo0') {
+					return renderWithIcon('ic:baseline-loop', value);
+				}
+
+				return renderWithIcon('mdi:ethernet', value);
+			}
 		},
 		{
 			field: 'model',
@@ -63,15 +80,27 @@ export function generateTableData(interfaces: Iface[]): {
 
 				return status;
 			}
+		},
+		{
+			field: 'isBridge',
+			title: 'isBridge',
+			visible: false
 		}
 	];
 
 	const rows: Row[] = [];
 	for (const iface of interfaces) {
+		let isBridge = false;
 		if (iface.groups) {
 			if (iface.groups.includes('bridge')) {
-				continue;
+				isBridge = true;
+				iface.model = 'Bridge';
 			}
+		}
+
+		// TODO: Skip sylve created VLANs for now
+		if (iface.description.startsWith('svm-vlan')) {
+			continue;
 		}
 
 		const row: Row = {
@@ -82,7 +111,8 @@ export function generateTableData(interfaces: Iface[]): {
 			description: iface.description,
 			metric: iface.metric,
 			mtu: iface.mtu,
-			media: iface.media
+			media: iface.media,
+			isBridge: isBridge
 		};
 
 		rows.push(row);
@@ -95,6 +125,13 @@ export function generateTableData(interfaces: Iface[]): {
 }
 
 export function getCleanIfaceData(iface: Iface): { [key: string | number]: any } {
+	if (iface.groups) {
+		if (iface.groups.includes('bridge')) {
+			iface.model = 'Bridge';
+			iface.name = `${iface.description} (${iface.name})`;
+		}
+	}
+
 	const obj = {
 		[capitalizeFirstLetter(getTranslation('common.name', 'Name'))]: iface.name,
 		[capitalizeFirstLetter(getTranslation('common.description', 'Description'))]:

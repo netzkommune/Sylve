@@ -34,19 +34,19 @@ export async function deleteSwitch(id: number): Promise<APIResponse> {
 
 export async function updateSwitch(
 	id: number,
-	name: string,
 	mtu: number,
 	vlan: number,
 	address: string,
+	address6: string,
 	privateSw: boolean,
 	ports: string[]
 ): Promise<APIResponse> {
 	const body = {
 		id,
-		name,
 		mtu,
 		vlan,
 		address,
+		address6,
 		private: privateSw,
 		ports
 	};

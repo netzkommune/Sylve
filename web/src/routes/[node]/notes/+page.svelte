@@ -269,8 +269,8 @@
 					{#if modalState.isEditMode}
 						<div class="p-1">
 							<CustomValueInput
-								label={capitalizeFirstLetter(getTranslation('common.name', 'Name'))}
-								placeholder="Content"
+								label={capitalizeFirstLetter(getTranslation('common.content', 'Content'))}
+								placeholder="This is a note"
 								bind:value={modalState.content}
 								classes="flex-1 space-y-1"
 								type="textarea"
@@ -278,10 +278,11 @@
 						</div>
 					{:else}
 						<div class="p-1">
-							<label
+							<span
 								class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-								>{capitalizeFirstLetter(getTranslation('common.content', 'Content'))}</label
 							>
+								{capitalizeFirstLetter(getTranslation('common.content', 'Content'))}
+							</span>
 							<article class="prose lg:prose-xl">
 								{@html markdownToTailwindHTML(modalState.content)}
 							</article>

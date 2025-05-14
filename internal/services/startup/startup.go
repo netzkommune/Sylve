@@ -79,7 +79,7 @@ func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface)
 	go s.ZFS.Cron()
 	go s.ZFS.StartSnapshotScheduler(context.Background())
 
-	err := s.Network.SyncStandardSwitches()
+	err := s.Network.SyncStandardSwitches(nil, "sync")
 
 	if err != nil {
 		logger.L.Error().Msgf("Error syncing standard switches: %v", err)

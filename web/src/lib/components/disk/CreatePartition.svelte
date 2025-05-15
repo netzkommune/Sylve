@@ -148,7 +148,7 @@
 						currentPartitionInput = '';
 					}}
 				>
-					<Icon icon="radix-icons:reset" class="h-4 w-4" />
+					<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
 					<span class="sr-only"
 						>{capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}</span
 					>
@@ -160,7 +160,7 @@
 					title={capitalizeFirstLetter(getTranslation('common.close', 'Close'))}
 					onclick={() => close()}
 				>
-					<Icon icon="material-symbols:close-rounded" class="h-4 w-4" />
+					<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
 					<span class="sr-only"
 						>{capitalizeFirstLetter(getTranslation('common.close', 'Close'))}</span
 					>

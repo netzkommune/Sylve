@@ -11,7 +11,6 @@
 	import AlertDialogModal from '$lib/components/custom/AlertDialog.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import Search from '$lib/components/custom/TreeTable/Search.svelte';
-	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
@@ -154,6 +153,24 @@
 			title: ''
 		}
 	});
+
+	async function closeCreateFsModal() {
+		confirmModals.createFilesystem.open = false;
+		confirmModals.createFilesystem.data = {
+			name: '',
+			properties: {
+				parent: '',
+				atime: 'on',
+				checksum: 'on',
+				compression: 'on',
+				dedup: 'off',
+				encryption: 'off',
+				encryptionKey: '',
+				quota: ''
+			}
+		};
+		confirmModals.createFilesystem.title = '';
+	}
 
 	async function confirmAction() {
 		if (confirmModals.active === 'deleteSnapshot') {
@@ -475,23 +492,58 @@
 {/if}
 
 {#if confirmModals.active === 'createSnapshot'}
-	<AlertDialog.Root
+	<Dialog.Root
 		bind:open={confirmModals.createSnapshot.open}
 		closeOnOutsideClick={false}
 		closeOnEscape={false}
 	>
-		<AlertDialog.Content>
-			<AlertDialog.Header>
-				<AlertDialog.Title>
-					<div class="flex items-center">
-						<Icon icon="carbon:ibm-cloud-vpc-block-storage-snapshots" class="mr-2 h-6 w-6" />
-						Snapshot -
-						{confirmModals.createSnapshot.data.name !== ''
-							? `${confirmModals.createSnapshot.title}@${confirmModals.createSnapshot.data.name}`
-							: `${confirmModals.createSnapshot.title}`}
-					</div>
-				</AlertDialog.Title>
-			</AlertDialog.Header>
+		<Dialog.Content class="p-5">
+			<div class="flex items-center justify-between">
+				<Dialog.Header class="flex-1">
+					<Dialog.Title>
+						<div class="flex items-center gap-2">
+							<Icon icon="carbon:ibm-cloud-vpc-block-storage-snapshots" class=" h-6 w-6" />
+							Snapshot -
+							{confirmModals.createSnapshot.data.name !== ''
+								? `${confirmModals.createSnapshot.title}@${confirmModals.createSnapshot.data.name}`
+								: `${confirmModals.createSnapshot.title}`}
+						</div>
+					</Dialog.Title>
+				</Dialog.Header>
+				<div class="flex items-center gap-0.5">
+					<Button
+						size="sm"
+						variant="ghost"
+						class="h-8"
+						title={capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}
+						onclick={() => {
+							confirmModals.createSnapshot.data.name = '';
+							confirmModals.createSnapshot.data.recursive = false;
+						}}
+					>
+						<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only"
+							>{capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}</span
+						>
+					</Button>
+					<Button
+						size="sm"
+						variant="ghost"
+						class="h-8"
+						title={capitalizeFirstLetter(getTranslation('common.close', 'Close'))}
+						onclick={() => {
+							console.log('close');
+
+							confirmModals.createSnapshot.open = false;
+						}}
+					>
+						<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only"
+							>{capitalizeFirstLetter(getTranslation('common.close', 'Close'))}</span
+						>
+					</Button>
+				</div>
+			</div>
 
 			<div class="flex-1 space-y-1">
 				<Label for="name">Name</Label>
@@ -505,36 +557,30 @@
 			</div>
 
 			<div class="flex items-center gap-2">
-				<Checkbox id="createRecursive" aria-labelledby="createRecursive-label" />
+				<Checkbox
+					id="createRecursive"
+					bind:checked={confirmModals.createSnapshot.data.recursive}
+					aria-labelledby="createRecursive-label"
+				/>
 				<Label
 					id="createRecursive-label"
 					for="createRecursive"
 					class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-					onclick={() => {
-						confirmModals.createSnapshot.data.recursive =
-							!confirmModals.createSnapshot.data.recursive;
-					}}
 				>
 					Recursive
 				</Label>
 			</div>
 
-			<AlertDialog.Footer>
-				<AlertDialog.Cancel
-					onclick={() => {
-						confirmModals.createSnapshot.open = false;
-					}}>Cancel</AlertDialog.Cancel
-				>
-				<AlertDialog.Action
+			<Dialog.Footer>
+				<Button
+					size="sm"
 					onclick={() => {
 						confirmAction();
-					}}
+					}}>Create</Button
 				>
-					Create
-				</AlertDialog.Action>
-			</AlertDialog.Footer>
-		</AlertDialog.Content>
-	</AlertDialog.Root>
+			</Dialog.Footer>
+		</Dialog.Content>
+	</Dialog.Root>
 {/if}
 
 {#if confirmModals.active === 'createFilesystem'}
@@ -544,23 +590,59 @@
 		closeOnEscape={false}
 	>
 		<Dialog.Content
-			class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-visible overflow-y-auto p-0 transition-all duration-300 ease-in-out lg:max-w-[70%]"
+			class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-visible overflow-y-auto p-5 transition-all duration-300 ease-in-out lg:max-w-[70%]"
 		>
-			<div class="flex items-center justify-between">
-				<Dialog.Header class="flex justify-between p-4">
+			<div class="flex items-center justify-between pb-3">
+				<Dialog.Header class="flex justify-between">
 					<Dialog.Title class="flex items-center text-left">
 						<Icon icon="material-symbols:files" class="mr-2 h-5 w-5" />Create Filesystem</Dialog.Title
 					>
 				</Dialog.Header>
-				<Dialog.Close
-					class="ring-offset-background data-[state=open]:bg-accent data-[state=open]:text-muted-foreground mr-4 flex h-5 w-5 items-center justify-center rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-0 disabled:pointer-events-none"
-				>
-					<Icon icon="lucide:x" class="h-5 w-5" />
-					<span class="sr-only">Close</span>
-				</Dialog.Close>
+
+				<div class="flex items-center gap-0.5">
+					<Button
+						size="sm"
+						variant="ghost"
+						class="h-8"
+						title={capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}
+						onclick={() => {
+							confirmModals.createFilesystem.data.name = '';
+							confirmModals.createFilesystem.data.properties = {
+								parent: '',
+								atime: 'on',
+								checksum: 'on',
+								compression: 'on',
+								dedup: 'off',
+								encryption: 'off',
+								encryptionKey: '',
+								quota: ''
+							};
+							confirmModals.createFilesystem.title = '';
+						}}
+					>
+						<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only"
+							>{capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}</span
+						>
+					</Button>
+					<Button
+						size="sm"
+						variant="ghost"
+						class="h-8"
+						title={capitalizeFirstLetter(getTranslation('common.close', 'Close'))}
+						onclick={() => {
+							closeCreateFsModal();
+						}}
+					>
+						<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only"
+							>{capitalizeFirstLetter(getTranslation('common.close', 'Close'))}</span
+						>
+					</Button>
+				</div>
 			</div>
 
-			<div class="w-full p-4">
+			<div class="w-full">
 				<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
 					<div class="space-y-1">
 						<Label for="name">Name</Label>
@@ -789,18 +871,7 @@
 					<Button
 						size="sm"
 						type="button"
-						variant="ghost"
-						class="disabled border-border h-8 w-full border"
-						onclick={() => {
-							confirmModals.createFilesystem.open = false;
-						}}
-					>
-						Cancel
-					</Button>
-					<Button
-						size="sm"
-						type="button"
-						class="h-8 w-full bg-blue-600 text-white hover:bg-blue-700"
+						class="h-8 w-full "
 						onclick={() => {
 							confirmAction();
 						}}

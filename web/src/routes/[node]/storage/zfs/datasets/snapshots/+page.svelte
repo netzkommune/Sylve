@@ -15,6 +15,7 @@
 	import CustomCheckbox from '$lib/components/ui/custom-input/checkbox.svelte';
 	import CustomComboBox from '$lib/components/ui/custom-input/combobox.svelte';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
+	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import ViewSnapshotJobs from '$lib/components/zfs/ViewSnapshotJobs.svelte';
 	import type { Row } from '$lib/types/components/tree-table';
@@ -147,6 +148,20 @@
 			open: false
 		}
 	});
+
+	async function closeModal() {
+		confirmModals.createSnapshot = {
+			open: false,
+			recursive: false,
+			interval: 0,
+			name: '',
+			title: '',
+			extraTitle: ''
+		};
+		comboBoxes.pool.value = '';
+		comboBoxes.datasets.value = '';
+		comboBoxes.interval.value = '0';
+	}
 
 	let comboBoxes = $state({
 		pool: {
@@ -340,21 +355,62 @@
 </div>
 
 {#if confirmModals.active === 'createSnapshot'}
-	<AlertDialog.Root
+	<Dialog.Root
 		bind:open={confirmModals[confirmModals.active].open}
 		closeOnOutsideClick={false}
 		closeOnEscape={false}
 	>
-		<AlertDialog.Content>
-			<AlertDialog.Header>
-				<AlertDialog.Title>
-					<div class="flex items-center">
-						<Icon icon="carbon:ibm-cloud-vpc-block-storage-snapshots" class="mr-2 h-6 w-6" />
-						Snapshot {confirmModals.createSnapshot.extraTitle}
-					</div>
-				</AlertDialog.Title>
-			</AlertDialog.Header>
-
+		<Dialog.Content>
+			<div class="flex items-center justify-between">
+				<Dialog.Header class="flex-1">
+					<Dialog.Title>
+						<div class="flex items-center">
+							<Icon icon="carbon:ibm-cloud-vpc-block-storage-snapshots" class="mr-2 h-6 w-6" />
+							Snapshot {confirmModals.createSnapshot.extraTitle}
+						</div>
+					</Dialog.Title>
+				</Dialog.Header>
+				<div class="flex items-center gap-0.5">
+					<Button
+						size="sm"
+						variant="ghost"
+						class="h-8"
+						title={capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}
+						onclick={() => {
+							confirmModals.createSnapshot = {
+								open: true,
+								recursive: false,
+								interval: 0,
+								name: '',
+								title: '',
+								extraTitle: ''
+							};
+							comboBoxes.pool.value = '';
+							comboBoxes.datasets.value = '';
+							comboBoxes.interval.value = '0';
+						}}
+					>
+						<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only"
+							>{capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}</span
+						>
+					</Button>
+					<Button
+						size="sm"
+						variant="ghost"
+						class="h-8"
+						title={capitalizeFirstLetter(getTranslation('common.close', 'Close'))}
+						onclick={() => {
+							closeModal();
+						}}
+					>
+						<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only"
+							>{capitalizeFirstLetter(getTranslation('common.close', 'Close'))}</span
+						>
+					</Button>
+				</div>
+			</div>
 			<CustomValueInput
 				label={capitalizeFirstLetter(getTranslation('common.name', 'Name')) +
 					' | ' +
@@ -401,22 +457,16 @@
 				classes="flex items-center gap-2"
 			></CustomCheckbox>
 
-			<AlertDialog.Footer>
-				<AlertDialog.Cancel
-					onclick={() => {
-						confirmModals.createSnapshot.open = false;
-					}}>Cancel</AlertDialog.Cancel
-				>
-				<AlertDialog.Action
+			<Dialog.Footer>
+				<Button
+					size="sm"
 					onclick={() => {
 						confirmAction();
-					}}
+					}}>Create</Button
 				>
-					Create
-				</AlertDialog.Action>
-			</AlertDialog.Footer>
-		</AlertDialog.Content>
-	</AlertDialog.Root>
+			</Dialog.Footer>
+		</Dialog.Content>
+	</Dialog.Root>
 {/if}
 
 {#if confirmModals.active === 'deleteSnapshot'}

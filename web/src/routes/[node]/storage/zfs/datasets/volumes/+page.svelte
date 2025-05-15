@@ -135,6 +135,24 @@
 
 	let zfsProperties = $state(createVolProps);
 
+	async function closeCreateVolumeModal() {
+		confirmModals.createVolume.open = false;
+		confirmModals.createVolume.data = {
+			name: '',
+			properties: {
+				parent: '',
+				checksum: 'on',
+				compression: 'on',
+				dedup: 'off',
+				encryption: 'off',
+				encryptionKey: '',
+				volblocksize: '16384',
+				size: ''
+			}
+		};
+		confirmModals.createVolume.title = '';
+	}
+
 	async function confirmAction() {
 		if (confirmModals.active === 'createVolume') {
 			if (!isValidPoolName(confirmModals.createVolume.data.name)) {
@@ -432,12 +450,47 @@
 						<Icon icon="carbon:volume-block-storage" class="mr-2 h-5 w-5" />Create Volume</Dialog.Title
 					>
 				</Dialog.Header>
-				<Dialog.Close
-					class="ring-offset-background data-[state=open]:bg-accent data-[state=open]:text-muted-foreground mr-4 flex h-5 w-5 items-center justify-center rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-0 disabled:pointer-events-none"
-				>
-					<Icon icon="lucide:x" class="h-5 w-5" />
-					<span class="sr-only">Close</span>
-				</Dialog.Close>
+				<div class="flex items-center gap-0.5">
+					<Button
+						size="sm"
+						variant="ghost"
+						class="h-8"
+						title={capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}
+						onclick={() => {
+							confirmModals.createVolume.data = {
+								name: '',
+								properties: {
+									parent: '',
+									checksum: 'on',
+									compression: 'on',
+									dedup: 'off',
+									encryption: 'off',
+									encryptionKey: '',
+									volblocksize: '16384',
+									size: ''
+								}
+							};
+							confirmModals.createVolume.title = '';
+						}}
+					>
+						<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only"
+							>{capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}</span
+						>
+					</Button>
+					<Button
+						size="sm"
+						variant="ghost"
+						class="h-8"
+						title={capitalizeFirstLetter(getTranslation('common.close', 'Close'))}
+						onclick={() => closeCreateVolumeModal()}
+					>
+						<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only"
+							>{capitalizeFirstLetter(getTranslation('common.close', 'Close'))}</span
+						>
+					</Button>
+				</div>
 			</div>
 
 			<div class="w-full p-4">
@@ -535,18 +588,7 @@
 					<Button
 						size="sm"
 						type="button"
-						variant="ghost"
-						class="disabled border-border h-8 w-full border"
-						onclick={() => {
-							confirmModals.createVolume.open = false;
-						}}
-					>
-						Cancel
-					</Button>
-					<Button
-						size="sm"
-						type="button"
-						class="h-8 w-full bg-blue-600 text-white hover:bg-blue-700"
+						class="h-8 w-full "
 						onclick={() => {
 							confirmAction();
 						}}

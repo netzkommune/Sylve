@@ -986,7 +986,12 @@
 	>
 		<div class="flex items-center justify-between px-4 py-3">
 			<Dialog.Header class="p-0">
-				<Dialog.Title>{getTranslation('zfs.pool.create_zfs_pool', 'Create ZFS Pool')}</Dialog.Title>
+				<Dialog.Title class="flex items-center gap-2 text-left">
+					<Icon icon="bi:hdd-stack-fill" class="h-5 w-5 " />{getTranslation(
+						'zfs.pool.create_zfs_pool',
+						'Create ZFS Pool'
+					)}</Dialog.Title
+				>
 			</Dialog.Header>
 
 			<div class="flex items-center gap-0.5">
@@ -1014,7 +1019,7 @@
 						modal.forceCreate = false;
 					}}
 				>
-					<Icon icon="radix-icons:reset" class="h-4 w-4" />
+					<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
 					<span class="sr-only"
 						>{capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}</span
 					>
@@ -1026,7 +1031,7 @@
 					title={capitalizeFirstLetter(getTranslation('common.close', 'Close'))}
 					onclick={() => modal.close()}
 				>
-					<Icon icon="material-symbols:close-rounded" class="h-4 w-4" />
+					<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
 					<span class="sr-only"
 						>{capitalizeFirstLetter(getTranslation('common.close', 'Close'))}</span
 					>

@@ -982,19 +982,56 @@
 
 <Dialog.Root bind:open={modal.open} closeOnOutsideClick={false}>
 	<Dialog.Content
-		class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-visible overflow-y-auto p-0 transition-all duration-300 ease-in-out lg:max-w-[70%]"
+		class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-visible overflow-y-auto p-5 transition-all duration-300 ease-in-out lg:max-w-[70%]"
 	>
 		<div class="flex items-center justify-between px-4 py-3">
 			<Dialog.Header class="p-0">
 				<Dialog.Title>{getTranslation('zfs.pool.create_zfs_pool', 'Create ZFS Pool')}</Dialog.Title>
 			</Dialog.Header>
 
-			<Dialog.Close
-				class="flex h-5 w-5 items-center justify-center rounded-sm opacity-70 transition-opacity hover:opacity-100"
-				onclick={() => modal.close()}
-			>
-				<Icon icon="material-symbols:close-rounded" class="h-5 w-5" />
-			</Dialog.Close>
+			<div class="flex items-center gap-0.5">
+				<Button
+					size="sm"
+					variant="ghost"
+					class="h-8"
+					title={capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}
+					onclick={() => {
+						modal.name = '';
+						modal.vdevCount = 1;
+						modal.vdevContainers = [];
+						modal.advanced = false;
+						modal.properties = {
+							comment: '',
+							ashift: 12,
+							autoexpand: 'off',
+							autotrim: 'off',
+							delegation: 'off',
+							failmode: 'wait'
+						};
+						modal.raidType = 'stripe';
+						modal.mountPoint = '';
+						modal.useable = 0;
+						modal.forceCreate = false;
+					}}
+				>
+					<Icon icon="radix-icons:reset" class="h-4 w-4" />
+					<span class="sr-only"
+						>{capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}</span
+					>
+				</Button>
+				<Button
+					size="sm"
+					variant="ghost"
+					class="h-8"
+					title={capitalizeFirstLetter(getTranslation('common.close', 'Close'))}
+					onclick={() => modal.close()}
+				>
+					<Icon icon="material-symbols:close-rounded" class="h-4 w-4" />
+					<span class="sr-only"
+						>{capitalizeFirstLetter(getTranslation('common.close', 'Close'))}</span
+					>
+				</Button>
+			</div>
 		</div>
 		<Tabs.Root value="tab-devices" class="w-full overflow-hidden">
 			<Tabs.List class="grid w-full grid-cols-2 p-0 px-4">
@@ -1358,11 +1395,7 @@
 
 		<Dialog.Footer class="flex justify-between gap-2 border-t px-4 py-3">
 			<div class="flex gap-2">
-				<Button
-					variant="default"
-					class="h-8 bg-blue-600 text-white hover:bg-blue-700"
-					onclick={() => makePool()}
-				>
+				<Button size="sm" class="h-8 " onclick={() => makePool()}>
 					{#if modal.creating}
 						<Icon icon="mdi:loading" class="mr-1 h-4 w-4 animate-spin" />
 					{:else}
@@ -1496,9 +1529,9 @@
 		closeOnEscape={false}
 	>
 		<Dialog.Content
-			class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-visible overflow-y-auto p-0 transition-all duration-300 ease-in-out lg:max-w-[70%]"
+			class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-visible overflow-y-auto p-6 transition-all duration-300 ease-in-out lg:max-w-[70%]"
 		>
-			<div class="flex items-center justify-between px-4 py-3">
+			<div class="flex items-center justify-between pb-3">
 				<Dialog.Header>
 					<Dialog.Title class="flex items-center">
 						<span class="text-primary font-semibold">Pool Status</span>
@@ -1527,7 +1560,7 @@
 				</Dialog.Close>
 			</div>
 
-			<div class="space-y-4 px-4 py-3">
+			<div class="space-y-4">
 				{#if sPool}
 					{#if sPool.status && sPool.status.length > 0}
 						<div
@@ -1677,8 +1710,8 @@
 
 			<Dialog.Footer class="px-4 py-3">
 				<Button
-					variant="default"
-					class="h-8 bg-blue-700 text-white hover:bg-blue-600"
+					size="sm"
+					class="h-8 "
 					onclick={() => {
 						confirmModals.statusPool.open = false;
 					}}>Close</Button

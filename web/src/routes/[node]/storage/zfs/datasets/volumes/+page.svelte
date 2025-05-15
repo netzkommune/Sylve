@@ -624,23 +624,62 @@
 {/if}
 
 {#if confirmModals.active === 'createSnapshot'}
-	<AlertDialog.Root
+	<Dialog.Root
 		bind:open={confirmModals.createSnapshot.open}
 		closeOnOutsideClick={false}
 		closeOnEscape={false}
 	>
-		<AlertDialog.Content>
-			<AlertDialog.Header>
-				<AlertDialog.Title>
-					<div class="flex items-center">
-						<Icon icon="carbon:ibm-cloud-vpc-block-storage-snapshots" class="mr-2 h-6 w-6" />
-						Snapshot -
-						{confirmModals.createSnapshot.data.name !== ''
-							? `${confirmModals.createSnapshot.title}@${confirmModals.createSnapshot.data.name}`
-							: `${confirmModals.createSnapshot.title}`}
-					</div>
-				</AlertDialog.Title>
-			</AlertDialog.Header>
+		<Dialog.Content class="p-5">
+			<div class="flex items-center justify-between">
+				<Dialog.Header class="flex-1">
+					<Dialog.Title>
+						<div class="flex items-center">
+							<Icon icon="carbon:ibm-cloud-vpc-block-storage-snapshots" class="mr-2 h-6 w-6" />
+							Snapshot -
+							{confirmModals.createSnapshot.data.name !== ''
+								? `${confirmModals.createSnapshot.title}@${confirmModals.createSnapshot.data.name}`
+								: `${confirmModals.createSnapshot.title}`}
+						</div>
+					</Dialog.Title>
+				</Dialog.Header>
+				<div class="flex items-center gap-0.5">
+					<Button
+						size="sm"
+						variant="ghost"
+						class="h-8"
+						title={capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}
+						onclick={() => {
+							confirmModals.createSnapshot.data.name = '';
+							confirmModals.createSnapshot.title = '';
+						}}
+					>
+						<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only"
+							>{capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}</span
+						>
+					</Button>
+					<Button
+						size="sm"
+						variant="ghost"
+						class="h-8"
+						title={capitalizeFirstLetter(getTranslation('common.close', 'Close'))}
+						onclick={() => {
+							confirmModals.createSnapshot = {
+								open: false,
+								data: {
+									name: ''
+								},
+								title: ''
+							};
+						}}
+					>
+						<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only"
+							>{capitalizeFirstLetter(getTranslation('common.close', 'Close'))}</span
+						>
+					</Button>
+				</div>
+			</div>
 
 			<div class="flex-1 space-y-1">
 				<Label for="name">Name</Label>
@@ -653,22 +692,16 @@
 				/>
 			</div>
 
-			<AlertDialog.Footer>
-				<AlertDialog.Cancel
-					onclick={() => {
-						confirmModals.createSnapshot.open = false;
-					}}>Cancel</AlertDialog.Cancel
-				>
-				<AlertDialog.Action
+			<Dialog.Footer>
+				<Button
+					size="sm"
 					onclick={() => {
 						confirmAction();
-					}}
+					}}>Create</Button
 				>
-					Create
-				</AlertDialog.Action>
-			</AlertDialog.Footer>
-		</AlertDialog.Content>
-	</AlertDialog.Root>
+			</Dialog.Footer>
+		</Dialog.Content>
+	</Dialog.Root>
 {/if}
 
 {#if confirmModals.active == 'deleteSnapshot'}

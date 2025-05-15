@@ -61,11 +61,6 @@
 					icon: 'file-icons:openzfs',
 					children: [
 						{
-							label: 'Dashboard',
-							icon: 'material-symbols:dashboard',
-							href: `/${node}/storage/zfs/dashboard`
-						},
-						{
 							label: 'pools',
 							icon: 'bi:hdd-stack-fill',
 							href: `/${node}/storage/zfs/pools`
@@ -91,7 +86,8 @@
 								}
 							]
 						}
-					]
+					],
+					href: `/${node}/storage/zfs/dashboard`
 				}
 			]
 		},

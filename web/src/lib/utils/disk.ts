@@ -15,6 +15,7 @@ import humanFormat from 'human-format';
 import type { CellComponent } from 'tabulator-tables';
 import { getTranslation } from './i18n';
 import { generateNumberFromString } from './numbers';
+import { capitalizeFirstLetter } from './string';
 import { renderWithIcon } from './table';
 
 export function parseSMART(disk: Disk): SmartAttribute | SmartAttribute[] {
@@ -56,13 +57,14 @@ export function parseSMART(disk: Disk): SmartAttribute | SmartAttribute[] {
 		if (data?.ata_smart_attributes?.table?.length) {
 			for (const element of data.ata_smart_attributes.table) {
 				attributes.push({
-					ID: element.id,
-					Name: element.name,
-					Value: element.value,
-					Worst: element.worst,
-					Threshold: element.thresh,
-					Flags: element.flags.string,
-					Failing: element.when_failed || '-'
+					[getTranslation('common.ID', 'ID')]: element.id,
+					[capitalizeFirstLetter(getTranslation('common.name', 'Name'))]: element.name,
+					[capitalizeFirstLetter(getTranslation('common.value', 'Value'))]: element.value,
+					[capitalizeFirstLetter(getTranslation('common.worst', 'Worst'))]: element.worst,
+					[capitalizeFirstLetter(getTranslation('common.threshold', 'Threshold'))]: element.thresh,
+					[capitalizeFirstLetter(getTranslation('common.flags', 'Flags'))]: element.flags.string,
+					[capitalizeFirstLetter(getTranslation('common.failing', 'Failing'))]:
+						element.when_failed || '-'
 				});
 			}
 		}

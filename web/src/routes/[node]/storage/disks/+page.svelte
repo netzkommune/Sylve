@@ -18,6 +18,7 @@
 	import { useQueries } from '@sveltestack/svelte-query';
 	import { untrack } from 'svelte';
 	import toast from 'svelte-french-toast';
+
 	interface Data {
 		disks: Disk[];
 		pools: Zpool[];

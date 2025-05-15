@@ -221,7 +221,12 @@
 		"mode": "mode",
 		"search": "search",
 		"private": "private",
-		"content": "content"
+		"content": "content",
+		"value": "value",
+		"worst": "worst",
+		"threshold": "threshold",
+		"flags": "flags",
+		"failing": "failing"
 	},
 	"validation_errors": {
 		"failed validation: min": "too small"

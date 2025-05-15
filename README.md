@@ -42,6 +42,8 @@ libvirtd_enable="YES"
 vmm_load="YES"
 if_bridge_load="YES"
 nmdm_load="YES"
+gateway_enable="YES"
+pf_enable="YES"
 ```
 
 Please reboot your system after enabling these services.

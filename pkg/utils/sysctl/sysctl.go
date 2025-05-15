@@ -12,6 +12,7 @@ package sysctl
 
 // #include <sys/types.h>
 // #include <sys/sysctl.h>
+// #include <stdlib.h>
 import "C"
 import "unsafe"
 
@@ -51,4 +52,30 @@ func GetBytes(name string) (value []byte, err error) {
 	}
 
 	return buf[:oldlen], nil
+}
+
+func Set(name string, value []byte) error {
+	newlen := C.size_t(len(value))
+	nameC := C.CString(name)
+	defer C.free(unsafe.Pointer(nameC))
+
+	var newp unsafe.Pointer
+	if len(value) > 0 {
+		newp = unsafe.Pointer(&value[0])
+	} else {
+		newp = unsafe.Pointer(uintptr(0))
+	}
+
+	_, err := C.sysctlbyname(nameC, nil, nil, newp, newlen)
+	return err
+}
+
+func SetInt32(name string, value int32) error {
+	nameC := C.CString(name)
+	defer C.free(unsafe.Pointer(nameC))
+	newlen := C.size_t(unsafe.Sizeof(value))
+	newp := unsafe.Pointer(&value)
+
+	_, err := C.sysctlbyname(nameC, nil, nil, newp, newlen)
+	return err
 }

@@ -20,14 +20,15 @@ type TLSConfig struct {
 }
 
 type SylveConfig struct {
-	Environment string            `json:"environment"`
-	ProxyToVite bool              `json:"proxyToVite"`
-	IP          string            `json:"ip"`
-	Port        int               `json:"port"`
-	LogLevel    int8              `json:"logLevel"`
-	Admins      []BaseConfigAdmin `json:"admins"`
-	DataPath    string            `json:"dataPath"`
-	TLS         TLSConfig         `json:"tlsConfig"`
+	Environment   string            `json:"environment"`
+	ProxyToVite   bool              `json:"proxyToVite"`
+	IP            string            `json:"ip"`
+	Port          int               `json:"port"`
+	LogLevel      int8              `json:"logLevel"`
+	WANInterfaces []string          `json:"wanInterfaces"`
+	Admins        []BaseConfigAdmin `json:"admins"`
+	DataPath      string            `json:"dataPath"`
+	TLS           TLSConfig         `json:"tlsConfig"`
 }
 
 type APIResponse[T any] struct {

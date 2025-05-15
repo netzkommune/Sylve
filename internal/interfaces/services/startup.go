@@ -10,5 +10,7 @@ package serviceInterfaces
 
 type StartupServiceInterface interface {
 	InitKeys(authService AuthServiceInterface) error
+	SysctlSync() error
+	InitFirewall() error
 	Initialize(authService AuthServiceInterface) error
 }

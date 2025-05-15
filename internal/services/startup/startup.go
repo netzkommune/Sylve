@@ -10,7 +10,9 @@ package startup
 
 import (
 	"context"
+	"fmt"
 	"os"
+	"sylve/internal/config"
 	serviceInterfaces "sylve/internal/interfaces/services"
 	infoServiceInterfaces "sylve/internal/interfaces/services/info"
 	libvirtServiceInterfaces "sylve/internal/interfaces/services/libvirt"
@@ -19,6 +21,8 @@ import (
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
 	"sylve/internal/logger"
 	"time"
+
+	sysctl "sylve/pkg/utils/sysctl"
 
 	"gorm.io/gorm"
 )
@@ -62,6 +66,29 @@ func (s *Service) InitKeys(authService serviceInterfaces.AuthServiceInterface) e
 	return nil
 }
 
+func (s *Service) SysctlSync() error {
+	intVals := map[string]int32{
+		"net.inet.ip.forwarding": 1,
+	}
+
+	for k, v := range intVals {
+		err := sysctl.SetInt32(k, v)
+		if err != nil {
+			logger.L.Error().Msgf("Error setting sysctl %s: %v", k, err)
+		}
+	}
+
+	return nil
+}
+
+func (s *Service) InitFirewall() error {
+	if len(config.ParsedConfig.WANInterfaces) == 0 {
+		return fmt.Errorf("no WAN interfaces found in config")
+	}
+
+	return nil
+}
+
 func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface) error {
 	if err := s.InitKeys(authService); err != nil {
 		return err
@@ -75,9 +102,17 @@ func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface)
 		return err
 	}
 
+	if err := s.InitFirewall(); err != nil {
+		return err
+	}
+
 	go s.Info.Cron()
 	go s.ZFS.Cron()
 	go s.ZFS.StartSnapshotScheduler(context.Background())
+
+	if err := s.SysctlSync(); err != nil {
+		return err
+	}
 
 	err := s.Network.SyncStandardSwitches(nil, "sync")
 

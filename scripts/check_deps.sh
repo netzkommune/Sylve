@@ -47,6 +47,8 @@ check_rcconf libvirtd_enable
 check_rcconf vmm_load
 check_rcconf if_bridge_load
 check_rcconf nmdm_load
+check_rcconf gateway_enable
+check_rcconf pf_enable
 
 echo "=== Dependency check completed ==="
 echo

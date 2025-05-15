@@ -12,6 +12,7 @@
 		autocomplete?: FullAutoFill | null | undefined;
 		classes: string;
 		type?: string;
+		textAreaCLasses?: string;
 	}
 
 	let {
@@ -20,17 +21,18 @@
 		placeholder = '',
 		autocomplete = 'off',
 		classes = 'space-y-1',
-		type = 'text'
+		type = 'text',
+		textAreaCLasses = 'min-h-56'
 	}: Props = $props();
 
 	let nanoId = $state(generateNanoId(label));
 </script>
 
-<div class={classes}>
+<div class={`${classes}`}>
 	<Label for={nanoId}>{label}</Label>
 
 	{#if type === 'textarea'}
-		<Textarea id={nanoId} {placeholder} {autocomplete} bind:value />
+		<Textarea class={textAreaCLasses} id={nanoId} {placeholder} {autocomplete} bind:value />
 	{:else}
 		<Input {type} id={nanoId} {placeholder} {autocomplete} bind:value />
 	{/if}

@@ -353,7 +353,7 @@
 		closeOnOutsideClick={false}
 		closeOnEscape={false}
 	>
-		<Dialog.Content>
+		<Dialog.Content class="w-[90%] gap-2 p-5 lg:max-w-2xl">
 			<div class="flex items-center justify-between px-1 py-1">
 				<Dialog.Header>
 					<Dialog.Title>

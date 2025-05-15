@@ -205,8 +205,8 @@
 	</div>
 
 	<Dialog.Root bind:open={modalState.isOpen} closeOnOutsideClick={false}>
-		<Dialog.Content class="w-[80%] gap-0 overflow-hidden p-3 lg:max-w-3xl">
-			<div class="flex items-center justify-between py-1 pb-2">
+		<Dialog.Content class="w-[90%] gap-2 overflow-hidden p-5 lg:max-w-2xl">
+			<div class="flex items-center justify-between">
 				<Dialog.Header class="flex-1">
 					<Dialog.Title>
 						<div class="flex items-center gap-2">
@@ -264,33 +264,32 @@
 				classes="flex-1 space-y-1"
 			/>
 
-			<div class="mt-2">
+			<div class="">
 				<ScrollArea orientation="vertical" class="h-full">
 					{#if modalState.isEditMode}
-						<div class="p-1">
+						<div>
 							<CustomValueInput
 								label={capitalizeFirstLetter(getTranslation('common.content', 'Content'))}
 								placeholder="This is a note"
 								bind:value={modalState.content}
-								classes="flex-1 space-y-1"
+								classes="flex-1 space-y-1 "
 								type="textarea"
 							/>
 						</div>
 					{:else}
-						<div class="p-1">
-							<span
-								class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+						<div class="mt-2">
+							<p
+								class="mb-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
 							>
 								{capitalizeFirstLetter(getTranslation('common.content', 'Content'))}
-							</span>
-							<article class="prose lg:prose-xl">
+							</p>
+							<article class="prose lg:prose-xl rounded-md border p-3">
 								{@html markdownToTailwindHTML(modalState.content)}
 							</article>
 						</div>
 					{/if}
 				</ScrollArea>
 			</div>
-
 			<Dialog.Footer class="flex justify-end">
 				<div class="flex w-full items-center justify-end gap-2 px-1 py-2">
 					{#if modalState.isEditMode}

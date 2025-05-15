@@ -13,6 +13,7 @@
 	import humanFormat from 'human-format';
 	import { tick } from 'svelte';
 	import toast from 'svelte-french-toast';
+	import { slide } from 'svelte/transition';
 
 	interface Data {
 		open: boolean;
@@ -126,23 +127,48 @@
 
 <Dialog.Root bind:open onOutsideClick={(e) => close()}>
 	<Dialog.Content
-		class="fixed left-1/2 top-1/2 w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-hidden p-0 lg:max-w-3xl"
+		class="fixed left-1/2 top-1/2 w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-4 overflow-hidden p-5 lg:max-w-3xl"
 	>
-		<div class="flex items-center justify-between p-4">
+		<div class="flex items-center justify-between">
 			<Dialog.Header class="p-0">
 				<Dialog.Title>Create Partitions</Dialog.Title>
 				<Dialog.Description></Dialog.Description>
 			</Dialog.Header>
 
-			<Dialog.Close
-				class="flex h-5 w-5 items-center justify-center rounded-sm opacity-70 transition-opacity hover:opacity-100"
-				onclick={() => close()}
-			>
-				<Icon icon="material-symbols:close-rounded" class="h-5 w-5" />
-			</Dialog.Close>
+			<div class="flex items-center gap-0.5">
+				<Button
+					size="sm"
+					variant="ghost"
+					class="h-8"
+					title={capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}
+					on:click={() => {
+						newPartitions = [];
+						remainingSpace = disk ? calculateRemainingSpace(disk) : 0;
+						currentPartition = 0;
+						currentPartitionInput = '';
+					}}
+				>
+					<Icon icon="radix-icons:reset" class="h-4 w-4" />
+					<span class="sr-only"
+						>{capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}</span
+					>
+				</Button>
+				<Button
+					size="sm"
+					variant="ghost"
+					class="h-8"
+					title={capitalizeFirstLetter(getTranslation('common.close', 'Close'))}
+					onclick={() => close()}
+				>
+					<Icon icon="material-symbols:close-rounded" class="h-4 w-4" />
+					<span class="sr-only"
+						>{capitalizeFirstLetter(getTranslation('common.close', 'Close'))}</span
+					>
+				</Button>
+			</div>
 		</div>
 
-		<div class="max-h-[300px] overflow-y-auto px-4" id="table-body">
+		<div class="max-h-[300px] overflow-y-auto" id="table-body">
 			<Table.Root>
 				<Table.Header class="bg-background sticky top-0 z-10">
 					<Table.Row>
@@ -192,7 +218,7 @@
 			</Table.Root>
 		</div>
 
-		<div class="space-y-2 border-t px-6 py-4">
+		<div class="space-y-2 border-t px-6 pt-4">
 			<div class="flex items-center gap-6">
 				<div class="flex-1">
 					<Slider
@@ -217,7 +243,6 @@
 
 				<div class={remainingSpace > 0 ? '' : 'cursor-not-allowed'}>
 					<Button
-						variant="outline"
 						class="h-8 whitespace-nowrap"
 						onclick={addPartition}
 						disabled={currentPartition <= 0}
@@ -231,23 +256,23 @@
 				</div>
 			</div>
 
-			<div class="flex justify-end">
-				<span class="text-muted-foreground text-sm">
+			<div class="flex flex-col items-end gap-2">
+				<p class="text-muted-foreground text-sm">
 					Size: {humanFormat(currentPartition)}
-				</span>
+				</p>
+				<p class="text-muted-foreground text-sm">
+					Remaining space: {humanFormat(remainingSpace)}
+				</p>
 			</div>
 		</div>
-
-		<Dialog.Footer class="flex justify-between gap-2 border-t px-6 py-4">
-			<div class="flex gap-2">
-				<div class="text-muted-foreground mt-2 text-sm">
-					Remaining space: {humanFormat(remainingSpace)}
-				</div>
-				<Button variant="outline" class="h-8" onclick={() => close()}>Cancel</Button>
-				{#if newPartitions.length > 0}
-					<Button variant="outline" class="h-8" onclick={savePartitions}>Save Partitions</Button>
-				{/if}
+		{#if newPartitions.length > 0}
+			<div in:slide={{ duration: 200 }} out:slide={{ duration: 200 }}>
+				<Dialog.Footer class="flex justify-between gap-2 border-t px-6 py-4">
+					<div class="flex gap-2">
+						<Button size="sm" class="h-8" onclick={savePartitions}>Save Partitions</Button>
+					</div>
+				</Dialog.Footer>
 			</div>
-		</Dialog.Footer>
+		{/if}
 	</Dialog.Content>
 </Dialog.Root>

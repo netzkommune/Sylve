@@ -1,6 +1,7 @@
 {
   "environment": "development",
   "proxyToVite": false,
+  "wanInterfaces": ["em0"]
   "admins": [
     {
       "username": "admin",

@@ -48,6 +48,10 @@ type RollbackSnapshotRequest struct {
 	DestroyMoreRecent bool   `json:"destroyMoreRecent"`
 }
 
+type BulkDeleteRequest struct {
+	GUIDs []string `json:"guids" binding:"required"`
+}
+
 // @Summary Get all ZFS datasets
 // @Description Get all ZFS datasets
 // @Tags ZFS
@@ -476,6 +480,51 @@ func DeleteVolume(zfsService *zfs.Service) gin.HandlerFunc {
 		c.JSON(http.StatusOK, internal.APIResponse[any]{
 			Status:  "success",
 			Message: "deleted_volume",
+			Error:   "",
+			Data:    nil,
+		})
+	}
+}
+
+// @Summary Bulk delete ZFS datasets
+// @Description Bulk delete ZFS datasets
+// @Tags ZFS
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body BulkDeleteRequest true "Bulk Delete Request"
+// @Success 200 {object} internal.APIResponse[any] "OK"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /zfs/datasets/bulk-delete [post]
+func BulkDeleteDataset(zfsService *zfs.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var guids BulkDeleteRequest
+
+		if err := c.ShouldBindJSON(&guids); err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		err := zfsService.BulkDeleteDataset(guids.GUIDs)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "deleted_datasets",
 			Error:   "",
 			Data:    nil,
 		})

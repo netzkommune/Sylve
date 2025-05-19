@@ -10,6 +10,7 @@ package middleware
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 
@@ -20,6 +21,12 @@ import (
 func EnsureAuthenticated(authService *authService.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		path := c.Request.URL.Path
+
+		if strings.HasPrefix(path, "/api/utilities/downloads/") &&
+			len(path) > len("/api/utilities/downloads/") {
+			return
+		}
+
 		if path == "/api/auth/login" {
 			return
 		}

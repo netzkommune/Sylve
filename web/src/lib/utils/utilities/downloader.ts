@@ -42,7 +42,13 @@ export function generateTableData(data: Download[]): { rows: Row[]; columns: Col
 			field: 'size',
 			title: getTranslation('disk.size', 'Size'),
 			formatter: (cell: CellComponent) => {
-				return humanFormat(cell.getValue());
+				const value = cell.getValue();
+
+				if (value === 0 || value === '0') {
+					return renderWithIcon('eos-icons:three-dots-loading', '');
+				}
+
+				return humanFormat(value);
 			}
 		},
 		{
@@ -66,6 +72,11 @@ export function generateTableData(data: Download[]): { rows: Row[]; columns: Col
 
 				return renderWithIcon('lets-icons:check-fill', '100 %');
 			}
+		},
+		{
+			field: 'parentUUID',
+			title: 'Parent UUID',
+			visible: false
 		}
 	];
 
@@ -90,7 +101,8 @@ export function generateTableData(data: Download[]): { rows: Row[]; columns: Col
 				size: file.size,
 				type: '-',
 				children: [],
-				progress: '-'
+				progress: '-',
+				parentUUID: download.uuid
 			};
 
 			row.children?.push(childRow);
@@ -98,6 +110,8 @@ export function generateTableData(data: Download[]): { rows: Row[]; columns: Col
 
 		rows.push(row);
 	}
+
+	console.log(rows);
 
 	return {
 		rows: rows,

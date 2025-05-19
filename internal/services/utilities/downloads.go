@@ -2,6 +2,7 @@ package utilities
 
 import (
 	"fmt"
+	"path"
 	utilitiesModels "sylve/internal/db/models/utilities"
 	"sylve/internal/logger"
 	"sylve/pkg/utils"
@@ -19,6 +20,53 @@ func (s *Service) ListDownloads() ([]utilitiesModels.Downloads, error) {
 	}
 
 	return downloads, nil
+}
+
+func (s *Service) GetDownload(uuid string) (*utilitiesModels.Downloads, error) {
+	var download utilitiesModels.Downloads
+	if err := s.DB.Preload("Files").Where("uuid = ?", uuid).First(&download).Error; err != nil {
+		logger.L.Error().Msgf("Failed to get download: %v", err)
+		return nil, err
+	}
+
+	return &download, nil
+}
+
+func (s *Service) GetDownloadAndFile(uuid, name string) (*utilitiesModels.Downloads, *utilitiesModels.DownloadedFile, error) {
+	var download utilitiesModels.Downloads
+
+	if err := s.DB.Preload("Files").Where("uuid = ?", uuid).First(&download).Error; err != nil {
+		logger.L.Error().Msgf("Failed to get download by UUID: %v", err)
+		return nil, nil, err
+	}
+
+	var file utilitiesModels.DownloadedFile
+	for _, f := range download.Files {
+		if f.Name == name {
+			file = f
+			break
+		}
+	}
+
+	return &download, &file, nil
+}
+
+func (s *Service) GetFilePathById(id int) (string, error) {
+	var file utilitiesModels.DownloadedFile
+	if err := s.DB.Where("id = ?", id).First(&file).Error; err != nil {
+		logger.L.Error().Msgf("Failed to get file by ID: %v", err)
+		return "", err
+	}
+
+	var download utilitiesModels.Downloads
+	if err := s.DB.Where("id = ?", file.DownloadID).First(&download).Error; err != nil {
+		logger.L.Error().Msgf("Failed to get download by ID: %v", err)
+		return "", err
+	}
+
+	fullPath := path.Join(download.Path, file.Name)
+
+	return fullPath, nil
 }
 
 func (s *Service) DownloadFile(url string) error {

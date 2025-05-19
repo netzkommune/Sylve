@@ -1,5 +1,6 @@
 <script lang="ts">
 	import {
+		bulkDelete,
 		createFileSystem,
 		createSnapshot,
 		deleteFileSystem,
@@ -96,6 +97,43 @@
 		return null;
 	});
 
+	let activeDatasets: Dataset[] = $derived.by(() => {
+		if (activeRows) {
+			let datasets: Dataset[] = [];
+			for (const row of activeRows) {
+				for (const dataset of grouped) {
+					const filesystems = dataset.filesystems;
+					const snapshots = dataset.snapshots;
+
+					for (const fs of filesystems) {
+						if (fs.name === row.name) {
+							datasets.push(fs);
+						}
+					}
+
+					for (const snap of snapshots) {
+						if (snap.name === row.name) {
+							datasets.push(snap);
+						}
+					}
+				}
+			}
+			return datasets;
+		}
+
+		return [];
+	});
+
+	let poolsSelected = $derived.by(() => {
+		// we need to return true or false
+		if (activeRows) {
+			let pools: string[] = [];
+			console.log('activeRows', activeRows);
+		}
+
+		return false;
+	});
+
 	$effect(() => {
 		if (activeDataset && confirmModals.active === 'createFilesystem') {
 			confirmModals.createFilesystem.data.properties.parent = activeDataset.name;
@@ -108,8 +146,9 @@
 			| 'createSnapshot'
 			| 'rollbackSnapshot'
 			| 'createFilesystem'
-			| 'deleteFilesystem',
-		parent: 'filesystem' as 'filesystem' | 'snapshot',
+			| 'deleteFilesystem'
+			| 'bulkDeleteDatasets',
+		parent: 'filesystem' as 'filesystem' | 'snapshot' | 'dataset',
 		deleteSnapshot: {
 			open: false,
 			data: '',
@@ -148,6 +187,11 @@
 			title: ''
 		},
 		deleteFilesystem: {
+			open: false,
+			data: '',
+			title: ''
+		},
+		bulkDeleteDatasets: {
 			open: false,
 			data: '',
 			title: ''
@@ -279,6 +323,18 @@
 			}
 		}
 
+		if (confirmModals.active === 'bulkDeleteDatasets') {
+			if (activeDatasets.length > 0) {
+				const response = await bulkDelete(activeDatasets);
+				if (response.error) {
+					handleError(response);
+					return;
+				}
+
+				activeRows = null;
+			}
+		}
+
 		confirmModals[confirmModals.active].open = false;
 
 		if (confirmModals.active === 'createSnapshot') {
@@ -286,7 +342,11 @@
 			confirmModals.createSnapshot.data.recursive = false;
 		}
 
-		if (confirmModals.active === 'deleteSnapshot' || confirmModals.active === 'deleteFilesystem') {
+		if (
+			confirmModals.active === 'deleteSnapshot' ||
+			confirmModals.active === 'deleteFilesystem' ||
+			confirmModals.active === 'bulkDeleteDatasets'
+		) {
 			confirmModals[confirmModals.active].data = '';
 			confirmModals[confirmModals.active].title = '';
 		}
@@ -345,73 +405,111 @@
 </script>
 
 {#snippet button(type: string)}
-	{#if type === 'rollback-snapshot' && activeDataset?.type === 'snapshot'}
-		<Button
-			onclick={async () => {
-				if (activeDataset) {
-					confirmModals.active = 'rollbackSnapshot';
-					confirmModals.parent = 'snapshot';
-					confirmModals.rollbackSnapshot.open = true;
-					confirmModals.rollbackSnapshot.data.name = activeDataset.name;
-					confirmModals.rollbackSnapshot.title = activeDataset.name;
-				}
-			}}
-			size="sm"
-			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
-		>
-			<Icon icon="eos-icons:snapshot-rollback" class="mr-1 h-4 w-4" /> Rollback To Snapshot
-		</Button>
-	{/if}
+	{#if activeRows && activeRows.length == 1}
+		{#if type === 'rollback-snapshot' && activeDataset?.type === 'snapshot'}
+			<Button
+				onclick={async () => {
+					if (activeDataset) {
+						confirmModals.active = 'rollbackSnapshot';
+						confirmModals.parent = 'snapshot';
+						confirmModals.rollbackSnapshot.open = true;
+						confirmModals.rollbackSnapshot.data.name = activeDataset.name;
+						confirmModals.rollbackSnapshot.title = activeDataset.name;
+					}
+				}}
+				size="sm"
+				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+			>
+				<Icon icon="eos-icons:snapshot-rollback" class="mr-1 h-4 w-4" /> Rollback To Snapshot
+			</Button>
+		{/if}
 
-	{#if type === 'delete-snapshot' && activeDataset?.type === 'snapshot'}
-		<Button
-			onclick={async () => {
-				if (activeDataset) {
-					confirmModals.active = 'deleteSnapshot';
-					confirmModals.parent = 'snapshot';
-					confirmModals.deleteSnapshot.open = true;
-					confirmModals.deleteSnapshot.title = activeDataset.name;
-				}
-			}}
-			size="sm"
-			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
-		>
-			<Icon icon="mdi:delete" class="mr-1 h-4 w-4" /> Delete Snapshot
-		</Button>
-	{/if}
+		{#if type === 'delete-snapshot' && activeDataset?.type === 'snapshot'}
+			<Button
+				onclick={async () => {
+					if (activeDataset) {
+						confirmModals.active = 'deleteSnapshot';
+						confirmModals.parent = 'snapshot';
+						confirmModals.deleteSnapshot.open = true;
+						confirmModals.deleteSnapshot.title = activeDataset.name;
+					}
+				}}
+				size="sm"
+				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+			>
+				<Icon icon="mdi:delete" class="mr-1 h-4 w-4" /> Delete Snapshot
+			</Button>
+		{/if}
 
-	{#if type === 'create-snapshot' && activeDataset?.type === 'filesystem'}
-		<Button
-			onclick={async () => {
-				if (activeDataset) {
-					confirmModals.active = 'createSnapshot';
-					confirmModals.parent = 'filesystem';
-					confirmModals.createSnapshot.open = true;
-					confirmModals.createSnapshot.title = activeDataset.name;
-				}
-			}}
-			size="sm"
-			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
-		>
-			<Icon icon="carbon:ibm-cloud-vpc-block-storage-snapshots" class="mr-1 h-4 w-4" /> Create Snapshot
-		</Button>
-	{/if}
+		{#if type === 'create-snapshot' && activeDataset?.type === 'filesystem'}
+			<Button
+				onclick={async () => {
+					if (activeDataset) {
+						confirmModals.active = 'createSnapshot';
+						confirmModals.parent = 'filesystem';
+						confirmModals.createSnapshot.open = true;
+						confirmModals.createSnapshot.title = activeDataset.name;
+					}
+				}}
+				size="sm"
+				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+			>
+				<Icon icon="carbon:ibm-cloud-vpc-block-storage-snapshots" class="mr-1 h-4 w-4" /> Create Snapshot
+			</Button>
+		{/if}
 
-	{#if type === 'delete-filesystem' && activeDataset?.type === 'filesystem' && activeDataset?.name.includes('/')}
-		<Button
-			onclick={async () => {
-				if (activeDataset) {
-					confirmModals.active = 'deleteFilesystem';
-					confirmModals.parent = 'filesystem';
-					confirmModals.deleteFilesystem.open = true;
-					confirmModals.deleteFilesystem.title = activeDataset.name;
-				}
-			}}
-			size="sm"
-			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
-		>
-			<Icon icon="mdi:delete" class="mr-1 h-4 w-4" /> Delete Filesystem
-		</Button>
+		{#if type === 'delete-filesystem' && activeDataset?.type === 'filesystem' && activeDataset?.name.includes('/')}
+			<Button
+				onclick={async () => {
+					if (activeDataset) {
+						confirmModals.active = 'deleteFilesystem';
+						confirmModals.parent = 'filesystem';
+						confirmModals.deleteFilesystem.open = true;
+						confirmModals.deleteFilesystem.title = activeDataset.name;
+					}
+				}}
+				size="sm"
+				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+			>
+				<Icon icon="mdi:delete" class="mr-1 h-4 w-4" /> Delete Filesystem
+			</Button>
+		{/if}
+	{:else if activeRows && activeRows.length > 1}
+		{#if activeDatasets.length > 0}
+			{#if type === 'bulk-delete'}
+				<Button
+					onclick={async () => {
+						confirmModals.active = 'bulkDeleteDatasets';
+						confirmModals.parent = 'dataset';
+						confirmModals.bulkDeleteDatasets.open = true;
+
+						let [snapLen, fsLen] = [0, 0];
+						activeDatasets.forEach((dataset) => {
+							if (dataset.type === 'snapshot') {
+								snapLen++;
+							} else if (dataset.type === 'filesystem') {
+								fsLen++;
+							}
+						});
+
+						let title = '';
+						if (snapLen > 0 && fsLen > 0) {
+							title = `${snapLen} snapshots and ${fsLen} filesystems`;
+						} else if (snapLen > 0) {
+							title = `${snapLen} snapshots`;
+						} else if (fsLen > 0) {
+							title = `${fsLen} filesystems`;
+						}
+
+						confirmModals.bulkDeleteDatasets.title = title;
+					}}
+					size="sm"
+					class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+				>
+					<Icon icon="mdi:delete" class="mr-1 h-4 w-4" /> Delete Datasets
+				</Button>
+			{/if}
+		{/if}
 	{/if}
 {/snippet}
 
@@ -435,13 +533,14 @@
 		{@render button('rollback-snapshot')}
 		{@render button('delete-snapshot')}
 		{@render button('delete-filesystem')}
+		{@render button('bulk-delete')}
 	</div>
 
 	<TreeTable
 		data={tableData}
 		name={tableName}
 		bind:parentActiveRow={activeRows}
-		multipleSelect={false}
+		multipleSelect={true}
 		bind:query
 	/>
 </div>
@@ -451,6 +550,28 @@
 		open={confirmModals.active && confirmModals[confirmModals.active].open}
 		names={{
 			parent: confirmModals.parent,
+			element: confirmModals.active ? confirmModals[confirmModals.active].title || '' : ''
+		}}
+		actions={{
+			onConfirm: () => {
+				if (confirmModals.active) {
+					confirmAction();
+				}
+			},
+			onCancel: () => {
+				if (confirmModals.active) {
+					confirmModals[confirmModals.active].open = false;
+				}
+			}
+		}}
+	></AlertDialogModal>
+{/if}
+
+{#if confirmModals.active === 'bulkDeleteDatasets'}
+	<AlertDialogModal
+		open={confirmModals.active && confirmModals[confirmModals.active].open}
+		names={{
+			parent: '',
 			element: confirmModals.active ? confirmModals[confirmModals.active].title || '' : ''
 		}}
 		actions={{

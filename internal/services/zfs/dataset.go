@@ -421,3 +421,44 @@ func (s *Service) DeleteVolume(guid string) error {
 
 	return fmt.Errorf("volume with guid %s not found", guid)
 }
+
+func (s *Service) BulkDeleteDataset(guids []string) error {
+	guidsMap := make(map[string]struct{})
+	for _, guid := range guids {
+		guidsMap[guid] = struct{}{}
+	}
+
+	datasets, err := zfs.Datasets("")
+	if err != nil {
+		return err
+	}
+
+	matched := make(map[string]*zfs.Dataset)
+
+	for _, dataset := range datasets {
+		properties, err := dataset.GetAllProperties()
+		if err != nil {
+			return err
+		}
+
+		for _, v := range properties {
+			if _, ok := guidsMap[v]; ok {
+				matched[v] = dataset
+				delete(guidsMap, v)
+				break
+			}
+		}
+	}
+
+	if len(guidsMap) > 0 {
+		return fmt.Errorf("datasets with guids %v not found", utils.MapKeys(guidsMap))
+	}
+
+	for guid, dataset := range matched {
+		if err := dataset.Destroy(zfs.DestroyDefault); err != nil {
+			return fmt.Errorf("failed to delete dataset with guid %s: %w", guid, err)
+		}
+	}
+
+	return nil
+}

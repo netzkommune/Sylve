@@ -104,3 +104,10 @@ export async function deleteVolume(dataset: Dataset): Promise<APIResponse> {
 		'DELETE'
 	);
 }
+
+export async function bulkDelete(datasets: Dataset[]): Promise<APIResponse> {
+	const guids = datasets.map((dataset) => dataset.properties.guid);
+	return await apiRequest('/zfs/datasets/bulk-delete', APIResponseSchema, 'POST', {
+		guids: guids
+	});
+}

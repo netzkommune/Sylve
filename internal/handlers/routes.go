@@ -122,6 +122,8 @@ func RegisterRoutes(r *gin.Engine,
 
 			datasets.POST("/volume", zfsHandlers.CreateVolume(zfsService))
 			datasets.DELETE("/volume/:guid", zfsHandlers.DeleteVolume(zfsService))
+
+			datasets.POST("/bulk-delete", zfsHandlers.BulkDeleteDataset(zfsService))
 		}
 	}
 
@@ -151,8 +153,10 @@ func RegisterRoutes(r *gin.Engine,
 	{
 		utilities.POST("/downloads", utilitiesHandlers.DownloadFile(utilitiesService))
 		utilities.GET("/downloads", utilitiesHandlers.ListDownloads(utilitiesService))
+		utilities.GET("/downloads/:uuid", utilitiesHandlers.DownloadFileFromSignedURL(utilitiesService))
 		utilities.DELETE("/downloads/:id", utilitiesHandlers.DeleteDownload(utilitiesService))
 		utilities.POST("/downloads/bulk-delete", utilitiesHandlers.BulkDeleteDownload(utilitiesService))
+		utilities.POST("/downloads/signed-url", utilitiesHandlers.GetSignedDownloadURL(utilitiesService))
 	}
 
 	auth := api.Group("/auth")

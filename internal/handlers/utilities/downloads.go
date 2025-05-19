@@ -9,11 +9,16 @@
 package utilitiesHandlers
 
 import (
+	"fmt"
 	"net/http"
+	"path"
+	"strconv"
 	"sylve/internal"
 	utilitiesModels "sylve/internal/db/models/utilities"
 	"sylve/internal/services/utilities"
+	"sylve/pkg/crypto"
 	"sylve/pkg/utils"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,6 +29,11 @@ type DownloadFileRequest struct {
 
 type BulkDeleteDownloadRequest struct {
 	IDs []int `json:"ids" binding:"required"`
+}
+
+type SignedURLRequest struct {
+	Name       string `json:"name" binding:"required"`
+	ParentUUID string `json:"parentUUID" binding:"required"`
 }
 
 // @Summary List Downloads
@@ -63,7 +73,7 @@ func ListDownloads(utilitiesService *utilities.Service) gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param url query string true "URL"
+// @Request body DownloadFileRequest true "Download File Request"
 // @Success 200 {object} internal.APIResponse[any] "Success"
 // @Failure 400 {object} internal.APIResponse[any] "Bad Request"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
@@ -144,14 +154,13 @@ func DeleteDownload(utilitiesService *utilities.Service) gin.HandlerFunc {
 	}
 }
 
-// BulkDeleteDownload
 // @Summary Bulk Delete Downloads
 // @Description Bulk delete downloads by their IDs
 // @Tags Utilities
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param ids body []int true "Download IDs"
+// @Request body BulkDeleteDownloadRequest true "Bulk Delete Download Request"
 // @Success 200 {object} internal.APIResponse[any] "Success"
 // @Failure 400 {object} internal.APIResponse[any] "Bad Request"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
@@ -185,5 +194,122 @@ func BulkDeleteDownload(utilitiesService *utilities.Service) gin.HandlerFunc {
 			Error:   "",
 			Data:    nil,
 		})
+	}
+}
+
+// @Summary Get Signed Download URL
+// @Description Get a signed URL for downloading a file
+// @Tags Utilities
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Request body SignedURLRequest true "Signed URL Request"
+// @Success 200 {object} internal.APIResponse[string] "Success"
+// @Failure 400 {object} internal.APIResponse[any] "Bad Request"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /utilities/downloads/signed-url [get]
+func GetSignedDownloadURL(utilitiesService *utilities.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var request SignedURLRequest
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+		}
+
+		download, file, err := utilitiesService.GetDownloadAndFile(request.ParentUUID, request.Name)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "failed_to_get_download",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+		}
+
+		expires := time.Now().Add(2 * time.Hour).Unix()
+		input := fmt.Sprintf("%s:%d", download.UUID, file.ID)
+		sig := crypto.GenerateSignature(input, expires, []byte("download_secret"))
+		signedURL := fmt.Sprintf("/api/utilities/downloads/%s?expires=%d&sig=%s&id=%d", download.UUID, expires, sig, file.ID)
+
+		c.JSON(http.StatusOK, internal.APIResponse[string]{
+			Status:  "success",
+			Message: "signed_url_generated",
+			Error:   "",
+			Data:    signedURL,
+		})
+	}
+}
+
+// @Summary Download File
+// @Description Download a file from a signed URL
+// @Tags Utilities
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param uuid path string true "Download UUID"
+// @Param expires query int true "Expiration time in Unix timestamp"
+// @Param sig query string true "Signature"
+// @Success 200 {file} file "File Download"
+// @Failure 400 {object} internal.APIResponse[any] "Bad Request"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /utilities/downloads/{uuid} [get]
+func DownloadFileFromSignedURL(utilitiesService *utilities.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		uuid := c.Param("uuid")
+		expiresStr := c.Query("expires")
+		sig := c.Query("sig")
+		idStr := c.Query("id")
+
+		if uuid == "" || expiresStr == "" || sig == "" || idStr == "" {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "missing_required_params",
+			})
+			return
+		}
+
+		expires, err := strconv.ParseInt(expiresStr, 10, 64)
+		if err != nil || time.Now().Unix() > expires {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_or_expired_signature",
+			})
+			return
+		}
+
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_file_id",
+			})
+			return
+		}
+
+		input := fmt.Sprintf("%s:%d", uuid, id)
+		expectedSig := crypto.GenerateSignature(input, expires, []byte("download_secret"))
+		if sig != expectedSig {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "signature_mismatch",
+			})
+			return
+		}
+
+		filePath, err := utilitiesService.GetFilePathById(id)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "file_not_found",
+				Error:   err.Error(),
+			})
+			return
+		}
+
+		c.FileAttachment(filePath, path.Base(filePath))
 	}
 }

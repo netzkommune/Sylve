@@ -3,6 +3,7 @@
 		bulkDeleteDownloads,
 		deleteDownload,
 		getDownloads,
+		getSignedURL,
 		startDownload
 	} from '$lib/api/utilities/downloader';
 	import AlertDialog from '$lib/components/custom/AlertDialog.svelte';
@@ -68,6 +69,19 @@
 		return true;
 	});
 
+	let onlyChildSelected: boolean = $derived.by(() => {
+		let hasParent = false;
+		if (activeRows) {
+			for (const row of activeRows) {
+				if (row.type !== '-') {
+					hasParent = true;
+					break;
+				}
+			}
+		}
+		return !hasParent;
+	});
+
 	async function newDownload() {
 		if (!modalState.url) {
 			toast.error('Please enter a valid URL', { position: 'bottom-center' });
@@ -107,6 +121,23 @@
 			modalState.title = `${activeRows.length} ${capitalizeFirstLetter(getTranslation('common.downloads', 'Downloads'))}`;
 		}
 	}
+
+	async function handleDownload() {
+		const row = activeRows ? activeRows[0] : null;
+		if (row) {
+			const result = await getSignedURL(row.name as string, row.parentUUID as string);
+			if (isAPIResponse(result) && result.status === 'success') {
+				const url = result.data as string;
+				const link = document.createElement('a');
+				link.href = url;
+				link.download = row.name as string;
+				document.body.appendChild(link);
+				link.click();
+			} else {
+				handleValidationErrors(result as APIResponse, 'downloads');
+			}
+		}
+	}
 </script>
 
 {#snippet button(type: string)}
@@ -126,6 +157,19 @@
 			</Button>
 		{/if}
 	{/if}
+
+	{#if type === 'download' && onlyChildSelected}
+		{#if activeRows && activeRows.length == 1}
+			<Button
+				on:click={handleDownload}
+				size="sm"
+				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+			>
+				<Icon icon="mdi:download" class="mr-1 h-4 w-4" />
+				{capitalizeFirstLetter(getTranslation('common.download', 'Download'))}
+			</Button>
+		{/if}
+	{/if}
 {/snippet}
 
 <div class="flex h-full w-full flex-col">
@@ -138,6 +182,7 @@
 		</Button>
 
 		{@render button('delete')}
+		{@render button('download')}
 	</div>
 
 	<Dialog.Root bind:open={modalState.isOpen} closeOnOutsideClick={false}>

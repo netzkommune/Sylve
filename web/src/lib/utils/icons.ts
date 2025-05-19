@@ -30,7 +30,8 @@ const icons = [
 	'material-symbols:public',
 	'clarity:network-switch-line',
 	'ic:baseline-loop',
-	'mdi:ethernet'
+	'mdi:ethernet',
+	'eos-icons:three-dots-loading'
 ];
 
 export async function preloadIcons() {

@@ -21,3 +21,10 @@ export async function bulkDeleteDownloads(ids: number[]): Promise<APIResponse> {
 		ids
 	});
 }
+
+export async function getSignedURL(name: string, parentUUID: string): Promise<APIResponse> {
+	return await apiRequest('/utilities/downloads/signed-url', APIResponseSchema, 'POST', {
+		name,
+		parentUUID
+	});
+}

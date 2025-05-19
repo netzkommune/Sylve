@@ -15,6 +15,7 @@ import (
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
 	"sylve/internal/logger"
 	"sylve/pkg/zfs"
+	"sync"
 	"time"
 
 	"gorm.io/gorm"
@@ -23,8 +24,9 @@ import (
 var _ zfsServiceInterfaces.ZfsServiceInterface = (*Service)(nil)
 
 type Service struct {
-	DB      *gorm.DB
-	Libvirt libvirtServiceInterfaces.LibvirtServiceInterface
+	DB        *gorm.DB
+	Libvirt   libvirtServiceInterfaces.LibvirtServiceInterface
+	syncMutex *sync.Mutex
 }
 
 func NewZfsService(db *gorm.DB, libvirt libvirtServiceInterfaces.LibvirtServiceInterface) zfsServiceInterfaces.ZfsServiceInterface {

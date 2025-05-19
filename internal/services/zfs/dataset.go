@@ -79,6 +79,9 @@ func (s *Service) GetDatasetByGUID(guid string) (*zfsServiceInterfaces.Dataset, 
 }
 
 func (s *Service) DeleteSnapshot(guid string, recursive bool) error {
+	s.syncMutex.Lock()
+	defer s.syncMutex.Unlock()
+
 	datasets, err := zfs.Snapshots("")
 
 	if err != nil {
@@ -114,6 +117,9 @@ func (s *Service) DeleteSnapshot(guid string, recursive bool) error {
 }
 
 func (s *Service) CreateSnapshot(guid string, name string, recursive bool) error {
+	s.syncMutex.Lock()
+	defer s.syncMutex.Unlock()
+
 	datasets, err := zfs.Datasets("")
 	if err != nil {
 		return err
@@ -210,6 +216,8 @@ func (s *Service) StartSnapshotScheduler(ctx context.Context) {
 		for {
 			select {
 			case <-ticker.C:
+				s.syncMutex.Lock()
+
 				var snapshotJobs []zfsModels.PeriodicSnapshot
 				if err := s.DB.Find(&snapshotJobs).Error; err != nil {
 					logger.L.Debug().Err(err).Msg("Failed to load snapshotJobs")
@@ -223,6 +231,7 @@ func (s *Service) StartSnapshotScheduler(ctx context.Context) {
 						allSets, err := zfs.Snapshots("")
 						if err != nil {
 							logger.L.Debug().Err(err).Msgf("Failed to get snapshots for %s", job.GUID)
+							s.syncMutex.Unlock()
 							continue
 						}
 
@@ -253,6 +262,8 @@ func (s *Service) StartSnapshotScheduler(ctx context.Context) {
 						logger.L.Debug().Msgf("Snapshot %s created successfully", name)
 					}
 				}
+
+				s.syncMutex.Unlock()
 			case <-ctx.Done():
 				ticker.Stop()
 				return
@@ -262,6 +273,9 @@ func (s *Service) StartSnapshotScheduler(ctx context.Context) {
 }
 
 func (s *Service) CreateFilesystem(name string, props map[string]string) error {
+	s.syncMutex.Lock()
+	defer s.syncMutex.Unlock()
+
 	parent := ""
 
 	for k, v := range props {
@@ -299,6 +313,9 @@ func (s *Service) CreateFilesystem(name string, props map[string]string) error {
 }
 
 func (s *Service) DeleteFilesystem(guid string) error {
+	s.syncMutex.Lock()
+	defer s.syncMutex.Unlock()
+
 	datasets, err := zfs.Datasets("")
 	if err != nil {
 		return err
@@ -346,6 +363,9 @@ func (s *Service) DeleteFilesystem(guid string) error {
 }
 
 func (s *Service) RollbackSnapshot(guid string, destroyMoreRecent bool) error {
+	s.syncMutex.Lock()
+	defer s.syncMutex.Unlock()
+
 	datasets, err := zfs.Snapshots("")
 	if err != nil {
 		return err
@@ -372,6 +392,9 @@ func (s *Service) RollbackSnapshot(guid string, destroyMoreRecent bool) error {
 }
 
 func (s *Service) CreateVolume(name string, parent string, props map[string]string) error {
+	s.syncMutex.Lock()
+	defer s.syncMutex.Unlock()
+
 	datasets, err := zfs.Datasets("")
 	if err != nil {
 		return err
@@ -397,6 +420,9 @@ func (s *Service) CreateVolume(name string, parent string, props map[string]stri
 }
 
 func (s *Service) DeleteVolume(guid string) error {
+	s.syncMutex.Lock()
+	defer s.syncMutex.Unlock()
+
 	datasets, err := zfs.Datasets("")
 	if err != nil {
 		return err
@@ -423,6 +449,9 @@ func (s *Service) DeleteVolume(guid string) error {
 }
 
 func (s *Service) BulkDeleteDataset(guids []string) error {
+	s.syncMutex.Lock()
+	defer s.syncMutex.Unlock()
+
 	guidsMap := make(map[string]struct{})
 	for _, guid := range guids {
 		guidsMap[guid] = struct{}{}

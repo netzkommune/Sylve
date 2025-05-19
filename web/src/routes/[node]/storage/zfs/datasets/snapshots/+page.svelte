@@ -276,6 +276,8 @@
 					position: 'bottom-center'
 				});
 			}
+
+			confirmModals.createSnapshot.open = false;
 		}
 	}
 </script>

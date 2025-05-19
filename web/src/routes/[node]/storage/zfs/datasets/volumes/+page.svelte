@@ -1,5 +1,6 @@
 <script lang="ts">
 	import {
+		bulkDelete,
 		createSnapshot,
 		createVolume,
 		deleteSnapshot,
@@ -79,11 +80,23 @@
 		return volume ?? null;
 	});
 
-	let activeVolumes: Datasets[] = $derived.by(() => {
-		if (activeRows) {
+	let isPoolSelected: boolean = $derived.by(() => {
+		if (activeRows && activeRows.length > 0) {
+			for (const row of activeRows) {
+				if (row.guid === undefined) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	});
+
+	let activeVolumes: Dataset[] = $derived.by(() => {
+		if (activeRows && activeRows.length > 0) {
 			const volumes = $results[1].data?.filter((volume) => volume.type === 'volume');
 			return (
-				volumes?.filter((volume) => activeRows.some((row) => row.name.endsWith(volume.name))) ?? []
+				volumes?.filter((volume) => activeRows?.some((row) => row.name.endsWith(volume.name))) ?? []
 			);
 		}
 
@@ -106,7 +119,12 @@
 	};
 
 	let confirmModals = $state({
-		active: '' as 'createVolume' | 'deleteVolume' | 'deleteSnapshot' | 'createSnapshot',
+		active: '' as
+			| 'createVolume'
+			| 'deleteVolume'
+			| 'deleteSnapshot'
+			| 'createSnapshot'
+			| 'deleteVolumes',
 		parent: '',
 		createVolume: {
 			open: false,
@@ -140,6 +158,11 @@
 			data: {
 				name: ''
 			},
+			title: ''
+		},
+		deleteVolumes: {
+			open: false,
+			data: '',
 			title: ''
 		}
 	});
@@ -328,62 +351,100 @@
 				);
 			}
 		}
+
+		if (confirmModals.active === 'deleteVolumes') {
+			if (activeVolumes.length > 0) {
+				const response = await bulkDelete(activeVolumes);
+				if (response.error) {
+					handleError(response);
+					return;
+				}
+
+				toast.success(
+					`${capitalizeFirstLetter(getTranslation('common.volumes', 'volumes'))} ${activeVolumes
+						.map((volume) => volume.name)
+						.join(', ')} ${capitalizeFirstLetter(getTranslation('common.deleted', 'deleted'))}`,
+					{
+						position: 'bottom-center'
+					}
+				);
+			}
+		}
 	}
 
 	let query: string = $state('');
 </script>
 
 {#snippet button(type: string)}
-	{#if type === 'create-snapshot' && activeVolume?.type === 'volume'}
-		<Button
-			on:click={async () => {
-				if (activeVolume) {
-					confirmModals.active = 'createSnapshot';
-					confirmModals.parent = 'volume';
-					confirmModals.createSnapshot.open = true;
-					confirmModals.createSnapshot.title = activeVolume.name;
-				}
-			}}
-			size="sm"
-			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
-		>
-			<Icon icon="carbon:ibm-cloud-vpc-block-storage-snapshots" class="mr-1 h-4 w-4" /> Create Snapshot
-		</Button>
-	{/if}
+	{#if activeRows && activeRows.length == 1}
+		{#if type === 'create-snapshot' && activeVolume?.type === 'volume'}
+			<Button
+				on:click={async () => {
+					if (activeVolume) {
+						confirmModals.active = 'createSnapshot';
+						confirmModals.parent = 'volume';
+						confirmModals.createSnapshot.open = true;
+						confirmModals.createSnapshot.title = activeVolume.name;
+					}
+				}}
+				size="sm"
+				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+			>
+				<Icon icon="carbon:ibm-cloud-vpc-block-storage-snapshots" class="mr-1 h-4 w-4" /> Create Snapshot
+			</Button>
+		{/if}
 
-	{#if type === 'delete-snapshot' && activeSnapshot?.type === 'snapshot'}
-		<Button
-			on:click={async () => {
-				if (activeSnapshot) {
-					confirmModals.active = 'deleteSnapshot';
-					confirmModals.parent = 'snapshot';
-					confirmModals.deleteSnapshot.open = true;
-					confirmModals.deleteSnapshot.title = activeSnapshot.name;
-				}
-			}}
-			size="sm"
-			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
-		>
-			<Icon icon="mdi:delete" class="mr-1 h-4 w-4" /> Delete Snapshot
-		</Button>
-	{/if}
+		{#if type === 'delete-snapshot' && activeSnapshot?.type === 'snapshot'}
+			<Button
+				on:click={async () => {
+					if (activeSnapshot) {
+						confirmModals.active = 'deleteSnapshot';
+						confirmModals.parent = 'snapshot';
+						confirmModals.deleteSnapshot.open = true;
+						confirmModals.deleteSnapshot.title = activeSnapshot.name;
+					}
+				}}
+				size="sm"
+				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+			>
+				<Icon icon="mdi:delete" class="mr-1 h-4 w-4" /> Delete Snapshot
+			</Button>
+		{/if}
 
-	{#if type === 'delete-volume' && activeVolume?.type === 'volume'}
-		<Button
-			on:click={async () => {
-				if (activeRow) {
-					confirmModals.active = 'deleteVolume';
-					confirmModals.parent = 'volume';
-					confirmModals.deleteVolume.open = true;
-					confirmModals.deleteVolume.data = activeRow.name;
-					confirmModals.deleteVolume.title = activeRow.name;
-				}
-			}}
-			size="sm"
-			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
-		>
-			<Icon icon="mdi:delete" class="mr-1 h-4 w-4" /> Delete Volume
-		</Button>
+		{#if type === 'delete-volume' && activeVolume?.type === 'volume'}
+			<Button
+				on:click={async () => {
+					if (activeRow) {
+						confirmModals.active = 'deleteVolume';
+						confirmModals.parent = 'volume';
+						confirmModals.deleteVolume.open = true;
+						confirmModals.deleteVolume.data = activeRow.name;
+						confirmModals.deleteVolume.title = activeRow.name;
+					}
+				}}
+				size="sm"
+				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+			>
+				<Icon icon="mdi:delete" class="mr-1 h-4 w-4" /> Delete Volume
+			</Button>
+		{/if}
+	{:else if activeRows && activeRows.length > 1}
+		{#if activeVolumes.length > 0 && type === 'delete-volumes' && !isPoolSelected}
+			<Button
+				on:click={async () => {
+					if (activeRow) {
+						confirmModals.active = 'deleteVolumes';
+						confirmModals.parent = 'volume';
+						confirmModals.deleteVolumes.open = true;
+						confirmModals.deleteVolumes.title = `${activeVolumes.length} volumes`;
+					}
+				}}
+				size="sm"
+				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+			>
+				<Icon icon="mdi:delete" class="mr-1 h-4 w-4" /> Delete Volumes
+			</Button>
+		{/if}
 	{/if}
 {/snippet}
 
@@ -405,6 +466,7 @@
 		{@render button('create-snapshot')}
 		{@render button('delete-snapshot')}
 		{@render button('delete-volume')}
+		{@render button('delete-volumes')}
 	</div>
 
 	<TreeTable
@@ -412,7 +474,7 @@
 		name={tableName}
 		bind:parentActiveRow={activeRows}
 		bind:query
-		multipleSelect={false}
+		multipleSelect={true}
 	/>
 </div>
 
@@ -627,6 +689,29 @@
 			},
 			onCancel: () => {
 				if (confirmModals.active) {
+					confirmModals[confirmModals.active].open = false;
+				}
+			}
+		}}
+	></AlertDialogModal>
+{/if}
+
+{#if confirmModals.active == 'deleteVolumes'}
+	<AlertDialogModal
+		open={confirmModals.active && confirmModals[confirmModals.active].open}
+		names={{
+			parent: '',
+			element: confirmModals[confirmModals.active].title
+		}}
+		actions={{
+			onConfirm: () => {
+				if (confirmModals.active) {
+					confirmAction();
+				}
+			},
+			onCancel: () => {
+				if (confirmModals.active) {
+					console.log(confirmModals[confirmModals.active]);
 					confirmModals[confirmModals.active].open = false;
 				}
 			}

@@ -177,6 +177,11 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 		{
 			field: 'mountpoint',
 			title: 'Mount Point'
+		},
+		{
+			field: 'type',
+			title: 'Type',
+			visible: false
 		}
 	];
 
@@ -213,7 +218,8 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 						referenced: snapshot.referenced,
 						mountpoint: snapshot.mountpoint || '',
 						children: []
-					}))
+					})),
+				type: filesystem.type
 			}));
 
 			rows.push({
@@ -241,7 +247,8 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 					if (aIsPoolSnapshot && !bIsPoolSnapshot) return -1;
 					if (!aIsPoolSnapshot && bIsPoolSnapshot) return 1;
 					return a.name.localeCompare(b.name);
-				})
+				}),
+				type: 'pool'
 			});
 		} else if (group.filesystems.length > 0) {
 			rows.push(

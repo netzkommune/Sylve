@@ -125,10 +125,12 @@
 	});
 
 	let poolsSelected = $derived.by(() => {
-		// we need to return true or false
-		if (activeRows) {
-			let pools: string[] = [];
-			console.log('activeRows', activeRows);
+		if (activeRows && activeRows.length > 0) {
+			const filtered = activeRows.filter((row) => {
+				return row.type === 'pool';
+			});
+
+			return filtered.length > 0;
 		}
 
 		return false;
@@ -475,7 +477,7 @@
 			</Button>
 		{/if}
 	{:else if activeRows && activeRows.length > 1}
-		{#if activeDatasets.length > 0}
+		{#if activeDatasets.length > 0 && !poolsSelected}
 			{#if type === 'bulk-delete'}
 				<Button
 					onclick={async () => {

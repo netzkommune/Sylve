@@ -79,6 +79,17 @@
 		return volume ?? null;
 	});
 
+	let activeVolumes: Datasets[] = $derived.by(() => {
+		if (activeRows) {
+			const volumes = $results[1].data?.filter((volume) => volume.type === 'volume');
+			return (
+				volumes?.filter((volume) => activeRows.some((row) => row.name.endsWith(volume.name))) ?? []
+			);
+		}
+
+		return [];
+	});
+
 	let activeSnapshot: Dataset | null = $derived.by(() => {
 		if (activePool) return null;
 		const snapshots = $results[1].data?.filter((snapshot) => snapshot.type === 'snapshot');

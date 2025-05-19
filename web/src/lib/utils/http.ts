@@ -13,7 +13,7 @@ import { APIResponseSchema, type APIResponse } from '$lib/types/common';
 import type { QueryFunctionContext } from '@sveltestack/svelte-query';
 import adze from 'adze';
 import toast from 'svelte-french-toast';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { getValidationError } from './i18n';
 
 export async function apiRequest<T extends z.ZodType>(

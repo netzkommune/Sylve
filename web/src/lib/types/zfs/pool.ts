@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export const IODelaySchema = z.object({
 	delay: z.number().default(0)

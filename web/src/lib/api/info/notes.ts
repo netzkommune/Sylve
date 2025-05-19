@@ -1,7 +1,7 @@
 import { APIResponseSchema, type APIResponse } from '$lib/types/common';
 import { NoteSchema, NotesSchema, type Note, type Notes } from '$lib/types/info/notes';
 import { apiRequest } from '$lib/utils/http';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 async function notesRequest(
 	endpoint: string,

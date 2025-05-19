@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export const RAMInfoSchema = z.object({
 	total: z.number().default(0),

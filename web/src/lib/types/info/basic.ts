@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export const BasicInfoSchema = z.object({
 	hostname: z.string().default('Unknown'),

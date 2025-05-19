@@ -1,7 +1,7 @@
 import { APIResponseSchema, type APIResponse } from '$lib/types/common';
 import { DiskSchema, type Disk } from '$lib/types/disk/disk';
 import { apiRequest } from '$lib/utils/http';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export async function listDisks(): Promise<Disk[]> {
 	return await apiRequest('/disk/list', z.array(DiskSchema), 'GET');

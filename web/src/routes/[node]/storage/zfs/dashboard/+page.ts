@@ -1,5 +1,5 @@
 import { getDatasets } from '$lib/api/zfs/datasets';
-import { getPools } from '$lib/api/zfs/pool';
+import { getPools, getPoolStats } from '$lib/api/zfs/pool';
 import { cachedFetch } from '$lib/utils/http';
 
 export async function load() {
@@ -8,6 +8,8 @@ export async function load() {
 		cachedFetch('datasets', async () => await getDatasets(), cacheDuration),
 		cachedFetch('pools', getPools, cacheDuration)
 	]);
+
+	console.log(await getPoolStats(1, 128));
 
 	return {
 		pools: pools,

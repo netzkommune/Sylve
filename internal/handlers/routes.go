@@ -94,6 +94,7 @@ func RegisterRoutes(r *gin.Engine,
 	zfs := api.Group("/zfs")
 	zfs.Use(middleware.EnsureAuthenticated(authService))
 	{
+		zfs.GET("/pool/stats/:interval/:limit", zfsHandlers.PoolStats(zfsService))
 		zfs.GET("/pool/io-delay", zfsHandlers.AvgIODelay(zfsService))
 		zfs.GET("/pool/io-delay/historical", zfsHandlers.AvgIODelayHistorical(zfsService))
 

@@ -9,14 +9,11 @@
 package zfs
 
 import (
-	"sylve/internal/db"
-	infoModels "sylve/internal/db/models/info"
 	libvirtServiceInterfaces "sylve/internal/interfaces/services/libvirt"
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
 	"sylve/internal/logger"
 	"sylve/pkg/zfs"
 	"sync"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -34,22 +31,6 @@ func NewZfsService(db *gorm.DB, libvirt libvirtServiceInterfaces.LibvirtServiceI
 		DB:        db,
 		Libvirt:   libvirt,
 		syncMutex: &sync.Mutex{},
-	}
-}
-
-func (s *Service) StoreStats() {
-	d := zfs.GetTotalIODelay()
-	db.StoreAndTrimRecords(s.DB, &infoModels.IODelay{Delay: d}, 128)
-}
-
-func (s *Service) Cron() {
-	ticker := time.NewTicker(10 * time.Second)
-	defer ticker.Stop()
-
-	s.StoreStats()
-
-	for range ticker.C {
-		s.StoreStats()
 	}
 }
 

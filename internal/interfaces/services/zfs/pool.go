@@ -27,3 +27,11 @@ type ReplaceDevice struct {
 	Old  string `json:"old" binding:"required,min=1,max=24"`
 	New  string `json:"new" binding:"required,min=1,max=24"`
 }
+
+type PoolStatPoint struct {
+	Time       int64   `json:"time"`
+	Allocated  uint64  `json:"allocated"`
+	Free       uint64  `json:"free"`
+	Size       uint64  `json:"size"`
+	DedupRatio float64 `json:"dedupRatio"`
+}

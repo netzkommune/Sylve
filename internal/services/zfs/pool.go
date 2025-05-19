@@ -10,6 +10,7 @@ package zfs
 
 import (
 	"fmt"
+	"sort"
 	"sylve/internal/db"
 	infoModels "sylve/internal/db/models/info"
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
@@ -108,4 +109,58 @@ func (s *Service) DeletePool(poolName string) error {
 
 func (s *Service) SyncToLibvirt() error {
 	return nil
+}
+
+func (s *Service) GetZpoolHistoricalStats(intervalMinutes int, limit int) (map[string][]zfsServiceInterfaces.PoolStatPoint, error) {
+	if intervalMinutes <= 0 {
+		return nil, fmt.Errorf("invalid interval: must be > 0")
+	}
+
+	var records []infoModels.ZPoolHistorical
+	err := s.DB.Order("created_at DESC").Find(&records).Error
+	if err != nil {
+		return nil, err
+	}
+
+	intervalMs := int64(intervalMinutes) * 60 * 1000
+	buckets := make(map[string]map[int64]zfsServiceInterfaces.PoolStatPoint)
+
+	for _, rec := range records {
+		t := rec.CreatedAt
+		bucket := t - (t % intervalMs)
+
+		p := zfs.Zpool(rec.Pools)
+		poolName := p.Name
+
+		if buckets[poolName] == nil {
+			buckets[poolName] = make(map[int64]zfsServiceInterfaces.PoolStatPoint)
+		}
+
+		if _, exists := buckets[poolName][bucket]; !exists {
+			buckets[poolName][bucket] = zfsServiceInterfaces.PoolStatPoint{
+				Time:       bucket,
+				Allocated:  p.Allocated,
+				Free:       p.Free,
+				Size:       p.Size,
+				DedupRatio: p.DedupRatio,
+			}
+		}
+	}
+
+	result := make(map[string][]zfsServiceInterfaces.PoolStatPoint)
+	for name, points := range buckets {
+		var sorted []zfsServiceInterfaces.PoolStatPoint
+		for _, point := range points {
+			sorted = append(sorted, point)
+		}
+		sort.Slice(sorted, func(i, j int) bool {
+			return sorted[i].Time < sorted[j].Time
+		})
+		if limit > 0 && len(sorted) > limit {
+			sorted = sorted[len(sorted)-limit:]
+		}
+		result[name] = sorted
+	}
+
+	return result, nil
 }

@@ -116,9 +116,25 @@ export const ReplaceDeviceSchema = z.object({
 	new: z.string()
 });
 
+export const PoolStatPointsSchema = z.record(
+	z.string(),
+	z
+		.array(
+			z.object({
+				time: z.number(),
+				allocated: z.number(),
+				free: z.number(),
+				size: z.number(),
+				dedupRatio: z.number()
+			})
+		)
+		.refine((obj) => Object.keys(obj).length > 0, { message: 'No Data Found' })
+);
+
 export type IODelay = z.infer<typeof IODelaySchema>;
 export type IODelayHistorical = z.infer<typeof IODelayHistoricalSchema>;
 export type Zpool = z.infer<typeof ZpoolSchema>;
 export type ReplaceDevice = z.infer<typeof ReplaceDeviceSchema>;
 export type CreateZpool = z.infer<typeof CreateZpoolSchema>;
 export type ZpoolRaidType = z.infer<typeof ZpoolRaidTypeSchema>;
+export type PoolStatPoints = z.infer<typeof PoolStatPointsSchema>;

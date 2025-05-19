@@ -2,10 +2,12 @@ import { APIResponseSchema } from '$lib/types/common';
 import {
 	IODelayHistoricalSchema,
 	IODelaySchema,
+	PoolStatPointsSchema,
 	ZpoolSchema,
 	type CreateZpool,
 	type IODelay,
 	type IODelayHistorical,
+	type PoolStatPoints,
 	type ReplaceDevice,
 	type Zpool
 } from '$lib/types/zfs/pool';
@@ -51,4 +53,8 @@ export async function deletePool(name: string) {
 
 export async function scrubPool(name: string) {
 	return await apiRequest(`/zfs/pools/${name}/scrub`, APIResponseSchema, 'POST');
+}
+
+export async function getPoolStats(interval: number, limit: number): Promise<PoolStatPoints> {
+	return await apiRequest(`/zfs/pool/stats/${interval}/${limit}`, PoolStatPointsSchema, 'GET');
 }

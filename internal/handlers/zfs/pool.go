@@ -11,6 +11,7 @@ package zfsHandlers
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"sylve/internal"
 	infoModels "sylve/internal/db/models/info"
@@ -325,5 +326,64 @@ func ReplaceDevice(infoService *info.Service, zfsSerice *zfs.Service) gin.Handle
 		})
 
 		infoService.EndAuditLog(id, "success")
+	}
+}
+
+// zfs.GET("/pool/stats/:interval/:limit", zfsHandlers.PoolStats(zfsService))
+// @Summary Get Pool Stats
+// @Description Get the historical stats of a ZFS pool
+// @Tags ZFS
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param interval path int true "Interval in minutes"
+// @Param limit path int true "Limit"
+// @Success 200 {object} internal.APIResponse[map[string][]zfsServiceInterfaces.PoolStatPoint] "Success"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /zfs/pool/stats/{interval}/{limit} [get]
+func PoolStats(zfsSerice *zfs.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		interval := c.Param("interval")
+		limit := c.Param("limit")
+
+		intervalInt, err := strconv.Atoi(interval)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_interval",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		limitInt, err := strconv.Atoi(limit)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_limit",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		stats, err := zfsSerice.GetZpoolHistoricalStats(intervalInt, limitInt)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[map[string][]zfsServiceInterfaces.PoolStatPoint]{
+			Status:  "success",
+			Message: "pool_stats",
+			Error:   "",
+			Data:    stats,
+		})
 	}
 }

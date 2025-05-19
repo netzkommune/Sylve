@@ -31,8 +31,9 @@ type Service struct {
 
 func NewZfsService(db *gorm.DB, libvirt libvirtServiceInterfaces.LibvirtServiceInterface) zfsServiceInterfaces.ZfsServiceInterface {
 	return &Service{
-		DB:      db,
-		Libvirt: libvirt,
+		DB:        db,
+		Libvirt:   libvirt,
+		syncMutex: &sync.Mutex{},
 	}
 }
 

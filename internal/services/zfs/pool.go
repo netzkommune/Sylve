@@ -116,29 +116,31 @@ func (s *Service) GetZpoolHistoricalStats(intervalMinutes int, limit int) (map[s
 		return nil, fmt.Errorf("invalid interval: must be > 0")
 	}
 
+	// 1) load all history in ascending time
 	var records []infoModels.ZPoolHistorical
-	err := s.DB.Order("created_at DESC").Find(&records).Error
-	if err != nil {
+	if err := s.DB.
+		Order("created_at ASC").
+		Find(&records).Error; err != nil {
 		return nil, err
 	}
 
+	// 2) compute bucket size in ms
 	intervalMs := int64(intervalMinutes) * 60 * 1000
+
+	// 3) bucket the data
 	buckets := make(map[string]map[int64]zfsServiceInterfaces.PoolStatPoint)
-
 	for _, rec := range records {
-		t := rec.CreatedAt
-		bucket := t - (t % intervalMs)
+		bucketTime := (rec.CreatedAt / intervalMs) * intervalMs
+		name := zfs.Zpool(rec.Pools).Name
 
-		p := zfs.Zpool(rec.Pools)
-		poolName := p.Name
-
-		if buckets[poolName] == nil {
-			buckets[poolName] = make(map[int64]zfsServiceInterfaces.PoolStatPoint)
+		if buckets[name] == nil {
+			buckets[name] = make(map[int64]zfsServiceInterfaces.PoolStatPoint)
 		}
-
-		if _, exists := buckets[poolName][bucket]; !exists {
-			buckets[poolName][bucket] = zfsServiceInterfaces.PoolStatPoint{
-				Time:       bucket,
+		// keep only the first sample per bucket
+		if _, seen := buckets[name][bucketTime]; !seen {
+			p := zfs.Zpool(rec.Pools)
+			buckets[name][bucketTime] = zfsServiceInterfaces.PoolStatPoint{
+				Time:       bucketTime,
 				Allocated:  p.Allocated,
 				Free:       p.Free,
 				Size:       p.Size,
@@ -147,19 +149,23 @@ func (s *Service) GetZpoolHistoricalStats(intervalMinutes int, limit int) (map[s
 		}
 	}
 
-	result := make(map[string][]zfsServiceInterfaces.PoolStatPoint)
-	for name, points := range buckets {
-		var sorted []zfsServiceInterfaces.PoolStatPoint
-		for _, point := range points {
-			sorted = append(sorted, point)
+	// 4) materialize, sort, and apply limit
+	result := make(map[string][]zfsServiceInterfaces.PoolStatPoint, len(buckets))
+	for name, mp := range buckets {
+		pts := make([]zfsServiceInterfaces.PoolStatPoint, 0, len(mp))
+		for _, pt := range mp {
+			pts = append(pts, pt)
 		}
-		sort.Slice(sorted, func(i, j int) bool {
-			return sorted[i].Time < sorted[j].Time
+		sort.Slice(pts, func(i, j int) bool {
+			return pts[i].Time < pts[j].Time
 		})
-		if limit > 0 && len(sorted) > limit {
-			sorted = sorted[len(sorted)-limit:]
+
+		// apply limit: keep only the last `limit` points
+		if limit > 0 && len(pts) > limit {
+			pts = pts[len(pts)-limit:]
 		}
-		result[name] = sorted
+
+		result[name] = pts
 	}
 
 	return result, nil

@@ -9,7 +9,7 @@ export async function load() {
 		cachedFetch('pools', getPools, cacheDuration)
 	]);
 
-	console.log(await getPoolStats(1, 128));
+	console.log(await getPoolStats(60, 128));
 
 	return {
 		pools: pools,

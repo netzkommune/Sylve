@@ -34,22 +34,19 @@ func (s *Service) StoreStats(interval int) {
 }
 
 func (s *Service) Cron() {
-	fastInterval := 10
-	slowInterval := 60
-
 	tickerFast := time.NewTicker(10 * time.Second)
 	tickerSlow := time.NewTicker(60 * time.Second)
-
 	defer tickerFast.Stop()
 	defer tickerSlow.Stop()
 
 	s.StoreStats(0)
 
-	for range tickerFast.C {
-		s.StoreStats(fastInterval)
-	}
-
-	for range tickerSlow.C {
-		s.StoreStats(slowInterval)
+	for {
+		select {
+		case <-tickerFast.C:
+			s.StoreStats(10)
+		case <-tickerSlow.C:
+			s.StoreStats(60)
+		}
 	}
 }

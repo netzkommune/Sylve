@@ -144,6 +144,29 @@
 		}
 	});
 
+	let editModal = $state({
+		open: false,
+		properties: {
+			comment: '',
+			autoexpand: '',
+			autotrim: '',
+			delegation: '',
+			failmode: ''
+		},
+		close: (close: boolean) => {
+			if (close) {
+				editModal.open = false;
+			}
+			editModal.properties = {
+				comment: '',
+				autoexpand: '',
+				autotrim: '',
+				delegation: '',
+				failmode: ''
+			};
+		}
+	});
+
 	let confirmModals = $state({
 		active: '' as 'statusPool' | 'deletePool' | 'replaceDevice',
 		statusPool: {
@@ -772,6 +795,35 @@
 			{/if}
 		{/if}
 
+		{#if type === 'pool-edit'}
+			{#if isPool(pools, activeRow.name)}
+				<Button
+					onclick={() => {
+						const propsArr = pools.find((p) => p.name === activeRow?.name)?.properties || [];
+
+						editModal.open = true;
+						editModal.properties.comment =
+							propsArr.find((prop) => prop.property === 'comment')?.value || '';
+						editModal.properties.autoexpand =
+							propsArr.find((prop) => prop.property === 'autoexpand')?.value || '';
+						editModal.properties.autotrim =
+							propsArr.find((prop) => prop.property === 'autotrim')?.value || '';
+						editModal.properties.delegation =
+							propsArr.find((prop) => prop.property === 'delegation')?.value || '';
+						editModal.properties.failmode =
+							propsArr.find((prop) => prop.property === 'failmode')?.value || '';
+					}}
+					size="sm"
+					class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+					disabled={replaceInProgress}
+					title={replaceInProgress ? 'Cannot edit pool when replacing device in any pool' : ''}
+				>
+					<Icon icon="mdi:pencil" class="mr-1 h-4 w-4" />
+					{capitalizeFirstLetter(getTranslation('common.edit', 'Edit'))}
+				</Button>
+			{/if}
+		{/if}
+
 		{#if type === 'pool-delete'}
 			{#if isPool(pools, activeRow.name)}
 				<Button
@@ -967,6 +1019,7 @@
 
 		{@render button('pool-status')}
 		{@render button('pool-scrub')}
+		{@render button('pool-edit')}
 		{@render button('pool-delete')}
 		{@render button('replace-device')}
 	</div>
@@ -1798,3 +1851,184 @@
 		</AlertDialog.Content>
 	</AlertDialog.Root>
 {/if}
+
+<Dialog.Root bind:open={editModal.open} closeOnOutsideClick={false}>
+	<Dialog.Content
+		class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-visible overflow-y-auto p-5 transition-all duration-300 ease-in-out lg:max-w-[70%]"
+	>
+		<div class="flex items-center justify-between px-4 py-3">
+			<Dialog.Header class="p-0">
+				<Dialog.Title class="flex items-center gap-2 text-left">
+					<Icon icon="bi:hdd-stack-fill" class="h-5 w-5 " />{getTranslation(
+						'zfs.pool.edit_zfs_pool',
+						'Edit ZFS Pool'
+					)}</Dialog.Title
+				>
+			</Dialog.Header>
+
+			<div class="flex items-center gap-0.5">
+				<Button
+					size="sm"
+					variant="ghost"
+					class="h-8"
+					title={capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}
+					onclick={() => {
+						editModal.close(false);
+					}}
+				>
+					<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
+					<span class="sr-only"
+						>{capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}</span
+					>
+				</Button>
+				<Button
+					size="sm"
+					variant="ghost"
+					class="h-8"
+					title={capitalizeFirstLetter(getTranslation('common.close', 'Close'))}
+					onclick={() => editModal.close(true)}
+				>
+					<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
+					<span class="sr-only"
+						>{capitalizeFirstLetter(getTranslation('common.close', 'Close'))}</span
+					>
+				</Button>
+			</div>
+		</div>
+
+		<Card.Root class="min-h-[20vh] border-none pb-6">
+			<Card.Content class="flex flex-col gap-4 p-4 !pb-0">
+				<div class="grid grid-cols-1 gap-4">
+					<div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+						<div class="h-full space-y-1">
+							<Label class="w-24 whitespace-nowrap text-sm" for="autoexpand">Auto Expand</Label>
+							<Select.Root
+								selected={{
+									label:
+										modal.properties.autoexpand === 'on'
+											? 'Yes'
+											: modal.properties.autoexpand === 'off'
+												? 'No'
+												: undefined,
+									value: modal.properties.autoexpand
+								}}
+								onSelectedChange={(value) => {
+									modal.properties.autoexpand = value?.value || 'off';
+								}}
+							>
+								<Select.Trigger class="w-full">
+									<Select.Value placeholder="Select Autoexpand" />
+								</Select.Trigger>
+								<Select.Content class="max-h-36 overflow-y-auto">
+									<Select.Group>
+										<Select.Item value="on" label="Yes">Yes</Select.Item>
+										<Select.Item value="off" label="No">No</Select.Item>
+									</Select.Group>
+								</Select.Content>
+							</Select.Root>
+						</div>
+
+						<!-- Auto Trim -->
+						<div class="h-full space-y-1">
+							<Label class="w-24 whitespace-nowrap text-sm" for="autotrim">Auto Trim</Label>
+							<Select.Root
+								selected={{
+									label:
+										modal.properties.autotrim === 'on'
+											? 'Yes'
+											: modal.properties.autotrim === 'off'
+												? 'No'
+												: undefined,
+									value: modal.properties.autotrim
+								}}
+								onSelectedChange={(value) => {
+									modal.properties.autotrim = value?.value || 'off';
+								}}
+							>
+								<Select.Trigger class="w-full">
+									<Select.Value placeholder="Select Auto Trim" />
+								</Select.Trigger>
+								<Select.Content class="max-h-36 overflow-y-auto">
+									<Select.Group>
+										<Select.Item value="on" label="Yes">Yes</Select.Item>
+										<Select.Item value="off" label="No">No</Select.Item>
+									</Select.Group>
+								</Select.Content>
+							</Select.Root>
+						</div>
+
+						<!-- Delegation -->
+						<div class="h-full space-y-1">
+							<Label class="w-24 whitespace-nowrap text-sm" for="delegation">Delegation</Label>
+							<Select.Root
+								selected={{
+									label:
+										modal.properties.delegation === 'on'
+											? 'Yes'
+											: modal.properties.delegation === 'off'
+												? 'No'
+												: undefined,
+									value: modal.properties.delegation
+								}}
+								onSelectedChange={(value) => {
+									modal.properties.delegation = value?.value || 'off';
+								}}
+							>
+								<Select.Trigger class="w-full">
+									<Select.Value placeholder="Select Delegation" />
+								</Select.Trigger>
+								<Select.Content class="max-h-36 overflow-y-auto">
+									<Select.Group>
+										<Select.Item value="on" label="Yes">Yes</Select.Item>
+										<Select.Item value="off" label="No">No</Select.Item>
+									</Select.Group>
+								</Select.Content>
+							</Select.Root>
+						</div>
+
+						<!-- Fail Mode -->
+						<div class="h-full space-y-1">
+							<Label class="w-24 whitespace-nowrap text-sm" for="failmode">Fail Mode</Label>
+							<Select.Root
+								selected={{
+									label:
+										modal.properties.failmode === 'wait'
+											? 'Wait'
+											: modal.properties.failmode === 'continue'
+												? 'Continue'
+												: modal.properties.failmode === 'panic'
+													? 'Panic'
+													: undefined,
+									value: modal.properties.failmode
+								}}
+								onSelectedChange={(value) => {
+									modal.properties.failmode = value?.value || 'wait';
+								}}
+							>
+								<Select.Trigger class="w-full">
+									<Select.Value placeholder="Select Delegation" />
+								</Select.Trigger>
+								<Select.Content class="max-h-36 overflow-y-auto">
+									<Select.Group>
+										<Select.Item value="wait" label="Wait">Wait</Select.Item>
+										<Select.Item value="continue" label="Continue">Continue</Select.Item>
+										<Select.Item value="panic" label="Panic">Panic</Select.Item>
+									</Select.Group>
+								</Select.Content>
+							</Select.Root>
+						</div>
+					</div>
+
+					<div class="flex-1 space-y-1">
+						<Label for="comment">Comment</Label>
+						<Textarea
+							id="comment"
+							placeholder="Comments about the pool"
+							bind:value={editModal.properties.comment}
+						/>
+					</div>
+				</div>
+			</Card.Content>
+		</Card.Root>
+	</Dialog.Content>
+</Dialog.Root>

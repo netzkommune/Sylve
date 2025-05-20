@@ -1,6 +1,7 @@
 package zfs
 
 import (
+	"bytes"
 	"fmt"
 	"strconv"
 	"strings"
@@ -44,23 +45,30 @@ type SpareDevice struct {
 	Health string `json:"health"`
 }
 
+type ZpoolProperty struct {
+	Property string `json:"property"`
+	Value    string `json:"value"`
+	Source   string `json:"source"`
+}
+
 type Zpool struct {
-	z             *zfs          `json:"-"`
-	ID            string        `json:"id"` /* Same as GUID but for ease of use in Tabulator*/
-	Name          string        `json:"name"`
-	GUID          string        `json:"guid"`
-	Health        string        `json:"health"`
-	Allocated     uint64        `json:"allocated"`
-	Size          uint64        `json:"size"`
-	Free          uint64        `json:"free"`
-	Fragmentation uint64        `json:"fragmentation"`
-	ReadOnly      bool          `json:"readOnly"`
-	Freeing       uint64        `json:"freeing"`
-	Leaked        uint64        `json:"leaked"`
-	DedupRatio    float64       `json:"dedupRatio"`
-	Vdevs         []Vdev        `json:"vdevs"`
-	Status        ZpoolStatus   `json:"status"`
-	Spares        []SpareDevice `json:"spares"`
+	z             *zfs            `json:"-"`
+	ID            string          `json:"id"` /* Same as GUID but for ease of use in Tabulator*/
+	Name          string          `json:"name"`
+	GUID          string          `json:"guid"`
+	Health        string          `json:"health"`
+	Allocated     uint64          `json:"allocated"`
+	Size          uint64          `json:"size"`
+	Free          uint64          `json:"free"`
+	Fragmentation uint64          `json:"fragmentation"`
+	ReadOnly      bool            `json:"readOnly"`
+	Freeing       uint64          `json:"freeing"`
+	Leaked        uint64          `json:"leaked"`
+	DedupRatio    float64         `json:"dedupRatio"`
+	Vdevs         []Vdev          `json:"vdevs"`
+	Status        ZpoolStatus     `json:"status"`
+	Spares        []SpareDevice   `json:"spares"`
+	Properties    []ZpoolProperty `json:"properties"`
 }
 
 type ZpoolDevice struct {
@@ -323,6 +331,11 @@ func (z *zfs) GetZpool(name string) (*Zpool, error) {
 		}
 	}
 
+	pool.Properties, err = z.GetProperties(pool.Name)
+	if err != nil {
+		return nil, err
+	}
+
 	pool.Status, err = z.GetZpoolStatus(name)
 	if err != nil {
 		return nil, err
@@ -448,6 +461,40 @@ func (z *zfs) GetZpoolStatus(name string) (ZpoolStatus, error) {
 	}
 
 	return status, nil
+}
+
+func (z *zfs) GetProperties(name string) ([]ZpoolProperty, error) {
+	args := []string{"get", "-H", "-p", "all", name}
+
+	var stdout, stderr bytes.Buffer
+	if err := z.exec.Run(nil, &stdout, &stderr, "zpool", args...); err != nil {
+		return nil, &Error{
+			Err:    err,
+			Debug:  "zpool " + strings.Join(args, " "),
+			Stderr: stderr.String(),
+		}
+	}
+
+	raw := stdout.String()
+	lines := strings.Split(strings.TrimSuffix(raw, "\n"), "\n")
+
+	properties := make([]ZpoolProperty, 0, len(lines))
+	for _, line := range lines {
+		cols := strings.Split(line, "\t")
+		if len(cols) < 4 {
+			continue
+		}
+
+		prop := ZpoolProperty{
+			Property: cols[1],
+			Value:    cols[2],
+			Source:   cols[3],
+		}
+
+		properties = append(properties, prop)
+	}
+
+	return properties, nil
 }
 
 func (z *Zpool) Datasets() ([]*Dataset, error) {

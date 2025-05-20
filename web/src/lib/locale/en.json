@@ -153,6 +153,7 @@
 			"partitions": "Partitions",
 			"no_available_partitions": "No available partitions",
 			"create_zfs_pool": "Create ZFS Pool",
+			"edit_zfs_pool": "Edit ZFS Pool",
 			"create_pool": "create pool",
 			"scrub_pool": "scrub pool",
 			"mount_point": "Mount Point"

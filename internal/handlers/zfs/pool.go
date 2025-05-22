@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"strings"
 	"sylve/internal"
+	"sylve/internal/db"
 	infoModels "sylve/internal/db/models/info"
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
 	"sylve/internal/services/info"
@@ -33,6 +34,11 @@ type ZpoolListResponse struct {
 	Message string            `json:"message"`
 	Error   string            `json:"error"`
 	Data    []*zfsUtils.Zpool `json:"data"`
+}
+
+type PoolStatPointResponse struct {
+	PoolStatPoint map[string][]zfsServiceInterfaces.PoolStatPoint `json:"poolStatPoint"`
+	IntervalMap   []db.IntervalOption                             `json:"intervalMap"`
 }
 
 // @Summary Get Average IO Delay
@@ -338,7 +344,7 @@ func ReplaceDevice(infoService *info.Service, zfsService *zfs.Service) gin.Handl
 // @Security BearerAuth
 // @Param interval path int true "Interval in minutes"
 // @Param limit path int true "Limit"
-// @Success 200 {object} internal.APIResponse[map[string][]zfsServiceInterfaces.PoolStatPoint] "Success"
+// @Success 200 {object} internal.APIResponse[PoolStatPointResponse] "Success"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
 // @Router /zfs/pool/stats/{interval}/{limit} [get]
 func PoolStats(zfsService *zfs.Service) gin.HandlerFunc {
@@ -368,7 +374,8 @@ func PoolStats(zfsService *zfs.Service) gin.HandlerFunc {
 			return
 		}
 
-		stats, err := zfsService.GetZpoolHistoricalStats(intervalInt, limitInt)
+		stats, count, err := zfsService.GetZpoolHistoricalStats(intervalInt, limitInt)
+
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 				Status:  "error",
@@ -379,11 +386,16 @@ func PoolStats(zfsService *zfs.Service) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, internal.APIResponse[map[string][]zfsServiceInterfaces.PoolStatPoint]{
+		response := PoolStatPointResponse{
+			PoolStatPoint: stats,
+			IntervalMap:   db.IntervalToMap(count),
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[PoolStatPointResponse]{
 			Status:  "success",
 			Message: "pool_stats",
 			Error:   "",
-			Data:    stats,
+			Data:    response,
 		})
 	}
 }

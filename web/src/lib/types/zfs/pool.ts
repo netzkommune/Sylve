@@ -105,7 +105,7 @@ export const CreateZpoolSchema = z.object({
 		.regex(/^[a-zA-Z0-9]+$/, 'Name must be alphanumeric'),
 	raidType: ZpoolRaidTypeSchema,
 	vdevs: z.array(CreateVdevSchema),
-	properties: z.record(z.string()).optional(),
+	properties: z.record(z.string(), z.string()).optional(),
 	createForce: z.boolean().default(false),
 	spares: z.array(z.string()).optional()
 });
@@ -116,20 +116,24 @@ export const ReplaceDeviceSchema = z.object({
 	new: z.string()
 });
 
+export const PoolStatPointSchema = z.object({
+	allocated: z.number(),
+	free: z.number(),
+	size: z.number(),
+	dedupRatio: z.number()
+});
+
 export const PoolStatPointsSchema = z.record(
 	z.string(),
 	z
-		.array(
-			z.object({
-				time: z.number(),
-				allocated: z.number(),
-				free: z.number(),
-				size: z.number(),
-				dedupRatio: z.number()
-			})
-		)
+		.array(PoolStatPointSchema)
 		.refine((obj) => Object.keys(obj).length > 0, { message: 'No Data Found' })
 );
+
+export const PoolStatPointsResponseSchema = z.object({
+	poolStatPoint: PoolStatPointsSchema,
+	intervalMap: z.array(z.object({ value: z.number(), label: z.string() }))
+});
 
 export type IODelay = z.infer<typeof IODelaySchema>;
 export type IODelayHistorical = z.infer<typeof IODelayHistoricalSchema>;
@@ -137,4 +141,4 @@ export type Zpool = z.infer<typeof ZpoolSchema>;
 export type ReplaceDevice = z.infer<typeof ReplaceDeviceSchema>;
 export type CreateZpool = z.infer<typeof CreateZpoolSchema>;
 export type ZpoolRaidType = z.infer<typeof ZpoolRaidTypeSchema>;
-export type PoolStatPoints = z.infer<typeof PoolStatPointsSchema>;
+export type PoolStatPointsResponse = z.infer<typeof PoolStatPointsResponseSchema>;

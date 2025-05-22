@@ -50,3 +50,27 @@ func StoreAndTrimRecords(db *gorm.DB, model interface{}, limit int) {
 		}
 	}
 }
+
+type IntervalOption struct {
+	Value int    `json:"value"`
+	Label string `json:"label"`
+}
+
+func IntervalToMap(count int) []IntervalOption {
+	intervalOptions := []IntervalOption{
+		{Value: 1, Label: "Every Minute"},
+		{Value: 60, Label: "Every Hour"},
+		{Value: 1440, Label: "Every Day"},
+		{Value: 10080, Label: "Every Week"},
+		{Value: 40320, Label: "Every Month"},
+		{Value: 483840, Label: "Every Year"},
+	}
+
+	var result []IntervalOption
+	for _, opt := range intervalOptions {
+		if count >= opt.Value {
+			result = append(result, opt)
+		}
+	}
+	return result
+}

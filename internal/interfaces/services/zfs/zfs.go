@@ -16,7 +16,7 @@ import (
 
 type ZfsServiceInterface interface {
 	GetTotalIODelayHisorical() ([]infoModels.IODelay, error)
-	GetZpoolHistoricalStats(intervalMinutes int, limit int) (map[string][]PoolStatPoint, error)
+	GetZpoolHistoricalStats(intervalMinutes int, limit int) (map[string][]PoolStatPoint, int, error)
 
 	CreatePool(Zpool) error
 	DeletePool(poolName string) error

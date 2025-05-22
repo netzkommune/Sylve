@@ -111,23 +111,21 @@ func (s *Service) SyncToLibvirt() error {
 	return nil
 }
 
-func (s *Service) GetZpoolHistoricalStats(intervalMinutes int, limit int) (map[string][]zfsServiceInterfaces.PoolStatPoint, error) {
+func (s *Service) GetZpoolHistoricalStats(intervalMinutes int, limit int) (map[string][]zfsServiceInterfaces.PoolStatPoint, int, error) {
 	if intervalMinutes <= 0 {
-		return nil, fmt.Errorf("invalid interval: must be > 0")
+		return nil, 0, fmt.Errorf("invalid interval: must be > 0")
 	}
 
-	// 1) load all history in ascending time
 	var records []infoModels.ZPoolHistorical
 	if err := s.DB.
 		Order("created_at ASC").
 		Find(&records).Error; err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	// 2) compute bucket size in ms
+	count := len(records)
 	intervalMs := int64(intervalMinutes) * 60 * 1000
 
-	// 3) bucket the data
 	buckets := make(map[string]map[int64]zfsServiceInterfaces.PoolStatPoint)
 	for _, rec := range records {
 		bucketTime := (rec.CreatedAt / intervalMs) * intervalMs
@@ -136,7 +134,7 @@ func (s *Service) GetZpoolHistoricalStats(intervalMinutes int, limit int) (map[s
 		if buckets[name] == nil {
 			buckets[name] = make(map[int64]zfsServiceInterfaces.PoolStatPoint)
 		}
-		// keep only the first sample per bucket
+
 		if _, seen := buckets[name][bucketTime]; !seen {
 			p := zfs.Zpool(rec.Pools)
 			buckets[name][bucketTime] = zfsServiceInterfaces.PoolStatPoint{
@@ -149,7 +147,6 @@ func (s *Service) GetZpoolHistoricalStats(intervalMinutes int, limit int) (map[s
 		}
 	}
 
-	// 4) materialize, sort, and apply limit
 	result := make(map[string][]zfsServiceInterfaces.PoolStatPoint, len(buckets))
 	for name, mp := range buckets {
 		pts := make([]zfsServiceInterfaces.PoolStatPoint, 0, len(mp))
@@ -160,7 +157,6 @@ func (s *Service) GetZpoolHistoricalStats(intervalMinutes int, limit int) (map[s
 			return pts[i].Time < pts[j].Time
 		})
 
-		// apply limit: keep only the last `limit` points
 		if limit > 0 && len(pts) > limit {
 			pts = pts[len(pts)-limit:]
 		}
@@ -168,5 +164,5 @@ func (s *Service) GetZpoolHistoricalStats(intervalMinutes int, limit int) (map[s
 		result[name] = pts
 	}
 
-	return result, nil
+	return result, count, nil
 }

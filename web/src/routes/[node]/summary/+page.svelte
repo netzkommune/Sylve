@@ -282,9 +282,10 @@
 							</div>
 						</Card.Title>
 					</Card.Header>
-					<Card.Content>
+					<Card.Content class="h-[300px]">
 						<LineGraph
 							data={[cpuHistoricalData, ioDelayHistoricalData]}
+							valueType="percentage"
 							keys={[
 								{
 									key: 'cpuUsage',

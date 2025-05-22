@@ -3,16 +3,17 @@ import { getPools, getPoolStats } from '$lib/api/zfs/pool';
 import { cachedFetch } from '$lib/utils/http';
 
 export async function load() {
-	const cacheDuration = 7 * 24 * 60 * 60;
-	const [datasets, pools] = await Promise.all([
-		cachedFetch('datasets', async () => await getDatasets(), cacheDuration),
-		cachedFetch('pools', getPools, cacheDuration)
-	]);
+    const cacheDuration = 1;
+    const [datasets, pools, poolStats] = await Promise.all([
+        cachedFetch('datasets', async () => await getDatasets(), cacheDuration),
+        cachedFetch('pools', getPools, cacheDuration),
+        cachedFetch('pool-stats', async () => await getPoolStats(1, 128), cacheDuration),
+    ]);
 
-	console.log(await getPoolStats(60, 128));
+    return {
+        pools: pools,
+        datasets: datasets,
+        poolStats: poolStats
 
-	return {
-		pools: pools,
-		datasets: datasets
-	};
+    };
 }

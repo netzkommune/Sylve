@@ -1,21 +1,26 @@
 <script lang="ts">
 	import { getDatasets } from '$lib/api/zfs/datasets';
-	import { getPools } from '$lib/api/zfs/pool';
+	import { getPools, getPoolStats } from '$lib/api/zfs/pool';
 	import BarChart from '$lib/components/custom/BarChart.svelte';
+	import LineGraph from '$lib/components/custom/LineGraph.svelte';
 	import PieChart from '$lib/components/custom/PieChart.svelte';
 	import * as Card from '$lib/components/ui/card';
 	import CustomComboBox from '$lib/components/ui/custom-input/combobox.svelte';
 	import type { Dataset } from '$lib/types/zfs/dataset';
-	import type { Zpool } from '$lib/types/zfs/pool';
+	import type { PoolStatPointsResponse, Zpool } from '$lib/types/zfs/pool';
 	import { updateCache } from '$lib/utils/http';
-	import { getDatasetCompressionHist, getPoolUsagePieData } from '$lib/utils/zfs/pool';
+	import {
+		getDatasetCompressionHist,
+		getPoolStatsCombined,
+		getPoolUsagePieData
+	} from '$lib/utils/zfs/pool';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
-	import humanFormat from 'human-format';
 
 	interface Data {
 		pools: Zpool[];
 		datasets: Dataset[];
+		poolStats: PoolStatPointsResponse;
 	}
 
 	type CardType = 'pools' | 'datasets' | 'file_systems' | 'volumes' | 'snapshots';
@@ -45,11 +50,24 @@
 			onSuccess: (data: Dataset[]) => {
 				updateCache('datasets', data);
 			}
+		},
+		{
+			queryKey: ['poolStats'],
+			queryFn: async () => {
+				return await getPoolStats(Number(comboBoxes.poolStats.interval.value), 128);
+			},
+			refetchInterval: 1000,
+			keepPreviousData: false,
+			initialData: Array.isArray(data.poolStats) ? data.poolStats[0] : data.poolStats,
+			onSuccess: (data: PoolStatPointsResponse) => {
+				updateCache('poolStats', data);
+			}
 		}
 	]);
 
 	let pools: Zpool[] = $derived($results[0].data as Zpool[]);
 	let datasets: Dataset[] = $derived($results[1].data as Dataset[]);
+	let poolStats: PoolStatPointsResponse = $derived($results[2].data as PoolStatPointsResponse);
 
 	let filesystems: Dataset[] = $derived.by(() => {
 		return datasets.filter((dataset) => dataset.type === 'filesystem');
@@ -122,6 +140,23 @@
 				value: pool.name,
 				label: pool.name
 			}))
+		},
+		poolStats: {
+			interval: {
+				open: false,
+				value: poolStats?.intervalMap[0]?.value || '1',
+				data: poolStats?.intervalMap
+			},
+			statType: {
+				open: false,
+				value: 'allocated',
+				data: [
+					{ value: 'allocated', label: 'Allocated' },
+					{ value: 'free', label: 'Free' },
+					{ value: 'size', label: 'Size' },
+					{ value: 'dedupRatio', label: 'Dedup Ratio' }
+				]
+			}
 		}
 	});
 
@@ -141,7 +176,12 @@
 		};
 	});
 
-	// $inspect(histograms);
+	type StatType = 'allocated' | 'free' | 'size' | 'dedupRatio';
+
+	let { poolStatsData, poolStatsKeys } = $derived.by(() => {
+		const statType = comboBoxes.poolStats.statType.value as StatType;
+		return getPoolStatsCombined(poolStats.poolStatPoint, statType);
+	});
 </script>
 
 {#snippet card(type: string)}
@@ -247,6 +287,62 @@
 										baseline: 'hsla(60, 50%, 50%, 0.5)',
 										value: 'hsla(120, 50%, 50%, 0.5)'
 									}}
+								/>
+							{/if}
+						</div>
+					</Card.Content>
+				</Card.Root>
+			</div>
+
+			<div
+				class="mt-3 flex h-[310px] min-h-[270px] w-[722px] min-w-[425px] resize flex-col overflow-auto"
+			>
+				<Card.Root class="flex flex-1 flex-col ">
+					<Card.Header>
+						<Card.Title class="mb-[-100px]">
+							<div class="flex w-full items-center justify-between">
+								<div class="flex items-center">
+									<Icon icon="mdi:data-usage" class="mr-2" />
+									<span class="text-sm font-bold md:text-lg xl:text-xl">PoolStats</span>
+								</div>
+
+								<div class="flex items-center gap-2">
+									<CustomComboBox
+										bind:open={comboBoxes.poolStats.statType.open}
+										label=""
+										bind:value={comboBoxes.poolStats.statType.value}
+										data={comboBoxes.poolStats.statType.data}
+										classes=""
+										placeholder="Select a stat type"
+										width="w-48"
+										disallowEmpty={true}
+									/>
+									<CustomComboBox
+										bind:open={comboBoxes.poolStats.interval.open}
+										label=""
+										bind:value={comboBoxes.poolStats.interval.value}
+										data={comboBoxes.poolStats.interval.data}
+										classes=""
+										placeholder="Select a interval"
+										width="w-48"
+										disallowEmpty={true}
+									/>
+								</div>
+							</div>
+						</Card.Title>
+					</Card.Header>
+
+					<Card.Content class="flex-1 overflow-hidden">
+						<div class="mt-4 flex h-full items-center justify-center">
+							{#if poolStatsData.length === 0}
+								<p class="text-sm font-semibold text-gray-500">No data available</p>
+							{:else}
+								<LineGraph
+									data={poolStatsData}
+									keys={poolStatsKeys}
+									unformattedKeys={[comboBoxes.poolStats.statType.value]}
+									valueType="fileSize"
+									interval={comboBoxes.poolStats.interval.value}
 								/>
 							{/if}
 						</div>

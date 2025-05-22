@@ -9,7 +9,9 @@
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { hostname, language as langStore } from '$lib/stores/basic';
 	import { getTranslation } from '$lib/utils/i18n';
+	import Icon from '@iconify/svelte';
 	import { mode } from 'mode-watcher';
+	import { onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 
 	interface Props {
@@ -29,15 +31,40 @@
 	let authType = $state('sylve');
 	let language = $state('en');
 	let remember = $state(false);
+	let loading = $state(false);
 
 	$effect(() => {
 		if ($page.url.search.includes('loggedOut')) {
 			revokeJWT();
 		}
 	});
+
+	async function handleKeydown(event: KeyboardEvent) {
+		if (event.key === 'Enter') {
+			event.preventDefault();
+			if (loading) return;
+			loading = true;
+
+			try {
+				await onLogin(username, password, authType, language, remember);
+			} catch (error) {
+				console.error('Login error:', error);
+			} finally {
+				loading = false;
+			}
+		}
+	}
+
+	onMount(() => {
+		window.addEventListener('keydown', handleKeydown);
+	});
+
+	onDestroy(() => {
+		window.removeEventListener('keydown', handleKeydown);
+	});
 </script>
 
-<div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 px-3">
+<div class="fixed inset-0 flex items-center justify-center px-3">
 	<Card.Root class="w-full max-w-lg rounded-lg shadow-lg">
 		<Card.Header class="flex flex-row items-center justify-center gap-2">
 			{#if $mode === 'dark'}
@@ -125,7 +152,11 @@
 				size="sm"
 				class="w-20 rounded-md bg-blue-700 text-white hover:bg-blue-600"
 			>
-				Login
+				{#if loading}
+					<Icon icon="line-md:loading-loop" width="24" height="24" />
+				{:else}
+					Login
+				{/if}
 			</Button>
 		</Card.Footer>
 	</Card.Root>

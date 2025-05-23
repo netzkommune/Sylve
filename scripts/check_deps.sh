@@ -25,8 +25,8 @@ check_command() {
     fi
 }
 
-check_command node "node -v" "pkg install npm-20"
-check_command npm "npm -v" "pkg install npm-20"
+check_command node "node -v" "pkg install node20"
+check_command npm "npm -v" "pkg install npm-node20"
 check_command go "go version" "pkg install go"
 check_command tmux "tmux -V" "pkg install tmux"
 check_command virsh "virsh --version" "pkg install libvirt"

@@ -110,12 +110,6 @@
 
 	let { children }: Props = $props();
 
-	let mainTree = $derived.by(() => {
-		const pathname = page.url.pathname;
-		const shouldShowHundredItems = /1|local/.test(pathname);
-		return shouldShowHundredItems ? [] : nodeItems;
-	});
-
 	$effect(() => {
 		if (page.url.pathname === `/${$hostname}`) {
 			goto(`/${node}/summary`);
@@ -150,7 +144,7 @@
 					<nav aria-label="Difuse-sidebar" class="menu thin-scrollbar w-full">
 						<ul>
 							<ScrollArea orientation="both" class="h-full w-full">
-								{#each mainTree as item}
+								{#each nodeItems as item}
 									<TreeView {item} onToggle={toggleCategory} bind:this={openCategories} />
 								{/each}
 							</ScrollArea>

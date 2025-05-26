@@ -1623,7 +1623,7 @@
 		closeOnEscape={false}
 	>
 		<Dialog.Content
-			class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-visible overflow-y-auto p-6 transition-all duration-300 ease-in-out lg:max-w-[70%]"
+			class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-visible overflow-y-auto p-6 transition-all duration-300 ease-in-out lg:max-w-[45%]"
 		>
 			<div class="flex items-center justify-between pb-3">
 				<Dialog.Header>

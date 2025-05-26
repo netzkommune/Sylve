@@ -90,7 +90,7 @@ func (s *Service) CreatePool(pool zfsServiceInterfaces.Zpool) error {
 		return fmt.Errorf("libvirt_create_pool_failed: %v", err)
 	}
 
-	return nil
+	return s.SyncToLibvirt()
 }
 
 func (s *Service) DeletePool(poolName string) error {
@@ -104,10 +104,61 @@ func (s *Service) DeletePool(poolName string) error {
 		return err
 	}
 
-	return nil
+	return s.SyncToLibvirt()
+}
+
+func (s *Service) EditPool(name string, props map[string]string) error {
+	s.syncMutex.Lock()
+	defer s.syncMutex.Unlock()
+
+	_, err := zfs.GetZpool(name)
+	if err != nil {
+		return fmt.Errorf("pool_not_found")
+	}
+
+	for prop, value := range props {
+		if err := zfs.SetZpoolProperty(name, prop, value); err != nil {
+			return fmt.Errorf("failed_to_set_property %s: %v", prop, err)
+		}
+	}
+
+	return s.SyncToLibvirt()
 }
 
 func (s *Service) SyncToLibvirt() error {
+	// 1) get existing libvirt pools
+	sPools, err := s.Libvirt.ListStoragePools()
+	if err != nil {
+		return fmt.Errorf("failed_to_list_libvirt_pools: %v", err)
+	}
+
+	existing := make(map[string]struct{}, len(sPools))
+	for _, sp := range sPools {
+		existing[sp.Name] = struct{}{}
+	}
+
+	for _, sp := range sPools {
+		if _, err := zfs.GetZpool(sp.Name); err != nil {
+			if derr := s.Libvirt.DeleteStoragePool(sp.Name); derr != nil {
+				return fmt.Errorf("failed_to_delete_libvirt_pool %s: %v", sp.Name, derr)
+			}
+		}
+	}
+
+	zPools, err := zfs.ListZpools()
+	if err != nil {
+		return fmt.Errorf("failed_to_list_zfs_pools: %v", err)
+	}
+
+	for _, zp := range zPools {
+		if _, ok := existing[zp.Name]; ok {
+			continue
+		}
+		if err := s.Libvirt.CreateStoragePool(zp.Name); err != nil {
+			return fmt.Errorf("failed_to_create_libvirt_pool %s: %w", zp.Name, err)
+		}
+	}
+
 	return nil
 }
 
@@ -165,22 +216,4 @@ func (s *Service) GetZpoolHistoricalStats(intervalMinutes int, limit int) (map[s
 	}
 
 	return result, count, nil
-}
-
-func (s *Service) EditZpool(name string, props map[string]string) error {
-	s.syncMutex.Lock()
-	defer s.syncMutex.Unlock()
-
-	_, err := zfs.GetZpool(name)
-	if err != nil {
-		return fmt.Errorf("pool_not_found")
-	}
-
-	for prop, value := range props {
-		if err := zfs.SetZpoolProperty(name, prop, value); err != nil {
-			return fmt.Errorf("failed_to_set_property %s: %v", prop, err)
-		}
-	}
-
-	return nil
 }

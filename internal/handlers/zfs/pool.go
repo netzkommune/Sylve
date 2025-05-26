@@ -428,7 +428,7 @@ func EditPool(infoService *info.Service, zfsService *zfs.Service) gin.HandlerFun
 		}
 
 		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("zfs.pool.edit_pool|-|%s", request.Name), "started")
-		err := zfsService.EditZpool(request.Name, request.Properties)
+		err := zfsService.EditPool(request.Name, request.Properties)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 				Status:  "error",

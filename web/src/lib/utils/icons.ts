@@ -22,6 +22,7 @@ const icons = [
 	'ant-design:partition-outlined',
 	'mdi:magnet',
 	'mdi:download',
+	'mdi:internet',
 	'mdi:file',
 	'mingcute:file-fill',
 	'line-md:downloading-loop',

@@ -13,6 +13,7 @@ import isCidr from 'is-cidr';
 import { isIP, isIPv4 } from 'is-ip';
 import { customRandom, nanoid } from 'nanoid';
 import { Mnemonic } from './vendor/mnemonic';
+import isURL from 'validator/lib/isURL';
 
 export function capitalizeFirstLetter(str: string, firstOnly: boolean = false): string {
 	if (firstOnly) {
@@ -127,4 +128,22 @@ export function isValidIPv6(ip: string, cidr: boolean = false): boolean {
 		console.log(e);
 		return false;
 	}
+}
+
+export function isDownloadURL(url: string): boolean {
+	const urlOpts = {
+		protocols: ['http', 'https'],
+		require_protocol: true,
+		require_valid_protocol: true,
+		require_host: true,
+		allow_underscores: false,
+		allow_fragments: false,
+		allow_query_components: false
+	};
+
+	if (!isURL(url, urlOpts)) {
+		return false;
+	}
+
+	return /\/[^\/]+\.[^\/]+$/.test(url);
 }

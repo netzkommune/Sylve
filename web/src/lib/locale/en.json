@@ -158,7 +158,8 @@
 			"edit_zfs_pool": "Edit ZFS Pool",
 			"create_pool": "create pool",
 			"scrub_pool": "scrub pool",
-			"mount_point": "Mount Point"
+			"mount_point": "Mount Point",
+			"edit_pool": "edit pool"
 		},
 		"datasets": {
 			"filesystem_already_exists": "filesystem already exists",
@@ -229,7 +230,9 @@
 		"worst": "worst",
 		"threshold": "threshold",
 		"flags": "flags",
-		"failing": "failing"
+		"failing": "failing",
+		"magnet": "magnet",
+		"http": "HTTP"
 	},
 	"validation_errors": {
 		"failed validation: min": "too small"

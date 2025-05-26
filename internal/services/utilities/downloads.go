@@ -10,12 +10,15 @@ package utilities
 
 import (
 	"fmt"
+	"os"
 	"path"
+	"sylve/internal/config"
 	utilitiesModels "sylve/internal/db/models/utilities"
 	"sylve/internal/logger"
 	"sylve/pkg/utils"
 
 	valid "github.com/asaskevich/govalidator"
+	"github.com/cavaliergopher/grab/v3"
 	"github.com/cenkalti/rain/torrent"
 )
 
@@ -40,7 +43,7 @@ func (s *Service) GetDownload(uuid string) (*utilitiesModels.Downloads, error) {
 	return &download, nil
 }
 
-func (s *Service) GetDownloadAndFile(uuid, name string) (*utilitiesModels.Downloads, *utilitiesModels.DownloadedFile, error) {
+func (s *Service) GetMagnetDownloadAndFile(uuid, name string) (*utilitiesModels.Downloads, *utilitiesModels.DownloadedFile, error) {
 	var download utilitiesModels.Downloads
 
 	if err := s.DB.Preload("Files").Where("uuid = ?", uuid).First(&download).Error; err != nil {
@@ -49,32 +52,47 @@ func (s *Service) GetDownloadAndFile(uuid, name string) (*utilitiesModels.Downlo
 	}
 
 	var file utilitiesModels.DownloadedFile
-	for _, f := range download.Files {
-		if f.Name == name {
-			file = f
-			break
+
+	if download.Type == "torrent" {
+		for _, f := range download.Files {
+			if f.Name == name {
+				file = f
+				break
+			}
 		}
 	}
 
 	return &download, &file, nil
 }
 
-func (s *Service) GetFilePathById(id int) (string, error) {
-	var file utilitiesModels.DownloadedFile
-	if err := s.DB.Where("id = ?", id).First(&file).Error; err != nil {
-		logger.L.Error().Msgf("Failed to get file by ID: %v", err)
+func (s *Service) GetFilePathById(uuid string, id int) (string, error) {
+	dl, err := s.GetDownload(uuid)
+	if err != nil {
+		logger.L.Error().Msgf("Failed to get download by UUID: %v", err)
 		return "", err
 	}
 
-	var download utilitiesModels.Downloads
-	if err := s.DB.Where("id = ?", file.DownloadID).First(&download).Error; err != nil {
-		logger.L.Error().Msgf("Failed to get download by ID: %v", err)
-		return "", err
+	if dl.Type == "torrent" {
+		var file utilitiesModels.DownloadedFile
+		if err := s.DB.Where("id = ?", id).First(&file).Error; err != nil {
+			logger.L.Error().Msgf("Failed to get file by ID: %v", err)
+			return "", err
+		}
+
+		var download utilitiesModels.Downloads
+		if err := s.DB.Where("id = ?", file.DownloadID).First(&download).Error; err != nil {
+			logger.L.Error().Msgf("Failed to get download by ID: %v", err)
+			return "", err
+		}
+
+		fullPath := path.Join(download.Path, file.Name)
+
+		return fullPath, nil
+	} else if dl.Type == "http" {
+		return path.Join(config.GetDownloadsPath("http"), dl.Name), nil
 	}
 
-	fullPath := path.Join(download.Path, file.Name)
-
-	return fullPath, nil
+	return "", fmt.Errorf("unsupported_download_type")
 }
 
 func (s *Service) DownloadFile(url string) error {
@@ -115,11 +133,35 @@ func (s *Service) DownloadFile(url string) error {
 		}
 
 		return nil
-	} else {
-		return fmt.Errorf("invalid_magnet_link")
+	} else if valid.IsURL(url) {
+		uuid := utils.GenerateDeterministicUUID(url)
+		destDir := config.GetDownloadsPath("http")
+		filename := path.Base(url)
+		download := utilitiesModels.Downloads{
+			URL:      url,
+			UUID:     uuid,
+			Path:     destDir,
+			Type:     "http",
+			Name:     filename,
+			Size:     0,
+			Progress: 0,
+			Files:    []utilitiesModels.DownloadedFile{},
+		}
+
+		if err := s.DB.Create(&download).Error; err != nil {
+			return err
+		}
+
+		req, _ := grab.NewRequest(path.Join(destDir, filename), url)
+		resp := s.GrabClient.Do(req)
+		s.httpRspMu.Lock()
+		s.httpResponses[uuid] = resp
+		s.httpRspMu.Unlock()
+
+		return nil
 	}
 
-	// return nil
+	return fmt.Errorf("invalid_url")
 }
 
 func (s *Service) SyncDownloadProgress() error {
@@ -180,6 +222,34 @@ func (s *Service) SyncDownloadProgress() error {
 				logger.L.Error().Msgf("Failed to update download record: %v", err)
 				return err
 			}
+		} else if download.Type == "http" {
+			s.httpRspMu.Lock()
+			resp, ok := s.httpResponses[download.UUID]
+			s.httpRspMu.Unlock()
+			if !ok {
+				logger.L.Debug().Msgf("No active HTTP download for %s", download.UUID)
+				continue
+			}
+
+			download.Progress = int(100 * resp.Progress())
+			if info, err := os.Stat(resp.Filename); err == nil {
+				download.Size = info.Size()
+			}
+
+			if resp.IsComplete() {
+				if err := resp.Err(); err != nil {
+					logger.L.Error().Msgf("HTTP download %s failed: %v", download.UUID, err)
+				}
+				s.httpRspMu.Lock()
+				delete(s.httpResponses, download.UUID)
+				s.httpRspMu.Unlock()
+
+				download.Progress = 100
+			}
+
+			if err := s.DB.Save(&download).Error; err != nil {
+				logger.L.Error().Msgf("Failed to update HTTP download record: %v", err)
+			}
 		}
 	}
 
@@ -200,6 +270,14 @@ func (s *Service) DeleteDownload(id int) error {
 				logger.L.Debug().Msgf("Failed to remove torrent: %v", err)
 				return err
 			}
+		}
+	}
+
+	if download.Type == "http" {
+		err := utils.DeleteFile(path.Join(config.GetDownloadsPath(download.Type), download.Name))
+		if err != nil {
+			logger.L.Debug().Msgf("Failed to delete HTTP download file: %v", err)
+			return err
 		}
 	}
 

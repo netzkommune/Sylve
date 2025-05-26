@@ -79,6 +79,8 @@ func GetDownloadsPath(dType string) string {
 		return filepath.Join(ParsedConfig.DataPath, "downloads", "torrents")
 	} else if dType == "torrent.db" {
 		return filepath.Join(ParsedConfig.DataPath, "downloads", "torrents", "torrent.db")
+	} else if dType == "http" {
+		return filepath.Join(ParsedConfig.DataPath, "downloads", "http")
 	}
 
 	return filepath.Join(ParsedConfig.DataPath, "downloads")

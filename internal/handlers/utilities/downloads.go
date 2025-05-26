@@ -220,7 +220,7 @@ func GetSignedDownloadURL(utilitiesService *utilities.Service) gin.HandlerFunc {
 			})
 		}
 
-		download, file, err := utilitiesService.GetDownloadAndFile(request.ParentUUID, request.Name)
+		download, err := utilitiesService.GetDownload(request.ParentUUID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 				Status:  "error",
@@ -228,19 +228,44 @@ func GetSignedDownloadURL(utilitiesService *utilities.Service) gin.HandlerFunc {
 				Error:   err.Error(),
 				Data:    nil,
 			})
+			return
 		}
 
 		expires := time.Now().Add(2 * time.Hour).Unix()
-		input := fmt.Sprintf("%s:%d", download.UUID, file.ID)
-		sig := crypto.GenerateSignature(input, expires, []byte("download_secret"))
-		signedURL := fmt.Sprintf("/api/utilities/downloads/%s?expires=%d&sig=%s&id=%d", download.UUID, expires, sig, file.ID)
 
-		c.JSON(http.StatusOK, internal.APIResponse[string]{
-			Status:  "success",
-			Message: "signed_url_generated",
-			Error:   "",
-			Data:    signedURL,
-		})
+		if download.Type == "torrent" {
+			download, file, err := utilitiesService.GetMagnetDownloadAndFile(request.ParentUUID, request.Name)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+					Status:  "error",
+					Message: "failed_to_get_download",
+					Error:   err.Error(),
+					Data:    nil,
+				})
+			}
+
+			input := fmt.Sprintf("%s:%d", download.UUID, file.ID)
+			sig := crypto.GenerateSignature(input, expires, []byte("download_secret"))
+			signedURL := fmt.Sprintf("/api/utilities/downloads/%s?expires=%d&sig=%s&id=%d", download.UUID, expires, sig, file.ID)
+
+			c.JSON(http.StatusOK, internal.APIResponse[string]{
+				Status:  "success",
+				Message: "signed_url_generated",
+				Error:   "",
+				Data:    signedURL,
+			})
+		} else if download.Type == "http" {
+			input := fmt.Sprintf("%s:%d", download.UUID, download.ID)
+			sig := crypto.GenerateSignature(input, expires, []byte("download_secret"))
+			signedURL := fmt.Sprintf("/api/utilities/downloads/%s?expires=%d&sig=%s&id=%d", download.UUID, expires, sig, download.ID)
+
+			c.JSON(http.StatusOK, internal.APIResponse[string]{
+				Status:  "success",
+				Message: "signed_url_generated",
+				Error:   "",
+				Data:    signedURL,
+			})
+		}
 	}
 }
 
@@ -300,7 +325,7 @@ func DownloadFileFromSignedURL(utilitiesService *utilities.Service) gin.HandlerF
 			return
 		}
 
-		filePath, err := utilitiesService.GetFilePathById(id)
+		filePath, err := utilitiesService.GetFilePathById(uuid, id)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 				Status:  "error",

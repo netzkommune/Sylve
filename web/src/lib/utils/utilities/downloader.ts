@@ -28,8 +28,8 @@ export function generateTableData(data: Download[]): { rows: Row[]; columns: Col
 				if (data.type !== '-') {
 					if (data.type === 'torrent') {
 						return renderWithIcon('mdi:magnet', value);
-					} else if (data.type === 'ddl') {
-						return renderWithIcon('mdi:download', value);
+					} else if (data.type === 'http') {
+						return renderWithIcon('mdi:internet', value);
 					} else {
 						return renderWithIcon('mdi:file', value);
 					}

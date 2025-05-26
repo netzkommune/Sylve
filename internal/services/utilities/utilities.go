@@ -13,15 +13,22 @@ import (
 	utilitiesServiceInterfaces "sylve/internal/interfaces/services/utilities"
 	"sylve/internal/logger"
 
+	"github.com/cavaliergopher/grab/v3"
 	"github.com/cenkalti/rain/torrent"
 	"gorm.io/gorm"
+	
+	"sync"
 )
 
 var _ utilitiesServiceInterfaces.UtilitiesServiceInterface = (*Service)(nil)
 
 type Service struct {
-	DB        *gorm.DB
-	BTTClient *torrent.Session
+	DB         *gorm.DB
+	BTTClient  *torrent.Session
+	GrabClient *grab.Client
+
+	httpRspMu    sync.Mutex
+	httpResponses map[string]*grab.Response
 }
 
 func NewUtilitiesService(db *gorm.DB) utilitiesServiceInterfaces.UtilitiesServiceInterface {
@@ -37,7 +44,9 @@ func NewUtilitiesService(db *gorm.DB) utilitiesServiceInterfaces.UtilitiesServic
 	}
 
 	return &Service{
-		DB:        db,
-		BTTClient: session,
+		DB:         db,
+		BTTClient:  session,
+		GrabClient: grab.NewClient(),
+		httpResponses: make(map[string]*grab.Response),
 	}
 }

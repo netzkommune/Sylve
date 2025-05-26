@@ -67,7 +67,10 @@ func main() {
 	gin.DefaultErrorWriter = io.Discard
 
 	r := gin.Default()
-	r.Use(gzip.Gzip(gzip.DefaultCompression))
+	r.Use(gzip.Gzip(
+		gzip.DefaultCompression,
+		gzip.WithExcludedPaths([]string{"/api/utilities/downloads"}),
+	))
 
 	handlers.RegisterRoutes(r,
 		cfg.Environment,

@@ -116,6 +116,7 @@
 			"pool_not_found": "Pool not found",
 			"pool_deleted": "Pool deleted",
 			"pool_created": "Pool created",
+			"pool_edited": "Pool edited",
 			"errors": {
 				"pool_create_failed_mirror_different_sizes": "Pool contains a mirror with devices of different sizes",
 				"pool_create_failed_raidz_different_sizes": "Pool contains a raidz vdev with devices of different sizes",
@@ -124,7 +125,8 @@
 				"pool_create_failed_invalid_name": "Invalid pool name",
 				"pool_create_failed_need_atleast_one": "Please add at least one disk",
 				"pool_create_failed_new_device_smaller": "New device is smaller than old device",
-				"pool_create_failed_new_partition_smaller": "New partition is smaller than old device"
+				"pool_create_failed_new_partition_smaller": "New partition is smaller than old device",
+				"pool_edit_failed": "Pool edit failed"
 			},
 			"warnings": {
 				"disks_within_vdev_should_be_same_type": "Disks within a VDEV should ideally be the same type",

@@ -102,6 +102,7 @@ func RegisterRoutes(r *gin.Engine,
 		{
 			pools.GET("", zfsHandlers.GetPools(zfsService))
 			pools.POST("", zfsHandlers.CreatePool(infoService, zfsService))
+			pools.PATCH("", zfsHandlers.EditPool(infoService, zfsService))
 			pools.POST("/:name/scrub", zfsHandlers.ScrubPool(infoService, zfsService))
 			pools.DELETE("/:name", zfsHandlers.DeletePool(infoService, zfsService))
 			pools.POST("/:name/replace-device", zfsHandlers.ReplaceDevice(infoService, zfsService))

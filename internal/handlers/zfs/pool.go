@@ -41,6 +41,11 @@ type PoolStatPointResponse struct {
 	IntervalMap   []db.IntervalOption                             `json:"intervalMap"`
 }
 
+type PoolEditRequest struct {
+	Name       string            `json:"name"`
+	Properties map[string]string `json:"properties"`
+}
+
 // @Summary Get Average IO Delay
 // @Description Get the average IO delay of all pools
 // @Tags ZFS
@@ -335,7 +340,6 @@ func ReplaceDevice(infoService *info.Service, zfsService *zfs.Service) gin.Handl
 	}
 }
 
-// zfs.GET("/pool/stats/:interval/:limit", zfsHandlers.PoolStats(zfsService))
 // @Summary Get Pool Stats
 // @Description Get the historical stats of a ZFS pool
 // @Tags ZFS
@@ -397,5 +401,53 @@ func PoolStats(zfsService *zfs.Service) gin.HandlerFunc {
 			Error:   "",
 			Data:    response,
 		})
+	}
+}
+
+// @Summary Edit Pool
+// @Description Edit a ZFS pool's properties
+// @Tags ZFS
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body PoolEditRequest true "Request"
+// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /zfs/pools [patch]
+func EditPool(infoService *info.Service, zfsService *zfs.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var request PoolEditRequest
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("zfs.pool.edit_pool|-|%s", request.Name), "started")
+		err := zfsService.EditZpool(request.Name, request.Properties)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "pool_edit_failed",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+
+			infoService.EndAuditLog(id, "failed")
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "pool_edited",
+			Error:   "",
+			Data:    nil,
+		})
+
+		infoService.EndAuditLog(id, "success")
 	}
 }

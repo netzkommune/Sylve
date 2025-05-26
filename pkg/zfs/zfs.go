@@ -56,6 +56,7 @@ type ZFS interface {
 	CreateZpool(name string, properties map[string]string, args ...string) (*Zpool, error)
 	GetPoolIODelay(poolName string) (float64, error)
 	GetTotalIODelay() float64
+	SetZpoolProperty(pool string, property string, value string) error
 }
 
 func (z *zfs) do(arg ...string) error {

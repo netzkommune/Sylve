@@ -655,3 +655,49 @@ func (z *zfs) ScrubPool(poolName string) error {
 	}
 	return nil
 }
+
+func validateZpoolProps(userProps map[string]string, existing []ZpoolProperty) error {
+	settable := make(map[string]bool)
+	for _, prop := range existing {
+		if prop.Source != "-" {
+			settable[prop.Property] = true
+		}
+	}
+
+	for prop := range userProps {
+		if !settable[prop] {
+			return fmt.Errorf("invalid_or_readonly_property: %s", prop)
+		}
+	}
+
+	return nil
+}
+
+func (z *zfs) SetZpoolProperty(pool string, property string, value string) error {
+	props, err := z.GetProperties(pool)
+	if err != nil {
+		return fmt.Errorf("failed_to_get_properties: %w", err)
+	}
+
+	isSettable := false
+	for _, p := range props {
+		if p.Property == property {
+			if p.Source == "-" {
+				return fmt.Errorf("property_is_readonly: %s", property)
+			}
+			isSettable = true
+			break
+		}
+	}
+
+	if !isSettable {
+		return fmt.Errorf("unknown_property: %s", property)
+	}
+
+	err = z.zpool("set", fmt.Sprintf("%s=%s", property, value), pool)
+	if err != nil {
+		return fmt.Errorf("failed_to_set_property %s=%s: %w", property, value, err)
+	}
+
+	return nil
+}

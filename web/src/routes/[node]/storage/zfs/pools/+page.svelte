@@ -1,6 +1,13 @@
 <script lang="ts">
 	import { listDisks } from '$lib/api/disk/disk';
-	import { createPool, deletePool, getPools, replaceDevice, scrubPool } from '$lib/api/zfs/pool';
+	import {
+		createPool,
+		deletePool,
+		getPools,
+		replaceDevice,
+		scrubPool,
+		editPool
+	} from '$lib/api/zfs/pool';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import CustomCheckbox from '$lib/components/ui/custom-input/checkbox.svelte';
@@ -616,6 +623,33 @@
 		}
 	}
 
+	async function saveEdit() {
+		if (editModal.open && activeRow) {
+			const poolName = activeRow.name || '';
+			const properties = {
+				comment: editModal.properties.comment,
+				autoexpand: editModal.properties.autoexpand,
+				autotrim: editModal.properties.autotrim,
+				delegation: editModal.properties.delegation,
+				failmode: editModal.properties.failmode
+			};
+
+			const response = await editPool(poolName, properties);
+			if (response.error) {
+				toast.error(parsePoolActionError(response), {
+					position: 'bottom-center'
+				});
+
+				return;
+			}
+
+			editModal.close(true);
+			toast.success(getTranslation('zfs.pool.pool_edited', 'Pool edited'), {
+				position: 'bottom-center'
+			});
+		}
+	}
+
 	async function confirmAction() {
 		if (confirmModals.active === 'deletePool') {
 			const response = await deletePool(confirmModals.deletePool.data);
@@ -759,7 +793,7 @@
 							?.status as Zpool['status'];
 					}}
 					size="sm"
-					class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+					class="h-6 bg-muted-foreground/40 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:bg-muted dark:text-white"
 				>
 					<Icon icon="mdi:eye" class="mr-1 h-4 w-4" />
 					{getTranslation('common.status', 'Status')}
@@ -783,7 +817,7 @@
 						}
 					}}
 					size="sm"
-					class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+					class="h-6 bg-muted-foreground/40 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:bg-muted dark:text-white"
 					disabled={scrubInProgress}
 					title={scrubInProgress
 						? getTranslation('zfs.pool.scrub_in_progress', 'A scrub is already in progress')
@@ -801,6 +835,8 @@
 					onclick={() => {
 						const propsArr = pools.find((p) => p.name === activeRow?.name)?.properties || [];
 
+						console.log(pools.find((p) => p.name === activeRow?.name));
+
 						editModal.open = true;
 						editModal.properties.comment =
 							propsArr.find((prop) => prop.property === 'comment')?.value || '';
@@ -814,7 +850,7 @@
 							propsArr.find((prop) => prop.property === 'failmode')?.value || '';
 					}}
 					size="sm"
-					class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+					class="h-6 bg-muted-foreground/40 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:bg-muted dark:text-white"
 					disabled={replaceInProgress}
 					title={replaceInProgress ? 'Cannot edit pool when replacing device in any pool' : ''}
 				>
@@ -834,7 +870,7 @@
 						confirmModals.deletePool.data = activeRow?.name;
 					}}
 					size="sm"
-					class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+					class="h-6 bg-muted-foreground/40 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:bg-muted dark:text-white"
 					disabled={replaceInProgress}
 					title={replaceInProgress
 						? getTranslation(
@@ -863,7 +899,7 @@
 						};
 					}}
 					size="sm"
-					class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+					class="h-6 bg-muted-foreground/40 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:bg-muted dark:text-white"
 					disabled={replaceInProgress}
 					title={replaceInProgress
 						? 'Cannot replace device while replacing device in any pool'
@@ -880,7 +916,7 @@
 {#snippet diskContainer(type: string)}
 	<div id="{type.toLowerCase()}-container">
 		<Label>{type}</Label>
-		<div class="bg-primary/10 dark:bg-background mt-1 rounded-lg p-4">
+		<div class="mt-1 rounded-lg bg-primary/10 p-4 dark:bg-background">
 			<ScrollArea class="w-full whitespace-nowrap rounded-md" orientation="horizontal">
 				<div class="flex min-h-[80px] items-center justify-center gap-4">
 					{#each useableDisks.filter((disk) => disk.type === type && disk.partitions.length === 0 && !isDiskInVdev(disk.uuid)) as disk (disk.uuid)}
@@ -897,14 +933,14 @@
 							<div class="max-w-[64px] truncate text-xs">
 								{disk.device.replaceAll('/dev/', '')}
 							</div>
-							<div class="text-muted-foreground text-xs">
+							<div class="text-xs text-muted-foreground">
 								{humanFormat(disk.size)}
 							</div>
 						</div>
 					{/each}
 
 					{#if useableDisks.filter((disk) => disk.type === type).length === 0 || useableDisks.filter((disk) => disk.type === type && disk.partitions.length === 0 && !isDiskInVdev(disk.uuid)).length === 0}
-						<div class="text-muted-foreground/80 flex h-16 w-full items-center justify-center">
+						<div class="flex h-16 w-full items-center justify-center text-muted-foreground/80">
 							{getTranslation('zfs.pool.no_available_disks', 'No available disks')}
 						</div>
 					{/if}
@@ -917,7 +953,7 @@
 {#snippet partitionsContainer()}
 	<div id="partitions-container">
 		<Label>{getTranslation('zfs.pool.partitions', 'Partitions')}</Label>
-		<div class="bg-primary/10 dark:bg-background mt-1 rounded-lg p-4">
+		<div class="mt-1 rounded-lg bg-primary/10 p-4 dark:bg-background">
 			<ScrollArea class="w-full whitespace-nowrap rounded-md" orientation="horizontal">
 				<div class="flex min-h-[80px] items-center justify-center gap-4">
 					{#each useablePartitions.filter((partition) => !modal.vdevContainers
@@ -933,7 +969,7 @@
 							<div class="max-w-[64px] truncate text-xs">
 								{partition.name}
 							</div>
-							<div class="text-muted-foreground text-xs">
+							<div class="text-xs text-muted-foreground">
 								{humanFormat(partition.size)}
 							</div>
 						</div>
@@ -1162,14 +1198,14 @@
 							<Label>VDEVs</Label>
 							<ScrollArea class="w-full whitespace-nowrap rounded-md" orientation="horizontal">
 								<div
-									class="bg-muted mt-1 flex w-full items-center justify-center gap-7 overflow-hidden rounded-lg border-y border-none p-4 pr-4"
+									class="mt-1 flex w-full items-center justify-center gap-7 overflow-hidden rounded-lg border-y border-none bg-muted p-4 pr-4"
 								>
 									{#each Array(modal.vdevCount) as _, i}
 										<div class="relative flex flex-col">
 											{@render vdevErrors(i)}
 
 											<div
-												class={`bg-primary/10 dark:bg-background relative h-28 w-48 flex-shrink-0 overflow-auto rounded-lg p-2 ${getVdevErrors(i) ? 'border border-yellow-700 ' : ''}`}
+												class={`relative h-28 w-48 flex-shrink-0 overflow-auto rounded-lg bg-primary/10 p-2 dark:bg-background ${getVdevErrors(i) ? 'border border-yellow-700 ' : ''}`}
 												use:dropzone={{
 													on_dropzone: (_: unknown, event: DragEvent) => handleDropToVdev(i, event),
 													dragover_class: 'droppable'
@@ -1177,7 +1213,7 @@
 											>
 												{#if !vdevContains(i)}
 													<div
-														class="text-muted-foreground/60 flex h-full flex-col items-center justify-center gap-1"
+														class="flex h-full flex-col items-center justify-center gap-1 text-muted-foreground/60"
 													>
 														<span class="text-muted-foreground/60">{i + 1}</span>
 														<span>Drop disks here</span>
@@ -1199,7 +1235,7 @@
 						<div id="disk-containers">
 							<Label>Disks</Label>
 							<div
-								class="bg-muted mt-1 grid grid-cols-4 gap-6 overflow-hidden border-y border-none p-4"
+								class="mt-1 grid grid-cols-4 gap-6 overflow-hidden border-y border-none bg-muted p-4"
 							>
 								{@render diskContainer('HDD')}
 								{@render diskContainer('SSD')}
@@ -1538,14 +1574,14 @@
 
 {#snippet deviceTreeNode(device: Zpool['status']['devices'][0], showNote: boolean)}
 	<div class="device-tree relative">
-		<div class="bg-background relative flex items-center rounded-md border p-1.5">
+		<div class="relative flex items-center rounded-md border bg-background p-1.5">
 			{#if showNote && !device.__isLast}
 				<div
-					class="bg-secondary absolute -left-6 bottom-0 top-0 w-0.5"
+					class="absolute -left-6 bottom-0 top-0 w-0.5 bg-secondary"
 					style="height: calc(100% + 0.7rem);"
 				></div>
 			{:else}
-				<div class="bg-secondary absolute -left-6 bottom-0 top-0 w-0.5" style="height: 18px;"></div>
+				<div class="absolute -left-6 bottom-0 top-0 w-0.5 bg-secondary" style="height: 18px;"></div>
 			{/if}
 			{@render dtEl(device, showNote)}
 		</div>
@@ -1555,7 +1591,7 @@
 				{#each device.children as child, index (child.name)}
 					<div class="relative">
 						<div
-							class="bg-secondary h-0.5 w-6"
+							class="h-0.5 w-6 bg-secondary"
 							style="position: absolute;left: -23px;top:18px"
 						></div>
 						{@render deviceTreeNode(
@@ -1568,7 +1604,7 @@
 		{/if}
 
 		{#if device.name.startsWith('replacing') && device.children && device.children.length > 0}
-			<div class="border-border ml-5 mt-2 space-y-2 border-l-2 pl-4">
+			<div class="ml-5 mt-2 space-y-2 border-l-2 border-border pl-4">
 				{#each device.children as replaceDisk}
 					{@render deviceTreeNode(replaceDisk, true)}
 				{/each}
@@ -1592,8 +1628,8 @@
 			<div class="flex items-center justify-between pb-3">
 				<Dialog.Header>
 					<Dialog.Title class="flex items-center">
-						<span class="text-primary font-semibold">Pool Status</span>
-						<span class="text-muted-foreground mx-2">•</span>
+						<span class="font-semibold text-primary">Pool Status</span>
+						<span class="mx-2 text-muted-foreground">•</span>
 						<span class="text-xl font-medium">{confirmModals.statusPool.data.status.name}</span>
 						<Badge
 							variant={sPool.state === 'ONLINE'
@@ -1638,8 +1674,8 @@
 
 					<div class="space-y-4 overflow-hidden rounded-md">
 						<div class="border">
-							<div class="bg-muted flex items-center gap-2 px-4 py-2">
-								<Icon icon="mdi:magnify" class="text-primary h-5 w-5" />
+							<div class="flex items-center gap-2 bg-muted px-4 py-2">
+								<Icon icon="mdi:magnify" class="h-5 w-5 text-primary" />
 								<span class="font-semibold">Scan Activity</span>
 							</div>
 							<div class="p-4">
@@ -1649,22 +1685,22 @@
 										{@const progress = progressMatch ? parseFloat(progressMatch[1]) : 0}
 										{@const isResilver = sPool.scan.includes('resilver')}
 
-										<div class="text-muted-foreground text-sm">
+										<div class="text-sm text-muted-foreground">
 											{capitalizeFirstLetter(sPool.scan)}
 										</div>
-										<div class="bg-secondary mt-3 h-2.5 w-full overflow-hidden rounded-full">
+										<div class="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-secondary">
 											<div
 												class="h-full rounded-full {isResilver ? 'bg-blue-500' : 'bg-primary'}"
 												style="width: {progress}%"
 											></div>
 										</div>
 									{:else}
-										<div class="text-muted-foreground text-sm">
+										<div class="text-sm text-muted-foreground">
 											{capitalizeFirstLetter(sPool.scan)}
 										</div>
 									{/if}
 								{:else}
-									<div class="text-muted-foreground flex items-center gap-2 py-1">
+									<div class="flex items-center gap-2 py-1 text-muted-foreground">
 										<Icon icon="material-symbols:info" class="h-4 w-4" />
 										<span>No recent scan activity</span>
 									</div>
@@ -1673,8 +1709,8 @@
 						</div>
 
 						<div class="border">
-							<div class="bg-muted flex items-center gap-2 px-4 py-2">
-								<Icon icon="tabler:topology-bus" class="text-primary h-5 w-5" />
+							<div class="flex items-center gap-2 bg-muted px-4 py-2">
+								<Icon icon="tabler:topology-bus" class="h-5 w-5 text-primary" />
 								<span class="font-semibold">Device Topology</span>
 							</div>
 							<div class="h-full max-h-28 overflow-auto p-4 md:max-h-44 xl:max-h-72">
@@ -1691,10 +1727,10 @@
 									{#if sPoolSpares && sPoolSpares.length > 0}
 										<div class="device-tree relative mt-2">
 											<div
-												class="bg-background relative flex items-center gap-2 rounded-md border p-1.5"
+												class="relative flex items-center gap-2 rounded-md border bg-background p-1.5"
 											>
 												<div
-													class="bg-secondary absolute -left-6 bottom-0 top-0 w-0.5"
+													class="absolute -left-6 bottom-0 top-0 w-0.5 bg-secondary"
 													style="height: calc(100% + 0.7rem);"
 												></div>
 												<Icon icon="tabler:replace" />
@@ -1705,15 +1741,15 @@
 												{#each sPoolSpares as spare, index (spare.name)}
 													<div class="relative">
 														<div
-															class="bg-secondary h-0.5 w-6"
+															class="h-0.5 w-6 bg-secondary"
 															style="position: absolute; left: -23px; top: 18px"
 														></div>
 														<div class="device-tree relative">
 															<div
-																class="bg-background relative flex items-center gap-2 rounded-md border p-1.5"
+																class="relative flex items-center gap-2 rounded-md border bg-background p-1.5"
 															>
 																<div
-																	class="bg-secondary absolute -left-6 bottom-0 top-0 w-0.5"
+																	class="absolute -left-6 bottom-0 top-0 w-0.5 bg-secondary"
 																	style="height: 18px;"
 																></div>
 																<div
@@ -1731,7 +1767,7 @@
 										</div>
 									{/if}
 								{:else}
-									<div class="text-muted-foreground flex items-center gap-2 py-2">
+									<div class="flex items-center gap-2 py-2 text-muted-foreground">
 										<Icon icon="material-symbols:info" class="h-4 w-4" />
 										<span>No devices found</span>
 									</div>
@@ -1740,8 +1776,8 @@
 						</div>
 
 						<div class="border">
-							<div class="bg-muted flex items-center gap-2 px-4 py-2">
-								<Icon icon="mdi:alert" class="text-primary h-5 w-5" />
+							<div class="flex items-center gap-2 bg-muted px-4 py-2">
+								<Icon icon="mdi:alert" class="h-5 w-5 text-primary" />
 								<span class="font-semibold">Error Status</span>
 							</div>
 							<div class="p-4">
@@ -1765,16 +1801,6 @@
 					</div>
 				{/if}
 			</div>
-
-			<Dialog.Footer class="px-4 py-3">
-				<Button
-					size="sm"
-					class="h-8 "
-					onclick={() => {
-						confirmModals.statusPool.open = false;
-					}}>Close</Button
-				>
-			</Dialog.Footer>
 		</Dialog.Content>
 	</Dialog.Root>
 {/if}
@@ -1905,15 +1931,15 @@
 							<Select.Root
 								selected={{
 									label:
-										modal.properties.autoexpand === 'on'
+										editModal.properties.autoexpand === 'on'
 											? 'Yes'
-											: modal.properties.autoexpand === 'off'
+											: editModal.properties.autoexpand === 'off'
 												? 'No'
 												: undefined,
-									value: modal.properties.autoexpand
+									value: editModal.properties.autoexpand
 								}}
 								onSelectedChange={(value) => {
-									modal.properties.autoexpand = value?.value || 'off';
+									editModal.properties.autoexpand = value?.value || 'off';
 								}}
 							>
 								<Select.Trigger class="w-full">
@@ -1934,15 +1960,15 @@
 							<Select.Root
 								selected={{
 									label:
-										modal.properties.autotrim === 'on'
+										editModal.properties.autotrim === 'on'
 											? 'Yes'
-											: modal.properties.autotrim === 'off'
+											: editModal.properties.autotrim === 'off'
 												? 'No'
 												: undefined,
-									value: modal.properties.autotrim
+									value: editModal.properties.autotrim
 								}}
 								onSelectedChange={(value) => {
-									modal.properties.autotrim = value?.value || 'off';
+									editModal.properties.autotrim = value?.value || 'off';
 								}}
 							>
 								<Select.Trigger class="w-full">
@@ -1963,15 +1989,15 @@
 							<Select.Root
 								selected={{
 									label:
-										modal.properties.delegation === 'on'
+										editModal.properties.delegation === 'on'
 											? 'Yes'
-											: modal.properties.delegation === 'off'
+											: editModal.properties.delegation === 'off'
 												? 'No'
 												: undefined,
-									value: modal.properties.delegation
+									value: editModal.properties.delegation
 								}}
 								onSelectedChange={(value) => {
-									modal.properties.delegation = value?.value || 'off';
+									editModal.properties.delegation = value?.value || 'off';
 								}}
 							>
 								<Select.Trigger class="w-full">
@@ -1992,17 +2018,17 @@
 							<Select.Root
 								selected={{
 									label:
-										modal.properties.failmode === 'wait'
+										editModal.properties.failmode === 'wait'
 											? 'Wait'
-											: modal.properties.failmode === 'continue'
+											: editModal.properties.failmode === 'continue'
 												? 'Continue'
-												: modal.properties.failmode === 'panic'
+												: editModal.properties.failmode === 'panic'
 													? 'Panic'
 													: undefined,
-									value: modal.properties.failmode
+									value: editModal.properties.failmode
 								}}
 								onSelectedChange={(value) => {
-									modal.properties.failmode = value?.value || 'wait';
+									editModal.properties.failmode = value?.value || 'wait';
 								}}
 							>
 								<Select.Trigger class="w-full">
@@ -2030,5 +2056,13 @@
 				</div>
 			</Card.Content>
 		</Card.Root>
+
+		<Dialog.Footer class="flex justify-between gap-2 px-4">
+			<div class="flex gap-2">
+				<Button size="sm" class="h-8 " onclick={() => saveEdit()}>
+					{capitalizeFirstLetter(getTranslation('common.edit', 'Edit'))}
+				</Button>
+			</div>
+		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

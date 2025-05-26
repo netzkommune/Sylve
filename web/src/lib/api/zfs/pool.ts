@@ -1,4 +1,4 @@
-import { APIResponseSchema } from '$lib/types/common';
+import { APIResponseSchema, type APIResponse } from '$lib/types/common';
 import {
 	IODelayHistoricalSchema,
 	IODelaySchema,
@@ -64,4 +64,14 @@ export async function getPoolStats(
 		PoolStatPointsResponseSchema,
 		'GET'
 	);
+}
+
+export async function editPool(
+	name: string,
+	properties: Record<string, string>
+): Promise<APIResponse> {
+	return await apiRequest(`/zfs/pools`, APIResponseSchema, 'PATCH', {
+		name,
+		properties
+	});
 }

@@ -19,7 +19,7 @@ import { getValidationError } from './i18n';
 export async function apiRequest<T extends z.ZodType>(
 	endpoint: string,
 	schema: T,
-	method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+	method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
 	body?: unknown
 ): Promise<z.infer<T>> {
 	try {

@@ -9,422 +9,423 @@ import { generateNumberFromString } from '../numbers';
 import { renderWithIcon, sizeFormatter } from '../table';
 
 export const raidTypeArr = [
-    {
-        value: 'stripe',
-        label: getTranslation('zfs.pool.redundancy.stripe', 'Stripe'),
-        available: true
-    },
-    {
-        value: 'mirror',
-        label: getTranslation('zfs.pool.redundancy.mirror', 'Mirror'),
-        available: false
-    },
-    {
-        value: 'raidz',
-        label: getTranslation('zfs.pool.redundancy.raidz', 'RAIDZ'),
-        available: false
-    },
-    {
-        value: 'raidz2',
-        label: getTranslation('zfs.pool.redundancy.raidz2', 'RAIDZ2'),
-        available: false
-    },
-    {
-        value: 'raidz3',
-        label: getTranslation('zfs.pool.redundancy.raidz3', 'RAIDZ3'),
-        available: false
-    }
+	{
+		value: 'stripe',
+		label: getTranslation('zfs.pool.redundancy.stripe', 'Stripe'),
+		available: true
+	},
+	{
+		value: 'mirror',
+		label: getTranslation('zfs.pool.redundancy.mirror', 'Mirror'),
+		available: false
+	},
+	{
+		value: 'raidz',
+		label: getTranslation('zfs.pool.redundancy.raidz', 'RAIDZ'),
+		available: false
+	},
+	{
+		value: 'raidz2',
+		label: getTranslation('zfs.pool.redundancy.raidz2', 'RAIDZ2'),
+		available: false
+	},
+	{
+		value: 'raidz3',
+		label: getTranslation('zfs.pool.redundancy.raidz3', 'RAIDZ3'),
+		available: false
+	}
 ];
 
 export function generateTableData(
-    pools: Zpool[],
-    disks: Disk[]
+	pools: Zpool[],
+	disks: Disk[]
 ): {
-    rows: Row[];
-    columns: Column[];
+	rows: Row[];
+	columns: Column[];
 } {
-    let rows: Row[] = [];
-    let columns: Column[] = [
-        {
-            field: 'id',
-            title: 'ID',
-            visible: false
-        },
-        {
-            field: 'name',
-            title: 'Name',
-            formatter: (cell) => {
-                const value = cell.getValue();
+	let rows: Row[] = [];
+	let columns: Column[] = [
+		{
+			field: 'id',
+			title: 'ID',
+			visible: false
+		},
+		{
+			field: 'name',
+			title: 'Name',
+			formatter: (cell) => {
+				const value = cell.getValue();
 
-                if (isPool(pools, value)) {
-                    return renderWithIcon('bi:hdd-stack-fill', value);
-                }
+				if (isPool(pools, value)) {
+					return renderWithIcon('bi:hdd-stack-fill', value);
+				}
 
-                if (value.match(/p\d+$/)) {
-                    return renderWithIcon('ant-design:partition-outlined', value);
-                }
+				if (value.match(/p\d+$/)) {
+					return renderWithIcon('ant-design:partition-outlined', value);
+				}
 
-                if (value.startsWith('/dev/')) {
-                    const nameOnly = value.replace('/dev/', '');
-                    const disk = disks.find((disk) => disk.device === nameOnly);
-                    if (disk) {
-                        if (disk.type === 'HDD') {
-                            return renderWithIcon('mdi:harddisk', value);
-                        } else if (disk.type === 'SSD') {
-                            return renderWithIcon('icon-park-outline:ssd', value);
-                        } else if (disk.type === 'NVMe') {
-                            return renderWithIcon('bi:nvme', value, 'rotate-90');
-                        }
-                    }
-                }
+				if (value.startsWith('/dev/')) {
+					const nameOnly = value.replace('/dev/', '');
+					const disk = disks.find((disk) => disk.device === nameOnly);
+					if (disk) {
+						if (disk.type === 'HDD') {
+							return renderWithIcon('mdi:harddisk', value);
+						} else if (disk.type === 'SSD') {
+							return renderWithIcon('icon-park-outline:ssd', value);
+						} else if (disk.type === 'NVMe') {
+							return renderWithIcon('bi:nvme', value, 'rotate-90');
+						}
+					}
+				}
 
-                return `<span class="whitespace-nowrap">${value}</span>`;
-            }
-        },
-        {
-            field: 'size',
-            title: 'Size',
-            formatter: sizeFormatter
-        },
-        {
-            field: 'used',
-            title: 'Used',
-            formatter: sizeFormatter
-        },
-        {
-            field: 'health',
-            title: 'Health'
-        },
-        {
-            field: 'redundancy',
-            title: 'Redundancy'
-        }
-    ];
+				return `<span class="whitespace-nowrap">${value}</span>`;
+			}
+		},
+		{
+			field: 'size',
+			title: 'Size',
+			formatter: sizeFormatter
+		},
+		{
+			field: 'used',
+			title: 'Used',
+			formatter: sizeFormatter
+		},
+		{
+			field: 'health',
+			title: 'Health'
+		},
+		{
+			field: 'redundancy',
+			title: 'Redundancy'
+		}
+	];
 
-    for (const pool of pools) {
-        const poolRow = {
-            id: generateNumberFromString(pool.name + '-pool'),
-            name: pool.name,
-            size: pool.size,
-            used: pool.allocated,
-            health: pool.health,
-            redundancy: '',
-            children: [] as Row[]
-        };
+	for (const pool of pools) {
+		const poolRow = {
+			id: generateNumberFromString(pool.name + '-pool'),
+			name: pool.name,
+			size: pool.size,
+			used: pool.allocated,
+			health: pool.health,
+			redundancy: '',
+			children: [] as Row[]
+		};
 
-        for (const vdev of pool.vdevs) {
-            if (vdev.name.includes('mirror') || vdev.name.includes('raid') || vdev.devices.length > 1) {
-                let redundancy = 'Stripe';
-                let vdevLabel = vdev.name;
+		for (const vdev of pool.vdevs) {
+			if (vdev.name.includes('mirror') || vdev.name.includes('raid') || vdev.devices.length > 1) {
+				let redundancy = 'Stripe';
+				let vdevLabel = vdev.name;
 
-                if (vdev.name.startsWith('mirror')) {
-                    redundancy = 'Mirror';
-                    vdevLabel = vdev.name.replace(/mirror-?(\d+)/i, 'Mirror $1');
-                } else if (vdev.name.startsWith('raidz')) {
-                    redundancy = 'RAIDZ ' + vdev.name.match(/raidz-?(\d+)/i)?.[1];
-                    vdevLabel = vdev.name.replace(/^raidz/i, 'RAIDZ');
-                }
+				if (vdev.name.startsWith('mirror')) {
+					redundancy = 'Mirror';
+					vdevLabel = vdev.name.replace(/mirror-?(\d+)/i, 'Mirror $1');
+				} else if (vdev.name.startsWith('raidz')) {
+					redundancy = 'RAIDZ ' + vdev.name.match(/raidz-?(\d+)/i)?.[1];
+					vdevLabel = vdev.name.replace(/^raidz/i, 'RAIDZ');
+				}
 
-                const vdevRow = {
-                    id: generateNumberFromString(vdev.name),
-                    name: vdevLabel,
-                    size: vdev.alloc + vdev.free,
-                    used: vdev.alloc,
-                    health: vdev.health,
-                    redundancy: '-',
-                    children: [] as Row[]
-                };
+				const vdevRow = {
+					id: generateNumberFromString(vdev.name),
+					name: vdevLabel,
+					size: vdev.alloc + vdev.free,
+					used: vdev.alloc,
+					health: vdev.health,
+					redundancy: '-',
+					children: [] as Row[]
+				};
 
-                for (const device of vdev.devices) {
-                    if (
-                        vdev.replacingDevices &&
-                        vdev.replacingDevices.some(
-                            (r) => r.oldDrive.name === device.name || r.newDrive.name === device.name
-                        )
-                    ) {
-                        continue;
-                    }
+				for (const device of vdev.devices) {
+					if (
+						vdev.replacingDevices &&
+						vdev.replacingDevices.some(
+							(r) => r.oldDrive.name === device.name || r.newDrive.name === device.name
+						)
+					) {
+						continue;
+					}
 
-                    vdevRow.children.push({
-                        id: generateNumberFromString(device.name),
-                        name: device.name,
-                        size: device.size,
-                        used: '-',
-                        health: device.health,
-                        redundancy: '-',
-                        children: []
-                    });
-                }
+					vdevRow.children.push({
+						id: generateNumberFromString(device.name),
+						name: device.name,
+						size: device.size,
+						used: '-',
+						health: device.health,
+						redundancy: '-',
+						children: []
+					});
+				}
 
-                if (vdev.replacingDevices && vdev.replacingDevices.length > 0) {
-                    for (const replacing of vdev.replacingDevices) {
-                        vdevRow.children.push({
-                            id: generateNumberFromString(replacing.oldDrive.name),
-                            name: `${replacing.oldDrive.name} [OLD]`,
-                            size: replacing.oldDrive.size,
-                            used: '-',
-                            health: `${replacing.oldDrive.health} (Being replaced)`,
-                            redundancy: '-',
-                            children: []
-                        });
+				if (vdev.replacingDevices && vdev.replacingDevices.length > 0) {
+					for (const replacing of vdev.replacingDevices) {
+						vdevRow.children.push({
+							id: generateNumberFromString(replacing.oldDrive.name),
+							name: `${replacing.oldDrive.name} [OLD]`,
+							size: replacing.oldDrive.size,
+							used: '-',
+							health: `${replacing.oldDrive.health} (Being replaced)`,
+							redundancy: '-',
+							children: []
+						});
 
-                        vdevRow.children.push({
-                            id: generateNumberFromString(replacing.newDrive.name),
-                            name: `${replacing.newDrive.name} [NEW]`,
-                            size: replacing.newDrive.size,
-                            used: '-',
-                            health: `${replacing.newDrive.health} (Replacement)`,
-                            redundancy: '-',
-                            children: []
-                        });
-                    }
-                }
+						vdevRow.children.push({
+							id: generateNumberFromString(replacing.newDrive.name),
+							name: `${replacing.newDrive.name} [NEW]`,
+							size: replacing.newDrive.size,
+							used: '-',
+							health: `${replacing.newDrive.health} (Replacement)`,
+							redundancy: '-',
+							children: []
+						});
+					}
+				}
 
-                poolRow.children.push(vdevRow);
-                poolRow.redundancy = redundancy;
-            } else {
-                poolRow.children.push({
-                    id: generateNumberFromString(vdev.devices[0].name),
-                    name: vdev.devices[0].name,
-                    size: vdev.devices[0].size,
-                    used: '-',
-                    health: vdev.devices[0].health,
-                    redundancy: '-',
-                    children: []
-                });
-                poolRow.redundancy = 'Stripe';
-            }
-        }
+				poolRow.children.push(vdevRow);
+				poolRow.redundancy = redundancy;
+			} else {
+				poolRow.children.push({
+					id: generateNumberFromString(vdev.devices[0].name),
+					name: vdev.devices[0].name,
+					size: vdev.devices[0].size,
+					used: '-',
+					health: vdev.devices[0].health,
+					redundancy: '-',
+					children: []
+				});
+				poolRow.redundancy = 'Stripe';
+			}
+		}
 
-        rows.push(poolRow);
+		rows.push(poolRow);
 
-        if (pool.spares && pool.spares.length > 0) {
-            const sparesRow: Row = {
-                id: generateNumberFromString(`${pool.name}-spares`),
-                name: 'Spares',
-                size:
-                    pool.spares.reduce((acc, spare) => acc + spare.size, 0) > 0
-                        ? pool.spares.reduce((acc, spare) => acc + spare.size, 0)
-                        : '-',
-                used: '-',
-                health: '-',
-                redundancy: '-',
-                children: []
-            };
+		if (pool.spares && pool.spares.length > 0) {
+			const sparesRow: Row = {
+				id: generateNumberFromString(`${pool.name}-spares`),
+				name: 'Spares',
+				size:
+					pool.spares.reduce((acc, spare) => acc + spare.size, 0) > 0
+						? pool.spares.reduce((acc, spare) => acc + spare.size, 0)
+						: '-',
+				used: '-',
+				health: '-',
+				redundancy: '-',
+				children: []
+			};
 
-            for (const spare of pool.spares) {
-                sparesRow.children!.push({
-                    id: generateNumberFromString(spare.name),
-                    name: spare.name,
-                    size: spare.size,
-                    used: '-',
-                    health: spare.health,
-                    redundancy: '-',
-                    children: []
-                });
-            }
+			for (const spare of pool.spares) {
+				sparesRow.children!.push({
+					id: generateNumberFromString(spare.name),
+					name: spare.name,
+					size: spare.size,
+					used: '-',
+					health: spare.health,
+					redundancy: '-',
+					children: []
+				});
+			}
 
-            poolRow.children!.push(sparesRow);
-        }
-    }
+			poolRow.children!.push(sparesRow);
+		}
+	}
 
-    // spares should be at the end of the pool
-    rows = rows.map((row) => {
-        if (row.children) {
-            const sparesIndex = row.children.findIndex((child) => child.name === 'Spares');
-            if (sparesIndex !== -1) {
-                const sparesRow = row.children.splice(sparesIndex, 1)[0];
-                row.children.push(sparesRow);
-            }
-        }
-        return row;
-    });
+	// spares should be at the end of the pool
+	rows = rows.map((row) => {
+		if (row.children) {
+			const sparesIndex = row.children.findIndex((child) => child.name === 'Spares');
+			if (sparesIndex !== -1) {
+				const sparesRow = row.children.splice(sparesIndex, 1)[0];
+				row.children.push(sparesRow);
+			}
+		}
+		return row;
+	});
 
-    return {
-        rows,
-        columns
-    };
+	return {
+		rows,
+		columns
+	};
 }
 
 export function isPool(pools: Zpool[], name: string): boolean {
-    return pools.some((pool) => pool.name === name);
+	return pools.some((pool) => pool.name === name);
 }
 
 export function isReplaceableDevice(pools: Zpool[], name: string): boolean {
-    for (const pool of pools) {
-        if (pool.vdevs.some((vdev) => vdev.name === name)) {
-            return false; // False if we're striped
-        }
-    }
+	for (const pool of pools) {
+		if (pool.vdevs.some((vdev) => vdev.name === name)) {
+			return false; // False if we're striped
+		}
+	}
 
-    return pools.some((pool) => {
-        for (const vdev of pool.vdevs) {
-            if (vdev.devices.some((device) => device.name === name)) {
-                return true;
-            }
-        }
-        return false;
-    });
+	return pools.some((pool) => {
+		for (const vdev of pool.vdevs) {
+			if (vdev.devices.some((device) => device.name === name)) {
+				return true;
+			}
+		}
+		return false;
+	});
 }
 
 export function getPoolByDevice(pools: Zpool[], name: string): string {
-    for (const pool of pools) {
-        for (const vdev of pool.vdevs) {
-            if (vdev.devices.some((device) => device.name === name)) {
-                return pool.name;
-            }
-        }
-    }
+	for (const pool of pools) {
+		for (const vdev of pool.vdevs) {
+			if (vdev.devices.some((device) => device.name === name)) {
+				return pool.name;
+			}
+		}
+	}
 
-    return '';
+	return '';
 }
 
 export function parsePoolActionError(error: APIResponse): string {
-    if (error.message && error.message === 'pool_create_failed') {
-        if (error.error) {
-            if (error.error.includes('mirror contains devices of different sizes')) {
-                return getTranslation(
-                    'zfs.pool.errors.pool_create_failed_mirror_different_sizes',
-                    'Pool contains a mirror with devices of different sizes'
-                );
-            } else if (error.error.includes('raidz contains devices of different sizes')) {
-                return getTranslation(
-                    'zfs.pool.errors.pool_create_failed_raidz_different_sizes',
-                    'Pool contains a raidz vdev with devices of different sizes'
-                );
-            }
-        }
-    }
+	if (error.message && error.message === 'pool_create_failed') {
+		if (error.error) {
+			if (error.error.includes('mirror contains devices of different sizes')) {
+				return getTranslation(
+					'zfs.pool.errors.pool_create_failed_mirror_different_sizes',
+					'Pool contains a mirror with devices of different sizes'
+				);
+			} else if (error.error.includes('raidz contains devices of different sizes')) {
+				return getTranslation(
+					'zfs.pool.errors.pool_create_failed_raidz_different_sizes',
+					'Pool contains a raidz vdev with devices of different sizes'
+				);
+			}
+		}
+	}
 
-    if (error.message && error.message === 'pool_delete_failed') {
-        if (error.error) {
-            if (error.error.includes('pool or dataset is busy')) {
-                return getTranslation('zfs.pool.errors.pool_delete_failed_busy', 'Pool is busy');
-            }
-        }
-    }
+	if (error.message && error.message === 'pool_delete_failed') {
+		if (error.error) {
+			if (error.error.includes('pool or dataset is busy')) {
+				return getTranslation('zfs.pool.errors.pool_delete_failed_busy', 'Pool is busy');
+			}
+		}
+	}
 
-    return '';
+	if (error.message && error.message === 'pool_edit_failed') {
+		return getTranslation('zfs.pool.errors.pool_edit_failed', 'Pool edit failed');
+	}
+
+	return '';
 }
 
 export function getPoolUsagePieData(pools: Zpool[], pool: string): PieChartData[] {
-    const poolData = pools.find((p) => p.name === pool);
+	const poolData = pools.find((p) => p.name === pool);
 
-    return [
-        {
-            label: 'Used',
-            value: poolData?.allocated || 0,
-            color: 'hsla(0, 50%, 50%, 0.5)'
-        },
-        {
-            label: 'Free',
-            value: poolData?.free || 0,
-            color: 'hsla(120, 50%, 50%, 0.5)'
-        }
-    ];
+	return [
+		{
+			label: 'Used',
+			value: poolData?.allocated || 0,
+			color: 'hsla(0, 50%, 50%, 0.5)'
+		},
+		{
+			label: 'Free',
+			value: poolData?.free || 0,
+			color: 'hsla(120, 50%, 50%, 0.5)'
+		}
+	];
 }
 
 export function getDatasetCompressionHist(
-    pool: string,
-    datasets: Dataset[]
+	pool: string,
+	datasets: Dataset[]
 ): SeriesDataWithBaseline[] {
-    const results: SeriesDataWithBaseline[] = [];
-    const related = datasets.filter(
-        (dataset) => dataset.name.startsWith(pool + '/') || dataset.name === pool
-    );
+	const results: SeriesDataWithBaseline[] = [];
+	const related = datasets.filter(
+		(dataset) => dataset.name.startsWith(pool + '/') || dataset.name === pool
+	);
 
-    for (const dataset of related) {
-        const used = dataset.used || dataset.properties?.used;
-        const logicalUsed = dataset.logicalused || dataset.properties?.logicalused;
+	for (const dataset of related) {
+		const used = dataset.used || dataset.properties?.used;
+		const logicalUsed = dataset.logicalused || dataset.properties?.logicalused;
 
-        if (typeof used === 'number' && typeof logicalUsed === 'number' && logicalUsed > 0) {
-            if (dataset.name.includes('/')) {
-                results.push({
-                    name: dataset.name,
-                    baseline: logicalUsed,
-                    value: used
-                });
-            }
-        }
-    }
+		if (typeof used === 'number' && typeof logicalUsed === 'number' && logicalUsed > 0) {
+			if (dataset.name.includes('/')) {
+				results.push({
+					name: dataset.name,
+					baseline: logicalUsed,
+					value: used
+				});
+			}
+		}
+	}
 
-    results.sort((a, b) => {
-        if (a.baseline !== b.baseline) {
-            return b.baseline - a.baseline;
-        }
+	results.sort((a, b) => {
+		if (a.baseline !== b.baseline) {
+			return b.baseline - a.baseline;
+		}
 
-        const ratioA = a.value / a.baseline;
-        const ratioB = b.value / b.baseline;
+		const ratioA = a.value / a.baseline;
+		const ratioB = b.value / b.baseline;
 
-        return ratioB - ratioA;
-    });
+		return ratioB - ratioA;
+	});
 
-    return results;
+	return results;
 }
-
-
 
 type StatType = 'allocated' | 'free' | 'size' | 'dedupRatio';
 
-export function getPoolStatsCombined(
-    poolStats: Record<string, any[]>,
-    statType: StatType
-) {
-    if (!poolStats) {
-        return {
-            poolStatsData: [],
-            poolStatsKeys: []
-        };
-    }
+export function getPoolStatsCombined(poolStats: Record<string, any[]>, statType: StatType) {
+	if (!poolStats) {
+		return {
+			poolStatsData: [],
+			poolStatsKeys: []
+		};
+	}
 
-    const poolStatsData = Object.entries(poolStats)
-        .map(([poolName, stats]) => {
-            if (!Array.isArray(stats)) return [];
+	const poolStatsData = Object.entries(poolStats)
+		.map(([poolName, stats]) => {
+			if (!Array.isArray(stats)) return [];
 
-            return stats.map((entry) => ({
-                date: new Date(entry.time),
-                [poolName]: entry[statType] ?? 0
-            }));
-        })
-        .filter((array) => array.length > 0)
-        // Sort each pool's data points by time
-        .map(dataPoints =>
-            dataPoints.sort((a, b) => a.date.getTime() - b.date.getTime())
-        );
+			return stats.map((entry) => ({
+				date: new Date(entry.time),
+				[poolName]: entry[statType] ?? 0
+			}));
+		})
+		.filter((array) => array.length > 0)
+		// Sort each pool's data points by time
+		.map((dataPoints) => dataPoints.sort((a, b) => a.date.getTime() - b.date.getTime()));
 
-    const poolStatsKeys = Object.keys(poolStats).map((poolName, index) => {
-        const hue = (index * 137) % 360;
-        return {
-            key: poolName,
-            title: poolName.charAt(0).toUpperCase() + poolName.slice(1),
-            color: `hsl(${hue}, 70%, 50%)`
-        };
-    });
+	const poolStatsKeys = Object.keys(poolStats).map((poolName, index) => {
+		const hue = (index * 137) % 360;
+		return {
+			key: poolName,
+			title: poolName.charAt(0).toUpperCase() + poolName.slice(1),
+			color: `hsl(${hue}, 70%, 50%)`
+		};
+	});
 
-    return { poolStatsData, poolStatsKeys };
+	return { poolStatsData, poolStatsKeys };
 }
 
 export const getDateFormatByInterval = (intervalValue: number, includeTime: boolean): string => {
-    if (intervalValue <= 1) return includeTime ? 'hh:mm:ss a' : 'hh:mm a';
-    if (intervalValue <= 5) return includeTime ? 'hh:mm a' : 'hh:mm a';
-    if (intervalValue <= 60) return includeTime ? 'hh:mm a' : 'hh:mm a';
-    if (intervalValue <= 1440) return includeTime ? 'MMM d, hh:mm a' : 'MMM d';
-    if (intervalValue <= 10080) return includeTime ? 'MMM d, hh:mm a' : 'MMM d';
-    if (intervalValue <= 40320) return includeTime ? 'MMM yyyy' : 'MMM yyyy';
-    return includeTime ? 'yyyy' : 'yyyy';
+	if (intervalValue <= 1) return includeTime ? 'hh:mm:ss a' : 'hh:mm a';
+	if (intervalValue <= 5) return includeTime ? 'hh:mm a' : 'hh:mm a';
+	if (intervalValue <= 60) return includeTime ? 'hh:mm a' : 'hh:mm a';
+	if (intervalValue <= 1440) return includeTime ? 'MMM d, hh:mm a' : 'MMM d';
+	if (intervalValue <= 10080) return includeTime ? 'MMM d, hh:mm a' : 'MMM d';
+	if (intervalValue <= 40320) return includeTime ? 'MMM yyyy' : 'MMM yyyy';
+	return includeTime ? 'yyyy' : 'yyyy';
 };
 
-export function formatValue(value: number, unformattedKeys: string[] | undefined, valueType: string): string | number {
-    if (unformattedKeys?.includes('dedupRatio')) return value;
+export function formatValue(
+	value: number,
+	unformattedKeys: string[] | undefined,
+	valueType: string
+): string | number {
+	if (unformattedKeys?.includes('dedupRatio')) return value;
 
-    switch (valueType) {
-        case 'fileSize':
-            return humanFormat(value);
-        case 'percentage':
-            return `${value}%`;
-        case 'celcius':
-            return `${value}°C`;
-        default:
-            return value;
-    }
+	switch (valueType) {
+		case 'fileSize':
+			return humanFormat(value);
+		case 'percentage':
+			return `${value}%`;
+		case 'celcius':
+			return `${value}°C`;
+		default:
+			return value;
+	}
 }

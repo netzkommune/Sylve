@@ -119,3 +119,7 @@ func CreateVolume(name string, size uint64, props map[string]string) (*Dataset, 
 func CreateFilesystem(name string, props map[string]string) (*Dataset, error) {
 	return z.CreateFilesystem(name, props)
 }
+
+func SetZpoolProperty(pool string, property string, value string) error {
+	return z.SetZpoolProperty(pool, property, value)
+}

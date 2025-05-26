@@ -1,5 +1,5 @@
 import { listDisks } from '$lib/api/disk/disk';
-import { getPools } from '$lib/api/zfs/pool';
+import { getPools, editPool } from '$lib/api/zfs/pool';
 import { cachedFetch } from '$lib/utils/http';
 
 export async function load() {

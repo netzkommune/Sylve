@@ -166,3 +166,21 @@ func (s *Service) GetZpoolHistoricalStats(intervalMinutes int, limit int) (map[s
 
 	return result, count, nil
 }
+
+func (s *Service) EditZpool(name string, props map[string]string) error {
+	s.syncMutex.Lock()
+	defer s.syncMutex.Unlock()
+
+	_, err := zfs.GetZpool(name)
+	if err != nil {
+		return fmt.Errorf("pool_not_found")
+	}
+
+	for prop, value := range props {
+		if err := zfs.SetZpoolProperty(name, prop, value); err != nil {
+			return fmt.Errorf("failed_to_set_property %s: %v", prop, err)
+		}
+	}
+
+	return nil
+}

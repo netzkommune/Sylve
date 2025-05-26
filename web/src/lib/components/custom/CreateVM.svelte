@@ -267,10 +267,10 @@
 					<Tabs.Trigger class="border-b" {value}>{label}</Tabs.Trigger>
 				{/each}
 			</Tabs.List>
-			<div class="max-h-[70vh] overflow-y-auto">
-				{#each modal.tabs as { value, label }}
-					<Tabs.Content {value} class="">
-						<!-- <ScrollArea orientation="vertical" class="h-96 w-full  "> -->
+
+			{#each modal.tabs as { value, label }}
+				<Tabs.Content {value} class="">
+					<div class="max-h-[65vh] overflow-y-auto">
 						{#if value === 'vm_basic'}
 							<div class="flex flex-col gap-4 p-4">
 								<!-- <div class="flex flex-col gap-1">
@@ -314,7 +314,7 @@
 									data={comboBoxes.basic.isoImage.options}
 									classes="flex-1 space-y-1"
 									placeholder="Select an ISO file"
-									width="w-[94%]"
+									width="w-[90%]"
 								></CustomComboBox>
 							</div>
 						{:else if value === 'vm_storage'}
@@ -360,7 +360,7 @@
 										data={comboBoxes.storage.storagePool.options}
 										classes="flex-1 space-y-1"
 										placeholder="Select storage pool"
-										width="w-[46%]"
+										width="w-[40%]"
 									></CustomComboBox>
 								</div>
 
@@ -479,7 +479,7 @@
 										data={comboBoxes.hardware.cpuCores.options}
 										classes="flex-1 space-y-1"
 										placeholder="Select number of CPU cores"
-										width="w-[84%] lg:w-[46%]"
+										width="w-[84%] lg:w-[40%]"
 									/>
 
 									<CustomComboBox
@@ -489,7 +489,7 @@
 										data={comboBoxes.hardware.memorySize.options}
 										classes="flex-1 space-y-1"
 										placeholder="Select memory size"
-										width="w-[84%] lg:w-[46%]"
+										width="w-[84%] lg:w-[40%]"
 									/>
 
 									<CustomComboBox
@@ -499,7 +499,7 @@
 										data={comboBoxes.hardware.cpuType.options}
 										classes="flex-1 space-y-1"
 										placeholder="Select CPU type"
-										width="w-[84%] lg:w-[46%]"
+										width="w-[84%] lg:w-[40%]"
 									/>
 
 									<CustomValueInput
@@ -595,7 +595,7 @@
 									data={comboBoxes.advanced.bootIso.options}
 									classes="flex-1 space-y-1"
 									placeholder="Select display type"
-									width="w-[94%]"
+									width="w-[85%]"
 								></CustomComboBox>
 
 								<hr />
@@ -615,7 +615,7 @@
 										data={comboBoxes.advanced.bios.options}
 										classes="flex-1 space-y-1"
 										placeholder="Select an ISO file"
-										width="w-[84%] lg:w-[46%]"
+										width="w-[84%] lg:w-[40%]"
 									></CustomComboBox>
 								</div>
 
@@ -654,10 +654,9 @@
 								/>
 							</div>
 						{/if}
-						<!-- </ScrollArea> -->
-					</Tabs.Content>
-				{/each}
-			</div>
+					</div>
+				</Tabs.Content>
+			{/each}
 		</Tabs.Root>
 
 		<Dialog.Footer>

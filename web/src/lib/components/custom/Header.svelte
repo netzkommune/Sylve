@@ -2,43 +2,24 @@
 	import { logOut } from '$lib/api/auth';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
 	import * as Sheet from '$lib/components/ui/sheet/index.js';
 	import { openTerminal, terminalStore } from '$lib/stores/terminal.svelte';
 	import Icon from '@iconify/svelte';
 	import { mode, toggleMode } from 'mode-watcher';
-	import { onMount } from 'svelte';
-	import CreateDialog from './CreateDialog.svelte';
+	import CreateVM from './CreateVM.svelte';
 
-	const vmTabs = [
-		{ value: 'vm_general', label: 'General' },
-		{ value: 'vm_os', label: 'OS' },
-		{ value: 'vm_system', label: 'System' },
-		{ value: 'vm_disks', label: 'Disks' },
-		{ value: 'vm_cpu', label: 'CPU' },
-		{ value: 'vm_memory', label: 'Memory' },
-		{ value: 'vm_network', label: 'Network' },
-		{ value: 'vm_confirm', label: 'Confirm' }
-	];
-
-	const ctTabs = [
-		{ value: 'ct_general', label: 'General' },
-		{ value: 'ct_template', label: 'Template' },
-		{ value: 'ct_disks', label: 'Disks' },
-		{ value: 'ct_cpu', label: 'CPU' },
-		{ value: 'ct_memory', label: 'Memory' },
-		{ value: 'ct_network', label: 'Network' },
-		{ value: 'ct_dns', label: 'DNS' },
-		{ value: 'ct_confirm', label: 'Confirm' }
-	];
-
-	const menuItems = [
-		{ icon: 'ic:baseline-settings', label: 'My Settings', shortcut: '⌘S' },
-		{ icon: 'solar:key-bold', label: 'Password', shortcut: '⇧⌘P' },
-		{ icon: 'ic:round-lock', label: 'TFA', shortcut: '⌘K' },
-		{ icon: 'mdi:palette', label: 'Color Theme', shortcut: '⌘⇧T' },
-		{ icon: 'meteor-icons:language', label: 'Language', shortcut: '⌘K' }
-	];
+	let menuData = $state({
+		createVM: {
+			open: false
+		},
+		menuItems: [
+			{ icon: 'ic:baseline-settings', label: 'My Settings', shortcut: '⌘S' },
+			{ icon: 'solar:key-bold', label: 'Password', shortcut: '⇧⌘P' },
+			{ icon: 'ic:round-lock', label: 'TFA', shortcut: '⌘K' },
+			{ icon: 'mdi:palette', label: 'Color Theme', shortcut: '⌘⇧T' },
+			{ icon: 'meteor-icons:language', label: 'Language', shortcut: '⌘K' }
+		]
+	});
 </script>
 
 <header class="sticky top-0 flex h-[5vh] items-center gap-4 border-b px-2 md:h-[4vh]">
@@ -83,13 +64,20 @@
 					<Icon icon="material-symbols-light:mail-outline-sharp" class="mr-2 h-4 w-4" />
 					Documentation
 				</Button> -->
-				<!-- <CreateDialog
-					title="Create: Virtual Machine"
-					tabs={vmTabs}
-					icon="material-symbols:monitor-outline-rounded"
-					buttonText="Create VM"
-					buttonClass="h-8 mt-4"
-				/> -->
+
+				<Button
+					size="sm"
+					class="h-6"
+					onclick={() => (menuData.createVM.open = !menuData.createVM.open)}
+				>
+					<Icon
+						icon="material-symbols:monitor-outline-rounded pointer-events-none"
+						class="mr-1.5 h-5 w-5"
+					/>
+					Create VM
+				</Button>
+				<CreateVM open={menuData.createVM.open} />
+
 				<!-- <CreateDialog
 					title="Create: Jail"
 					tabs={ctTabs}
@@ -136,13 +124,15 @@
 				Documentation
 			</Button> -->
 
-			<!-- <CreateDialog
-				title="Create: Virtual Machine"
-				tabs={vmTabs}
-				icon="material-symbols:monitor-outline-rounded"
-				buttonText="Create VM"
-				buttonClass="h-6"
-			/> -->
+			<Button
+				size="sm"
+				class="h-6"
+				onclick={() => (menuData.createVM.open = !menuData.createVM.open)}
+			>
+				<Icon icon="material-symbols:monitor-outline-rounded" class="mr-1.5 h-5 w-5" />
+				Create VM
+			</Button>
+			<CreateVM bind:open={menuData.createVM.open} />
 
 			<!--
 
@@ -159,7 +149,7 @@
 				<Button
 					builders={[builder]}
 					variant="outline"
-					class="border-border flex h-7 items-center gap-1 rounded-md border"
+					class="flex h-7 items-center gap-1 rounded-md border border-border"
 					><Icon icon="mdi:user" class="h-4 w-4" /> Root <Icon
 						icon="famicons:chevron-down"
 						class="h-4 w-4"
@@ -169,7 +159,7 @@
 			</DropdownMenu.Trigger>
 			<DropdownMenu.Content class="w-56">
 				<DropdownMenu.Group>
-					{#each menuItems as { icon, label, shortcut }}
+					{#each menuData.menuItems as { icon, label, shortcut }}
 						<DropdownMenu.Item
 							class="cursor-pointer"
 							onclick={() => label === 'Color Theme' && toggleMode()}

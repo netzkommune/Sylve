@@ -46,10 +46,85 @@ definitions:
     - device
     - sizes
     type: object
+  internal_handlers_network.CreateStandardSwitchRequest:
+    properties:
+      address:
+        type: string
+      address6:
+        type: string
+      mtu:
+        type: integer
+      name:
+        type: string
+      ports:
+        items:
+          type: string
+        type: array
+      private:
+        type: boolean
+      vlan:
+        type: integer
+    required:
+    - name
+    - ports
+    - private
+    type: object
+  internal_handlers_network.InterfacesListResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_pkg_network_iface.Interface'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  internal_handlers_network.ListSwitchResponse:
+    properties:
+      standard:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models_network.StandardSwitch'
+        type: array
+    type: object
+  internal_handlers_network.UpdateStandardSwitchRequest:
+    properties:
+      address:
+        type: string
+      address6:
+        type: string
+      id:
+        type: integer
+      mtu:
+        type: integer
+      ports:
+        items:
+          type: string
+        type: array
+      private:
+        type: boolean
+      vlan:
+        type: integer
+    required:
+    - id
+    - ports
+    - private
+    type: object
   internal_handlers_zfs.AvgIODelayResponse:
     properties:
       delay:
         type: number
+    type: object
+  internal_handlers_zfs.BulkDeleteRequest:
+    properties:
+      guids:
+        items:
+          type: string
+        type: array
+    required:
+    - guids
     type: object
   internal_handlers_zfs.CreateFilesystemRequest:
     properties:
@@ -105,6 +180,28 @@ definitions:
     required:
     - name
     - parent
+    type: object
+  internal_handlers_zfs.PoolEditRequest:
+    properties:
+      name:
+        type: string
+      properties:
+        additionalProperties:
+          type: string
+        type: object
+    type: object
+  internal_handlers_zfs.PoolStatPointResponse:
+    properties:
+      intervalMap:
+        items:
+          $ref: '#/definitions/sylve_internal_db.IntervalOption'
+        type: array
+      poolStatPoint:
+        additionalProperties:
+          items:
+            $ref: '#/definitions/sylve_internal_interfaces_services_zfs.PoolStatPoint'
+          type: array
+        type: object
     type: object
   internal_handlers_zfs.RollbackSnapshotRequest:
     properties:
@@ -190,6 +287,19 @@ definitions:
       status:
         type: string
     type: object
+  sylve_internal.APIResponse-array_sylve_internal_db_models_utilities_Downloads:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models_utilities.Downloads'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
   sylve_internal.APIResponse-array_sylve_internal_db_models_zfs_PeriodicSnapshot:
     properties:
       data:
@@ -229,10 +339,43 @@ definitions:
       status:
         type: string
     type: object
+  sylve_internal.APIResponse-internal_handlers_network_ListSwitchResponse:
+    properties:
+      data:
+        $ref: '#/definitions/internal_handlers_network.ListSwitchResponse'
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
   sylve_internal.APIResponse-internal_handlers_zfs_AvgIODelayResponse:
     properties:
       data:
         $ref: '#/definitions/internal_handlers_zfs.AvgIODelayResponse'
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-internal_handlers_zfs_PoolStatPointResponse:
+    properties:
+      data:
+        $ref: '#/definitions/internal_handlers_zfs.PoolStatPointResponse'
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-string:
+    properties:
+      data:
+        type: string
       error:
         type: string
       message:
@@ -295,16 +438,12 @@ definitions:
       status:
         type: string
     type: object
-  sylve_internal.APIResponse-sylve_pkg_network_iface_Interface:
+  sylve_internal_db.IntervalOption:
     properties:
-      data:
-        $ref: '#/definitions/sylve_pkg_network_iface.Interface'
-      error:
+      label:
         type: string
-      message:
-        type: string
-      status:
-        type: string
+      value:
+        type: integer
     type: object
   sylve_internal_db_models_info.AuditLog:
     properties:
@@ -359,7 +498,85 @@ definitions:
         type: integer
       title:
         type: string
-      updateAt:
+      updatedAt:
+        type: string
+    type: object
+  sylve_internal_db_models_network.NetworkPort:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      switch:
+        $ref: '#/definitions/sylve_internal_db_models_network.StandardSwitch'
+      switchId:
+        type: integer
+    type: object
+  sylve_internal_db_models_network.StandardSwitch:
+    properties:
+      address:
+        type: string
+      address6:
+        type: string
+      bridgeName:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: integer
+      mtu:
+        type: integer
+      name:
+        type: string
+      ports:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models_network.NetworkPort'
+        type: array
+      private:
+        type: boolean
+      updatedAt:
+        type: string
+      vlan:
+        type: integer
+    type: object
+  sylve_internal_db_models_utilities.DownloadedFile:
+    properties:
+      download:
+        $ref: '#/definitions/sylve_internal_db_models_utilities.Downloads'
+      downloadId:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+      size:
+        type: integer
+    type: object
+  sylve_internal_db_models_utilities.Downloads:
+    properties:
+      createdAt:
+        type: string
+      files:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models_utilities.DownloadedFile'
+        type: array
+      id:
+        type: integer
+      name:
+        type: string
+      path:
+        type: string
+      progress:
+        type: integer
+      size:
+        type: integer
+      type:
+        type: string
+      updatedAt:
+        type: string
+      url:
+        type: string
+      uuid:
         type: string
     type: object
   sylve_internal_db_models_zfs.PeriodicSnapshot:
@@ -518,6 +735,19 @@ definitions:
       written:
         type: integer
     type: object
+  sylve_internal_interfaces_services_zfs.PoolStatPoint:
+    properties:
+      allocated:
+        type: integer
+      dedupRatio:
+        type: number
+      free:
+        type: integer
+      size:
+        type: integer
+      time:
+        type: integer
+    type: object
   sylve_internal_interfaces_services_zfs.ReplaceDevice:
     properties:
       name:
@@ -576,6 +806,23 @@ definitions:
     required:
     - name
     type: object
+  sylve_pkg_network_iface.BridgeMember:
+    properties:
+      flags:
+        $ref: '#/definitions/sylve_pkg_network_iface.Flags'
+      ifmaxaddr:
+        type: integer
+      name:
+        type: string
+      pathCost:
+        type: integer
+      port:
+        type: integer
+      priority:
+        type: integer
+      state:
+        type: integer
+    type: object
   sylve_pkg_network_iface.Capabilities:
     properties:
       enabled:
@@ -631,14 +878,26 @@ definitions:
     type: object
   sylve_pkg_network_iface.Interface:
     properties:
+      bridgeId:
+        type: string
+      bridgeMembers:
+        items:
+          $ref: '#/definitions/sylve_pkg_network_iface.BridgeMember'
+        type: array
       capabilities:
         $ref: '#/definitions/sylve_pkg_network_iface.Capabilities'
+      description:
+        type: string
       driver:
         type: string
       ether:
         type: string
       flags:
         $ref: '#/definitions/sylve_pkg_network_iface.Flags'
+      groups:
+        items:
+          type: string
+        type: array
       ipv4:
         items:
           $ref: '#/definitions/sylve_pkg_network_iface.IPv4'
@@ -647,16 +906,24 @@ definitions:
         items:
           $ref: '#/definitions/sylve_pkg_network_iface.IPv6'
         type: array
+      maxaddr:
+        type: integer
       media:
         $ref: '#/definitions/sylve_pkg_network_iface.Media'
       metric:
         type: integer
+      model:
+        type: string
       mtu:
         type: integer
       name:
         type: string
       nd6:
         $ref: '#/definitions/sylve_pkg_network_iface.ND6'
+      stp:
+        $ref: '#/definitions/sylve_pkg_network_iface.STP'
+      timeout:
+        type: integer
     type: object
   sylve_pkg_network_iface.Media:
     properties:
@@ -684,6 +951,29 @@ definitions:
           type: string
         type: array
       raw:
+        type: integer
+    type: object
+  sylve_pkg_network_iface.STP:
+    properties:
+      fwddelay:
+        type: integer
+      hellotime:
+        type: integer
+      holdcnt:
+        type: integer
+      ifcost:
+        type: integer
+      maxage:
+        type: integer
+      port:
+        type: integer
+      priority:
+        type: integer
+      proto:
+        type: string
+      rootId:
+        type: string
+      rootPriority:
         type: integer
     type: object
   sylve_pkg_zfs.RW:
@@ -772,6 +1062,10 @@ definitions:
         type: integer
       name:
         type: string
+      properties:
+        items:
+          $ref: '#/definitions/sylve_pkg_zfs.ZpoolProperty'
+        type: array
       readOnly:
         type: boolean
       size:
@@ -805,6 +1099,15 @@ definitions:
         type: string
       write:
         type: integer
+    type: object
+  sylve_pkg_zfs.ZpoolProperty:
+    properties:
+      property:
+        type: string
+      source:
+        type: string
+      value:
+        type: string
     type: object
   sylve_pkg_zfs.ZpoolStatus:
     properties:
@@ -1078,23 +1381,23 @@ paths:
     get:
       consumes:
       - application/json
-      description: List all network interfaces on the system
+      description: Get the basic information about the system
       produces:
       - application/json
       responses:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/sylve_internal.APIResponse-sylve_pkg_network_iface_Interface'
+            $ref: '#/definitions/sylve_internal.APIResponse-sylve_internal_interfaces_services_info_BasicInfo'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/sylve_internal.APIResponse-any'
       security:
       - BearerAuth: []
-      summary: List Network Interfaces
+      summary: Get Basic Info
       tags:
-      - Network
+      - Info
   /info/cpu:
     get:
       consumes:
@@ -1227,6 +1530,31 @@ paths:
       summary: Update a note by ID
       tags:
       - Info
+  /info/notes/bulk-delete:
+    post:
+      consumes:
+      - application/json
+      description: Delete multiple notes from the database by their IDs
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Invalid note IDs
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Bulk delete notes
+      tags:
+      - Info
   /info/ram:
     get:
       consumes:
@@ -1269,6 +1597,313 @@ paths:
       summary: Get Swap Info
       tags:
       - Info
+  /network/interface:
+    get:
+      consumes:
+      - application/json
+      description: List all network interfaces on the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/internal_handlers_network.InterfacesListResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: List Network Interfaces
+      tags:
+      - Network
+  /network/switch:
+    get:
+      consumes:
+      - application/json
+      description: List all network switches on the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-internal_handlers_network_ListSwitchResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: List Network Switches
+      tags:
+      - Network
+    post:
+      consumes:
+      - application/json
+      description: Create a new standard switch
+      parameters:
+      - description: Create Standard Switch Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_network.CreateStandardSwitchRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Create a new Standard Switch
+      tags:
+      - Network
+    put:
+      consumes:
+      - application/json
+      description: Update a standard switch by ID
+      parameters:
+      - description: Switch ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update Standard Switch Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_network.UpdateStandardSwitchRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Update a Standard Switch
+      tags:
+      - Network
+  /network/switch/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a standard switch by ID
+      parameters:
+      - description: Switch ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Delete a Standard Switch
+      tags:
+      - Network
+  /utilities/downloads:
+    get:
+      consumes:
+      - application/json
+      description: List all downloads
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_internal_db_models_utilities_Downloads'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: List Downloads
+      tags:
+      - Utilities
+    post:
+      consumes:
+      - application/json
+      description: Download a file from a Magnet or HTTP(s) URL
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Download File
+      tags:
+      - Utilities
+  /utilities/downloads/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a download by its ID
+      parameters:
+      - description: Download ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Delete Download
+      tags:
+      - Utilities
+  /utilities/downloads/{uuid}:
+    get:
+      consumes:
+      - application/json
+      description: Download a file from a signed URL
+      parameters:
+      - description: Download UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: Expiration time in Unix timestamp
+        in: query
+        name: expires
+        required: true
+        type: integer
+      - description: Signature
+        in: query
+        name: sig
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: File Download
+          schema:
+            type: file
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Download File
+      tags:
+      - Utilities
+  /utilities/downloads/bulk-delete:
+    post:
+      consumes:
+      - application/json
+      description: Bulk delete downloads by their IDs
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Bulk Delete Downloads
+      tags:
+      - Utilities
+  /utilities/downloads/signed-url:
+    get:
+      consumes:
+      - application/json
+      description: Get a signed URL for downloading a file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-string'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Get Signed Download URL
+      tags:
+      - Utilities
   /zfs/datasets:
     get:
       consumes:
@@ -1288,6 +1923,34 @@ paths:
       security:
       - BearerAuth: []
       summary: Get all ZFS datasets
+      tags:
+      - ZFS
+  /zfs/datasets/bulk-delete:
+    post:
+      consumes:
+      - application/json
+      description: Bulk delete ZFS datasets
+      parameters:
+      - description: Bulk Delete Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_zfs.BulkDeleteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Bulk delete ZFS datasets
       tags:
       - ZFS
   /zfs/datasets/filesystem:
@@ -1620,6 +2283,38 @@ paths:
       summary: Get Average IO Delay Historical
       tags:
       - ZFS
+  /zfs/pool/stats/{interval}/{limit}:
+    get:
+      consumes:
+      - application/json
+      description: Get the historical stats of a ZFS pool
+      parameters:
+      - description: Interval in minutes
+        in: path
+        name: interval
+        required: true
+        type: integer
+      - description: Limit
+        in: path
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-internal_handlers_zfs_PoolStatPointResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Get Pool Stats
+      tags:
+      - ZFS
   /zfs/pools:
     get:
       consumes:
@@ -1639,6 +2334,33 @@ paths:
       security:
       - BearerAuth: []
       summary: Get Pools
+      tags:
+      - ZFS
+    patch:
+      consumes:
+      - application/json
+      description: Edit a ZFS pool's properties
+      parameters:
+      - description: Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_zfs.PoolEditRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Edit Pool
       tags:
       - ZFS
     post:

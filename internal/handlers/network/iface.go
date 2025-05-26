@@ -17,13 +17,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type InterfacesListResponse struct {
+    Status  string             `json:"status"`
+    Message string             `json:"message"`
+    Error   string             `json:"error"`
+    Data    []*iface.Interface `json:"data"`
+}
+
 // @Summary List Network Interfaces
 // @Description List all network interfaces on the system
 // @Tags Network
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Success 200 {object} internal.APIResponse[[]*iface.Interface] "Success"
+// @Success 200 {object} InterfacesListResponse "Success"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
 // @Router /network/interface [get]
 func ListInterfaces(networkService *network.Service) gin.HandlerFunc {

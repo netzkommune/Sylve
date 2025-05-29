@@ -39,14 +39,23 @@ smartd_enable="YES"
 zfs_enable="YES"
 linux_enable="YES"
 libvirtd_enable="YES"
-vmm_load="YES"
-if_bridge_load="YES"
-nmdm_load="YES"
 gateway_enable="YES"
 pf_enable="YES"
 ```
 
-Please reboot your system after enabling these services.
+And these into `/boot/loader.conf`:
+
+```sh
+cryptodev_load="YES"
+zfs_load="YES"
+vmm_load="YES"
+nmdm_load="YES"
+if_tap_load="YES"
+if_bridge_load="YES"
+hw.vmm.iommu.passthrough=1
+```
+
+Please reboot your system after adding those entries to ensure that the services are started correctly and the kernel modules are loaded.
 
 # Installation
 

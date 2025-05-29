@@ -12,8 +12,9 @@ import { getIcon, loadIcon } from '@iconify/svelte';
 import isCidr from 'is-cidr';
 import { isIP, isIPv4 } from 'is-ip';
 import { customRandom, nanoid } from 'nanoid';
-import { Mnemonic } from './vendor/mnemonic';
+import isMACAddress from 'validator/lib/isMACAddress';
 import isURL from 'validator/lib/isURL';
+import { Mnemonic } from './vendor/mnemonic';
 
 export function capitalizeFirstLetter(str: string, firstOnly: boolean = false): string {
 	if (firstOnly) {
@@ -146,4 +147,13 @@ export function isDownloadURL(url: string): boolean {
 	}
 
 	return /\/[^\/]+\.[^\/]+$/.test(url);
+}
+
+export function isValidVMName(name: string): boolean {
+	const regex = /^[a-zA-Z0-9-_]+$/;
+	return regex.test(name);
+}
+
+export function isValidMACAddress(mac: string): boolean {
+	return isMACAddress(mac, { no_colons: false });
 }

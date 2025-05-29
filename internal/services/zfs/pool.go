@@ -126,7 +126,8 @@ func (s *Service) EditPool(name string, props map[string]string) error {
 }
 
 func (s *Service) SyncToLibvirt() error {
-	// 1) get existing libvirt pools
+	defer s.Libvirt.RescanStoragePools()
+
 	sPools, err := s.Libvirt.ListStoragePools()
 	if err != nil {
 		return fmt.Errorf("failed_to_list_libvirt_pools: %v", err)

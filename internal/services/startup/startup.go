@@ -17,6 +17,7 @@ import (
 	infoServiceInterfaces "sylve/internal/interfaces/services/info"
 	libvirtServiceInterfaces "sylve/internal/interfaces/services/libvirt"
 	networkServiceInterfaces "sylve/internal/interfaces/services/network"
+	systemServiceInterfaces "sylve/internal/interfaces/services/system"
 	utilitiesServiceInterfaces "sylve/internal/interfaces/services/utilities"
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
 	"sylve/internal/logger"
@@ -36,6 +37,7 @@ type Service struct {
 	Network   networkServiceInterfaces.NetworkServiceInterface
 	Libvirt   libvirtServiceInterfaces.LibvirtServiceInterface
 	Utilities utilitiesServiceInterfaces.UtilitiesServiceInterface
+	System    systemServiceInterfaces.SystemServiceInterface
 }
 
 func NewStartupService(db *gorm.DB,
@@ -43,7 +45,9 @@ func NewStartupService(db *gorm.DB,
 	zfs zfsServiceInterfaces.ZfsServiceInterface,
 	network networkServiceInterfaces.NetworkServiceInterface,
 	libvirt libvirtServiceInterfaces.LibvirtServiceInterface,
-	utiliies utilitiesServiceInterfaces.UtilitiesServiceInterface) serviceInterfaces.StartupServiceInterface {
+	utiliies utilitiesServiceInterfaces.UtilitiesServiceInterface,
+	system systemServiceInterfaces.SystemServiceInterface,
+) serviceInterfaces.StartupServiceInterface {
 	return &Service{
 		DB:        db,
 		Info:      info,
@@ -51,6 +55,7 @@ func NewStartupService(db *gorm.DB,
 		Network:   network,
 		Libvirt:   libvirt,
 		Utilities: utiliies,
+		System:    system,
 	}
 }
 
@@ -98,7 +103,7 @@ func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface)
 		return err
 	}
 
-	if err := s.ZFS.SyncLibvirt(); err != nil {
+	if err := s.ZFS.SyncLibvirtPools(); err != nil {
 		return err
 	}
 
@@ -114,10 +119,15 @@ func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface)
 		return err
 	}
 
-	err := s.Network.SyncStandardSwitches(nil, "sync")
+	if config.ParsedConfig.Environment != "development" {
+		err := s.Network.SyncStandardSwitches(nil, "sync")
+		if err != nil {
+			logger.L.Error().Msgf("Error syncing standard switches: %v", err)
+		}
+	}
 
-	if err != nil {
-		logger.L.Error().Msgf("Error syncing standard switches: %v", err)
+	if err := s.System.SyncPPTDevices(); err != nil {
+		return fmt.Errorf("failed to sync passthrough devices: %w", err)
 	}
 
 	go func() {

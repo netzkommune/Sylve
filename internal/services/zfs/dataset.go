@@ -394,6 +394,7 @@ func (s *Service) RollbackSnapshot(guid string, destroyMoreRecent bool) error {
 func (s *Service) CreateVolume(name string, parent string, props map[string]string) error {
 	s.syncMutex.Lock()
 	defer s.syncMutex.Unlock()
+	defer s.Libvirt.RescanStoragePools()
 
 	datasets, err := zfs.Datasets("")
 	if err != nil {
@@ -422,6 +423,7 @@ func (s *Service) CreateVolume(name string, parent string, props map[string]stri
 func (s *Service) DeleteVolume(guid string) error {
 	s.syncMutex.Lock()
 	defer s.syncMutex.Unlock()
+	defer s.Libvirt.RescanStoragePools()
 
 	datasets, err := zfs.Datasets("")
 	if err != nil {
@@ -451,6 +453,7 @@ func (s *Service) DeleteVolume(guid string) error {
 func (s *Service) BulkDeleteDataset(guids []string) error {
 	s.syncMutex.Lock()
 	defer s.syncMutex.Unlock()
+	defer s.Libvirt.RescanStoragePools()
 
 	guidsMap := make(map[string]struct{})
 	for _, guid := range guids {

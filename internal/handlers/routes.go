@@ -19,14 +19,19 @@ import (
 	infoHandlers "sylve/internal/handlers/info"
 	"sylve/internal/handlers/middleware"
 	networkHandlers "sylve/internal/handlers/network"
+	systemHandlers "sylve/internal/handlers/system"
 	utilitiesHandlers "sylve/internal/handlers/utilities"
-	zfsHandlers "sylve/internal/handlers/zfs"
+	vmHandlers "sylve/internal/handlers/vm"
 	authService "sylve/internal/services/auth"
 	diskService "sylve/internal/services/disk"
 	infoService "sylve/internal/services/info"
+	"sylve/internal/services/libvirt"
 	networkService "sylve/internal/services/network"
+	systemService "sylve/internal/services/system"
 	utilitiesService "sylve/internal/services/utilities"
 	zfsService "sylve/internal/services/zfs"
+
+	zfsHandlers "sylve/internal/handlers/zfs"
 )
 
 // @title           Sylve API
@@ -57,6 +62,8 @@ func RegisterRoutes(r *gin.Engine,
 	diskService *diskService.Service,
 	networkService *networkService.Service,
 	utilitiesService *utilitiesService.Service,
+	systemService *systemService.Service,
+	libvirtService *libvirt.Service,
 ) {
 	api := r.Group("/api")
 
@@ -148,6 +155,22 @@ func RegisterRoutes(r *gin.Engine,
 		network.POST("/switch/standard", networkHandlers.CreateStandardSwitch(networkService))
 		network.DELETE("/switch/standard/:id", networkHandlers.DeleteStandardSwitch(networkService))
 		network.PUT("/switch/standard", networkHandlers.UpdateStandardSwitch(networkService))
+	}
+
+	system := api.Group("/system")
+	system.Use(middleware.EnsureAuthenticated(authService))
+	{
+		system.GET("/pci-devices", systemHandlers.ListDevices())
+		system.GET("/ppt-devices", systemHandlers.ListPPTDevices(systemService))
+		system.POST("/ppt-devices", systemHandlers.AddPPTDevice(systemService))
+		system.DELETE("/ppt-devices/:id", systemHandlers.RemovePPTDevice(systemService))
+	}
+
+	vm := api.Group("/vm")
+	vm.Use(middleware.EnsureAuthenticated(authService))
+	{
+		// vm.GET("/list", systemHandlers.ListVMs(systemService))
+		vm.POST("/create", vmHandlers.CreateVM(libvirtService))
 	}
 
 	utilities := api.Group("/utilities")

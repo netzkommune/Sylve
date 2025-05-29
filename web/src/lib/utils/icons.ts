@@ -32,7 +32,8 @@ const icons = [
 	'clarity:network-switch-line',
 	'ic:baseline-loop',
 	'mdi:ethernet',
-	'eos-icons:three-dots-loading'
+	'eos-icons:three-dots-loading',
+	'wpf:connected'
 ];
 
 export async function preloadIcons() {

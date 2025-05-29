@@ -14,6 +14,7 @@ import (
 	infoModels "sylve/internal/db/models/info"
 	networkModels "sylve/internal/db/models/network"
 	utilitiesModels "sylve/internal/db/models/utilities"
+	vmModels "sylve/internal/db/models/vm"
 	zfsModels "sylve/internal/db/models/zfs"
 	"sylve/internal/logger"
 	"sylve/pkg/utils"
@@ -51,6 +52,12 @@ func SetupDatabase(cfg *internal.SylveConfig, isTest bool) *gorm.DB {
 		&models.User{},
 		&models.Token{},
 		&models.SystemSecrets{},
+
+		&vmModels.Storage{},
+		&vmModels.Network{},
+		&vmModels.VM{},
+
+		&models.PassedThroughIDs{},
 
 		&infoModels.CPU{},
 		&infoModels.IODelay{},

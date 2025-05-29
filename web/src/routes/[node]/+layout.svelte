@@ -101,6 +101,17 @@
 					href: `/${node}/utilities/downloader`
 				}
 			]
+		},
+		{
+			label: 'settings',
+			icon: 'material-symbols:settings',
+			children: [
+				{
+					label: 'PCI Passthrough',
+					icon: 'eos-icons:hardware-circuit',
+					href: `/${node}/settings/device-passthrough`
+				}
+			]
 		}
 	]);
 

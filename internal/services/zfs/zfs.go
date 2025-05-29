@@ -34,7 +34,7 @@ func NewZfsService(db *gorm.DB, libvirt libvirtServiceInterfaces.LibvirtServiceI
 	}
 }
 
-func (s *Service) SyncLibvirt() error {
+func (s *Service) SyncLibvirtPools() error {
 	zfsPools, err := zfs.ListZpools()
 
 	if err != nil {

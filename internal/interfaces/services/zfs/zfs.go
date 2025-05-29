@@ -36,7 +36,7 @@ type ZfsServiceInterface interface {
 	CreateFilesystem(name string, props map[string]string) error
 	DeleteFilesystem(guid string) error
 
-	SyncLibvirt() error
+	SyncLibvirtPools() error
 
 	StoreStats(interval int)
 	Cron()

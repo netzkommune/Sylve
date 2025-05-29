@@ -28,7 +28,9 @@ import (
 	"sylve/internal/services/auth"
 	"sylve/internal/services/disk"
 	"sylve/internal/services/info"
+	"sylve/internal/services/libvirt"
 	"sylve/internal/services/network"
+	"sylve/internal/services/system"
 	"sylve/internal/services/utilities"
 	"sylve/internal/services/zfs"
 
@@ -51,6 +53,8 @@ func main() {
 	dS := serviceRegistry.DiskService
 	nS := serviceRegistry.NetworkService
 	uS := serviceRegistry.UtilitiesService
+	sysS := serviceRegistry.SystemService
+	lvS := serviceRegistry.LibvirtService
 
 	err := sS.Initialize(aS.(*auth.Service))
 
@@ -81,6 +85,8 @@ func main() {
 		dS.(*disk.Service),
 		nS.(*network.Service),
 		uS.(*utilities.Service),
+		sysS.(*system.Service),
+		lvS.(*libvirt.Service),
 	)
 
 	tlsConfig, err := aS.GetSylveCertificate()

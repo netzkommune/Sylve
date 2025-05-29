@@ -88,3 +88,18 @@ func (s *Service) DeleteStoragePool(name string) error {
 
 	return nil
 }
+
+func (s *Service) RescanStoragePools() error {
+	pools, _, err := s.Conn.ConnectListAllStoragePools(-1, libvirt.ConnectListStoragePoolsZfs)
+	if err != nil {
+		return fmt.Errorf("failed to list storage pools: %w", err)
+	}
+
+	for _, pool := range pools {
+		if err := s.Conn.StoragePoolRefresh(pool, 0); err != nil {
+			return fmt.Errorf("failed to refresh storage pool %s: %w", pool.Name, err)
+		}
+	}
+
+	return nil
+}

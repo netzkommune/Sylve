@@ -34,7 +34,8 @@
 		"snapshots": "Snapshots",
 		"switches": "Switches",
 		"utilities": "Utilities",
-		"downloader": "Downloader"
+		"downloader": "Downloader",
+		"settings": "Settings"
 	},
 	"summary": {
 		"CPU_s": "CPU(s)",

@@ -41,14 +41,25 @@ check_rcconf() {
     fi
 }
 
+LOADER_CONF="/boot/loader.conf"
+check_loaderconf() {
+    if grep -q "^$1" "$LOADER_CONF"; then
+        echo "✅ $1 is set in loader.conf"
+    else
+        echo "❌ Error: $1 is not set in loader.conf. Add '$1' to enable it."
+        exit 1
+    fi
+}
+
 check_rcconf smartd_enable
 check_rcconf linux_enable
 check_rcconf libvirtd_enable
-check_rcconf vmm_load
-check_rcconf if_bridge_load
-check_rcconf nmdm_load
 check_rcconf gateway_enable
 check_rcconf pf_enable
+
+check_loaderconf vmm_load
+check_loaderconf if_bridge_load
+check_loaderconf nmdm_load
 
 echo "=== Dependency check completed ==="
 echo

@@ -14,4 +14,5 @@ type LibvirtServiceInterface interface {
 	ListStoragePools() ([]StoragePool, error)
 	CreateStoragePool(name string) error
 	DeleteStoragePool(name string) error
+	RescanStoragePools() error
 }

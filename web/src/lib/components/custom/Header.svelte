@@ -65,7 +65,7 @@
 					Documentation
 				</Button> -->
 
-				<Button
+				<!-- <Button
 					size="sm"
 					class="h-6"
 					onclick={() => (menuData.createVM.open = !menuData.createVM.open)}
@@ -76,7 +76,7 @@
 					/>
 					Create VM
 				</Button>
-				<CreateVM open={menuData.createVM.open} />
+				<CreateVM open={menuData.createVM.open} /> -->
 
 				<!-- <CreateDialog
 					title="Create: Jail"
@@ -124,7 +124,7 @@
 				Documentation
 			</Button> -->
 
-			<Button
+			<!-- <Button
 				size="sm"
 				class="h-6"
 				onclick={() => (menuData.createVM.open = !menuData.createVM.open)}
@@ -132,7 +132,7 @@
 				<Icon icon="material-symbols:monitor-outline-rounded" class="mr-1.5 h-5 w-5" />
 				Create VM
 			</Button>
-			<CreateVM bind:open={menuData.createVM.open} />
+			<CreateVM bind:open={menuData.createVM.open} /> -->
 
 			<!--
 
@@ -149,7 +149,7 @@
 				<Button
 					builders={[builder]}
 					variant="outline"
-					class="flex h-7 items-center gap-1 rounded-md border border-border"
+					class="border-border flex h-7 items-center gap-1 rounded-md border"
 					><Icon icon="mdi:user" class="h-4 w-4" /> Root <Icon
 						icon="famicons:chevron-down"
 						class="h-4 w-4"

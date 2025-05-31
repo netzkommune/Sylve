@@ -51,6 +51,16 @@ func StoreAndTrimRecords(db *gorm.DB, model interface{}, limit int) {
 	}
 }
 
+func Count(db *gorm.DB, model interface{}, cond string, args ...interface{}) (int64, error) {
+	var count int64
+	if err := db.Model(model).
+		Where(cond, args...).
+		Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
 type IntervalOption struct {
 	Value int    `json:"value"`
 	Label string `json:"label"`

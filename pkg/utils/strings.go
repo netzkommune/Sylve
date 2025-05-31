@@ -303,3 +303,13 @@ func MapKeys(m map[string]struct{}) []string {
 	}
 	return keys
 }
+
+func IsValidVMName(name string) bool {
+	regex := regexp.MustCompile(`^[a-zA-Z0-9-_]+$`)
+	return regex.MatchString(name)
+}
+
+func IsValidMACAddress(mac string) bool {
+	regex := regexp.MustCompile(`^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$`)
+	return regex.MatchString(mac)
+}

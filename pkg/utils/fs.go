@@ -10,7 +10,9 @@ package utils
 
 import (
 	"fmt"
+	"io"
 	"os"
+	"path/filepath"
 )
 
 func DeleteFile(path string) error {
@@ -32,4 +34,52 @@ func DeleteFile(path string) error {
 	}
 
 	return nil
+}
+
+func CopyFile(src, dst string) error {
+	sourceFile, err := os.Open(src)
+	if err != nil {
+		return fmt.Errorf("failed_to_open_source: %w", err)
+	}
+	defer sourceFile.Close()
+
+	destFile, err := os.Create(dst)
+	if err != nil {
+		return fmt.Errorf("failed_to_create_dest: %w", err)
+	}
+	defer destFile.Close()
+
+	if _, err := io.Copy(destFile, sourceFile); err != nil {
+		return fmt.Errorf("failed_to_copy_file: %w", err)
+	}
+
+	return nil
+}
+
+func FindFileInDirectoryByPrefix(dir, prefix string) (string, error) {
+	err := filepath.WalkDir(dir, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if d.IsDir() {
+			return nil
+		}
+
+		if len(d.Name()) >= len(prefix) && d.Name()[:len(prefix)] == prefix {
+			return fmt.Errorf("FOUND:%s", path)
+		}
+
+		return nil
+	})
+
+	if err != nil && len(err.Error()) > 6 && err.Error()[:6] == "FOUND:" {
+		return err.Error()[6:], nil
+	}
+
+	if err != nil {
+		return "", fmt.Errorf("walk_error: %w", err)
+	}
+
+	return "", fmt.Errorf("file_with_prefix_not_found: %s in %s", prefix, dir)
 }

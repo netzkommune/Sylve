@@ -50,15 +50,37 @@ func ParseConfig(path string) *internal.SylveConfig {
 	return ParsedConfig
 }
 
-func SetupDataPath() error {
+func GetDataPath() (string, error) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		log.Fatal("Failed to get current working directory:", err)
+	}
+
+	if ParsedConfig == nil {
+		return filepath.Join(cwd, "data"), nil
+	}
+
 	if ParsedConfig.DataPath == "" {
-		ParsedConfig.DataPath = "./data"
+		ParsedConfig.DataPath = filepath.Join(cwd, "data")
+		if err := os.MkdirAll(ParsedConfig.DataPath, 0755); err != nil {
+			return "", fmt.Errorf("failed to create data directory: %w", err)
+		}
+	}
+
+	return ParsedConfig.DataPath, nil
+}
+
+func SetupDataPath() error {
+	dataPath, err := GetDataPath()
+	if err != nil {
+		return fmt.Errorf("failed to get data path: %w", err)
 	}
 
 	dirs := []string{
-		ParsedConfig.DataPath,
-		filepath.Join(ParsedConfig.DataPath, "downloads"),
-		filepath.Join(ParsedConfig.DataPath, "downloads", "torrents"),
+		dataPath,
+		filepath.Join(dataPath, "vms"),
+		filepath.Join(dataPath, "downloads"),
+		filepath.Join(dataPath, "downloads", "torrents"),
 	}
 
 	for _, dir := range dirs {
@@ -72,7 +94,13 @@ func SetupDataPath() error {
 
 func GetDownloadsPath(dType string) string {
 	if ParsedConfig == nil {
-		return "./data/downloads"
+		cwd, err := os.Getwd()
+
+		if err != nil {
+			log.Fatal("Failed to get current working directory:", err)
+		}
+
+		return filepath.Join(cwd, "data", "downloads")
 	}
 
 	if dType == "torrents" {
@@ -84,4 +112,15 @@ func GetDownloadsPath(dType string) string {
 	}
 
 	return filepath.Join(ParsedConfig.DataPath, "downloads")
+}
+
+func GetVMsPath() (string, error) {
+	dataPath, err := GetDataPath()
+	if err != nil {
+		return "", fmt.Errorf("failed to get data path: %w", err)
+	}
+
+	vmsPath := filepath.Join(dataPath, "vms")
+
+	return vmsPath, nil
 }

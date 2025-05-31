@@ -8,7 +8,10 @@
 
 package utils
 
-import "net"
+import (
+	"fmt"
+	"net"
+)
 
 func IsValidMetric(metric int) bool {
 	return metric >= 0 && metric <= 255
@@ -38,4 +41,32 @@ func IsValidIPv4CIDR(cidr string) bool {
 
 func BridgeIfName(name string) string {
 	return ShortHash("syl" + name)
+}
+
+func IsPortInUse(port int) bool {
+	if port < 1 || port > 65535 {
+		return false
+	}
+	addr := fmt.Sprintf(":%d", port)
+
+	tcpLn, tcpErr := net.Listen("tcp", addr)
+	if tcpErr != nil {
+		return false
+	} else {
+		tcpLn.Close()
+	}
+
+	udpAddr, udpResErr := net.ResolveUDPAddr("udp", addr)
+	if udpResErr != nil {
+		return false
+	}
+
+	udpConn, udpErr := net.ListenUDP("udp", udpAddr)
+	if udpErr != nil {
+		return false
+	} else {
+		udpConn.Close()
+	}
+
+	return false
 }

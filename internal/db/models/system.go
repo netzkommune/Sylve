@@ -25,6 +25,4 @@ type PassedThroughIDs struct {
 	ID       int    `json:"id" gorm:"primaryKey"`
 	Domain   int    `json:"domain"`
 	DeviceID string `json:"deviceID" gorm:"uniqueIndex"`
-
-	VMID uint `json:"vmId" gorm:"index"`
 }

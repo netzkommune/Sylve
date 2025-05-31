@@ -6,7 +6,7 @@
 	import { openTerminal, terminalStore } from '$lib/stores/terminal.svelte';
 	import Icon from '@iconify/svelte';
 	import { mode, toggleMode } from 'mode-watcher';
-	import CreateVM from './CreateVM.svelte';
+	import CreateVM from './CreateVM/CreateVM.svelte';
 
 	let menuData = $state({
 		createVM: {
@@ -119,12 +119,7 @@
 				{/if}
 			</Button>
 
-			<!-- <Button size="sm" class="h-6">
-				<Icon icon="material-symbols:mail-outline" class="mr-2 h-5 w-5" />
-				Documentation
-			</Button> -->
-
-			<!-- <Button
+			<Button
 				size="sm"
 				class="h-6"
 				onclick={() => (menuData.createVM.open = !menuData.createVM.open)}
@@ -132,10 +127,12 @@
 				<Icon icon="material-symbols:monitor-outline-rounded" class="mr-1.5 h-5 w-5" />
 				Create VM
 			</Button>
-			<CreateVM bind:open={menuData.createVM.open} /> -->
+
+			{#if menuData.createVM.open}
+				<CreateVM bind:open={menuData.createVM.open} />
+			{/if}
 
 			<!--
-
 			<CreateDialog
 				title="Create: Jail"
 				tabs={ctTabs}

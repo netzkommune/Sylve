@@ -11,6 +11,7 @@
 	import { capitalizeFirstLetter } from '$lib/utils/string';
 	import { shortcut, type ShortcutTrigger } from '@svelte-put/shortcut';
 	import CircleHelp from 'lucide-svelte/icons/circle-help';
+	import { onMount } from 'svelte';
 
 	let openCategories: { [key: string]: boolean } = $state({});
 
@@ -20,100 +21,127 @@
 
 	let node = $hostname;
 
-	const nodeItems = $state([
-		{
-			label: 'summary',
-			icon: 'basil:document-outline',
-			href: `/${node}/summary`
-		},
-		{
-			label: 'notes',
-			icon: 'mdi:notes',
-			href: `/${node}/notes`
-		},
-		{
-			label: 'network',
-			icon: 'mdi:network',
-			children: [
+	interface NodeItem {
+		label: string;
+		icon: string;
+		href?: string;
+		children?: NodeItem[];
+	}
+
+	let nodeItems = $state([] as NodeItem[]);
+
+	$effect(() => {
+		if (page.url.pathname.startsWith(`/${$hostname}/vm`)) {
+			const vmName = page.url.pathname.split('/')[3];
+			nodeItems = [
 				{
-					label: 'interfaces',
-					icon: 'carbon:network-interface',
-					href: `/${node}/network/interfaces`
+					label: 'summary',
+					icon: 'basil:document-outline',
+					href: `/${node}/vm/${vmName}/summary`
 				},
 				{
-					label: 'switches',
-					icon: 'clarity:network-switch-line',
-					href: `/${node}/network/switches`
+					label: 'console',
+					icon: 'mdi:monitor',
+					href: `/${node}/vm/${vmName}/console`
 				}
-			]
-		},
-		{
-			label: 'storage',
-			icon: 'mdi:storage',
-			children: [
+			];
+		} else {
+			nodeItems = [
 				{
-					label: 'disks',
-					icon: 'mdi:harddisk',
-					href: `/${node}/storage/disks`
+					label: 'summary',
+					icon: 'basil:document-outline',
+					href: `/${node}/summary`
 				},
 				{
-					label: 'zfs',
-					icon: 'file-icons:openzfs',
+					label: 'notes',
+					icon: 'mdi:notes',
+					href: `/${node}/notes`
+				},
+				{
+					label: 'network',
+					icon: 'mdi:network',
 					children: [
 						{
-							label: 'pools',
-							icon: 'bi:hdd-stack-fill',
-							href: `/${node}/storage/zfs/pools`
+							label: 'interfaces',
+							icon: 'carbon:network-interface',
+							href: `/${node}/network/interfaces`
 						},
 						{
-							label: 'datasets',
-							icon: 'material-symbols:dataset',
+							label: 'switches',
+							icon: 'clarity:network-switch-line',
+							href: `/${node}/network/switches`
+						}
+					]
+				},
+				{
+					label: 'storage',
+					icon: 'mdi:storage',
+					children: [
+						{
+							label: 'disks',
+							icon: 'mdi:harddisk',
+							href: `/${node}/storage/disks`
+						},
+						{
+							label: 'zfs',
+							icon: 'file-icons:openzfs',
 							children: [
 								{
-									label: 'file_systems',
-									icon: 'eos-icons:file-system',
-									href: `/${node}/storage/zfs/datasets/fs`
+									label: 'pools',
+									icon: 'bi:hdd-stack-fill',
+									href: `/${node}/storage/zfs/pools`
 								},
 								{
-									label: 'volumes',
-									icon: 'carbon:volume-block-storage',
-									href: `/${node}/storage/zfs/datasets/volumes`
-								},
-								{
-									label: 'snapshots',
-									icon: 'carbon:ibm-cloud-vpc-block-storage-snapshots',
-									href: `/${node}/storage/zfs/datasets/snapshots`
+									label: 'datasets',
+									icon: 'material-symbols:dataset',
+									children: [
+										{
+											label: 'file_systems',
+											icon: 'eos-icons:file-system',
+											href: `/${node}/storage/zfs/datasets/fs`
+										},
+										{
+											label: 'volumes',
+											icon: 'carbon:volume-block-storage',
+											href: `/${node}/storage/zfs/datasets/volumes`
+										},
+										{
+											label: 'snapshots',
+											icon: 'carbon:ibm-cloud-vpc-block-storage-snapshots',
+											href: `/${node}/storage/zfs/datasets/snapshots`
+										}
+									]
 								}
-							]
+							],
+							href: `/${node}/storage/zfs/dashboard`
 						}
-					],
-					href: `/${node}/storage/zfs/dashboard`
-				}
-			]
-		},
-		{
-			label: 'utilities',
-			icon: 'mdi:tools',
-			children: [
+					]
+				},
 				{
-					label: 'downloader',
-					icon: 'material-symbols:download',
-					href: `/${node}/utilities/downloader`
-				}
-			]
-		},
-		{
-			label: 'settings',
-			icon: 'material-symbols:settings',
-			children: [
+					label: 'utilities',
+					icon: 'mdi:tools',
+					children: [
+						{
+							label: 'downloader',
+							icon: 'material-symbols:download',
+							href: `/${node}/utilities/downloader`
+						}
+					]
+				},
 				{
-					label: 'PCI Passthrough',
-					icon: 'eos-icons:hardware-circuit',
-					href: `/${node}/settings/device-passthrough`
+					label: 'settings',
+					icon: 'material-symbols:settings',
+					children: [
+						{
+							label: 'PCI Passthrough',
+							icon: 'eos-icons:hardware-circuit',
+							href: `/${node}/settings/device-passthrough`
+						}
+					]
 				}
-			]
+			];
 		}
-	]);
+	});
 
 	interface Props {
 		children?: import('svelte').Snippet;
@@ -124,6 +152,11 @@
 	$effect(() => {
 		if (page.url.pathname === `/${$hostname}`) {
 			goto(`/${node}/summary`);
+		} else if (page.url.pathname.startsWith(`/${$hostname}/vm`)) {
+			const vmId = page.url.pathname.split('/')[3];
+			if (page.url.pathname === `/${node}/vm/${vmId}`) {
+				goto(`/${node}/vm/${vmId}/summary`, { replaceState: true });
+			}
 		}
 	});
 </script>

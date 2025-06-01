@@ -9,7 +9,9 @@
 package handlers
 
 import (
+	"io/fs"
 	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	static "github.com/soulteary/gin-static"
@@ -22,6 +24,7 @@ import (
 	systemHandlers "sylve/internal/handlers/system"
 	utilitiesHandlers "sylve/internal/handlers/utilities"
 	vmHandlers "sylve/internal/handlers/vm"
+	vncHandler "sylve/internal/handlers/vnc"
 	authService "sylve/internal/services/auth"
 	diskService "sylve/internal/services/disk"
 	infoService "sylve/internal/services/info"
@@ -172,6 +175,7 @@ func RegisterRoutes(r *gin.Engine,
 		vm.GET("/list", vmHandlers.ListVMs(libvirtService))
 		vm.POST("/create", vmHandlers.CreateVM(libvirtService))
 		vm.DELETE("/remove/:id", vmHandlers.RemoveVM(libvirtService))
+		vm.GET("/domain/:id", vmHandlers.GetLvDomain(libvirtService))
 	}
 
 	utilities := api.Group("/utilities")
@@ -191,6 +195,12 @@ func RegisterRoutes(r *gin.Engine,
 		auth.Any("/logout", LogoutHandler(authService))
 	}
 
+	novncSub, _ := fs.Sub(assets.SvelteKitFiles, "web-files/novnc")
+	novncFS := http.FS(novncSub)
+	r.StaticFS("/novnc", novncFS)
+
+	api.GET("/vnc/:port", vncHandler.VNCProxyHandler)
+
 	if proxyToVite {
 		r.NoRoute(func(c *gin.Context) {
 			ReverseProxy(c, "http://127.0.0.1:5173")
@@ -199,16 +209,16 @@ func RegisterRoutes(r *gin.Engine,
 		staticFiles, err := static.EmbedFolder(assets.SvelteKitFiles, "web-files")
 		if err != nil {
 			log.Fatalln("Initialization of embed folder failed:", err)
-		} else {
-			r.Use(static.Serve("/", staticFiles))
-
-			r.NoRoute(func(c *gin.Context) {
-				c.FileFromFS("index.html", staticFiles)
-			})
-
-			r.GET("/", func(c *gin.Context) {
-				c.FileFromFS("index.html", staticFiles)
-			})
 		}
+
+		r.Use(static.Serve("/", staticFiles))
+
+		r.NoRoute(func(c *gin.Context) {
+			c.FileFromFS("index.html", staticFiles)
+		})
+
+		r.GET("/", func(c *gin.Context) {
+			c.FileFromFS("index.html", staticFiles)
+		})
 	}
 }

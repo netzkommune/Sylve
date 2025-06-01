@@ -80,6 +80,11 @@ type Source struct {
 	File string `xml:"file,attr"`
 }
 
+type Volume struct {
+	Pool   string `xml:"pool,attr"`
+	Volume string `xml:"volume,attr"`
+}
+
 type Disk struct {
 	Type     string    `xml:"type,attr"`
 	Device   string    `xml:"device,attr"`

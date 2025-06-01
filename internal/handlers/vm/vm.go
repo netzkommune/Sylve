@@ -36,6 +36,57 @@ func ListVMs(libvirtService *libvirt.Service) gin.HandlerFunc {
 	}
 }
 
+// @Summary Get a Virtual Machine's Domain
+// @Description Retrieve the domain information of a virtual machine by its ID
+// @Tags VM
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Virtual Machine ID"
+// @Success 200 {object} internal.APIResponse[libvirtServiceInterfaces.LvDomain] "Success"
+// @Failure 400 {object} internal.APIResponse[any] "Bad Request"
+// @Failure 404 {object} internal.APIResponse[any] "Not Found"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /vm/domain/{id} [get]
+func GetLvDomain(libvirtService *libvirt.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		vmID := c.Param("id")
+		if vmID == "" {
+			c.JSON(400, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_vm_id",
+				Data:    nil,
+				Error:   "Virtual Machine ID is required",
+			})
+			return
+		}
+
+		vmInt, err := strconv.Atoi(vmID)
+		if err != nil {
+			c.JSON(400, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_vm_id_format",
+				Data:    nil,
+				Error:   "Virtual Machine ID must be a valid integer",
+			})
+			return
+		}
+
+		domain, err := libvirtService.GetLvDomain(vmInt)
+		if err != nil {
+			c.JSON(500, internal.APIResponse[any]{Error: "failed_to_get_domain: " + err.Error()})
+			return
+		}
+
+		c.JSON(200, internal.APIResponse[*libvirtServiceInterfaces.LvDomain]{
+			Status:  "success",
+			Message: "vm_domain_retrieved",
+			Data:    domain,
+			Error:   "",
+		})
+	}
+}
+
 // @Summary Create a new Virtual Machine
 // @Description Create a new virtual machine with the specified parameters
 // @Tags VM

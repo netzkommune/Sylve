@@ -16,3 +16,10 @@ type LibvirtServiceInterface interface {
 	DeleteStoragePool(name string) error
 	RescanStoragePools() error
 }
+
+type LvDomain struct {
+	ID     int32  `json:"id"`
+	UUID   string `json:"uuid"`
+	Name   string `json:"name"`
+	Status string `json:"status"`
+}

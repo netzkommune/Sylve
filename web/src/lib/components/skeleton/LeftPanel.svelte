@@ -41,7 +41,7 @@
 					children: vms.map((vm) => ({
 						label: `${vm.name} (${vm.vmId})`,
 						icon: 'material-symbols:monitor-outline',
-						href: `/${node}/${vm.name}`
+						href: `/${node}/vm/${vm.vmId}`
 					}))
 				}
 			]

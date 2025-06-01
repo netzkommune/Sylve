@@ -70,10 +70,18 @@ export const VMSchema = z.object({
 	networks: z.array(VMNetworkSchema),
 	pciDevices: z.array(z.number().int()),
 
-	createdAt: z.string(), // ISO date string
-	updatedAt: z.string() // ISO date string
+	createdAt: z.string(),
+	updatedAt: z.string()
+});
+
+export const VMDomainSchema = z.object({
+	id: z.number().int(),
+	uuid: z.string(),
+	name: z.string(),
+	status: z.string()
 });
 
 export type VM = z.infer<typeof VMSchema>;
 export type VMStorage = z.infer<typeof VMStorageSchema>;
 export type VMNetwork = z.infer<typeof VMNetworkSchema>;
+export type VMDomain = z.infer<typeof VMDomainSchema>;

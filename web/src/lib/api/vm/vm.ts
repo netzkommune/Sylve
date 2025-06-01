@@ -1,5 +1,11 @@
 import { APIResponseSchema, type APIResponse } from '$lib/types/common';
-import { VMSchema, type CreateData, type VM } from '$lib/types/vm/vm';
+import {
+	VMDomainSchema,
+	VMSchema,
+	type CreateData,
+	type VM,
+	type VMDomain
+} from '$lib/types/vm/vm';
 import { apiRequest } from '$lib/utils/http';
 import { z } from 'zod/v4';
 
@@ -35,4 +41,8 @@ export async function newVM(data: CreateData): Promise<APIResponse> {
 
 export async function deleteVM(id: number): Promise<APIResponse> {
 	return await apiRequest(`/vm/remove/${id}`, APIResponseSchema, 'DELETE');
+}
+
+export async function getVMDomain(id: number | string): Promise<VMDomain> {
+	return await apiRequest(`/vm/domain/${id}`, VMDomainSchema, 'GET');
 }

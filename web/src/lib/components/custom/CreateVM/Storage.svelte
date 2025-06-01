@@ -49,16 +49,20 @@
 		if (downloads && downloads.length > 0) {
 			for (const download of downloads) {
 				if (download.type === 'http') {
-					options.push({
-						label: download.name,
-						value: download.uuid
-					});
-				} else if (download.type === 'magnet') {
-					for (const file of download.files) {
+					if (download.name.endsWith('.iso')) {
 						options.push({
-							label: file.name,
+							label: download.name,
 							value: download.uuid
 						});
+					}
+				} else if (download.type === 'torrent') {
+					for (const file of download.files) {
+						if (file.name.endsWith('.iso')) {
+							options.push({
+								label: file.name,
+								value: download.uuid
+							});
+						}
 					}
 				}
 			}
@@ -85,9 +89,9 @@
 		},
 		emulationType: {
 			open: false,
-			value: 'virtio-blk',
+			value: 'virtio',
 			options: [
-				{ label: 'VirtIO', value: 'virtio-blk' },
+				{ label: 'VirtIO', value: 'virtio' },
 				{
 					label: 'AHCI-HD',
 					value: 'ahci-hd'

@@ -182,7 +182,7 @@
 
 	onMount(async () => {
 		// console.log(await getVMs());
-		// console.log(await deleteVM(22));
+		// console.log(await deleteVM(26));
 	});
 </script>
 

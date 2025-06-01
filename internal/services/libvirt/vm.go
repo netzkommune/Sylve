@@ -314,6 +314,11 @@ func (s *Service) RemoveVM(id uint) error {
 		return fmt.Errorf("failed_to_find_vm: %w", err)
 	}
 
+	err := s.RemoveLvVm(int(vm.ID))
+	if err != nil {
+		return fmt.Errorf("failed_to_remove_lv_vm: %w", err)
+	}
+
 	for _, network := range vm.Networks {
 		if err := s.DB.Delete(&network).Error; err != nil {
 			return fmt.Errorf("failed_to_delete_network: %w", err)

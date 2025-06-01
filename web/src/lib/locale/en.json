@@ -35,7 +35,8 @@
 		"switches": "Switches",
 		"utilities": "Utilities",
 		"downloader": "Downloader",
-		"settings": "Settings"
+		"settings": "Settings",
+		"console": "Console"
 	},
 	"summary": {
 		"CPU_s": "CPU(s)",

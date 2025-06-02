@@ -36,7 +36,8 @@
 		"utilities": "Utilities",
 		"downloader": "Downloader",
 		"settings": "Settings",
-		"console": "Console"
+		"console": "Console",
+		"dashboard": "Dashboard"
 	},
 	"summary": {
 		"CPU_s": "CPU(s)",

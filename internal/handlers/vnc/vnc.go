@@ -13,6 +13,8 @@ import (
 )
 
 var upgrader = websocket.Upgrader{
+	ReadBufferSize:  32 * 1024,
+	WriteBufferSize: 32 * 1024,
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
@@ -21,47 +23,49 @@ var upgrader = websocket.Upgrader{
 func VNCProxyHandler(c *gin.Context) {
 	port := c.Param("port")
 	if port == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing 'port' query parameter"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing 'port' parameter"})
 		return
 	}
 
 	vncAddress := fmt.Sprintf("localhost:%s", port)
-	vncConn, err := net.Dial("tcp", vncAddress)
+	rawConn, err := net.Dial("tcp", vncAddress)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to connect to VNC server on port %s", port)})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to connect to VNC on port %s", port)})
 		return
 	}
-	defer vncConn.Close()
+	defer rawConn.Close()
 
-	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+	// Disable Nagle's algorithm for lower latency
+	if tcpConn, ok := rawConn.(*net.TCPConn); ok {
+		tcpConn.SetNoDelay(true)
+	}
+
+	wsConn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upgrade to WebSocket"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "WebSocket upgrade failed"})
 		return
 	}
-	defer conn.Close()
+	defer wsConn.Close()
 
-	done := make(chan bool)
+	done := make(chan struct{})
 	var once sync.Once
+	closeDone := func() { once.Do(func() { close(done) }) }
 
-	closeDone := func() {
-		once.Do(func() {
-			close(done)
-		})
-	}
+	const bufSize = 32 * 1024
+	buffer := make([]byte, bufSize)
 
 	go func() {
 		defer closeDone()
-		buffer := make([]byte, 1024)
 		for {
-			n, err := vncConn.Read(buffer)
+			msgType, reader, err := wsConn.NextReader()
 			if err != nil {
-				if err != io.EOF {
-					logger.L.Debug().Err(err).Msg("Error reading from VNC connection")
-				}
 				return
 			}
-			err = conn.WriteMessage(websocket.BinaryMessage, buffer[:n])
-			if err != nil {
+			if msgType != websocket.BinaryMessage {
+				io.Copy(io.Discard, reader)
+				continue
+			}
+			if _, err := io.Copy(rawConn, reader); err != nil {
 				return
 			}
 		}
@@ -70,15 +74,22 @@ func VNCProxyHandler(c *gin.Context) {
 	go func() {
 		defer closeDone()
 		for {
-			_, message, err := conn.ReadMessage()
-			if websocket.IsCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) || err == io.EOF {
+			n, err := rawConn.Read(buffer)
+			if err != nil {
+				if err != io.EOF {
+					logger.L.Debug().Err(err).Msg("Error reading from VNC connection")
+				}
 				return
 			}
+			writer, err := wsConn.NextWriter(websocket.BinaryMessage)
 			if err != nil {
 				return
 			}
-			_, err = vncConn.Write(message)
-			if err != nil {
+			if _, err := writer.Write(buffer[:n]); err != nil {
+				writer.Close()
+				return
+			}
+			if err := writer.Close(); err != nil {
 				return
 			}
 		}

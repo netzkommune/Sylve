@@ -165,7 +165,7 @@
 			data={comboBoxes.volumes.options}
 			classes="flex-1 space-y-1"
 			placeholder="Select ZFS volume"
-			width="w-[40%]"
+			width="w-[70%]"
 		></CustomComboBox>
 	{/if}
 
@@ -228,6 +228,6 @@
 		data={comboBoxes.isos.options}
 		classes="flex-1 space-y-1"
 		placeholder="Select installation media"
-		width="w-[40%]"
+		width="w-[70%]"
 	></CustomComboBox>
 </div>

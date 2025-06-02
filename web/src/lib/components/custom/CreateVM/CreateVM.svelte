@@ -14,7 +14,7 @@
 	import type { Download } from '$lib/types/utilities/downloader';
 	import type { Dataset } from '$lib/types/zfs/dataset';
 	import { getTranslation } from '$lib/utils/i18n';
-	import { capitalizeFirstLetter } from '$lib/utils/string';
+	import { capitalizeFirstLetter, generatePassword } from '$lib/utils/string';
 	import { isValidCreateData } from '$lib/utils/vm/vm';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
@@ -156,7 +156,7 @@
 		},
 		advanced: {
 			vncPort: 0,
-			vncPassword: '',
+			vncPassword: generatePassword(),
 			vncWait: false,
 			vncResolution: '1024x768',
 			startAtBoot: false,

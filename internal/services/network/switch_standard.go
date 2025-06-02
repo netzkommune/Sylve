@@ -228,14 +228,63 @@ func (s *Service) SyncStandardSwitches(sw *networkModels.StandardSwitch, action 
 		if err := s.DB.Preload("Ports").Find(&switches).Error; err != nil {
 			return fmt.Errorf("db_error_checking_switches: %v", err)
 		}
-		for _, switchObj := range switches {
-			if err := deleteStandardBridge(switchObj); err != nil {
-				return fmt.Errorf("sync_standard_switches: failed_to_delete: %v", err)
+
+		var nonDbPorts = make(map[string][]string)
+
+		for _, sw := range switches {
+			var dbPorts []string
+
+			for _, port := range sw.Ports {
+				dbPorts = append(dbPorts, port.Name)
+			}
+
+			iface, _ := iface.Get(sw.BridgeName)
+			if iface != nil {
+				for _, member := range iface.BridgeMembers {
+					if utils.Contains(dbPorts, member.Name) {
+						continue
+					}
+
+					if _, exists := nonDbPorts[sw.BridgeName]; !exists {
+						nonDbPorts[sw.BridgeName] = []string{}
+					}
+
+					nonDbPorts[sw.BridgeName] = append(nonDbPorts[sw.BridgeName], member.Name)
+				}
 			}
 		}
-		for _, switchObj := range switches {
-			if err := createStandardBridge(switchObj); err != nil {
+
+		for _, sw := range switches {
+			if err := deleteStandardBridge(sw); err != nil {
+				return fmt.Errorf("sync_standard_switches: failed_to_delete: %v", err)
+			}
+
+			if err := createStandardBridge(sw); err != nil {
 				return fmt.Errorf("sync_standard_switches: failed_to_create: %v", err)
+			}
+		}
+
+		for br, members := range nonDbPorts {
+			ifaceObj, err := iface.Get(br)
+			if err != nil {
+				return fmt.Errorf("sync_standard_switches: get %s: %v", br, err)
+			}
+
+			existingMembers := make(map[string]bool)
+			for _, m := range ifaceObj.BridgeMembers {
+				existingMembers[m.Name] = true
+			}
+
+			for _, member := range members {
+				if _, exists := existingMembers[member]; !exists {
+					if _, err := utils.RunCommand("ifconfig", br, "addm", member, "up"); err != nil {
+						return fmt.Errorf("sync_standard_switches: add member %s to %s: %v", member, br, err)
+					}
+
+					if _, err := utils.RunCommand("ifconfig", member, "up"); err != nil {
+						return fmt.Errorf("sync_standard_switches: bring up member %s: %v", member, err)
+					}
+				}
 			}
 		}
 
@@ -400,9 +449,13 @@ func editStandardBridge(oldSw, newSw networkModels.StandardSwitch) error {
 		if err != nil {
 			continue
 		}
-		if strings.Contains(oif.Driver, "tap") || utils.Contains(oif.Groups, "tap") {
+		if strings.Contains(oif.Driver, "tap") || utils.Contains(oif.Groups, "tap") || utils.Contains(oif.Groups, "vnet") {
 			if _, err := utils.RunCommand("ifconfig", br, "addm", m, "up"); err != nil {
 				return fmt.Errorf("edit_standard_bridge: re-add tap %s: %v", m, err)
+			}
+
+			if _, err := utils.RunCommand("ifconfig", m, "up"); err != nil {
+				return fmt.Errorf("edit_standard_bridge: bring up tap %s: %v", m, err)
 			}
 		}
 	}
@@ -453,14 +506,21 @@ func addBridgeMember(br, portName string, mtu, vlan int) error {
 				return fmt.Errorf("create vlan %s: %v", vif, err)
 			}
 		}
-		// add VLAN iface to bridge
+
 		if _, err := utils.RunCommand("ifconfig", br, "addm", vif, "up"); err != nil {
 			return fmt.Errorf("add vlan %s: %v", vif, err)
 		}
+
+		if _, err := utils.RunCommand("ifconfig", vif, "up"); err != nil {
+			return fmt.Errorf("bring up vlan %s: %v", vif, err)
+		}
 	} else {
-		// add plain port to bridge
 		if _, err := utils.RunCommand("ifconfig", br, "addm", portName, "up"); err != nil {
 			return fmt.Errorf("add port %s: %v", portName, err)
+		}
+
+		if _, err := utils.RunCommand("ifconfig", portName, "up"); err != nil {
+			return fmt.Errorf("bring up port %s: %v", portName, err)
 		}
 	}
 	return nil

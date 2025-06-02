@@ -71,14 +71,18 @@ export const VMSchema = z.object({
 	pciDevices: z.array(z.number().int()),
 
 	createdAt: z.string(),
-	updatedAt: z.string()
+	updatedAt: z.string(),
+
+	startedAt: z.string().nullable(),
+	stoppedAt: z.string().nullable()
 });
 
 export const VMDomainSchema = z.object({
 	id: z.number().int(),
 	uuid: z.string(),
 	name: z.string(),
-	status: z.string()
+	status: z.string(),
+	cpuUsage: z.number()
 });
 
 export type VM = z.infer<typeof VMSchema>;

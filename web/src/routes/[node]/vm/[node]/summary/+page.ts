@@ -1,13 +1,8 @@
-import { page } from '$app/stores';
 import { getVMDomain, getVMs } from '$lib/api/vm/vm';
 import { cachedFetch } from '$lib/utils/http';
 
-export async function load() {
-	// console.log(page.url);
-	// const vmId = page.url.pathname.split('/')[2];
-
-	let vmId = 100;
-	console.log(`Loading summary for VM ID: ${vmId}`);
+export async function load({ params }) {
+	let vmId = params.node;
 
 	const [vms, domain] = await Promise.all([
 		cachedFetch('vm-list', async () => getVMs(), 7 * 24 * 60 * 60 * 1000),

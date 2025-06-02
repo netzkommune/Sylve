@@ -172,9 +172,10 @@ func RegisterRoutes(r *gin.Engine,
 	vm := api.Group("/vm")
 	vm.Use(middleware.EnsureAuthenticated(authService))
 	{
-		vm.GET("/list", vmHandlers.ListVMs(libvirtService))
-		vm.POST("/create", vmHandlers.CreateVM(libvirtService))
-		vm.DELETE("/remove/:id", vmHandlers.RemoveVM(libvirtService))
+		vm.POST("/:id/:action", vmHandlers.VMActionHandler(libvirtService))
+		vm.GET("", vmHandlers.ListVMs(libvirtService))
+		vm.POST("", vmHandlers.CreateVM(libvirtService))
+		vm.DELETE("/:id", vmHandlers.RemoveVM(libvirtService))
 		vm.GET("/domain/:id", vmHandlers.GetLvDomain(libvirtService))
 	}
 

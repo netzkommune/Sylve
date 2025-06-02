@@ -10,11 +10,11 @@ import { apiRequest } from '$lib/utils/http';
 import { z } from 'zod/v4';
 
 export async function getVMs(): Promise<VM[]> {
-	return await apiRequest('/vm/list', z.array(VMSchema), 'GET');
+	return await apiRequest('/vm', z.array(VMSchema), 'GET');
 }
 
 export async function newVM(data: CreateData): Promise<APIResponse> {
-	return await apiRequest('/vm/create', APIResponseSchema, 'POST', {
+	return await apiRequest('/vm', APIResponseSchema, 'POST', {
 		name: data.name,
 		vmId: data.id,
 		iso: data.storage.iso,
@@ -40,9 +40,13 @@ export async function newVM(data: CreateData): Promise<APIResponse> {
 }
 
 export async function deleteVM(id: number): Promise<APIResponse> {
-	return await apiRequest(`/vm/remove/${id}`, APIResponseSchema, 'DELETE');
+	return await apiRequest(`/vm/${id}`, APIResponseSchema, 'DELETE');
 }
 
 export async function getVMDomain(id: number | string): Promise<VMDomain> {
 	return await apiRequest(`/vm/domain/${id}`, VMDomainSchema, 'GET');
+}
+
+export async function actionVm(id: number | string, action: string): Promise<APIResponse> {
+	return await apiRequest(`/vm/${id}/${action}`, APIResponseSchema, 'POST');
 }

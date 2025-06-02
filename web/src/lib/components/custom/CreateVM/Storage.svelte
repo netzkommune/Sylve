@@ -48,20 +48,22 @@
 		const options = [];
 		if (downloads && downloads.length > 0) {
 			for (const download of downloads) {
-				if (download.type === 'http') {
-					if (download.name.endsWith('.iso')) {
-						options.push({
-							label: download.name,
-							value: download.uuid
-						});
-					}
-				} else if (download.type === 'torrent') {
-					for (const file of download.files) {
-						if (file.name.endsWith('.iso')) {
+				if (download.progress === 100) {
+					if (download.type === 'http') {
+						if (download.name.endsWith('.iso')) {
 							options.push({
-								label: file.name,
+								label: download.name,
 								value: download.uuid
 							});
+						}
+					} else if (download.type === 'torrent') {
+						for (const file of download.files) {
+							if (file.name.endsWith('.iso')) {
+								options.push({
+									label: file.name,
+									value: download.uuid
+								});
+							}
 						}
 					}
 				}
@@ -76,8 +78,6 @@
 		return options;
 	});
 
-	// $inspect(downloads, 'here');
-
 	let comboBoxes = $state({
 		volumes: {
 			open: false,
@@ -91,7 +91,7 @@
 			open: false,
 			value: 'virtio',
 			options: [
-				{ label: 'VirtIO', value: 'virtio' },
+				{ label: 'VirtIO', value: 'virtio-blk' },
 				{
 					label: 'AHCI-HD',
 					value: 'ahci-hd'
@@ -204,7 +204,14 @@
 <div class="flex flex-col gap-4 p-4">
 	<RadioGroup.Root bind:value={type} class="border p-2">
 		<ScrollArea orientation="vertical" class="h-60 w-full max-w-full">
-			{#each ['zvol', 'raw', 'none'] as storageType}
+			<!-- {#each ['zvol', 'raw', 'none'] as storageType}
+				{@render radioItem(storageType)}
+			{/each} 
+            
+            Disabled 'raw' option for now
+            -->
+
+			{#each ['zvol', 'none'] as storageType}
 				{@render radioItem(storageType)}
 			{/each}
 		</ScrollArea>

@@ -14,6 +14,7 @@ import (
 	"runtime"
 	"strings"
 	"sylve/pkg/utils/sysctl"
+	"syscall"
 
 	"github.com/mackerelio/go-osstat/loadavg"
 	"github.com/mackerelio/go-osstat/uptime"
@@ -117,4 +118,8 @@ func IsGPT(sector []byte) bool {
 		}
 	}
 	return true
+}
+
+func KillProcess(pid int) error {
+	return syscall.Kill(pid, syscall.SIGKILL)
 }

@@ -18,7 +18,7 @@ import (
 // @Security BearerAuth
 // @Success 200 {object} internal.APIResponse[[]vmModels.vm] "Success"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
-// @Router /vm/list [get]
+// @Router /vm [get]
 func ListVMs(libvirtService *libvirt.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		vms, err := libvirtService.ListVMs()
@@ -74,7 +74,12 @@ func GetLvDomain(libvirtService *libvirt.Service) gin.HandlerFunc {
 
 		domain, err := libvirtService.GetLvDomain(vmInt)
 		if err != nil {
-			c.JSON(500, internal.APIResponse[any]{Error: "failed_to_get_domain: " + err.Error()})
+			c.JSON(500, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "failed_to_get_domain",
+				Data:    nil,
+				Error:   "failed_to_get_domain: " + err.Error(),
+			})
 			return
 		}
 
@@ -97,7 +102,7 @@ func GetLvDomain(libvirtService *libvirt.Service) gin.HandlerFunc {
 // @Success 200 {object} internal.APIResponse[any] "Success"
 // @Failure 400 {object} internal.APIResponse[any] "Bad Request"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
-// @Router /vm/create [post]
+// @Router /vm [post]
 func CreateVM(libvirtService *libvirt.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req libvirtServiceInterfaces.CreateVMRequest
@@ -138,7 +143,7 @@ func CreateVM(libvirtService *libvirt.Service) gin.HandlerFunc {
 // @Failure 400 {object} internal.APIResponse[any] "Bad Request"
 // @Failure 404 {object} internal.APIResponse[any] "Not Found"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
-// @Router /vm/remove/{id} [delete]
+// @Router /vm/{id} [delete]
 func RemoveVM(libvirtService *libvirt.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		vmID := c.Param("id")
@@ -166,13 +171,77 @@ func RemoveVM(libvirtService *libvirt.Service) gin.HandlerFunc {
 		err = libvirtService.RemoveVM(uint(vmInt))
 
 		if err != nil {
-			c.JSON(500, internal.APIResponse[any]{Error: "failed_to_remove: " + err.Error()})
+			c.JSON(500, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "failed_to_remove_vm",
+				Data:    nil,
+				Error:   "failed_to_remove: " + err.Error(),
+			})
 			return
 		}
 
 		c.JSON(200, internal.APIResponse[any]{
 			Status:  "success",
 			Message: "vm_removed",
+			Data:    nil,
+			Error:   "",
+		})
+	}
+}
+
+// @Summary Perform an action on a Virtual Machine
+// @Description Perform a specified action (start, stop, reboot) on a virtual machine by its ID
+// @Tags VM
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Virtual Machine ID"
+// @Param action path string true "Action to perform (start, stop, reboot)"
+// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Failure 400 {object} internal.APIResponse[any] "Bad Request"
+// @Failure 404 {object} internal.APIResponse[any] "Not Found"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /vm/{id}/{action} [post]
+func VMActionHandler(libvirtService *libvirt.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		vmID := c.Param("id")
+		action := c.Param("action")
+
+		if vmID == "" || action == "" {
+			c.JSON(400, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request",
+				Data:    nil,
+				Error:   "Virtual Machine ID and action are required",
+			})
+			return
+		}
+
+		vmInt, err := strconv.Atoi(vmID)
+		if err != nil {
+			c.JSON(400, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_vm_id_format",
+				Data:    nil,
+				Error:   "Virtual Machine ID must be a valid integer",
+			})
+			return
+		}
+
+		err = libvirtService.PerformAction(uint(vmInt), action)
+		if err != nil {
+			c.JSON(500, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "failed_to_perform_action",
+				Data:    nil,
+				Error:   "failed_to_perform_action: " + err.Error(),
+			})
+			return
+		}
+
+		c.JSON(200, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "action_performed",
 			Data:    nil,
 			Error:   "",
 		})

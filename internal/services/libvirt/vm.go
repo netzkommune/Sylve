@@ -106,6 +106,12 @@ func validateCreate(data libvirtServiceInterfaces.CreateVMRequest, db *gorm.DB) 
 		}
 	}
 
+	if data.StorageEmulationType != "" {
+		if data.StorageEmulationType != "virtio-blk" && data.StorageEmulationType != "ahci-hd" && data.StorageEmulationType != "nvme" {
+			return fmt.Errorf("invalid_storage_emulation_type")
+		}
+	}
+
 	if data.SwitchID != nil && *data.SwitchID != 0 {
 		if data.NetworkMAC != "" && !utils.IsValidMACAddress(data.NetworkMAC) {
 			return fmt.Errorf("invalid_mac_address")
@@ -181,20 +187,19 @@ func validateCreate(data libvirtServiceInterfaces.CreateVMRequest, db *gorm.DB) 
 				return fmt.Errorf("pci_device_not_found: %d", pciID)
 			}
 
-			var vm vmModels.VM
+			// var vm vmModels.VM
+			// if err := db.Preload("PCIDevices").First(&vm, "id = ?", pciID).Error; err != nil {
+			// 	if err == gorm.ErrRecordNotFound {
+			// 		return fmt.Errorf("pci_device_not_found: %d", pciID)
+			// 	}
+			// 	return fmt.Errorf("failed_to_check_pci_device_usage: %w", err)
+			// }
 
-			if err := db.Preload("PCIDevices").First(&vm, "id = ?", pciID).Error; err != nil {
-				if err == gorm.ErrRecordNotFound {
-					return fmt.Errorf("pci_device_not_found: %d", pciID)
-				}
-				return fmt.Errorf("failed_to_check_pci_device_usage: %w", err)
-			}
-
-			for _, device := range vm.PCIDevices {
-				if device == pciID {
-					return fmt.Errorf("pci_device_already_in_use: %d", pciID)
-				}
-			}
+			// for _, device := range vm.PCIDevices {
+			// 	if device == pciID {
+			// 		return fmt.Errorf("pci_device_already_in_use: %d", pciID)
+			// 	}
+			// }
 		}
 	}
 
@@ -314,7 +319,7 @@ func (s *Service) RemoveVM(id uint) error {
 		return fmt.Errorf("failed_to_find_vm: %w", err)
 	}
 
-	err := s.RemoveLvVm(int(vm.ID))
+	err := s.RemoveLvVm(int(vm.VmID))
 	if err != nil {
 		return fmt.Errorf("failed_to_remove_lv_vm: %w", err)
 	}
@@ -333,6 +338,24 @@ func (s *Service) RemoveVM(id uint) error {
 
 	if err := s.DB.Delete(&vm).Error; err != nil {
 		return fmt.Errorf("failed_to_delete_vm: %w", err)
+	}
+
+	return nil
+}
+
+func (s *Service) PerformAction(id uint, action string) error {
+	var vm vmModels.VM
+
+	if err := s.DB.First(&vm, "id = ?", id).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return fmt.Errorf("vm_not_found: %d", id)
+		}
+		return fmt.Errorf("failed_to_find_vm: %w", err)
+	}
+
+	err := s.LvVMAction(vm, action)
+	if err != nil {
+		return fmt.Errorf("failed_to_perform_action: %w", err)
 	}
 
 	return nil

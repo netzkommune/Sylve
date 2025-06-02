@@ -8,10 +8,12 @@ import (
 	"strconv"
 	"strings"
 	"sylve/internal/config"
+	"sylve/internal/db/models"
 	vmModels "sylve/internal/db/models/vm"
 	libvirtServiceInterfaces "sylve/internal/interfaces/services/libvirt"
 	"sylve/pkg/utils"
 	"sylve/pkg/zfs"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -56,11 +58,14 @@ func (s *Service) CreateVmXML(vm vmModels.VM, vmPath string) (string, error) {
 		})
 	}
 
+	sIndex := 10
+	uefi := fmt.Sprintf("%s,%s/%d_vars.fd", "/usr/local/share/uefi-firmware/BHYVE_UEFI.fd", vmPath, vm.VmID)
+
+	var bhyveArgs [][]libvirtServiceInterfaces.BhyveArg
+
 	if vm.Storages != nil && len(vm.Storages) > 0 {
 		for _, storage := range vm.Storages {
 			if storage.Dataset != "" && storage.Type == "zvol" {
-				fmt.Println("Using ZFS dataset for storage:", storage.Dataset)
-
 				datasets, err := zfs.Datasets("")
 				if err != nil {
 					return "", fmt.Errorf("failed_to_get_datasets: %w", err)
@@ -91,23 +96,45 @@ func (s *Service) CreateVmXML(vm vmModels.VM, vmPath string) (string, error) {
 					volume = volume[idx+1:]
 				}
 
-				devices.Disks = append(devices.Disks, libvirtServiceInterfaces.Disk{
-					Type:   "volume",
-					Device: "disk",
-					Source: libvirtServiceInterfaces.Volume{
-						Pool:   pool,
-						Volume: volume,
+				bhyveArgs = append(bhyveArgs, []libvirtServiceInterfaces.BhyveArg{
+					{
+						Value: fmt.Sprintf("-s %d:%d,%s,%s",
+							sIndex,
+							0,
+							storage.Emulation,
+							filepath.Join("/dev/zvol", pool, volume)),
 					},
-					Target: libvirtServiceInterfaces.Target{
-						Dev: "vdb",
-						Bus: storage.Emulation,
-					},
+				})
+
+				sIndex++
+			}
+		}
+	}
+
+	var interfaces []libvirtServiceInterfaces.Interface
+
+	if vm.Networks != nil && len(vm.Networks) > 0 {
+		for _, network := range vm.Networks {
+			if network.SwitchID != 0 {
+				nType := "bridge"
+				emulation := network.Emulation
+
+				var mac *libvirtServiceInterfaces.MACAddress
+				if network.MAC != "" {
+					mac = &libvirtServiceInterfaces.MACAddress{Address: network.MAC}
+				}
+
+				interfaces = append(interfaces, libvirtServiceInterfaces.Interface{
+					Type:   nType,
+					MAC:    mac,
+					Source: libvirtServiceInterfaces.BridgeSource{Bridge: network.Switch.BridgeName},
+					Model:  libvirtServiceInterfaces.Model{Type: emulation},
 				})
 			}
 		}
 	}
 
-	uefi := fmt.Sprintf("%s,%s/%d_vars.fd", "/usr/local/share/uefi-firmware/BHYVE_UEFI.fd", vmPath, vm.VmID)
+	devices.Interfaces = interfaces
 
 	domain := libvirtServiceInterfaces.Domain{
 		Type:       "bhyve",
@@ -147,6 +174,26 @@ func (s *Service) CreateVmXML(vm vmModels.VM, vmPath string) (string, error) {
 		Devices:    devices,
 	}
 
+	if vm.PCIDevices != nil && len(vm.PCIDevices) > 0 {
+		for _, pci := range vm.PCIDevices {
+			var pciDevice models.PassedThroughIDs
+			if err := s.DB.First(&pciDevice, pci).Error; err != nil {
+				return "", fmt.Errorf("failed_to_find_pci_device: %w", err)
+			}
+
+			bhyveArgs = append(bhyveArgs, []libvirtServiceInterfaces.BhyveArg{
+				{
+					Value: fmt.Sprintf("-s %d:0,passthru,%s",
+						sIndex,
+						pciDevice.DeviceID,
+					),
+				},
+			})
+
+			sIndex++
+		}
+	}
+
 	width, height, f := strings.Cut(vm.VNCResolution, "x")
 	if f != true {
 		return "", fmt.Errorf("invalid_vnc_resolution")
@@ -158,7 +205,8 @@ func (s *Service) CreateVmXML(vm vmModels.VM, vmPath string) (string, error) {
 		vncWait = ",wait"
 	}
 
-	vncArg := fmt.Sprintf("-s 20:0,fbuf,tcp=0.0.0.0:%d,w=%s,h=%s,password=%s%s",
+	vncArg := fmt.Sprintf("-s %d:0,fbuf,tcp=0.0.0.0:%d,w=%s,h=%s,password=%s%s",
+		sIndex,
 		vm.VNCPort,
 		width,
 		height,
@@ -166,10 +214,19 @@ func (s *Service) CreateVmXML(vm vmModels.VM, vmPath string) (string, error) {
 		vncWait,
 	)
 
-	domain.BhyveCommandline = &libvirtServiceInterfaces.BhyveCommandline{
-		Args: []libvirtServiceInterfaces.BhyveArg{
-			{Value: vncArg},
+	bhyveArgs = append(bhyveArgs, []libvirtServiceInterfaces.BhyveArg{
+		{
+			Value: vncArg,
 		},
+	})
+
+	var flatBhyveArgs []libvirtServiceInterfaces.BhyveArg
+	for _, args := range bhyveArgs {
+		flatBhyveArgs = append(flatBhyveArgs, args...)
+	}
+
+	domain.BhyveCommandline = &libvirtServiceInterfaces.BhyveCommandline{
+		Args: flatBhyveArgs,
 	}
 
 	out, err := xml.Marshal(domain)
@@ -182,7 +239,7 @@ func (s *Service) CreateVmXML(vm vmModels.VM, vmPath string) (string, error) {
 
 func (s *Service) CreateLvVm(id int) error {
 	var vm vmModels.VM
-	if err := s.DB.Preload("Storages").Preload("Networks").First(&vm, id).Error; err != nil {
+	if err := s.DB.Preload("Storages").Preload("Networks.Switch").First(&vm, id).Error; err != nil {
 		return fmt.Errorf("failed_to_find_vm: %w", err)
 	}
 
@@ -236,7 +293,9 @@ func (s *Service) RemoveLvVm(vmId int) error {
 	}
 
 	if err := s.Conn.DomainDestroy(domain); err != nil {
-		return fmt.Errorf("failed_to_destroy_domain: %w", err)
+		if !strings.Contains(err.Error(), "is not running") {
+			return fmt.Errorf("failed_to_destroy_domain: %w", err)
+		}
 	}
 
 	if err := s.Conn.DomainUndefine(domain); err != nil {
@@ -256,6 +315,32 @@ func (s *Service) RemoveLvVm(vmId int) error {
 	}
 
 	return nil
+}
+
+func (s *Service) GetCPUUsage(vmId int) (float64, error) {
+	domain, err := s.Conn.DomainLookupByName(strconv.Itoa(vmId))
+	if err != nil {
+		return 0, fmt.Errorf("failed_to_lookup_domain: %w", err)
+	}
+	_, _, _, vcpus, cpuTime1, err := s.Conn.DomainGetInfo(domain)
+	if err != nil {
+		return 0, fmt.Errorf("failed_to_get_cpu_info_1: %w", err)
+	}
+
+	time.Sleep(1 * time.Second)
+	_, _, _, _, cpuTime2, err := s.Conn.DomainGetInfo(domain)
+	if err != nil {
+		return 0, fmt.Errorf("failed_to_get_cpu_info_2: %w", err)
+	}
+
+	if vcpus == 0 || cpuTime2 <= cpuTime1 {
+		return 0, fmt.Errorf("invalid_cpu_stats")
+	}
+
+	deltaCPU := cpuTime2 - cpuTime1
+	usage := (float64(deltaCPU) / 1e9) / float64(vcpus) * 100
+
+	return usage, nil
 }
 
 func (s *Service) GetLvDomain(vmId int) (*libvirtServiceInterfaces.LvDomain, error) {
@@ -286,6 +371,112 @@ func (s *Service) GetLvDomain(vmId int) (*libvirtServiceInterfaces.LvDomain, err
 	dom.UUID = uuid.UUID(domain.UUID).String()
 	dom.Name = domain.Name
 	dom.Status = stateMap[state]
+	dom.CPUUsage = 0.0
 
 	return &dom, nil
+}
+
+func (s *Service) LvVMAction(vm vmModels.VM, action string) error {
+	s.actionMutex.Lock()
+	defer s.actionMutex.Unlock()
+
+	domain, err := s.Conn.DomainLookupByName(strconv.Itoa(vm.VmID))
+	if err != nil {
+		return fmt.Errorf("failed_to_lookup_domain: %w", err)
+	}
+
+	switch action {
+	case "start":
+		state, _, err := s.Conn.DomainGetState(domain, 0)
+		if err != nil {
+			return fmt.Errorf("could_not_get_state: %w", err)
+		}
+
+		if state == 1 {
+			return nil
+		}
+
+		if err := s.Conn.DomainCreate(domain); err != nil {
+			return fmt.Errorf("failed_to_start_domain: %w", err)
+		}
+
+		newState, _, err := s.Conn.DomainGetState(domain, 0)
+
+		if err != nil {
+			return fmt.Errorf("could_not_verify_run: %w", err)
+		}
+
+		if newState != 1 {
+			return fmt.Errorf("unexpected_state_after_start: %d", newState)
+		}
+
+		err = s.SetActionDate(vm, "start")
+
+		if err != nil {
+			return fmt.Errorf("failed_to_set_start_date: %w", err)
+		}
+
+	case "stop":
+		if err := s.Conn.DomainDestroy(domain); err != nil {
+			return fmt.Errorf("failed_to_stop_domain: %w", err)
+		}
+
+		newState, _, err := s.Conn.DomainGetState(domain, 0)
+
+		if err != nil {
+			return fmt.Errorf("could_not_verify_stop: %w", err)
+		}
+
+		if newState != 5 {
+			return fmt.Errorf("unexpected_state_after_stop: %d", newState)
+		}
+
+		/* This is an ugly hack because sometimes bhyve does not really stop?
+		And this causes issues with the next start. So we find the user of the VNC port and kill that PID */
+		user, err := utils.GetPortUserPID("tcp", vm.VNCPort)
+		if err != nil {
+			if !strings.HasPrefix(err.Error(), "no process found using tcp port") {
+				return err
+			}
+		}
+
+		if user > 0 {
+			if err := utils.KillProcess(user); err != nil {
+				return fmt.Errorf("failed_to_kill_process_using_vnc_port: %w", err)
+			}
+		}
+
+		err = s.SetActionDate(vm, "stop")
+
+		if err != nil {
+			return fmt.Errorf("failed_to_set_stop_date: %w", err)
+		}
+	case "reboot":
+		if err := s.Conn.DomainReboot(domain, 0); err != nil {
+			return fmt.Errorf("failed_to_reboot_domain: %w", err)
+		}
+	default:
+		return fmt.Errorf("invalid_action: %s", action)
+	}
+
+	return nil
+}
+
+func (s *Service) SetActionDate(vm vmModels.VM, action string) error {
+	now := time.Now().UTC()
+
+	switch action {
+	case "start":
+		vm.StartedAt = &now
+	case "stop":
+		vm.StoppedAt = &now
+	default:
+		return fmt.Errorf("invalid_action: %s", action)
+	}
+
+	if err := s.DB.Save(&vm).Error; err != nil {
+		return fmt.Errorf("failed_to_save_vm_action_date: %w", err)
+	}
+
+	return nil
 }

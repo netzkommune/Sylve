@@ -164,6 +164,20 @@ export const createVolProps = {
 			label: '128K (131072B) Media/backups',
 			value: '131072'
 		}
+	],
+	primarycache: [
+		{
+			label: 'All',
+			value: 'all'
+		},
+		{
+			label: 'Metadata',
+			value: 'metadata'
+		},
+		{
+			label: 'None',
+			value: 'none'
+		}
 	]
 };
 

@@ -18,8 +18,9 @@ type LibvirtServiceInterface interface {
 }
 
 type LvDomain struct {
-	ID     int32  `json:"id"`
-	UUID   string `json:"uuid"`
-	Name   string `json:"name"`
-	Status string `json:"status"`
+	ID       int32   `json:"id"`
+	UUID     string  `json:"uuid"`
+	Name     string  `json:"name"`
+	Status   string  `json:"status"`
+	CPUUsage float64 `json:"cpuUsage"`
 }

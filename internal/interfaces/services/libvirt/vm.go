@@ -114,8 +114,8 @@ type Interface struct {
 }
 
 type Devices struct {
-	Disks      []Disk      `xml:"disk"`
-	Interfaces []Interface `xml:"interface"`
+	Disks      []Disk      `xml:"disk,omitempty"`
+	Interfaces []Interface `xml:"interface,omitempty"`
 }
 
 type BhyveArg struct {

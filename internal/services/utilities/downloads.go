@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 	"sylve/internal/config"
 	utilitiesModels "sylve/internal/db/models/utilities"
 	"sylve/internal/logger"
@@ -137,10 +138,22 @@ func (s *Service) DownloadFile(url string) error {
 		uuid := utils.GenerateDeterministicUUID(url)
 		destDir := config.GetDownloadsPath("http")
 		filename := path.Base(url)
+
+		if idx := strings.Index(filename, "?"); idx != -1 {
+			filename = filename[:idx]
+		}
+
+		filename = strings.ReplaceAll(filename, " ", "_")
+		if filename == "" {
+			return fmt.Errorf("invalid_filename")
+		}
+
+		filePath := path.Join(destDir, filename)
+
 		download := utilitiesModels.Downloads{
 			URL:      url,
 			UUID:     uuid,
-			Path:     destDir,
+			Path:     filePath,
 			Type:     "http",
 			Name:     filename,
 			Size:     0,
@@ -149,6 +162,7 @@ func (s *Service) DownloadFile(url string) error {
 		}
 
 		if err := s.DB.Create(&download).Error; err != nil {
+			fmt.Printf("Failed to create download record: %+v\n", err)
 			return err
 		}
 

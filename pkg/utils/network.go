@@ -11,6 +11,8 @@ package utils
 import (
 	"fmt"
 	"net"
+	"strconv"
+	"strings"
 )
 
 func IsValidMetric(metric int) bool {
@@ -27,6 +29,10 @@ func IsValidIP(ip string) bool {
 
 func IsValidVLAN(vlan int) bool {
 	return vlan >= 0 && vlan <= 4095
+}
+
+func IsValidPort(port int) bool {
+	return port >= 1 && port <= 65535
 }
 
 func IsValidIPv4CIDR(cidr string) bool {
@@ -69,4 +75,39 @@ func IsPortInUse(port int) bool {
 	}
 
 	return false
+}
+
+func GetPortUserPID(proto string, port int) (int, error) {
+	if proto != "tcp" && proto != "udp" {
+		return 0, fmt.Errorf("invalid protocol: %s", proto)
+	}
+
+	if !IsValidPort(port) {
+		return 0, fmt.Errorf("invalid port: %d", port)
+	}
+
+	output, err := RunCommand("sockstat", "-P", proto, "-p", strconv.Itoa(port))
+
+	if err != nil {
+		return 0, fmt.Errorf("failed to run sockstat: %w", err)
+	}
+
+	lines := strings.Split(output, "\n")
+	for _, line := range lines {
+		if strings.Contains(line, fmt.Sprintf(":%d", port)) {
+			fields := strings.Fields(line)
+			if len(fields) >= 3 {
+				pid := fields[2]
+
+				pidInt, err := strconv.Atoi(pid)
+				if err != nil {
+					return 0, fmt.Errorf("failed to convert PID to integer: %w", err)
+				}
+
+				return pidInt, nil
+			}
+		}
+	}
+
+	return 0, fmt.Errorf("no process found using %s port %d", proto, port)
 }

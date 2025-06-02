@@ -139,14 +139,19 @@ export function isDownloadURL(url: string): boolean {
 		require_host: true,
 		allow_underscores: false,
 		allow_fragments: false,
-		allow_query_components: false
+		allow_query_components: true
 	};
 
 	if (!isURL(url, urlOpts)) {
 		return false;
 	}
 
-	return /\/[^\/]+\.[^\/]+$/.test(url);
+	try {
+		const { pathname } = new URL(url);
+		return /\/[^\/]+\.[^\/]+$/.test(pathname);
+	} catch {
+		return false;
+	}
 }
 
 export function isValidVMName(name: string): boolean {

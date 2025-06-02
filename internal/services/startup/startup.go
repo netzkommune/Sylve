@@ -119,11 +119,9 @@ func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface)
 		return err
 	}
 
-	if config.ParsedConfig.Environment != "development" {
-		err := s.Network.SyncStandardSwitches(nil, "sync")
-		if err != nil {
-			logger.L.Error().Msgf("Error syncing standard switches: %v", err)
-		}
+	err := s.Network.SyncStandardSwitches(nil, "sync")
+	if err != nil {
+		logger.L.Error().Msgf("Error syncing standard switches: %v", err)
 	}
 
 	if err := s.System.SyncPPTDevices(); err != nil {

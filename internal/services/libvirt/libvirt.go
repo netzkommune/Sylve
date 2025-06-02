@@ -12,6 +12,7 @@ import (
 	"net/url"
 	libvirtServiceInterfaces "sylve/internal/interfaces/services/libvirt"
 	"sylve/internal/logger"
+	"sync"
 
 	"github.com/digitalocean/go-libvirt"
 	"gorm.io/gorm"
@@ -22,6 +23,8 @@ var _ libvirtServiceInterfaces.LibvirtServiceInterface = (*Service)(nil)
 type Service struct {
 	DB   *gorm.DB
 	Conn *libvirt.Libvirt
+
+	actionMutex sync.Mutex
 }
 
 func NewLibvirtService(db *gorm.DB) libvirtServiceInterfaces.LibvirtServiceInterface {

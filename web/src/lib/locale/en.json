@@ -112,6 +112,12 @@
 	"partition": {
 		"create": "Create Partition"
 	},
+	"vm": {
+		"vm": "VM",
+		"create_vm": "create VM",
+		"delete_vm": "delete VM",
+		"deleting_vm_full": "deleting virtual machine"
+	},
 	"zfs": {
 		"pool": {
 			"pool": "pool",

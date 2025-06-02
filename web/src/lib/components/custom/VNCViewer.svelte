@@ -1,4 +1,6 @@
 <script lang="ts">
+	import NoVNC from 'svelte-vnc';
+
 	interface Props {
 		vncPort: number;
 		vncPassword: string;
@@ -6,24 +8,18 @@
 
 	let { vncPort, vncPassword }: Props = $props();
 
-	const host = window.location.hostname;
-	const port = window.location.port;
-	const noVncBase = `https://${host}:${port}/novnc/vnc.html`;
-	const noVncParams = [
-		`host=${encodeURIComponent(host)}`,
-		`port=${encodeURIComponent(port)}`,
-		`path=api/vnc/${encodeURIComponent(String(vncPort))}`,
-		`password=${encodeURIComponent(vncPassword)}`,
-		`autoconnect=true`,
-		`reconnect=true`
-	].join('&');
-
-	const iframeSrc = noVncBase + '?' + noVncParams;
+	let host = window.location.hostname;
+	let port = window.location.port ? window.location.port : null;
+	let path = `api/vnc/${encodeURIComponent(String(vncPort))}`;
 </script>
 
-<iframe
-	title="noVNC session"
-	src={iframeSrc}
-	allowfullscreen
-	class="h-full w-full rounded-lg border border-gray-300 shadow-lg"
-/>
+<div class="h-full w-full">
+	<NoVNC
+		class="h-full w-full"
+		{host}
+		{port}
+		{path}
+		password={vncPassword}
+		clearLocalStorage={true}
+	/>
+</div>

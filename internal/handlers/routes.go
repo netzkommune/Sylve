@@ -9,9 +9,7 @@
 package handlers
 
 import (
-	"io/fs"
 	"log"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 	static "github.com/soulteary/gin-static"
@@ -195,10 +193,6 @@ func RegisterRoutes(r *gin.Engine,
 		auth.POST("/login", LoginHandler(authService))
 		auth.Any("/logout", LogoutHandler(authService))
 	}
-
-	novncSub, _ := fs.Sub(assets.SvelteKitFiles, "web-files/novnc")
-	novncFS := http.FS(novncSub)
-	r.StaticFS("/novnc", novncFS)
 
 	api.GET("/vnc/:port", vncHandler.VNCProxyHandler)
 

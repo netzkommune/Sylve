@@ -80,6 +80,7 @@
 		"svelte-i18n": "^4.0.1",
 		"svelte-multiselect": "^11.0.0-rc.1",
 		"svelte-ux": "^1.0.3",
+		"svelte-vnc": "^2.1.0",
 		"tabulator-tables": "^6.3.1",
 		"validator": "^13.15.0"
 	}

@@ -40,7 +40,6 @@ zfs_enable="YES"
 linux_enable="YES"
 libvirtd_enable="YES"
 gateway_enable="YES"
-pf_enable="YES"
 ```
 
 And these into `/boot/loader.conf`:

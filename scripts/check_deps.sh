@@ -55,7 +55,7 @@ check_rcconf smartd_enable
 check_rcconf linux_enable
 check_rcconf libvirtd_enable
 check_rcconf gateway_enable
-check_rcconf pf_enable
+# check_rcconf pf_enable # We'll skip this for now, as it may not be needed for all setups
 
 check_loaderconf vmm_load
 check_loaderconf if_bridge_load

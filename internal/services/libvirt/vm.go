@@ -100,7 +100,27 @@ func validateCreate(data libvirtServiceInterfaces.CreateVMRequest, db *gorm.DB) 
 				return fmt.Errorf("raw_storage_dataset_must_have_mountpoint")
 			}
 
-			if dataset.Avail > *data.StorageSize {
+			if data.StorageSize == nil {
+				return fmt.Errorf("raw_storage_dataset_size_must_be_specified")
+			}
+
+			available, err := dataset.GetProperty("available")
+
+			if err != nil {
+				return fmt.Errorf("failed_to_get_dataset_properties: %w", err)
+			}
+
+			if available == "" {
+				return fmt.Errorf("raw_storage_dataset_must_have_available_space")
+			}
+
+			avail := utils.HumanFormatToSize(available)
+
+			if err != nil {
+				return fmt.Errorf("failed_to_parse_available_space: %w", err)
+			}
+
+			if avail < *data.StorageSize {
 				return fmt.Errorf("not_enough_space_in_raw_storage_dataset")
 			}
 		}

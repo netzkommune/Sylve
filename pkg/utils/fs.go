@@ -83,3 +83,25 @@ func FindFileInDirectoryByPrefix(dir, prefix string) (string, error) {
 
 	return "", fmt.Errorf("file_with_prefix_not_found: %s in %s", prefix, dir)
 }
+
+func IsAbsPath(path string) bool {
+	return len(path) > 0 && os.IsPathSeparator(path[0])
+}
+
+func CreateOrTruncateFile(path string, size int64) error {
+	if !IsAbsPath(path) {
+		return fmt.Errorf("path must be absolute: %s", path)
+	}
+
+	f, err := os.Create(path)
+	if err != nil {
+		return fmt.Errorf("failed to create file: %w", err)
+	}
+	defer f.Close()
+
+	if err := f.Truncate(size); err != nil {
+		return fmt.Errorf("failed to truncate file: %w", err)
+	}
+
+	return nil
+}

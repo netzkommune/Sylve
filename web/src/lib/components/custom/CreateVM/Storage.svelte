@@ -136,6 +136,7 @@
 		if (humanSize) {
 			try {
 				const parsed = humanFormat.parse.raw(humanSize);
+				console.log(parsed);
 				size = parsed.factor * parsed.value;
 			} catch (e) {
 				size = 1024;
@@ -204,14 +205,7 @@
 <div class="flex flex-col gap-4 p-4">
 	<RadioGroup.Root bind:value={type} class="border p-2">
 		<ScrollArea orientation="vertical" class="h-60 w-full max-w-full">
-			<!-- {#each ['zvol', 'raw', 'none'] as storageType}
-				{@render radioItem(storageType)}
-			{/each} 
-            
-            Disabled 'raw' option for now
-            -->
-
-			{#each ['zvol', 'none'] as storageType}
+			{#each ['zvol', 'raw', 'none'] as storageType}
 				{@render radioItem(storageType)}
 			{/each}
 		</ScrollArea>

@@ -132,9 +132,9 @@
 	];
 
 	let modal: CreateData = $state({
-		name: 'test',
-		id: 100,
-		description: 'test',
+		name: '',
+		id: 0,
+		description: '',
 		storage: {
 			type: 'zvol',
 			guid: '',

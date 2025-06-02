@@ -112,6 +112,16 @@ definitions:
     - ports
     - private
     type: object
+  internal_handlers_system.AddPassthroughDeviceRequest:
+    properties:
+      deviceId:
+        type: string
+      domain:
+        type: string
+    required:
+    - deviceId
+    - domain
+    type: object
   internal_handlers_zfs.AvgIODelayResponse:
     properties:
       delay:
@@ -235,6 +245,19 @@ definitions:
       status:
         type: string
     type: object
+  sylve_internal.APIResponse-array_sylve_internal_db_models_PassedThroughIDs:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models.PassedThroughIDs'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
   sylve_internal.APIResponse-array_sylve_internal_db_models_info_AuditLog:
     properties:
       data:
@@ -300,6 +323,19 @@ definitions:
       status:
         type: string
     type: object
+  sylve_internal.APIResponse-array_sylve_internal_db_models_vm_VM:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models_vm.VM'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
   sylve_internal.APIResponse-array_sylve_internal_db_models_zfs_PeriodicSnapshot:
     properties:
       data:
@@ -331,6 +367,19 @@ definitions:
       data:
         items:
           $ref: '#/definitions/sylve_internal_interfaces_services_zfs.Dataset'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-array_sylve_pkg_system_pciconf_PCIDevice:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_pkg_system_pciconf.PCIDevice'
         type: array
       error:
         type: string
@@ -438,11 +487,31 @@ definitions:
       status:
         type: string
     type: object
+  sylve_internal.APIResponse-sylve_internal_interfaces_services_libvirt_LvDomain:
+    properties:
+      data:
+        $ref: '#/definitions/sylve_internal_interfaces_services_libvirt.LvDomain'
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
   sylve_internal_db.IntervalOption:
     properties:
       label:
         type: string
       value:
+        type: integer
+    type: object
+  sylve_internal_db_models.PassedThroughIDs:
+    properties:
+      deviceID:
+        type: string
+      domain:
+        type: integer
+      id:
         type: integer
     type: object
   sylve_internal_db_models_info.AuditLog:
@@ -579,6 +648,89 @@ definitions:
       uuid:
         type: string
     type: object
+  sylve_internal_db_models_vm.Network:
+    properties:
+      emulation:
+        type: string
+      id:
+        type: integer
+      mac:
+        type: string
+      switch:
+        $ref: '#/definitions/sylve_internal_db_models_network.StandardSwitch'
+      switchId:
+        type: integer
+      vmId:
+        type: integer
+    type: object
+  sylve_internal_db_models_vm.Storage:
+    properties:
+      dataset:
+        type: string
+      emulation:
+        type: string
+      id:
+        type: integer
+      size:
+        type: integer
+      type:
+        type: string
+      vmId:
+        type: integer
+    type: object
+  sylve_internal_db_models_vm.VM:
+    properties:
+      cpuCores:
+        type: integer
+      cpuSockets:
+        type: integer
+      cpuThreads:
+        type: integer
+      createdAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      iso:
+        type: string
+      name:
+        type: string
+      networks:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models_vm.Network'
+        type: array
+      pciDevices:
+        items:
+          type: integer
+        type: array
+      ram:
+        type: integer
+      startAtBoot:
+        type: boolean
+      startOrder:
+        type: integer
+      startedAt:
+        type: string
+      stoppedAt:
+        type: string
+      storages:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models_vm.Storage'
+        type: array
+      updatedAt:
+        type: string
+      vmId:
+        type: integer
+      vncPassword:
+        type: string
+      vncPort:
+        type: integer
+      vncResolution:
+        type: string
+      vncWait:
+        type: boolean
+    type: object
   sylve_internal_db_models_zfs.PeriodicSnapshot:
     properties:
       createdAt:
@@ -701,6 +853,81 @@ definitions:
         type: integer
       usedPercent:
         type: number
+    type: object
+  sylve_internal_interfaces_services_libvirt.CreateVMRequest:
+    properties:
+      cpuCores:
+        type: integer
+      cpuSockets:
+        type: integer
+      cpuThreads:
+        type: integer
+      description:
+        type: string
+      iso:
+        type: string
+      macAddress:
+        type: string
+      name:
+        type: string
+      pciDevices:
+        items:
+          type: integer
+        type: array
+      ram:
+        type: integer
+      startAtBoot:
+        type: boolean
+      startOrder:
+        type: integer
+      storageDataset:
+        type: string
+      storageEmulationType:
+        type: string
+      storageSize:
+        type: integer
+      storageType:
+        type: string
+      switchEmulationType:
+        type: string
+      switchId:
+        type: integer
+      vmId:
+        type: integer
+      vncPassword:
+        type: string
+      vncPort:
+        type: integer
+      vncResolution:
+        type: string
+      vncWait:
+        type: boolean
+    required:
+    - cpuCores
+    - cpuSockets
+    - cpuThreads
+    - name
+    - ram
+    - startAtBoot
+    - storageDataset
+    - storageSize
+    - storageType
+    - switchId
+    - vmId
+    - vncPort
+    type: object
+  sylve_internal_interfaces_services_libvirt.LvDomain:
+    properties:
+      cpuUsage:
+        type: number
+      id:
+        type: integer
+      name:
+        type: string
+      status:
+        type: string
+      uuid:
+        type: string
     type: object
   sylve_internal_interfaces_services_zfs.Dataset:
     properties:
@@ -974,6 +1201,44 @@ definitions:
       rootId:
         type: string
       rootPriority:
+        type: integer
+    type: object
+  sylve_pkg_system_pciconf.PCIDevice:
+    properties:
+      bus:
+        type: integer
+      class:
+        type: integer
+      device:
+        type: integer
+      domain:
+        type: integer
+      function:
+        type: integer
+      hdr:
+        type: integer
+      name:
+        type: string
+      names:
+        properties:
+          class:
+            type: string
+          device:
+            type: string
+          subclass:
+            type: string
+          vendor:
+            type: string
+        type: object
+      rev:
+        type: integer
+      subdevice:
+        type: integer
+      subvendor:
+        type: integer
+      unit:
+        type: integer
+      vendor:
         type: integer
     type: object
   sylve_pkg_zfs.RW:
@@ -1737,6 +2002,110 @@ paths:
       summary: Delete a Standard Switch
       tags:
       - Network
+  /system/pci-devices:
+    get:
+      consumes:
+      - application/json
+      description: List all PCI devices on the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_pkg_system_pciconf_PCIDevice'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: List PCI Devices
+      tags:
+      - System
+  /system/ppt-devices:
+    get:
+      consumes:
+      - application/json
+      description: List all passed through devices on the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_internal_db_models_PassedThroughIDs'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: List Passed Through Devices
+      tags:
+      - System
+    post:
+      consumes:
+      - application/json
+      description: Add a device to the passed through devices db
+      parameters:
+      - description: Device ID
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_system.AddPassthroughDeviceRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Add Passed Through Device
+      tags:
+      - System
+  /system/ppt-devices/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a device from the passed through devices db
+      parameters:
+      - description: Device ID
+        in: path
+        name: deviceId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Remove Passed Through Device
+      tags:
+      - System
   /utilities/downloads:
     get:
       consumes:
@@ -1904,6 +2273,169 @@ paths:
       summary: Get Signed Download URL
       tags:
       - Utilities
+  /vm:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all virtual machines
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_internal_db_models_vm_VM'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: List all Virtual Machines
+      tags:
+      - VM
+    post:
+      consumes:
+      - application/json
+      description: Create a new virtual machine with the specified parameters
+      parameters:
+      - description: Create Virtual Machine Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/sylve_internal_interfaces_services_libvirt.CreateVMRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Create a new Virtual Machine
+      tags:
+      - VM
+  /vm/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a virtual machine by its ID
+      parameters:
+      - description: Virtual Machine ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Remove a Virtual Machine
+      tags:
+      - VM
+  /vm/{id}/{action}:
+    post:
+      consumes:
+      - application/json
+      description: Perform a specified action (start, stop, reboot) on a virtual machine
+        by its ID
+      parameters:
+      - description: Virtual Machine ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Action to perform (start, stop, reboot)
+        in: path
+        name: action
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Perform an action on a Virtual Machine
+      tags:
+      - VM
+  /vm/domain/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the domain information of a virtual machine by its ID
+      parameters:
+      - description: Virtual Machine ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-sylve_internal_interfaces_services_libvirt_LvDomain'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Get a Virtual Machine's Domain
+      tags:
+      - VM
   /zfs/datasets:
     get:
       consumes:

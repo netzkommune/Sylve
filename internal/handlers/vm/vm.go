@@ -16,7 +16,7 @@ import (
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Success 200 {object} internal.APIResponse[[]vmModels.vm] "Success"
+// @Success 200 {object} internal.APIResponse[[]vmModels.VM] "Success"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
 // @Router /vm [get]
 func ListVMs(libvirtService *libvirt.Service) gin.HandlerFunc {
@@ -98,7 +98,7 @@ func GetLvDomain(libvirtService *libvirt.Service) gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param request body CreateVMRequest true "Create Virtual Machine Request"
+// @Param request body libvirtServiceInterfaces.CreateVMRequest true "Create Virtual Machine Request"
 // @Success 200 {object} internal.APIResponse[any] "Success"
 // @Failure 400 {object} internal.APIResponse[any] "Bad Request"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"

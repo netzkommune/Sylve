@@ -313,3 +313,16 @@ func IsValidMACAddress(mac string) bool {
 	regex := regexp.MustCompile(`^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$`)
 	return regex.MatchString(mac)
 }
+
+func GenerateRandomMAC() string {
+	mac := make([]byte, 6)
+	_, err := rand.Read(mac)
+	if err != nil {
+		return ""
+	}
+
+	mac[0] &= 0xFE
+	mac[0] |= 0x02
+
+	return fmt.Sprintf("%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5])
+}

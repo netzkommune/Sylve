@@ -130,14 +130,14 @@
 	let cpuHistoricalData: HistoricalData[] = $derived.by(() => {
 		return cpuInfoHistorical.map((data) => ({
 			date: new Date(data.createdAt),
-			cpuUsage: data.usage
+			cpuUsage: Math.floor(data.usage)
 		}));
 	});
 
 	let ioDelayHistoricalData: HistoricalData[] = $derived.by(() => {
 		return ioDelayHistorical.map((data) => ({
 			date: new Date(data.createdAt),
-			ioDelay: data.delay
+			ioDelay: Math.floor(data.delay)
 		}));
 	});
 </script>

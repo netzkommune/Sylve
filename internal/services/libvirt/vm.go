@@ -187,19 +187,18 @@ func validateCreate(data libvirtServiceInterfaces.CreateVMRequest, db *gorm.DB) 
 				return fmt.Errorf("pci_device_not_found: %d", pciID)
 			}
 
-			// var vm vmModels.VM
-			// if err := db.Preload("PCIDevices").First(&vm, "id = ?", pciID).Error; err != nil {
-			// 	if err == gorm.ErrRecordNotFound {
-			// 		return fmt.Errorf("pci_device_not_found: %d", pciID)
-			// 	}
-			// 	return fmt.Errorf("failed_to_check_pci_device_usage: %w", err)
-			// }
+			var vms []vmModels.VM
+			if err := db.Find(&vms).Error; err != nil {
+				return fmt.Errorf("failed_to_fetch_vms")
+			}
 
-			// for _, device := range vm.PCIDevices {
-			// 	if device == pciID {
-			// 		return fmt.Errorf("pci_device_already_in_use: %d", pciID)
-			// 	}
-			// }
+			for _, vm := range vms {
+				for _, deviceId := range vm.PCIDevices {
+					if deviceId == pciID {
+						return fmt.Errorf("pci_device_already_in_use: %d", pciID)
+					}
+				}
+			}
 		}
 	}
 
@@ -240,8 +239,14 @@ func (s *Service) CreateVM(data libvirtServiceInterfaces.CreateVMRequest) error 
 
 	var networks []vmModels.Network
 	if data.SwitchID != nil && *data.SwitchID != 0 {
+		mac := data.NetworkMAC
+
+		if mac == "" {
+			mac = utils.GenerateRandomMAC()
+		}
+
 		networks = append(networks, vmModels.Network{
-			MAC:       data.NetworkMAC,
+			MAC:       mac,
 			SwitchID:  uint(*data.SwitchID),
 			Emulation: data.SwitchEmulationType,
 		})

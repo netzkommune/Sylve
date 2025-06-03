@@ -286,6 +286,15 @@ func (s *Service) CreateVM(data libvirtServiceInterfaces.CreateVMRequest) error 
 		})
 	}
 
+	if data.ISO != "" && data.ISO != "none" {
+		storages = append(storages, vmModels.Storage{
+			Type:      "iso",
+			Dataset:   data.ISO,
+			Size:      0,
+			Emulation: "sata",
+		})
+	}
+
 	vm := &vmModels.VM{
 		Name:          data.Name,
 		VmID:          *data.VMID,

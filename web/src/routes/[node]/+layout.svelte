@@ -43,6 +43,11 @@
 					label: 'console',
 					icon: 'mdi:monitor',
 					href: `/${node}/vm/${vmName}/console`
+				},
+				{
+					label: 'storage',
+					icon: 'mdi:storage',
+					href: `/${node}/vm/${vmName}/storage`
 				}
 			];
 		} else {

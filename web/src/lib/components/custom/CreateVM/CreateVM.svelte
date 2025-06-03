@@ -175,7 +175,10 @@
 				});
 				open = false;
 			} else {
-				toast.error(`Failed to create VM`);
+				toast.error('Failed to create VM', {
+					duration: 3000,
+					position: 'bottom-center'
+				});
 			}
 		}
 	}

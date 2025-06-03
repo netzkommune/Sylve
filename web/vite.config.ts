@@ -7,6 +7,12 @@ export default defineConfig({
 	},
 	plugins: [sveltekit()],
 	optimizeDeps: {
+		esbuildOptions: {
+			target: 'esnext'
+		},
 		exclude: ['xterm', 'Xterm.svelte', '@battlefieldduck/xterm-svelte']
+	},
+	build: {
+		target: 'esnext'
 	}
 });

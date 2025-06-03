@@ -33,7 +33,11 @@ const icons = [
 	'ic:baseline-loop',
 	'mdi:ethernet',
 	'eos-icons:three-dots-loading',
-	'wpf:connected'
+	'wpf:connected',
+	'tdesign:cd-filled',
+	'clarity:hard-disk-solid',
+	'file-icons:openzfs',
+	'carbon:volume-block-storage'
 ];
 
 export async function preloadIcons() {

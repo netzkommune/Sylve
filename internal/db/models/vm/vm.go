@@ -11,6 +11,7 @@ type Storage struct {
 	Dataset   string `json:"dataset"`
 	Size      int64  `json:"size"`
 	Emulation string `json:"emulation"`
+	Detached  bool   `json:"detached"`
 
 	VMID uint `json:"vmId" gorm:"index"`
 }

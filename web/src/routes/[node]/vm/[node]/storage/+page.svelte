@@ -17,6 +17,7 @@
 	import { updateCache } from '$lib/utils/http';
 
 	import { getDownloads } from '$lib/api/utilities/downloader';
+	import { storageDetach } from '$lib/api/vm/storage';
 	import { getDatasets } from '$lib/api/zfs/datasets';
 	import { getPools } from '$lib/api/zfs/pool';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
@@ -32,6 +33,7 @@
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
 	import { toast } from 'svelte-french-toast';
+	import { t } from 'svelte-i18n';
 
 	interface Data {
 		vms: VM[];
@@ -122,7 +124,22 @@
 			position: 'bottom-center'
 		});
 	}
+
+	async function handleDetach() {
+		await storageDetach(Number(vmId), Number(activeRows[0].id));
+	}
 </script>
+
+{#snippet button(type: string)}
+	{#if domain && domain.status === 'Shutoff' && activeRows && activeRows.length === 1}
+		{#if type === 'detach'}
+			<Button onclick={() => handleDetach()} size="sm" class="h-6">
+				<Icon icon="gg:remove" class="mr-1 h-4 w-4" />
+				{capitalizeFirstLetter(getTranslation('common.detach', 'Detach'))}
+			</Button>
+		{/if}
+	{/if}
+{/snippet}
 
 <div class="flex h-full w-full flex-col">
 	<div class="flex h-10 w-full items-center gap-2 border p-2">
@@ -130,6 +147,8 @@
 			<Icon icon="gg:add" class="mr-1 h-4 w-4" />
 			{capitalizeFirstLetter(getTranslation('common.new', 'New'))}
 		</Button>
+
+		{@render button('detach')}
 	</div>
 
 	<TreeTable

@@ -2,7 +2,7 @@
 	import { page } from '$app/state';
 	import { getVMs } from '$lib/api/vm/vm';
 	import { capitalizeFirstLetter } from '$lib/utils/string';
-	import RFB, { RFBConstructorOptions } from '@novnc/novnc';
+	import RFB from '@novnc/novnc/lib/rfb.js';
 	import { onDestroy, onMount, tick } from 'svelte';
 
 	interface Data {
@@ -15,9 +15,10 @@
 	let status: string = $state('');
 	let rfb: RFB | null = $state(null);
 	let screen: HTMLDivElement;
-	const options: RFBConstructorOptions = {
+	const options = {
 		credentials: { password: data.password }
 	};
+
 	let vnc = $state({
 		password: data.password,
 		path: `/api/vnc/${encodeURIComponent(String(data.port))}`

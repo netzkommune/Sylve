@@ -119,10 +119,13 @@
 
 	$effect(() => {
 		if (volumes || filesystems) {
-			comboBoxes.volumes.options = volumes.map((v) => ({
-				label: v.name,
-				value: v.properties.guid || ''
-			}));
+			comboBoxes.volumes.options = volumes
+				.filter((v) => v.properties.volmode && v.properties.volmode === 'dev')
+				.map((v) => ({
+					label: v.name,
+					value: v.properties.guid || ''
+				}));
+
 			comboBoxes.filesystems.options = filesystems.map((fs) => ({
 				label: fs.name,
 				value: fs.properties.guid || ''

@@ -178,6 +178,28 @@ export const createVolProps = {
 			label: 'None',
 			value: 'none'
 		}
+	],
+	volmode: [
+		{
+			label: 'default',
+			value: 'default'
+		},
+		{
+			label: 'full',
+			value: 'full'
+		},
+		{
+			label: 'geom',
+			value: 'geom'
+		},
+		{
+			label: 'dev',
+			value: 'dev'
+		},
+		{
+			label: 'none',
+			value: 'none'
+		}
 	]
 };
 

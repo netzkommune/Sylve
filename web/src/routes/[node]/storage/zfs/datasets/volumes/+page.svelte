@@ -117,6 +117,7 @@
 		encryption: string;
 		volblocksize: string;
 		primarycache: string;
+		volmode: string;
 	};
 
 	let confirmModals = $state({
@@ -140,7 +141,8 @@
 					encryptionKey: '',
 					volblocksize: '16384',
 					size: '',
-					primarycache: 'all'
+					primarycache: 'all',
+					volmode: 'dev'
 				}
 			},
 			title: ''
@@ -184,7 +186,8 @@
 				encryptionKey: '',
 				volblocksize: '16384',
 				size: '',
-				primarycache: 'all'
+				primarycache: 'all',
+				volmode: 'dev'
 			}
 		};
 		confirmModals.createVolume.title = '';
@@ -303,6 +306,7 @@
 			confirmModals.createVolume.data.properties.checksum = 'on';
 			confirmModals.createVolume.data.properties.volblocksize = '16384';
 			confirmModals.createVolume.data.properties.primarycache = 'all';
+			confirmModals.createVolume.data.properties.volmode = 'dev';
 		}
 
 		if (confirmModals.active === 'deleteVolume') {
@@ -545,7 +549,8 @@
 									encryptionKey: '',
 									volblocksize: '16384',
 									size: '',
-									primarycache: 'all'
+									primarycache: 'all',
+									volmode: 'dev'
 								}
 							};
 							confirmModals.createVolume.title = '';
@@ -628,6 +633,7 @@
 					{@render simpleSlect('dedup', 'Deduplication', 'Select deduplication mode')}
 					{@render simpleSlect('encryption', 'Encryption', 'Select encryption')}
 					{@render simpleSlect('primarycache', 'Primary Cache', 'Select primary cache mode')}
+					{@render simpleSlect('volmode', 'Volume Mode', 'Select volume mode')}
 
 					{#if confirmModals.createVolume.data.properties.encryption !== 'off'}
 						<div class="space-y-1">

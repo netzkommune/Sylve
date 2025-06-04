@@ -67,7 +67,28 @@ func (s *Service) CreateVmXML(vm vmModels.VM, vmPath string) (string, error) {
 				pool = strings.SplitN(dataset.Name, "/", 2)[0]
 			}
 
-			if storage.Type == "zvol" {
+			if storage.Type == "iso" {
+				isoPath, err := s.FindISOByUUID(storage.Dataset)
+				if err != nil {
+					return "", fmt.Errorf("failed to find ISO: %w", err)
+				}
+
+				if isoPath == "" {
+					return "", fmt.Errorf("iso_file_not_found: %s", storage.Dataset)
+				}
+
+				bhyveArgs = append(bhyveArgs, []libvirtServiceInterfaces.BhyveArg{
+					{
+						Value: fmt.Sprintf("-s %d:%d,%s,%s",
+							sIndex,
+							0,
+							"ahci-cd",
+							isoPath),
+					},
+				})
+
+				sIndex++
+			} else if storage.Type == "zvol" {
 				volume := dataset.Name
 
 				if idx := strings.LastIndex(volume, "/"); idx != -1 {
@@ -103,32 +124,6 @@ func (s *Service) CreateVmXML(vm vmModels.VM, vmPath string) (string, error) {
 				})
 
 				sIndex++
-			} else if storage.Type == "iso" {
-				isoPath, err := s.FindISOByUUID(storage.Dataset)
-				if err != nil {
-					return "", fmt.Errorf("failed to find ISO: %w", err)
-				}
-
-				if isoPath == "" {
-					return "", fmt.Errorf("iso_file_not_found: %s", storage.Dataset)
-				}
-
-				devices.Disks = append(devices.Disks, libvirtServiceInterfaces.Disk{
-					Type:   "file",
-					Device: "cdrom",
-					Driver: &libvirtServiceInterfaces.Driver{
-						Name: "file",
-						Type: "raw",
-					},
-					Source: libvirtServiceInterfaces.Source{
-						File: isoPath,
-					},
-					Target: libvirtServiceInterfaces.Target{
-						Dev: "sda",
-						Bus: "sata",
-					},
-					ReadOnly: &struct{}{},
-				})
 			} else {
 				return "", fmt.Errorf("invalid_storage_type: %s", storage.Type)
 			}

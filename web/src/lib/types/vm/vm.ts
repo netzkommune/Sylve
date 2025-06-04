@@ -39,6 +39,7 @@ export const VMStorageSchema = z.object({
 	dataset: z.string(),
 	size: z.number().int(),
 	emulation: z.string(),
+	detached: z.boolean().optional(),
 	vmId: z.number().int().optional()
 });
 

@@ -65,6 +65,10 @@ export function generateTableData(
 		let name = '';
 		let size = 0;
 
+		if (storage.detached) {
+			continue;
+		}
+
 		if (storage.type === 'iso') {
 			const download = downloads.find((d) => d.uuid === storage.dataset);
 			name = download ? download.name : 'Unknown ISO';

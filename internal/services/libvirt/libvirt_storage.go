@@ -5,7 +5,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
+	"strings"
+	vmModels "sylve/internal/db/models/vm"
 	libvirtServiceInterfaces "sylve/internal/interfaces/services/libvirt"
 	"sylve/pkg/utils"
 	"sylve/pkg/zfs"
@@ -69,6 +72,17 @@ func (s *Service) CreateDiskImage(vmId int, guid string, size int64) error {
 }
 
 func (s *Service) StorageDetach(vmId int, storageId int) error {
+	var storage vmModels.Storage
+
+	err := s.DB.Find(&storage, "id = ?", storageId).Error
+	if err != nil {
+		return fmt.Errorf("failed_to_find_storage: %w", err)
+	}
+
+	if storage.Detached {
+		return fmt.Errorf("storage_already_detached: %d", storageId)
+	}
+
 	domain, err := s.Conn.DomainLookupByName(strconv.Itoa(vmId))
 	if err != nil {
 		return fmt.Errorf("failed_to_lookup_domain_by_name: %w", err)
@@ -97,20 +111,39 @@ func (s *Service) StorageDetach(vmId int, storageId int) error {
 		return fmt.Errorf("failed_to_parse_domain_xml: %w", err)
 	}
 
-	fmt.Println("Parsed Domain XML:", parsed)
+	if storage.Type == "iso" {
+		filePath, err := s.FindISOByUUID(storage.Dataset)
+		if err != nil {
+			return fmt.Errorf("failed_to_find_iso_by_uuid: %w", err)
+		}
 
-	// var stroage vmModels.Storage
+		pattern := fmt.Sprintf(`\s*-s\s+\d+:0,ahci-cd,%s\s*`, regexp.QuoteMeta(filePath))
+		re := regexp.MustCompile(pattern)
 
-	// err = s.DB.Find(&stroage, "id = ?", storageId).Error
-	// if err != nil {
-	// 	return fmt.Errorf("failed_to_find_storage: %w", err)
-	// }
+		var filteredLines []string
+		for _, line := range strings.Split(domainXML, "\n") {
+			if re.MatchString(line) {
+				continue
+			}
+			filteredLines = append(filteredLines, line)
+		}
 
-	// stroage.Detached = true
+		newXML := strings.Join(filteredLines, "\n")
 
-	// if err := s.DB.Save(&stroage).Error; err != nil {
-	// 	return fmt.Errorf("failed_to_save_storage: %w", err)
-	// }
+		if err := s.Conn.DomainUndefineFlags(domain, 0); err != nil {
+			return fmt.Errorf("failed_to_undefine_domain: %w", err)
+		}
+
+		if _, err := s.Conn.DomainDefineXML(newXML); err != nil {
+			return fmt.Errorf("failed_to_define_domain_with_modified_xml: %w", err)
+		}
+
+		storage.Detached = true
+
+		if err := s.DB.Save(&storage).Error; err != nil {
+			return fmt.Errorf("failed_to_save_storage: %w", err)
+		}
+	}
 
 	return nil
 }

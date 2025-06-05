@@ -29,6 +29,7 @@ type CreateStandardSwitchRequest struct {
 	Address  string   `json:"address"`
 	Address6 string   `json:"address6"`
 	Private  *bool    `json:"private" binding:"required"`
+	DHCP     *bool    `json:"dhcp"`
 	Ports    []string `json:"ports" binding:"required"`
 }
 
@@ -135,7 +136,12 @@ func CreateStandardSwitch(networkService *network.Service) gin.HandlerFunc {
 			*request.Private = false
 		}
 
-		err := networkService.NewStandardSwitch(request.Name, mtu, vlan, request.Address, request.Address6, request.Ports, *request.Private)
+		if request.DHCP == nil {
+			request.DHCP = new(bool)
+			*request.DHCP = false
+		}
+
+		err := networkService.NewStandardSwitch(request.Name, mtu, vlan, request.Address, request.Address6, request.Ports, *request.Private, *request.DHCP)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 				Status:  "error",

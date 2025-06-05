@@ -13,6 +13,7 @@ export async function createSwitch(
 	address: string,
 	address6: string,
 	privateSw: boolean,
+	dhcp: boolean,
 	ports: string[]
 ): Promise<APIResponse> {
 	const body = {
@@ -22,7 +23,8 @@ export async function createSwitch(
 		address,
 		address6,
 		private: privateSw,
-		ports
+		ports,
+		dhcp
 	};
 
 	return await apiRequest('/network/switch/standard', APIResponseSchema, 'POST', body);

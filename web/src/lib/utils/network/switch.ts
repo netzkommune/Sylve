@@ -56,7 +56,15 @@ export function generateTableData(
 		},
 		{
 			field: 'ipv4',
-			title: getTranslation('network.ipv4', 'IPv4')
+			title: getTranslation('network.ipv4', 'IPv4'),
+			formatter: (cell: CellComponent) => {
+				const row = cell.getRow();
+				const data = row.getData();
+				const value = cell.getValue();
+				if (value === '-' && data.dhcp) {
+					return 'DHCP';
+				}
+			}
 		},
 		{
 			field: 'ipv6',
@@ -65,6 +73,11 @@ export function generateTableData(
 		{
 			field: 'private',
 			title: getTranslation('common.private', 'Private'),
+			visible: false
+		},
+		{
+			field: 'dhcp',
+			title: getTranslation('network.DHCP', 'DHCP'),
 			visible: false
 		}
 	];
@@ -87,7 +100,8 @@ export function generateTableData(
 				ipv6: sw.address6 || '-',
 				ports: sw.ports,
 				private: sw.private,
-				portsOnly: portsOnly
+				portsOnly: portsOnly,
+				dhcp: sw.dhcp || false
 			});
 		}
 	}

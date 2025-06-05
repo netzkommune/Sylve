@@ -9,12 +9,15 @@
 package network
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
 	networkModels "sylve/internal/db/models/network"
+	vmModels "sylve/internal/db/models/vm"
 	iface "sylve/pkg/network/iface"
 	"sylve/pkg/utils"
+	"time"
 )
 
 func (s *Service) GetStandardSwitches() ([]networkModels.StandardSwitch, error) {
@@ -35,6 +38,7 @@ func (s *Service) NewStandardSwitch(
 	address6 string,
 	ports []string,
 	private bool,
+	dhcp bool,
 ) error {
 	var existingPorts []networkModels.NetworkPort
 	if err := s.DB.Where("name IN ?", ports).Find(&existingPorts).Error; err != nil {
@@ -65,6 +69,7 @@ func (s *Service) NewStandardSwitch(
 		Address6:   address6,
 		BridgeName: utils.ShortHash("vm-" + name),
 		Private:    private,
+		DHCP:       dhcp,
 	}
 
 	if err := s.DB.Create(sw).Error; err != nil {
@@ -93,6 +98,18 @@ func (s *Service) NewStandardSwitch(
 }
 
 func (s *Service) DeleteStandardSwitch(id int) error {
+	var vmCount int64
+
+	if err := s.DB.Model(&vmModels.Network{}).
+		Where("switch_id = ?", id).
+		Count(&vmCount).Error; err != nil {
+		return fmt.Errorf("db_error_checking_vm_switch: %v", err)
+	}
+
+	if vmCount > 0 {
+		return fmt.Errorf("switch_in_use_by_vm")
+	}
+
 	var oldSw networkModels.StandardSwitch
 
 	var sw networkModels.StandardSwitch
@@ -354,6 +371,16 @@ func createStandardBridge(sw networkModels.StandardSwitch) error {
 	for _, port := range sw.Ports {
 		if err := addBridgeMember(sw.BridgeName, port.Name, sw.MTU, sw.VLAN); err != nil {
 			return fmt.Errorf("create_standard_bridge: %v", err)
+		}
+	}
+
+	if sw.DHCP {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		_, err := utils.RunCommandWithContext(ctx, "dhclient", sw.BridgeName)
+		if err != nil {
+			return fmt.Errorf("create_standard_bridge: failed_to_run_dhclient: %v", err)
 		}
 	}
 

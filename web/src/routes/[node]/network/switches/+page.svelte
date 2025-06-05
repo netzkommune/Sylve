@@ -103,7 +103,8 @@
 			address: '',
 			address6: '',
 			private: false,
-			ports: [] as string[]
+			ports: [] as string[],
+			dhcp: false
 		},
 		editSwitch: {
 			oldName: '',
@@ -114,7 +115,8 @@
 			address: '',
 			address6: '',
 			private: false,
-			ports: [] as string[]
+			ports: [] as string[],
+			dhcp: false
 		},
 		deleteSwitch: {
 			open: false,
@@ -196,6 +198,7 @@
 					activeModal.address,
 					activeModal.address6,
 					activeModal.private,
+					activeModal.dhcp,
 					comboBoxes.ports.value
 				);
 
@@ -266,6 +269,7 @@
 			confirmModals.editSwitch.address = activeRow.ipv4 === '-' ? '' : activeRow.ipv4;
 			confirmModals.editSwitch.address6 = activeRow.ipv6 === '-' ? '' : activeRow.ipv6;
 			confirmModals.editSwitch.private = (activeRow.private as boolean) || false;
+			confirmModals.editSwitch.dhcp = (activeRow.dhcp as boolean) || false;
 
 			comboBoxes.ports.value = activeRow.ports.map((port: { name: string }) => port.name);
 		}
@@ -284,6 +288,7 @@
 		confirmModals.newSwitch.address = '';
 		confirmModals.newSwitch.address6 = '';
 		confirmModals.newSwitch.private = false;
+		confirmModals.newSwitch.dhcp = false;
 
 		confirmModals.editSwitch.name = '';
 		confirmModals.editSwitch.mtu = '';
@@ -291,6 +296,7 @@
 		confirmModals.editSwitch.address = '';
 		confirmModals.editSwitch.address6 = '';
 		confirmModals.editSwitch.private = false;
+		confirmModals.editSwitch.dhcp = false;
 
 		comboBoxes.ports.value = [];
 	}
@@ -432,6 +438,7 @@
 					placeholder="10.0.0.1/24"
 					bind:value={confirmModals[confirmModals.active].address}
 					classes="flex-1 space-y-1"
+					disabled={confirmModals[confirmModals.active].dhcp ? true : false}
 				/>
 
 				<CustomValueInput
@@ -466,11 +473,19 @@
 				></CustomComboBox>
 			{/if}
 
-			<CustomCheckbox
-				label={capitalizeFirstLetter(getTranslation('common.private', 'Private'))}
-				bind:checked={confirmModals[confirmModals.active].private}
-				classes="flex items-center gap-2"
-			></CustomCheckbox>
+			<div class="flex items-center gap-2">
+				<CustomCheckbox
+					label={capitalizeFirstLetter(getTranslation('common.private', 'Private'))}
+					bind:checked={confirmModals[confirmModals.active].private}
+					classes="flex items-center gap-2 mt-1"
+				></CustomCheckbox>
+
+				<CustomCheckbox
+					label={capitalizeFirstLetter(getTranslation('common.dhcp', 'DHCP'))}
+					bind:checked={confirmModals[confirmModals.active].dhcp}
+					classes="flex items-center gap-2 mt-1"
+				></CustomCheckbox>
+			</div>
 
 			<Dialog.Footer class="flex justify-between gap-2 py-3">
 				<div class="flex gap-2">
@@ -501,6 +516,21 @@
 					position: 'bottom-center'
 				});
 			} else {
+				if (result && result.error) {
+					if (result.error === 'switch_in_use_by_vm') {
+						toast.error(
+							getTranslation(
+								'network.switch.errors.switch_in_use_by_vm',
+								'Switch is in use by a VM'
+							),
+							{
+								position: 'bottom-center'
+							}
+						);
+						return;
+					}
+				}
+
 				toast.error(
 					getTranslation('network.switch.errors.delete_switch', 'Error deleting switch'),
 					{

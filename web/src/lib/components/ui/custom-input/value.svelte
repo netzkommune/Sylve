@@ -13,6 +13,7 @@
 		classes: string;
 		type?: string;
 		textAreaCLasses?: string;
+		disabled?: boolean;
 	}
 
 	let {
@@ -22,7 +23,8 @@
 		autocomplete = 'off',
 		classes = 'space-y-1',
 		type = 'text',
-		textAreaCLasses = 'min-h-56'
+		textAreaCLasses = 'min-h-56',
+		disabled = false
 	}: Props = $props();
 
 	let nanoId = $state(generateNanoId(label));
@@ -33,8 +35,15 @@
 		<Label for={nanoId}>{label}</Label>
 	{/if}
 	{#if type === 'textarea'}
-		<Textarea class={textAreaCLasses} id={nanoId} {placeholder} {autocomplete} bind:value />
+		<Textarea
+			class={textAreaCLasses}
+			id={nanoId}
+			{placeholder}
+			{autocomplete}
+			bind:value
+			{disabled}
+		/>
 	{:else}
-		<Input {type} id={nanoId} {placeholder} {autocomplete} bind:value />
+		<Input {type} id={nanoId} {placeholder} {autocomplete} bind:value {disabled} />
 	{/if}
 </div>

@@ -14,7 +14,8 @@ export const StandardSwitchSchema = z.object({
 	private: z.boolean(),
 	address: z.string(),
 	address6: z.string(),
-	ports: array(NetworkPortSchema).optional()
+	ports: array(NetworkPortSchema).optional(),
+	dhcp: z.boolean().optional()
 });
 
 export const SwitchListSchema = z.object({

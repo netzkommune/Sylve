@@ -24,6 +24,8 @@ type StandardSwitch struct {
 
 	Ports []NetworkPort `json:"ports" gorm:"foreignKey:SwitchID;constraint:OnDelete:CASCADE"`
 
+	DHCP bool `json:"dhcp" gorm:"default:false"`
+
 	CreatedAt time.Time `json:"createdAt" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updatedAt" gorm:"autoUpdateTime"`
 }

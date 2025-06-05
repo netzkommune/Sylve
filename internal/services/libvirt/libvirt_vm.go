@@ -429,13 +429,15 @@ func (s *Service) LvVMAction(vm vmModels.VM, action string) error {
 			shutdown = true
 		}
 
-		if !shutdown {
+		time.Sleep(10 * time.Second)
+
+		stateAfterShutdown, _, err := s.Conn.DomainGetState(domain, 0)
+
+		if !shutdown || stateAfterShutdown != 5 {
 			if err := s.Conn.DomainDestroy(domain); err != nil {
 				return fmt.Errorf("failed_to_stop_domain: %w", err)
 			}
 		}
-
-		time.Sleep(10 * time.Second)
 
 		newState, _, err := s.Conn.DomainGetState(domain, 0)
 

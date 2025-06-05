@@ -182,7 +182,8 @@
 			"invalid_volume_name": "invalid volume name",
 			"no_parent_selected": "no parent selected",
 			"encryption_key_required": "encryption key required",
-			"invalid_volume_size": "invalid volume size"
+			"invalid_volume_size": "invalid volume size",
+			"dataset_in_use_by_vm": "Dataset used by a VM"
 		}
 	},
 	"common": {

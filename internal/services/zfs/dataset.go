@@ -12,6 +12,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	vmModels "sylve/internal/db/models/vm"
 	zfsModels "sylve/internal/db/models/zfs"
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
 	"sylve/internal/logger"
@@ -316,6 +317,15 @@ func (s *Service) DeleteFilesystem(guid string) error {
 	s.syncMutex.Lock()
 	defer s.syncMutex.Unlock()
 
+	var count int64
+	if err := s.DB.Model(&vmModels.Storage{}).Where("dataset = ?", guid).Count(&count).Error; err != nil {
+		return fmt.Errorf("failed to check if dataset is in use: %w", err)
+	}
+
+	if count > 0 {
+		return fmt.Errorf("dataset_in_use_by_vm")
+	}
+
 	datasets, err := zfs.Datasets("")
 	if err != nil {
 		return err
@@ -424,6 +434,15 @@ func (s *Service) DeleteVolume(guid string) error {
 	s.syncMutex.Lock()
 	defer s.syncMutex.Unlock()
 	defer s.Libvirt.RescanStoragePools()
+
+	var count int64
+	if err := s.DB.Model(&vmModels.Storage{}).Where("dataset = ?", guid).Count(&count).Error; err != nil {
+		return fmt.Errorf("failed to check if dataset is in use: %w", err)
+	}
+
+	if count > 0 {
+		return fmt.Errorf("dataset_in_use_by_vm")
+	}
 
 	datasets, err := zfs.Datasets("")
 	if err != nil {

@@ -300,6 +300,20 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 }
 
 export function handleError(error: APIResponse): void {
+	if (error.error?.includes('dataset_in_use_by_vm')) {
+		toast.error(
+			capitalizeFirstLetter(
+				getTranslation('zfs.datasets.dataset_in_use_by_vm', 'dataset is in use by a VM'),
+				true
+			),
+			{
+				position: 'bottom-center'
+			}
+		);
+
+		return;
+	}
+
 	if (error.error?.includes('dataset already exists')) {
 		toast.error(
 			capitalizeFirstLetter(

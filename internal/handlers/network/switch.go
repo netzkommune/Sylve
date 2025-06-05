@@ -141,6 +141,10 @@ func CreateStandardSwitch(networkService *network.Service) gin.HandlerFunc {
 			*request.DHCP = false
 		}
 
+		if *request.DHCP == true {
+			request.Address = ""
+		}
+
 		err := networkService.NewStandardSwitch(request.Name, mtu, vlan, request.Address, request.Address6, request.Ports, *request.Private, *request.DHCP)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{

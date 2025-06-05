@@ -15,6 +15,7 @@ import (
 	"strings"
 	networkModels "sylve/internal/db/models/network"
 	vmModels "sylve/internal/db/models/vm"
+	"sylve/internal/logger"
 	iface "sylve/pkg/network/iface"
 	"sylve/pkg/utils"
 	"time"
@@ -380,7 +381,7 @@ func createStandardBridge(sw networkModels.StandardSwitch) error {
 
 		_, err := utils.RunCommandWithContext(ctx, "dhclient", sw.BridgeName)
 		if err != nil {
-			return fmt.Errorf("create_standard_bridge: failed_to_run_dhclient: %v", err)
+			logger.L.Debug().Msgf("create_standard_bridge: failed_to_run_dhclient: %v", err)
 		}
 	}
 

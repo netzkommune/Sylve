@@ -313,6 +313,8 @@
 			if (activeVolume) {
 				const response = await deleteVolume(activeVolume);
 				if (response.error) {
+					confirmModals.deleteVolume.open = false;
+
 					handleError(response);
 					return;
 				}

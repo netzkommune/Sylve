@@ -25,6 +25,7 @@ type Service struct {
 	Conn *libvirt.Libvirt
 
 	actionMutex sync.Mutex
+	crudMutex   sync.Mutex
 }
 
 func NewLibvirtService(db *gorm.DB) libvirtServiceInterfaces.LibvirtServiceInterface {

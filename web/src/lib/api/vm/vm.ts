@@ -37,7 +37,8 @@ export async function newVM(data: CreateData): Promise<APIResponse> {
 		vncResolution: data.advanced.vncResolution,
 		startAtBoot: data.advanced.startAtBoot,
 		bootOrder: data.advanced.bootOrder,
-		pciDevices: data.hardware.passthroughIds
+		pciDevices: data.hardware.passthroughIds,
+		description: data.description
 	});
 }
 
@@ -57,5 +58,12 @@ export async function getStats(vmId: number, limit: number): Promise<VMStat[]> {
 	return await apiRequest(`/vm/stats`, z.array(VMStatSchema), 'POST', {
 		vmId,
 		limit
+	});
+}
+
+export async function updateDescription(id: number, description: string): Promise<APIResponse> {
+	return await apiRequest(`/vm/description`, APIResponseSchema, 'PUT', {
+		id,
+		description
 	});
 }

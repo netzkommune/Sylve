@@ -36,8 +36,6 @@ type VMStats struct {
 	MemoryUsed  float64 `json:"memoryUsed"`
 
 	CreatedAt time.Time `json:"createdAt" gorm:"autoCreateTime"`
-
-	VM VM `json:"vm" gorm:"foreignKey:VMID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
 
 type VM struct {
@@ -61,7 +59,7 @@ type VM struct {
 	Networks   []Network `json:"networks" gorm:"foreignKey:VMID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	PCIDevices []int     `json:"pciDevices" gorm:"serializer:json;type:json"`
 
-	Stats *VMStats `json:"-" gorm:"foreignKey:VMID;references:ID"`
+	Stats []VMStats `json:"-" gorm:"foreignKey:VMID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 
 	CreatedAt time.Time `json:"createdAt" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updatedAt" gorm:"autoUpdateTime"`

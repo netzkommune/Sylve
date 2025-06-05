@@ -10,6 +10,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type VMEditDescRequest struct {
+	ID          uint   `json:"id" binding:"required"`
+	Description string `json:"description" binding:"required"`
+}
+
 // @Summary List all Virtual Machines
 // @Description Retrieve a list of all virtual machines
 // @Tags VM
@@ -242,6 +247,49 @@ func VMActionHandler(libvirtService *libvirt.Service) gin.HandlerFunc {
 		c.JSON(200, internal.APIResponse[any]{
 			Status:  "success",
 			Message: "action_performed",
+			Data:    nil,
+			Error:   "",
+		})
+	}
+}
+
+// @Summary Edit a Virtual Machine's description
+// @Description Update the description of a virtual machine by its ID
+// @Tags VM
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body VMEditDescRequest true "Edit Virtual Machine Description Request"
+// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Failure 400 {object} internal.APIResponse[any] "Bad Request"
+// @Router /vm/description [put]
+func UpdateVMDescription(libvirtService *libvirt.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var req VMEditDescRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(400, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request_data",
+				Data:    nil,
+				Error:   "Invalid request data: " + err.Error(),
+			})
+			return
+		}
+
+		err := libvirtService.UpdateDescription(req.ID, req.Description)
+		if err != nil {
+			c.JSON(500, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "failed_to_update_description",
+				Data:    nil,
+				Error:   "failed_to_update_description: " + err.Error(),
+			})
+			return
+		}
+
+		c.JSON(200, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "vm_description_updated",
 			Data:    nil,
 			Error:   "",
 		})

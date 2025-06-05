@@ -12,6 +12,12 @@ import (
 )
 
 func (s *Service) StoreVMUsage() error {
+	if s.crudMutex.TryLock() == false {
+		return nil
+	}
+
+	defer s.crudMutex.Unlock()
+
 	var vmIds []int
 	if err := s.DB.Model(&vmModels.VM{}).Pluck("vm_id", &vmIds).Error; err != nil {
 		return fmt.Errorf("failed_to_get_vm_ids: %w", err)

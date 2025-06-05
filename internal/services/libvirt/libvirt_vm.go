@@ -263,6 +263,9 @@ func (s *Service) CreateVmXML(vm vmModels.VM, vmPath string) (string, error) {
 }
 
 func (s *Service) CreateLvVm(id int) error {
+	s.crudMutex.Lock()
+	defer s.crudMutex.Unlock()
+
 	var vm vmModels.VM
 	if err := s.DB.Preload("Storages").Preload("Networks.Switch").First(&vm, id).Error; err != nil {
 		return fmt.Errorf("failed_to_find_vm: %w", err)
@@ -321,6 +324,9 @@ func (s *Service) CreateLvVm(id int) error {
 }
 
 func (s *Service) RemoveLvVm(vmId int) error {
+	s.crudMutex.Lock()
+	defer s.crudMutex.Unlock()
+
 	domain, err := s.Conn.DomainLookupByName(strconv.Itoa(vmId))
 	if err != nil {
 		return fmt.Errorf("failed_to_lookup_domain: %w", err)

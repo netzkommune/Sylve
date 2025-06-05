@@ -5,7 +5,14 @@
 	import { goto } from '$app/navigation';
 	import * as Card from '$lib/components/ui/card/index.js';
 
-	import { actionVm, deleteVM, getStats, getVMDomain, getVMs } from '$lib/api/vm/vm';
+	import {
+		actionVm,
+		deleteVM,
+		getStats,
+		getVMDomain,
+		getVMs,
+		updateDescription
+	} from '$lib/api/vm/vm';
 	import LoadingDialog from '$lib/components/custom/LoadingDialog.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
@@ -83,6 +90,10 @@
 	);
 	let stats: VMStat[] = $derived($results[2].data as VMStat[]);
 	let recentStat = $derived(stats[0] || ({} as VMStat));
+
+	let vmDescription = $derived.by(() => {
+		return vm.description || '';
+	});
 
 	let modalState = $state({
 		isDeleteOpen: false,
@@ -200,6 +211,12 @@
 			memoryUsage: Math.floor(data.memoryUsage)
 		}));
 	});
+
+	$effect(() => {
+		if (vmDescription) {
+			updateDescription(vm.id, vmDescription);
+		}
+	});
 </script>
 
 {#snippet button(type: string)}
@@ -303,7 +320,7 @@
 						<CustomValueInput
 							label={''}
 							placeholder="Notes about VM"
-							bind:value={vm.description}
+							bind:value={vmDescription}
 							classes=""
 							textAreaCLasses="!h-32"
 							type="textarea"

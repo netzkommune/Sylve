@@ -61,7 +61,9 @@ func (s *Service) CreateDiskImage(vmId int, guid string, size int64) error {
 
 	imagePath := filepath.Join(vmPath, fmt.Sprintf("%d.img", vmId))
 	if _, err := os.Stat(imagePath); !os.IsNotExist(err) {
-		return fmt.Errorf("image_already_exists: %s", imagePath)
+		if err := os.Remove(imagePath); err != nil {
+			return fmt.Errorf("failed_to_remove_existing_image: %w", err)
+		}
 	}
 
 	if err := utils.CreateOrTruncateFile(imagePath, size); err != nil {

@@ -346,7 +346,7 @@ func (s *Service) CreateVM(data libvirtServiceInterfaces.CreateVMRequest) error 
 
 func (s *Service) RemoveVM(id uint) error {
 	var vm vmModels.VM
-	if err := s.DB.Preload("Networks").Preload("Storages").First(&vm, "id = ?", id).Error; err != nil {
+	if err := s.DB.Preload("Stats").Preload("Networks").Preload("Storages").First(&vm, "id = ?", id).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return fmt.Errorf("vm_not_found: %d", id)
 		}
@@ -370,6 +370,13 @@ func (s *Service) RemoveVM(id uint) error {
 		}
 	}
 
+	for _, stat := range vm.Stats {
+		fmt.Println("Deleting VM Stat:", stat.ID)
+		if err := s.DB.Delete(&stat).Error; err != nil {
+			return fmt.Errorf("failed_to_delete_vm_stat: %w", err)
+		}
+	}
+
 	if err := s.DB.Delete(&vm).Error; err != nil {
 		return fmt.Errorf("failed_to_delete_vm: %w", err)
 	}
@@ -390,6 +397,28 @@ func (s *Service) PerformAction(id uint, action string) error {
 	err := s.LvVMAction(vm, action)
 	if err != nil {
 		return fmt.Errorf("failed_to_perform_action: %w", err)
+	}
+
+	return nil
+}
+
+func (s *Service) UpdateDescription(id uint, description string) error {
+	var vm vmModels.VM
+	if err := s.DB.First(&vm, "id = ?", id).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return fmt.Errorf("vm_not_found: %d", id)
+		}
+		return fmt.Errorf("failed_to_find_vm: %w", err)
+	}
+
+	if len(description) < 1 || len(description) > 1024 {
+		return fmt.Errorf("invalid_description")
+	}
+
+	vm.Description = description
+
+	if err := s.DB.Save(&vm).Error; err != nil {
+		return fmt.Errorf("failed_to_update_vm_description: %w", err)
 	}
 
 	return nil

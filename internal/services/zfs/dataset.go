@@ -474,6 +474,15 @@ func (s *Service) BulkDeleteDataset(guids []string) error {
 	defer s.syncMutex.Unlock()
 	defer s.Libvirt.RescanStoragePools()
 
+	var count int64
+	if err := s.DB.Model(&vmModels.Storage{}).Where("dataset IN ?", guids).Count(&count).Error; err != nil {
+		return fmt.Errorf("failed to check if datasets are in use: %w", err)
+	}
+
+	if count > 0 {
+		return fmt.Errorf("datasets_in_use_by_vm")
+	}
+
 	guidsMap := make(map[string]struct{})
 	for _, guid := range guids {
 		guidsMap[guid] = struct{}{}

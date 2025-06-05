@@ -2,9 +2,11 @@ import { APIResponseSchema, type APIResponse } from '$lib/types/common';
 import {
 	VMDomainSchema,
 	VMSchema,
+	VMStatSchema,
 	type CreateData,
 	type VM,
-	type VMDomain
+	type VMDomain,
+	type VMStat
 } from '$lib/types/vm/vm';
 import { apiRequest } from '$lib/utils/http';
 import { z } from 'zod/v4';
@@ -49,4 +51,11 @@ export async function getVMDomain(id: number | string): Promise<VMDomain> {
 
 export async function actionVm(id: number | string, action: string): Promise<APIResponse> {
 	return await apiRequest(`/vm/${id}/${action}`, APIResponseSchema, 'POST');
+}
+
+export async function getStats(vmId: number, limit: number): Promise<VMStat[]> {
+	return await apiRequest(`/vm/stats`, z.array(VMStatSchema), 'POST', {
+		vmId,
+		limit
+	});
 }

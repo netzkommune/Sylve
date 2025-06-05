@@ -114,6 +114,7 @@ func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface)
 	go s.Info.Cron()
 	go s.ZFS.Cron()
 	go s.ZFS.StartSnapshotScheduler(context.Background())
+	go s.Libvirt.StoreVMUsage()
 
 	if err := s.SysctlSync(); err != nil {
 		return err
@@ -135,6 +136,15 @@ func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface)
 				logger.L.Fatal().Msgf("Failed to sync progress for downloads: %v", err)
 			}
 
+			time.Sleep(5 * time.Second)
+		}
+	}()
+
+	go func() {
+		for {
+			if err := s.Libvirt.StoreVMUsage(); err != nil {
+				logger.L.Error().Msgf("Failed to store VM usage: %v", err)
+			}
 			time.Sleep(5 * time.Second)
 		}
 	}()

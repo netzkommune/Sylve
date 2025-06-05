@@ -15,12 +15,13 @@ type LibvirtServiceInterface interface {
 	CreateStoragePool(name string) error
 	DeleteStoragePool(name string) error
 	RescanStoragePools() error
+
+	StoreVMUsage() error
 }
 
 type LvDomain struct {
-	ID       int32   `json:"id"`
-	UUID     string  `json:"uuid"`
-	Name     string  `json:"name"`
-	Status   string  `json:"status"`
-	CPUUsage float64 `json:"cpuUsage"`
+	ID     int32  `json:"id"`
+	UUID   string `json:"uuid"`
+	Name   string `json:"name"`
+	Status string `json:"status"`
 }

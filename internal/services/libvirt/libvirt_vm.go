@@ -28,6 +28,12 @@ func (s *Service) CreateVmXML(vm vmModels.VM, vmPath string) (string, error) {
 	}
 
 	var devices libvirtServiceInterfaces.Devices
+	devices.Inputs = []libvirtServiceInterfaces.Input{
+		{
+			Type: "tablet",
+			Bus:  "usb",
+		},
+	}
 
 	sIndex := 10
 	uefi := fmt.Sprintf("%s,%s/%d_vars.fd", "/usr/local/share/uefi-firmware/BHYVE_UEFI.fd", vmPath, vm.VmID)
@@ -345,32 +351,6 @@ func (s *Service) RemoveLvVm(vmId int) error {
 	return nil
 }
 
-func (s *Service) GetCPUUsage(vmId int) (float64, error) {
-	domain, err := s.Conn.DomainLookupByName(strconv.Itoa(vmId))
-	if err != nil {
-		return 0, fmt.Errorf("failed_to_lookup_domain: %w", err)
-	}
-	_, _, _, vcpus, cpuTime1, err := s.Conn.DomainGetInfo(domain)
-	if err != nil {
-		return 0, fmt.Errorf("failed_to_get_cpu_info_1: %w", err)
-	}
-
-	time.Sleep(1 * time.Second)
-	_, _, _, _, cpuTime2, err := s.Conn.DomainGetInfo(domain)
-	if err != nil {
-		return 0, fmt.Errorf("failed_to_get_cpu_info_2: %w", err)
-	}
-
-	if vcpus == 0 || cpuTime2 <= cpuTime1 {
-		return 0, fmt.Errorf("invalid_cpu_stats")
-	}
-
-	deltaCPU := cpuTime2 - cpuTime1
-	usage := (float64(deltaCPU) / 1e9) / float64(vcpus) * 100
-
-	return usage, nil
-}
-
 func (s *Service) GetLvDomain(vmId int) (*libvirtServiceInterfaces.LvDomain, error) {
 	var dom libvirtServiceInterfaces.LvDomain
 
@@ -399,7 +379,6 @@ func (s *Service) GetLvDomain(vmId int) (*libvirtServiceInterfaces.LvDomain, err
 	dom.UUID = uuid.UUID(domain.UUID).String()
 	dom.Name = domain.Name
 	dom.Status = stateMap[state]
-	dom.CPUUsage = 0.0
 
 	return &dom, nil
 }
@@ -445,9 +424,18 @@ func (s *Service) LvVMAction(vm vmModels.VM, action string) error {
 		}
 
 	case "stop":
-		if err := s.Conn.DomainDestroy(domain); err != nil {
-			return fmt.Errorf("failed_to_stop_domain: %w", err)
+		shutdown := false
+		if err := s.Conn.DomainShutdown(domain); err == nil {
+			shutdown = true
 		}
+
+		if !shutdown {
+			if err := s.Conn.DomainDestroy(domain); err != nil {
+				return fmt.Errorf("failed_to_stop_domain: %w", err)
+			}
+		}
+
+		time.Sleep(10 * time.Second)
 
 		newState, _, err := s.Conn.DomainGetState(domain, 0)
 

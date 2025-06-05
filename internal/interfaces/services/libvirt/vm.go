@@ -113,9 +113,15 @@ type Interface struct {
 	Model  Model        `xml:"model"`
 }
 
+type Input struct {
+	Type string `xml:"type,attr"`
+	Bus  string `xml:"bus,attr"`
+}
+
 type Devices struct {
 	Disks      []Disk      `xml:"disk,omitempty"`
 	Interfaces []Interface `xml:"interface,omitempty"`
+	Inputs     []Input     `xml:"input,omitempty"`
 }
 
 type BhyveArg struct {

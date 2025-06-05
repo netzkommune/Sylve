@@ -29,8 +29,9 @@
 </script>
 
 <div class={`${classes}`}>
-	<Label for={nanoId}>{label}</Label>
-
+	{#if label}
+		<Label for={nanoId}>{label}</Label>
+	{/if}
 	{#if type === 'textarea'}
 		<Textarea class={textAreaCLasses} id={nanoId} {placeholder} {autocomplete} bind:value />
 	{:else}

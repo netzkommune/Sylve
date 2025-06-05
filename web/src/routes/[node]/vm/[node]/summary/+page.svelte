@@ -5,28 +5,34 @@
 	import { goto } from '$app/navigation';
 	import * as Card from '$lib/components/ui/card/index.js';
 
-	import { actionVm, deleteVM, getVMDomain, getVMs } from '$lib/api/vm/vm';
+	import { actionVm, deleteVM, getStats, getVMDomain, getVMs } from '$lib/api/vm/vm';
 	import LoadingDialog from '$lib/components/custom/LoadingDialog.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import { Progress } from '$lib/components/ui/progress/index.js';
+
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 
 	import { hostname } from '$lib/stores/basic';
-	import type { VM, VMDomain } from '$lib/types/vm/vm';
+	import type { VM, VMDomain, VMStat } from '$lib/types/vm/vm';
 	import { sleep } from '$lib/utils';
 	import { updateCache } from '$lib/utils/http';
 
+	import LineGraph from '$lib/components/custom/LineGraph.svelte';
+	import type { HistoricalData } from '$lib/types/common';
 	import { getTranslation } from '$lib/utils/i18n';
 	import { floatToNDecimals } from '$lib/utils/numbers';
 	import { capitalizeFirstLetter } from '$lib/utils/string';
 	import { dateToAgo } from '$lib/utils/time';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
+	import humanFormat from 'human-format';
 	import toast from 'svelte-french-toast';
 
 	interface Data {
 		vms: VM[];
 		domain: VMDomain;
+		stats: VMStat[];
 	}
 
 	let { data }: { data: Data } = $props();
@@ -56,6 +62,18 @@
 			onSuccess: (data: VMDomain) => {
 				updateCache(`vm-domain-${vmId}`, data);
 			}
+		},
+		{
+			queryKey: [`vm-stats-${vmId}`],
+			queryFn: async () => {
+				return await getStats(Number(vmId), 128);
+			},
+			refetchInterval: 1000,
+			keepPreviousData: true,
+			initialData: data.stats,
+			onSuccess: (data: VMStat[]) => {
+				updateCache(`vm-stats-${vmId}`, data);
+			}
 		}
 	]);
 
@@ -63,6 +81,8 @@
 	let vm: VM = $derived(
 		($results[0].data as VM[]).find((vm: VM) => vm.vmId === parseInt(vmId)) || ({} as VM)
 	);
+	let stats: VMStat[] = $derived($results[2].data as VMStat[]);
+	let recentStat = $derived(stats[0] || ({} as VMStat));
 
 	let modalState = $state({
 		isDeleteOpen: false,
@@ -166,6 +186,20 @@
 		}
 		return '';
 	});
+
+	let cpuHistoricalData: HistoricalData[] = $derived.by(() => {
+		return stats.map((data) => ({
+			date: new Date(data.createdAt),
+			cpuUsage: Math.floor(data.cpuUsage)
+		}));
+	});
+
+	let memoryUsageData: HistoricalData[] = $derived.by(() => {
+		return stats.map((data) => ({
+			date: new Date(data.createdAt),
+			memoryUsage: Math.floor(data.memoryUsage)
+		}));
+	});
 </script>
 
 {#snippet button(type: string)}
@@ -209,8 +243,8 @@
 	</div>
 
 	<div class="min-h-0 flex-1">
-		<ScrollArea orientation="both" class="h-full w-1/2">
-			<div class="space-y-3 p-3">
+		<ScrollArea orientation="both" class="h-full">
+			<div class="grid grid-cols-1 gap-3 p-3 lg:grid-cols-2">
 				<Card.Root class="w-full">
 					<Card.Header class="p-2">
 						<Card.Description class="text-md font-normal text-blue-600 dark:text-blue-500"
@@ -218,7 +252,7 @@
 						>
 					</Card.Header>
 					<Card.Content class="p-2">
-						<div class="flex items-start space-y-2">
+						<div class="flex items-start">
 							<div class="flex items-center">
 								<Icon icon="fluent:status-12-filled" class="mr-1 h-5 w-5" />
 								{getTranslation('vm.stats', 'Status')}
@@ -228,20 +262,104 @@
 							</div>
 						</div>
 
-						<div>
+						<div class="mt-2">
 							<div class="flex w-full justify-between pb-1">
 								<p class="inline-flex items-center">
 									<Icon icon="solar:cpu-bold" class="mr-1 h-5 w-5" />
 									{getTranslation('summary.cpu_usage', 'CPU Usage')}
 								</p>
 								<p class="ml-auto">
-									{floatToNDecimals(domain.cpuUsage, 2)}% {getTranslation('common.of', 'of')}
+									{floatToNDecimals(recentStat.cpuUsage, 2)}% {getTranslation('common.of', 'of')}
 									{vm.cpuCores * vm.cpuThreads * vm.cpuSockets}
 									vCPU(s)
 								</p>
 							</div>
-							<Progress value={domain.cpuUsage || 0} max={100} class="ml-auto h-2" />
+							<Progress value={recentStat.cpuUsage || 0} max={100} class="ml-auto h-2" />
 						</div>
+
+						<div class="mt-2">
+							<div class="flex w-full justify-between pb-1">
+								<p class="inline-flex items-center">
+									<Icon icon="ph:memory" class="mr-1 h-5 w-5" />
+									{getTranslation('summary.ram_usage', 'RAM Usage')}
+								</p>
+								<p class="ml-auto">
+									{floatToNDecimals(recentStat.memoryUsage, 2)}% {getTranslation('common.of', 'of')}
+									{humanFormat(vm.ram)}
+								</p>
+							</div>
+							<Progress value={recentStat.memoryUsage || 0} max={100} class="ml-auto h-2" />
+						</div>
+					</Card.Content>
+				</Card.Root>
+
+				<Card.Root class="w-full">
+					<Card.Header class="p-2">
+						<Card.Description class="text-md font-normal text-blue-600 dark:text-blue-500">
+							Description
+						</Card.Description>
+					</Card.Header>
+					<Card.Content class="p-2">
+						<CustomValueInput
+							label={''}
+							placeholder="Notes about VM"
+							bind:value={vm.description}
+							classes=""
+							textAreaCLasses="!h-32"
+							type="textarea"
+						/>
+					</Card.Content>
+				</Card.Root>
+			</div>
+
+			<div class="p-3">
+				<Card.Root class="w-full">
+					<Card.Header>
+						<Card.Title>
+							<div class="flex items-center space-x-2">
+								<Icon icon="solar:cpu-bold" class="h-5 w-5" />
+								<p>{getTranslation('summary.cpu_usage', 'CPU Usage')}</p>
+							</div>
+						</Card.Title>
+					</Card.Header>
+					<Card.Content class="h-[300px]">
+						<LineGraph
+							data={[cpuHistoricalData]}
+							valueType="percentage"
+							keys={[
+								{
+									key: 'cpuUsage',
+									title: getTranslation('summary.cpu_usage', 'CPU Usage'),
+									color: 'hsl(0, 50%, 50%)'
+								}
+							]}
+						/>
+					</Card.Content>
+				</Card.Root>
+			</div>
+
+			<div class="p-3">
+				<Card.Root class="w-full">
+					<Card.Header>
+						<Card.Title>
+							<div class="flex items-center space-x-2">
+								<Icon icon="ph:memory" class="h-5 w-5" />
+								<p>{getTranslation('summary.memory_usage', 'Memory Usage')}</p>
+							</div>
+						</Card.Title>
+					</Card.Header>
+					<Card.Content class="h-[300px]">
+						<LineGraph
+							data={[memoryUsageData]}
+							valueType="percentage"
+							keys={[
+								{
+									key: 'memoryUsage',
+									title: getTranslation('summary.memory_usage', 'Memory Usage'),
+									color: 'hsl(50, 50%, 50%)'
+								}
+							]}
+						/>
 					</Card.Content>
 				</Card.Root>
 			</div>

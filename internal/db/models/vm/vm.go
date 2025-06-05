@@ -28,6 +28,18 @@ type Network struct {
 	VMID uint `json:"vmId" gorm:"index"`
 }
 
+type VMStats struct {
+	ID          uint    `gorm:"primaryKey" json:"id"`
+	VMID        uint    `json:"vmId" gorm:"index"`
+	CPUUsage    float64 `json:"cpuUsage"`
+	MemoryUsage float64 `json:"memoryUsage"`
+	MemoryUsed  float64 `json:"memoryUsed"`
+
+	CreatedAt time.Time `json:"createdAt" gorm:"autoCreateTime"`
+
+	VM VM `json:"vm" gorm:"foreignKey:VMID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+}
+
 type VM struct {
 	ID            uint   `gorm:"primaryKey" json:"id"`
 	Name          string `json:"name"`
@@ -48,6 +60,8 @@ type VM struct {
 	Storages   []Storage `json:"storages" gorm:"foreignKey:VMID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Networks   []Network `json:"networks" gorm:"foreignKey:VMID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	PCIDevices []int     `json:"pciDevices" gorm:"serializer:json;type:json"`
+
+	Stats *VMStats `json:"-" gorm:"foreignKey:VMID;references:ID"`
 
 	CreatedAt time.Time `json:"createdAt" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updatedAt" gorm:"autoUpdateTime"`

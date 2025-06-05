@@ -78,15 +78,23 @@ export const VMSchema = z.object({
 	stoppedAt: z.string().nullable()
 });
 
+export const VMStatSchema = z.object({
+	vmId: z.number().int(),
+	cpuUsage: z.number(),
+	memoryUsage: z.number(),
+	memoryUsed: z.number(),
+	createdAt: z.string()
+});
+
 export const VMDomainSchema = z.object({
 	id: z.number().int(),
 	uuid: z.string(),
 	name: z.string(),
-	status: z.string(),
-	cpuUsage: z.number()
+	status: z.string()
 });
 
 export type VM = z.infer<typeof VMSchema>;
 export type VMStorage = z.infer<typeof VMStorageSchema>;
 export type VMNetwork = z.infer<typeof VMNetworkSchema>;
 export type VMDomain = z.infer<typeof VMDomainSchema>;
+export type VMStat = z.infer<typeof VMStatSchema>;

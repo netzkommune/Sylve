@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { getVMs } from '$lib/api/vm/vm';
+	import Button from '$lib/components/ui/button/button.svelte';
 	import { capitalizeFirstLetter } from '$lib/utils/string';
+	import Icon from '@iconify/svelte';
 	import RFB from '@novnc/novnc/lib/rfb.js';
 	import { onDestroy, onMount, tick } from 'svelte';
 
@@ -52,7 +54,6 @@
 
 		rfb.addEventListener('connect', () => {
 			setStatus('connected');
-			console.log(rfb.clipboardPasteFrom('TEST'));
 		});
 
 		rfb.addEventListener('disconnect', () => {
@@ -78,9 +79,36 @@
 </script>
 
 <div class="flex h-full min-h-0 w-full flex-col">
-	<div class="flex h-10 w-full items-center gap-2 border p-2">
-		<p>{@html status}</p>
+	<div class="flex h-10 w-full items-center justify-between gap-2 border p-2">
+		<div class="flex items-center gap-2">
+			<p>{@html status}</p>
+
+			<Button
+				size="sm"
+				variant="ghost"
+				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+				title={'Reconnect'}
+				onclick={() => {
+					disconnectVNC();
+					connectVNC();
+				}}
+			>
+				<Icon icon="mdi:restart" class="pointer-events-none mr-2 h-4 w-4" />
+				<span>Reconnect</span>
+			</Button>
+		</div>
 	</div>
 
-	<div id="screen" class="w-full flex-1" bind:this={screen}></div>
+	<div id="screen" class="w-full flex-1 overflow-auto" bind:this={screen}></div>
 </div>
+
+<style>
+	:global(#screen canvas) {
+		width: 100% !important;
+		height: 100% !important;
+	}
+
+	:global(#screen > div) {
+		@apply !bg-black p-4 !important;
+	}
+</style>

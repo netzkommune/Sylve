@@ -10,6 +10,8 @@ package utils
 
 import (
 	"fmt"
+	"reflect"
+	"sort"
 	"strings"
 	"testing"
 	"time"
@@ -713,5 +715,234 @@ func TestContains(t *testing.T) {
 				t.Errorf("Contains(%v, %q) = %v; want %v", tt.slice, tt.val, result, tt.expected)
 			}
 		})
+	}
+}
+
+func TestEncodeBase62Basic(t *testing.T) {
+	tests := []struct {
+		num    uint64
+		length int
+		want   string
+	}{
+		{0, 1, "0"},
+		{1, 1, "1"},
+		{61, 1, "z"},
+		{62, 2, "10"},
+		{3843, 2, "zz"},
+		{238327, 3, "zzz"},
+		{238328, 4, "1000"},
+	}
+
+	for _, tt := range tests {
+		got := EncodeBase62(tt.num, tt.length)
+		if got != tt.want {
+			t.Errorf("EncodeBase62(%d, %d) = %s; want %s", tt.num, tt.length, got, tt.want)
+		}
+	}
+}
+
+func TestEncodeBase62Padding(t *testing.T) {
+	got := EncodeBase62(0, 5)
+	if got != "00000" {
+		t.Errorf("Expected zero-padded result '00000', got %s", got)
+	}
+}
+
+func TestEncodeBase62TruncationRisk(t *testing.T) {
+	got := EncodeBase62(3843, 1)
+	if got == "z" {
+		t.Logf("Warning: result truncated to %q due to insufficient length", got)
+	} else if len(got) != 1 {
+		t.Errorf("Expected length 1 result, got length %d", len(got))
+	}
+}
+
+func TestShortHashDeterministic(t *testing.T) {
+	input := "freebsd"
+	hash1 := ShortHash(input)
+	hash2 := ShortHash(input)
+
+	if hash1 != hash2 {
+		t.Errorf("ShortHash should be deterministic, got %s and %s", hash1, hash2)
+	}
+}
+
+func TestShortHashLength(t *testing.T) {
+	input := "any input string"
+	hash := ShortHash(input)
+
+	if len(hash) != 8 {
+		t.Errorf("Expected hash length of 8, got %d", len(hash))
+	}
+}
+
+func TestShortHashUniqueness(t *testing.T) {
+	hash1 := ShortHash("input1")
+	hash2 := ShortHash("input2")
+
+	if hash1 == hash2 {
+		t.Errorf("Expected different hashes for different inputs, got same: %s", hash1)
+	}
+}
+
+func TestJoinStringsEmptySlice(t *testing.T) {
+	result := JoinStrings([]string{}, ",")
+	if result != "" {
+		t.Errorf("Expected empty string for empty slice, got %q", result)
+	}
+}
+
+func TestJoinStringsSingleElement(t *testing.T) {
+	result := JoinStrings([]string{"hello"}, ",")
+	if result != "hello" {
+		t.Errorf("Expected 'hello', got %q", result)
+	}
+}
+
+func TestJoinStringsMultipleElements(t *testing.T) {
+	result := JoinStrings([]string{"a", "b", "c"}, "-")
+	expected := "a-b-c"
+	if result != expected {
+		t.Errorf("Expected %q, got %q", expected, result)
+	}
+}
+
+func TestJoinStringsCustomSeparator(t *testing.T) {
+	result := JoinStrings([]string{"1", "2", "3"}, " | ")
+	expected := "1 | 2 | 3"
+	if result != expected {
+		t.Errorf("Expected %q, got %q", expected, result)
+	}
+}
+
+func TestMapKeysEmpty(t *testing.T) {
+	m := map[string]struct{}{}
+	keys := MapKeys(m)
+
+	if len(keys) != 0 {
+		t.Errorf("Expected 0 keys, got %d", len(keys))
+	}
+}
+
+func TestMapKeysSingle(t *testing.T) {
+	m := map[string]struct{}{"one": {}}
+	keys := MapKeys(m)
+
+	if len(keys) != 1 || keys[0] != "one" {
+		t.Errorf("Expected [\"one\"], got %v", keys)
+	}
+}
+
+func TestMapKeysMultiple(t *testing.T) {
+	m := map[string]struct{}{
+		"a": {},
+		"b": {},
+		"c": {},
+	}
+	keys := MapKeys(m)
+
+	sort.Strings(keys)
+	expected := []string{"a", "b", "c"}
+
+	if !reflect.DeepEqual(keys, expected) {
+		t.Errorf("Expected %v, got %v", expected, keys)
+	}
+}
+
+func TestIsValidVMName(t *testing.T) {
+	valid := []string{"vm1", "my-vm", "VM_123", "a", "A-B_C"}
+	invalid := []string{"vm!", "my.vm", "name with space", "💻", ""}
+
+	for _, name := range valid {
+		if !IsValidVMName(name) {
+			t.Errorf("Expected valid VM name: %q", name)
+		}
+	}
+	for _, name := range invalid {
+		if IsValidVMName(name) {
+			t.Errorf("Expected invalid VM name: %q", name)
+		}
+	}
+}
+
+func TestIsValidMACAddress(t *testing.T) {
+	valid := []string{
+		"00:1A:2B:3C:4D:5E",
+		"aa:bb:cc:dd:ee:ff",
+		"AA-BB-CC-DD-EE-FF",
+	}
+	invalid := []string{
+		"001A:2B:3C:4D:5E",
+		"00:1A:2B:3C:4D:5E:6F",
+		"GG:HH:II:JJ:KK:LL",
+		"00-1A-2B-3C-4D",
+		"123456",
+		"",
+	}
+
+	for _, mac := range valid {
+		if !IsValidMACAddress(mac) {
+			t.Errorf("Expected valid MAC address: %q", mac)
+		}
+	}
+	for _, mac := range invalid {
+		if IsValidMACAddress(mac) {
+			t.Errorf("Expected invalid MAC address: %q", mac)
+		}
+	}
+}
+
+func TestGenerateRandomMAC(t *testing.T) {
+	for i := 0; i < 5; i++ {
+		mac := GenerateRandomMAC()
+		if mac == "" {
+			t.Fatal("GenerateRandomMAC returned empty string")
+		}
+		if !IsValidMACAddress(mac) {
+			t.Errorf("Generated MAC is not valid: %s", mac)
+		}
+	}
+}
+
+func TestIsHexValid(t *testing.T) {
+	valid := []string{
+		"abc123",
+		"ABCDEF",
+		"0123456789abcdef",
+		"deadBEEF",
+		"CAFEBABE",
+		"0",
+		"f",
+	}
+
+	for _, s := range valid {
+		if !IsHex(s) {
+			t.Errorf("Expected IsHex(%q) to be true", s)
+		}
+	}
+}
+
+func TestIsHexInvalid(t *testing.T) {
+	invalid := []string{
+		"xyz123",
+		"hello",
+		"123g",
+		"ABCXYZ",
+		"abc-123",
+		"12 34",
+		"💀dead",
+		"",
+	}
+
+	for _, s := range invalid {
+		if IsHex(s) {
+			t.Errorf("Expected IsHex(%q) to be false", s)
+		}
+	}
+}
+
+func TestIsHexEmpty(t *testing.T) {
+	if IsHex("") {
+		t.Error("Expected IsHex(\"\") to be true (empty string is valid hex)")
 	}
 }

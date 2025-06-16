@@ -326,3 +326,15 @@ func GenerateRandomMAC() string {
 
 	return fmt.Sprintf("%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5])
 }
+
+func IsHex(s string) bool {
+	if s == "" {
+		return false
+	}
+	for _, c := range strings.ToLower(s) {
+		if !(c >= '0' && c <= '9') && !(c >= 'a' && c <= 'f') {
+			return false
+		}
+	}
+	return true
+}

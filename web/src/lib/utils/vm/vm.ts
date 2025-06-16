@@ -40,6 +40,11 @@ export function isValidCreateData(modal: CreateData): boolean {
 		toast.error('No emulation type selected', toastConfig);
 	}
 
+	if (modal.storage.type === 'none' && modal.storage.iso === '') {
+		toast.error('Atleast one disk or ISO must be selected', toastConfig);
+		return false;
+	}
+
 	if (modal.network.switch !== 0) {
 		if (modal.network.emulation === '') {
 			toast.error('No network emulation type selected', toastConfig);

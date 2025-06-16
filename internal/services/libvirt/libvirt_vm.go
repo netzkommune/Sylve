@@ -504,3 +504,17 @@ func (s *Service) SetActionDate(vm vmModels.VM, action string) error {
 
 	return nil
 }
+
+func (s *Service) GetVMXML(vmId int) (string, error) {
+	domain, err := s.Conn.DomainLookupByName(strconv.Itoa(vmId))
+	if err != nil {
+		return "", fmt.Errorf("failed_to_lookup_domain: %w", err)
+	}
+
+	xmlDesc, err := s.Conn.DomainGetXMLDesc(domain, 0)
+	if err != nil {
+		return "", fmt.Errorf("failed_to_get_domain_xml_desc: %w", err)
+	}
+
+	return xmlDesc, nil
+}

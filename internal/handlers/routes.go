@@ -179,6 +179,7 @@ func RegisterRoutes(r *gin.Engine,
 		vm.PUT("/description", vmHandlers.UpdateVMDescription(libvirtService))
 
 		vm.POST("/storage/detach", vmHandlers.StorageDetach(libvirtService))
+		vm.POST("/network/detach", vmHandlers.NetworkDetach(libvirtService))
 	}
 
 	utilities := api.Group("/utilities")

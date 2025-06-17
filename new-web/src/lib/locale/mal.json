@@ -1,0 +1,110 @@
+{
+	"auth": {
+		"username": "പേര്",
+		"password": "പാസ്സ്‌വേഡ്",
+		"realm": "സാമ്രാജ്യം",
+		"pam": "പി.എ.എം",
+		"sylve": "സിൽവ്",
+		"language": "ഭാഷ",
+		"select_language": "ഭാഷ തിരഞ്ഞെടുക്കുക",
+		"remember_me": "എന്നെ ഓർമ്മിക്കുക",
+		"login": "ലോഗിൻ",
+		"logout": "ലോഗ്ഔട്ട്",
+		"invalid_auth_type": "അധികാര തരം ആവശ്യമാണ്",
+		"invalid_credentials": "അസാധുവായ ക്രെഡൻഷ്യലുകൾ",
+		"pam_auth_error": "പി.എ.എം. അധികാര പിശക്"
+	},
+	"node": {
+		"summary": "സാരാംശം",
+		"search": "തിരയൽ",
+		"notes": "കുറിപ്പുകൾ",
+		"storage": "സ്റ്റോറേജ്",
+		"certificates": "സർട്ടിഫിക്കറ്റുകൾ",
+		"firewall": "ഫയർവാൾ",
+		"disks": "ഡിസ്കുകൾ",
+		"zfs": "ഇസഡ് എഫ് എസ്",
+		"pools": "പൂലുകൾ",
+		"datasets": "ഡാറ്റാസെറ്റുകൾ",
+		"file_systems": "ഫയൽ സിസ്റ്റങ്ങൾ",
+		"notifications": "അറിയിപ്പുകൾ"
+	},
+	"summary": {
+		"CPU_s": "സിപിയു",
+		"operating_system": "ഓപ്പറേറ്റിംഗ് സിസ്റ്റം",
+		"load_average": "ലോഡ് ശരാശരി",
+		"boot_mode": "ബൂട്ട് മോഡ്",
+		"sylve_version": "സിൽവ് പതിപ്പ്",
+		"cpu_usage": "സിപിയു ഉപയോഗം",
+		"disk_usage": "ഡിസ്ക് ഉപയോഗം",
+		"swap_usage": "സ്വാപ്പ് ഉപയോഗം",
+		"ram_usage": "റാം ഉപയോഗം",
+		"io_delay": "ഐ/ഒ വൈകിയാൽ"
+	},
+	"notes": {
+		"note": "കുറിപ്പ്",
+		"note_l": "കുറിപ്പ്",
+		"title": "ശീർഷകം"
+	},
+	"disk": {
+		"smart": "എസ്.മാർട്ട്",
+		"smart_values": "എസ്.മാർട്ട് വിലകൾ",
+		"initialize_gpt": "ജിപിടി ആരംഭിക്കുക",
+		"wipe_disk": "ഡിസ്ക് ശുദ്ധീകരിക്കുക",
+		"attribute": "ഗുണം",
+		"delete_partition": "വിഭാഗം ഇല്ലാതാക്കുക",
+		"create_partition": "വിഭാഗം സൃഷ്ടിക്കുക",
+		"value": "മൂല്യം",
+		"wipe": "ശുദ്ധീകരിക്കുക",
+		"partition": "വിഭാഗം",
+		"partitions": "വിഭാഗങ്ങൾ",
+		"gpt_initialized": "ജിപിടി ഉപയോഗിച്ച് ആരംഭിച്ചു",
+		"initialize": "ആരംഭിക്കുക",
+		"full_wipe_success": "ഡിസ്ക് ശുദ്ധീകരിച്ചു",
+		"partition_wipe_success": "വിഭാഗം ഇല്ലാതാക്കി",
+		"device": "ഉപകരണം",
+		"type": "തരം",
+		"usage": "ഉപയോഗം",
+		"size": "വലുപ്പം",
+		"gpt": "ജിപിടി",
+		"model": "മോഡൽ",
+		"serial": "സീരിയൽ",
+		"wearout": "വെയർ ഔട്ട്"
+	},
+	"zfs": {
+		"pool": {
+			"pool_not_found": "പൂൽ കണ്ടെത്തിയില്ല",
+			"pool_deleted": "പൂൽ ഇല്ലാതാക്കി",
+			"pool_created": "പൂൽ സൃഷ്ടിച്ചു",
+			"errors": {
+				"pool_create_failed_mirror_different_sizes": "പൂൽ വ്യത്യസ്ത വലുപ്പങ്ങളുള്ള ഉപകരണങ്ങളുമായി ഒരു മിറർ അടങ്ങിയിരിക്കുന്നു",
+				"pool_create_failed_raidz_different_sizes": "പൂൽ വ്യത്യസ്ത വലുപ്പങ്ങളുള്ള ഉപകരണങ്ങളുമായി ഒരു റെയിഡ്‌എസ് വി.ഡി.ഇ.വി അടങ്ങിയിരിക്കുന്നു",
+				"pool_delete_failed_busy": "പൂൽ തിരക്കിലാണ്"
+			}
+		}
+	},
+	"common": {
+		"example": "ഉദാഹരണം",
+		"of": "യുടെ",
+		"are_you_sure": "നിങ്ങൾക്ക് ഉറപ്പാണോ?",
+		"this_action_cannot_be_undone": "ഈ പ്രവർത്തനം തിരികെ ചെയ്യാൻ കഴിയില്ല",
+		"this_will_permanently": "ഈ സ്ഥിരമായി",
+		"permanent_delete_msg": "ഈ പ്രവർത്തനം തിരികെ ചെയ്യാൻ കഴിയില്ല. ഇത് സ്ഥിരമായി ഇല്ലാതാക്കും",
+		"completely": "പൂർണ്ണമായും",
+		"created": "സൃഷ്ടിച്ചു",
+		"creating": "സൃഷ്ടിക്കുന്നു",
+		"created_successfully": "വിജയകരമായി സൃഷ്ടിച്ചു",
+		"error": "പിശക്",
+		"delete": "ഇല്ലാതാക്കുക",
+		"create": "സൃഷ്ടിക്കുക",
+		"invalid_response_received": "അസാധുവായ പ്രതികരണം ലഭിച്ചു",
+		"datacenter": "ഡാറ്റാ സെന്റർ",
+		"languages": {
+			"en": "English",
+			"en_default": "English (Default)",
+			"mal": "Malayalam"
+		}
+	},
+	"validation_errors": {
+		"failed validation: min": "ചെറിയത്"
+	}
+}

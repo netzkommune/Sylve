@@ -105,3 +105,30 @@ func CreateOrTruncateFile(path string, size int64) error {
 
 	return nil
 }
+
+func FileExists(path string) (bool, error) {
+	info, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+
+	if err != nil {
+		return false, fmt.Errorf("stat %q: %w", path, err)
+	}
+
+	if info.IsDir() {
+		return false, fmt.Errorf("%q is a directory, not a file", path)
+	}
+
+	return true, nil
+}
+
+func ReadFile(path string) ([]byte, error) {
+	data, err := os.ReadFile(path)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to read file %q: %w", path, err)
+	}
+
+	return data, nil
+}

@@ -102,9 +102,11 @@
 			vlan: '',
 			address: '',
 			address6: '',
+			disableIPv6: false,
 			private: false,
 			ports: [] as string[],
-			dhcp: false
+			dhcp: false,
+			slaac: false
 		},
 		editSwitch: {
 			oldName: '',
@@ -114,9 +116,11 @@
 			vlan: '',
 			address: '',
 			address6: '',
+			disableIPv6: false,
 			private: false,
 			ports: [] as string[],
-			dhcp: false
+			dhcp: false,
+			slaac: false
 		},
 		deleteSwitch: {
 			open: false,
@@ -199,7 +203,9 @@
 					activeModal.address6,
 					activeModal.private,
 					activeModal.dhcp,
-					comboBoxes.ports.value
+					comboBoxes.ports.value,
+					activeModal.disableIPv6,
+					activeModal.slaac
 				);
 
 				if (isAPIResponse(created) && created.status === 'success') {
@@ -223,7 +229,10 @@
 					activeModal.address,
 					activeModal.address6,
 					activeModal.private,
-					comboBoxes.ports.value
+					comboBoxes.ports.value,
+					activeModal.disableIPv6,
+					activeModal.slaac,
+					activeModal.dhcp
 				);
 
 				if (isAPIResponse(edited) && edited.status === 'success') {
@@ -268,8 +277,10 @@
 			confirmModals.editSwitch.vlan = activeRow.vlan === '-' ? '' : (activeRow.vlan as string);
 			confirmModals.editSwitch.address = activeRow.ipv4 === '-' ? '' : activeRow.ipv4;
 			confirmModals.editSwitch.address6 = activeRow.ipv6 === '-' ? '' : activeRow.ipv6;
+			confirmModals.editSwitch.disableIPv6 = (activeRow.disableIPv6 as boolean) || false;
 			confirmModals.editSwitch.private = (activeRow.private as boolean) || false;
 			confirmModals.editSwitch.dhcp = (activeRow.dhcp as boolean) || false;
+			confirmModals.editSwitch.slaac = (activeRow.slaac as boolean) || false;
 
 			comboBoxes.ports.value = activeRow.ports.map((port: { name: string }) => port.name);
 		}
@@ -287,19 +298,43 @@
 		confirmModals.newSwitch.vlan = '';
 		confirmModals.newSwitch.address = '';
 		confirmModals.newSwitch.address6 = '';
+		confirmModals.newSwitch.disableIPv6 = false;
 		confirmModals.newSwitch.private = false;
 		confirmModals.newSwitch.dhcp = false;
+		confirmModals.newSwitch.slaac = false;
 
 		confirmModals.editSwitch.name = '';
 		confirmModals.editSwitch.mtu = '';
 		confirmModals.editSwitch.vlan = '';
 		confirmModals.editSwitch.address = '';
 		confirmModals.editSwitch.address6 = '';
+		confirmModals.editSwitch.disableIPv6 = false;
 		confirmModals.editSwitch.private = false;
 		confirmModals.editSwitch.dhcp = false;
+		confirmModals.editSwitch.slaac = false;
 
 		comboBoxes.ports.value = [];
 	}
+
+	$effect(() => {
+		if (confirmModals.newSwitch.slaac) {
+			confirmModals.newSwitch.disableIPv6 = false;
+		}
+
+		if (confirmModals.editSwitch.slaac) {
+			confirmModals.editSwitch.disableIPv6 = false;
+		}
+	});
+
+	$effect(() => {
+		if (confirmModals.newSwitch.disableIPv6) {
+			confirmModals.newSwitch.slaac = false;
+		}
+
+		if (confirmModals.editSwitch.disableIPv6) {
+			confirmModals.editSwitch.slaac = false;
+		}
+	});
 </script>
 
 {#snippet button(type: string)}
@@ -446,6 +481,10 @@
 					placeholder="fdcb:cafe::beef/56"
 					bind:value={confirmModals[confirmModals.active].address6}
 					classes="flex-1 space-y-1"
+					disabled={confirmModals[confirmModals.active].disableIPv6 ||
+					confirmModals[confirmModals.active].slaac
+						? true
+						: false}
 				/>
 			</div>
 
@@ -483,6 +522,18 @@
 				<CustomCheckbox
 					label={capitalizeFirstLetter(getTranslation('common.dhcp', 'DHCP'))}
 					bind:checked={confirmModals[confirmModals.active].dhcp}
+					classes="flex items-center gap-2 mt-1"
+				></CustomCheckbox>
+
+				<CustomCheckbox
+					label={capitalizeFirstLetter(getTranslation('common.slaac', 'SLAAC'))}
+					bind:checked={confirmModals[confirmModals.active].slaac}
+					classes="flex items-center gap-2 mt-1"
+				></CustomCheckbox>
+
+				<CustomCheckbox
+					label={capitalizeFirstLetter(getTranslation('common.disable_ipv6', 'Disable IPV6'))}
+					bind:checked={confirmModals[confirmModals.active].disableIPv6}
 					classes="flex items-center gap-2 mt-1"
 				></CustomCheckbox>
 			</div>

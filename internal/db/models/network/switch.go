@@ -13,18 +13,20 @@ import (
 )
 
 type StandardSwitch struct {
-	ID         int    `json:"id" gorm:"primaryKey;autoIncrement"`
-	Name       string `json:"name" gorm:"unique;not null"`
-	BridgeName string `gorm:"unique;not null"`
-	MTU        int    `json:"mtu" gorm:"default:1500"`
-	VLAN       int    `json:"vlan" gorm:"default:0"`
-	Address    string `json:"address"`
-	Address6   string `json:"address6"`
-	Private    bool   `json:"private" gorm:"default:false"`
+	ID          int    `json:"id" gorm:"primaryKey;autoIncrement"`
+	Name        string `json:"name" gorm:"unique;not null"`
+	BridgeName  string `gorm:"unique;not null"`
+	MTU         int    `json:"mtu" gorm:"default:1500"`
+	VLAN        int    `json:"vlan" gorm:"default:0"`
+	Address     string `json:"address"`
+	Address6    string `json:"address6"`
+	DisableIPv6 bool   `json:"disableIPv6" gorm:"default:false"`
+	Private     bool   `json:"private" gorm:"default:false"`
 
 	Ports []NetworkPort `json:"ports" gorm:"foreignKey:SwitchID;constraint:OnDelete:CASCADE"`
 
-	DHCP bool `json:"dhcp" gorm:"default:false"`
+	DHCP  bool `json:"dhcp" gorm:"default:false"`
+	SLAAC bool `json:"slaac" gorm:"default:false"`
 
 	CreatedAt time.Time `json:"createdAt" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updatedAt" gorm:"autoUpdateTime"`

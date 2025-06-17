@@ -73,7 +73,8 @@ func (s *Service) InitKeys(authService serviceInterfaces.AuthServiceInterface) e
 
 func (s *Service) SysctlSync() error {
 	intVals := map[string]int32{
-		"net.inet.ip.forwarding": 1,
+		"net.inet.ip.forwarding":      1,
+		"net.link.bridge.inherit_mac": 1,
 	}
 
 	for k, v := range intVals {

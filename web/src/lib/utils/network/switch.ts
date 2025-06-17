@@ -64,6 +64,8 @@ export function generateTableData(
 				if (value === '-' && data.dhcp) {
 					return 'DHCP';
 				}
+
+				return value || '-';
 			}
 		},
 		{
@@ -78,6 +80,16 @@ export function generateTableData(
 		{
 			field: 'dhcp',
 			title: getTranslation('network.DHCP', 'DHCP'),
+			visible: false
+		},
+		{
+			field: 'disableIPv6',
+			title: getTranslation('network.disableIPv6', 'Disable IPv6'),
+			visible: false
+		},
+		{
+			field: 'slaac',
+			title: getTranslation('network.slaac', 'SLAAC'),
 			visible: false
 		}
 	];
@@ -101,7 +113,9 @@ export function generateTableData(
 				ports: sw.ports,
 				private: sw.private,
 				portsOnly: portsOnly,
-				dhcp: sw.dhcp || false
+				dhcp: sw.dhcp || false,
+				disableIPv6: sw.disableIPv6 || false,
+				slaac: sw.slaac || false
 			});
 		}
 	}

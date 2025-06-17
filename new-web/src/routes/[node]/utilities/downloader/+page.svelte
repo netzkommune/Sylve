@@ -165,7 +165,7 @@
 	{#if type === 'delete' && onlyParentsSelected}
 		{#if activeRows && activeRows.length >= 1}
 			<Button
-				on:click={handleDelete}
+				onclick={handleDelete}
 				size="sm"
 				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 			>
@@ -182,7 +182,7 @@
 	{#if type === 'download' && onlyChildSelected && isDownloadCompleted}
 		{#if activeRows && activeRows.length == 1}
 			<Button
-				on:click={handleDownload}
+				onclick={handleDownload}
 				size="sm"
 				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 			>
@@ -195,7 +195,7 @@
 	{#if type === 'download' && httpDownloadSelected && isDownloadCompleted}
 		{#if activeRows && activeRows.length == 1}
 			<Button
-				on:click={handleDownload}
+				onclick={handleDownload}
 				size="sm"
 				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 			>
@@ -219,7 +219,7 @@
 		{@render button('download')}
 	</div>
 
-	<Dialog.Root bind:open={modalState.isOpen} closeOnOutsideClick={false}>
+	<Dialog.Root bind:open={modalState.isOpen}>
 		<Dialog.Content class="w-[80%] gap-0 overflow-hidden p-3 lg:max-w-xl">
 			<div class="flex items-center justify-between py-1 pb-2">
 				<Dialog.Header class="flex-1">
@@ -237,8 +237,8 @@
 						variant="ghost"
 						class="h-8"
 						title={capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}
-						on:click={() => {
-							modalState.isOpen = false;
+						onclick={() => {
+							modalState.isOpen = true;
 							modalState.url = '';
 						}}
 					>
@@ -252,7 +252,7 @@
 						variant="ghost"
 						class="h-8"
 						title={capitalizeFirstLetter(getTranslation('common.close', 'Close'))}
-						on:click={() => {
+						onclick={() => {
 							modalState.isOpen = false;
 							modalState.url = '';
 						}}

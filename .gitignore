@@ -10,6 +10,8 @@ package-lock.json
 package.json
 !web/package.json
 !web/package-lock.json
+!new-web/package-lock.json
+!new-web/package.json
 cmd/dont-move/
 .DS_Store
 .AppleDouble

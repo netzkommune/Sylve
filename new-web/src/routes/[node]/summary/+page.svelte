@@ -181,7 +181,7 @@
 										{getTranslation('summary.CPU_s', 'CPU(s)')}
 									</p>
 								</div>
-								<Progress value={cpuInfo.usage || 0} max={100} class="h-2 w-[100%] " />
+								<Progress value={cpuInfo.usage || 0} max={100} class="h-2 w-[100%]" />
 							</div>
 							<div>
 								<div class="flex w-full justify-between pb-1">

@@ -341,7 +341,7 @@
 	{#if activeRow && Object.keys(activeRow).length > 0}
 		{#if type === 'edit'}
 			<Button
-				on:click={handleEdit}
+				onclick={handleEdit}
 				size="sm"
 				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 			>
@@ -350,7 +350,7 @@
 			</Button>
 		{:else if type === 'delete'}
 			<Button
-				on:click={handleDelete}
+				onclick={handleDelete}
 				size="sm"
 				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 			>
@@ -365,7 +365,7 @@
 	<div class="flex h-10 w-full items-center gap-2 border p-2">
 		<Search bind:query />
 		<Button
-			on:click={() => {
+			onclick={() => {
 				confirmModals.active = 'newSwitch';
 				confirmModals.newSwitch.open = true;
 			}}
@@ -389,12 +389,8 @@
 </div>
 
 {#if confirmModals.active === 'newSwitch' || confirmModals.active === 'editSwitch'}
-	<Dialog.Root
-		bind:open={confirmModals[confirmModals.active].open}
-		closeOnOutsideClick={false}
-		closeOnEscape={false}
-	>
-		<Dialog.Content class="w-[90%] gap-2 p-5 lg:max-w-2xl">
+	<Dialog.Root bind:open={confirmModals[confirmModals.active].open}>
+		<Dialog.Content class="w-[90%] gap-4 p-5 lg:max-w-2xl">
 			<div class="flex items-center justify-between px-1 py-1">
 				<Dialog.Header>
 					<Dialog.Title>
@@ -445,7 +441,7 @@
 					label={capitalizeFirstLetter(getTranslation('common.name', 'Name'))}
 					placeholder="public"
 					bind:value={confirmModals[confirmModals.active].name}
-					classes="flex-1 space-y-1"
+					classes="flex-1 space-y-1.5"
 				/>
 			{/if}
 
@@ -454,7 +450,7 @@
 					label={capitalizeFirstLetter(getTranslation('network.mtu', 'MTU'))}
 					placeholder="1280"
 					bind:value={confirmModals[confirmModals.active].mtu}
-					classes="flex-1 space-y-1"
+					classes="flex-1 space-y-1.5"
 					type="number"
 				/>
 
@@ -462,7 +458,7 @@
 					label={capitalizeFirstLetter(getTranslation('network.vlan', 'VLAN'))}
 					placeholder="0"
 					bind:value={confirmModals[confirmModals.active].vlan}
-					classes="flex-1 space-y-1"
+					classes="flex-1 space-y-1.5"
 					type="number"
 				/>
 			</div>
@@ -472,7 +468,7 @@
 					label={capitalizeFirstLetter(getTranslation('network.ipv4', 'IPv4'))}
 					placeholder="10.0.0.1/24"
 					bind:value={confirmModals[confirmModals.active].address}
-					classes="flex-1 space-y-1"
+					classes="flex-1 space-y-1.5"
 					disabled={confirmModals[confirmModals.active].dhcp ? true : false}
 				/>
 
@@ -480,7 +476,7 @@
 					label={capitalizeFirstLetter(getTranslation('network.ipv6', 'IPv6'))}
 					placeholder="fdcb:cafe::beef/56"
 					bind:value={confirmModals[confirmModals.active].address6}
-					classes="flex-1 space-y-1"
+					classes="flex-1 space-y-1.5"
 					disabled={confirmModals[confirmModals.active].disableIPv6 ||
 					confirmModals[confirmModals.active].slaac
 						? true

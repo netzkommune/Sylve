@@ -64,7 +64,7 @@
 {#snippet button(type: string)}
 	{#if type === 'view' && activeRow !== null && activeRow.length > 0}
 		<Button
-			on:click={() => activeRow !== null && viewInterface(activeRow[0]?.name)}
+			onclick={() => activeRow !== null && viewInterface(activeRow[0]?.name)}
 			size="sm"
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>

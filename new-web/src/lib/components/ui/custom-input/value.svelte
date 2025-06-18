@@ -21,7 +21,7 @@
 		label = '',
 		placeholder = '',
 		autocomplete = 'off',
-		classes = 'space-y-1',
+		classes = 'space-y-1.5',
 		type = 'text',
 		textAreaCLasses = 'min-h-56',
 		disabled = false

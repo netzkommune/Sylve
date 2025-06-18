@@ -217,7 +217,7 @@
 {#snippet button(type: string)}
 	{#if type == 'smart' && buttonAbilities.smart.ability}
 		<Button
-			on:click={() => diskAction('smart')}
+			onclick={() => diskAction('smart')}
 			size="sm"
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
@@ -228,7 +228,7 @@
 
 	{#if type == 'gpt' && buttonAbilities.gpt.ability}
 		<Button
-			on:click={() => diskAction('gpt')}
+			onclick={() => diskAction('gpt')}
 			size="sm"
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
@@ -239,7 +239,7 @@
 
 	{#if type == 'wipe-disk' && buttonAbilities.wipe.ability && activeDisk !== null}
 		<Button
-			on:click={() => diskAction('wipe')}
+			onclick={() => diskAction('wipe')}
 			size="sm"
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
@@ -250,7 +250,7 @@
 
 	{#if type == 'wipe-partition' && buttonAbilities.wipe.ability && activePartition !== null}
 		<Button
-			on:click={() => diskAction('wipe')}
+			onclick={() => diskAction('wipe')}
 			size="sm"
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
@@ -261,7 +261,7 @@
 
 	{#if type == 'partition' && buttonAbilities.createPartition.ability}
 		<Button
-			on:click={() => diskAction('partition')}
+			onclick={() => diskAction('partition')}
 			size="sm"
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>

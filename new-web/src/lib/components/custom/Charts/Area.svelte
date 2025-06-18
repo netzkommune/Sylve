@@ -1,11 +1,12 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card/index.js';
-	import ChartContainer from '$lib/components/ui/chart/chart-container.svelte';
 	import * as Chart from '$lib/components/ui/chart/index.js';
+	import { scaleUtc } from 'd3-scale';
 	import { curveNatural } from 'd3-shape';
-	import { Area, AreaChart, ChartClipPath } from 'layerchart';
+	import { AreaChart } from 'layerchart';
 
 	import { type AreaChartElement } from '$lib/types/components/chart';
+	import Icon from '@iconify/svelte';
 
 	interface Props {
 		title: string;
@@ -22,23 +23,48 @@
 	);
 
 	let data = $derived.by(() => {
-		let result: Array<{ date: Date } & { [key: string]: number | Date }> = [];
-		for (const element of elements) {
-			for (const data of element.data) {
-				const existing = result.find(
-					(item) => item.date instanceof Date && item.date.getTime() === data.date.getTime()
-				);
-				if (existing) {
-					existing[element.field] = data.value;
-				} else {
-					const newData: { date: Date } & { [key: string]: number | Date } = { date: data.date };
-					newData[element.field] = data.value;
-					result.push(newData);
+		if (!elements?.length) return [];
+
+		const THRESH = 60_000;
+		const series = elements.map(({ field, data: pts }) => ({
+			field,
+			points: pts
+				.map((p) => ({ t: new Date(p.date).getTime(), v: p.value }))
+				.sort((a, b) => a.t - b.t)
+		}));
+
+		series.sort((a, b) => a.points.length - b.points.length);
+		const [base, ...others] = series;
+
+		const out = [];
+
+		for (const { t: bt, v: bv } of base.points) {
+			const rec = { date: new Date(bt), [base.field]: bv };
+			let good = true;
+
+			for (const { field, points } of others) {
+				let bestDiff = Infinity,
+					bestVal = null;
+				for (const { t, v } of points) {
+					const d = Math.abs(t - bt);
+					if (d < bestDiff) {
+						bestDiff = d;
+						bestVal = v;
+					}
+
+					if (t - bt > bestDiff) break;
 				}
+				if (bestVal === null || bestDiff > THRESH) {
+					good = false;
+					break;
+				}
+				rec[field] = bestVal;
 			}
+
+			if (good) out.push(rec);
 		}
 
-		return result;
+		return out;
 	});
 
 	let series = $derived.by(() => {
@@ -48,12 +74,20 @@
 			color: element.color
 		}));
 	});
+
+	$inspect(data);
 </script>
 
 <Card.Root>
-	<Card.Header class="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
+	<Card.Header class="flex items-center gap-2 space-y-0 border-b py-0 sm:flex-row">
 		<div class="grid flex-1 gap-1 text-center sm:text-left">
-			<Card.Title>{title}</Card.Title>
+			<Card.Title>
+				<!-- Icon and {title} -->
+				<div class="flex items-center gap-2">
+					<Icon icon="solar:cpu-bold" class="h-5 w-5" />
+					{title}
+				</div>
+			</Card.Title>
 			{#if description}
 				<Card.Description>{description}</Card.Description>
 			{/if}
@@ -61,11 +95,13 @@
 	</Card.Header>
 
 	<Card.Content>
-		<ChartContainer {config} class="aspect-auto h-[250px] w-full">
+		<Chart.Container {config} class="h-48 w-full">
 			<AreaChart
 				legend
 				{data}
 				x="date"
+				xScale={scaleUtc()}
+				yPadding={[0, 25]}
 				{series}
 				seriesLayout="stack"
 				props={{
@@ -76,17 +112,39 @@
 						motion: 'tween'
 					},
 					xAxis: {
-						ticks: 7,
-						format: (v) => {
-							return v.toLocaleDateString('en-US', {
-								month: 'short',
-								day: 'numeric'
-							});
+						format: (v: Date) => {
+							return (
+								v.toLocaleDateString('en-US', {
+									day: 'numeric',
+									month: 'numeric',
+									year: 'numeric'
+								}) +
+								'\n' +
+								v.toLocaleTimeString('en-US', {
+									hour: '2-digit',
+									minute: '2-digit'
+								})
+							);
 						}
-					},
-					yAxis: { format: () => '' }
+					}
 				}}
-			></AreaChart>
-		</ChartContainer>
+			>
+				{#snippet tooltip()}
+					<Chart.Tooltip
+						indicator="dot"
+						labelFormatter={(v: Date) => {
+							return v.toLocaleDateString('en-US', {
+								month: 'long',
+								day: 'numeric',
+								year: 'numeric',
+								minute: '2-digit',
+								hour: '2-digit',
+								hour12: true
+							});
+						}}
+					/>
+				{/snippet}
+			</AreaChart>
+		</Chart.Container>
 	</Card.Content>
 </Card.Root>

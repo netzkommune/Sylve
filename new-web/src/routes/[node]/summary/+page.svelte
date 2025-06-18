@@ -126,25 +126,30 @@
 	let totalDiskUsage = $derived($results[5].data as number);
 	let cpuInfoHistorical = $derived($results[6].data as CPUInfoHistorical);
 	let ioDelayHistorical = $derived($results[7].data as IODelayHistorical);
+
 	let chartElements = $derived.by(() => {
 		return [
 			{
 				field: 'cpuUsage',
 				label: getTranslation('summary.cpu_usage', 'CPU Usage'),
-				color: 'var(--blue-500)',
-				data: cpuInfoHistorical.map((data) => ({
-					date: new Date(data.createdAt),
-					value: Math.floor(data.usage)
-				}))
+				color: 'var(--chart-1)',
+				data: cpuInfoHistorical
+					.map((data) => ({
+						date: new Date(data.createdAt),
+						value: data.usage.toFixed(2)
+					}))
+					.slice(-16)
 			},
 			{
 				field: 'ioDelay',
 				label: getTranslation('summary.io_delay', 'I/O Delay'),
-				color: 'var(--red-500)',
-				data: ioDelayHistorical.map((data) => ({
-					date: new Date(data.createdAt),
-					value: Math.floor(data.delay)
-				}))
+				color: 'var(--chart-2)',
+				data: ioDelayHistorical
+					.map((data) => ({
+						date: new Date(data.createdAt),
+						value: data.delay.toFixed(2)
+					}))
+					.slice(-16)
 			}
 		];
 	});
@@ -281,35 +286,7 @@
 					</Card.Content>
 				</Card.Root>
 
-				<!-- <AreaChart title="CPU Usage" elements={chartElements} /> -->
-				<!-- <Card.Root class="w-full">
-					<Card.Header>
-						<Card.Title>
-							<div class="flex items-center space-x-2">
-								<Icon icon="solar:cpu-bold" class="h-5 w-5" />
-								<p>{getTranslation('summary.cpu_usage', 'CPU Usage')}</p>
-							</div>
-						</Card.Title>
-					</Card.Header>
-					<Card.Content class="h-[300px]">
-						<LineGraph
-							data={[cpuHistoricalData, ioDelayHistoricalData]}
-							valueType="percentage"
-							keys={[
-								{
-									key: 'cpuUsage',
-									title: getTranslation('summary.cpu_usage', 'CPU Usage'),
-									color: 'hsl(0, 50%, 50%)'
-								},
-								{
-									key: 'ioDelay',
-									title: getTranslation('summary.io_delay', 'I/O Delay'),
-									color: 'hsl(50, 50%, 50%)'
-								}
-							]}
-						/>
-					</Card.Content>
-				</Card.Root> -->
+				<AreaChart title="CPU Usage" elements={chartElements} />
 			</div>
 		</ScrollArea>
 	</div>

@@ -4,6 +4,6 @@ export interface AreaChartElement {
 	color: string;
 	data: Array<{
 		date: Date;
-		value: number;
+		value: number | string;
 	}>;
 }

@@ -3,6 +3,7 @@
 	import { getCPUInfo } from '$lib/api/info/cpu';
 	import { getRAMInfo, getSwapInfo } from '$lib/api/info/ram';
 	import { getIODelay } from '$lib/api/zfs/pool';
+	import AreaChart from '$lib/components/custom/Charts/Area.svelte';
 	import LineGraph from '$lib/components/custom/LineGraph.svelte';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { Progress } from '$lib/components/ui/progress/index.js';
@@ -125,19 +126,27 @@
 	let totalDiskUsage = $derived($results[5].data as number);
 	let cpuInfoHistorical = $derived($results[6].data as CPUInfoHistorical);
 	let ioDelayHistorical = $derived($results[7].data as IODelayHistorical);
-
-	let cpuHistoricalData: HistoricalData[] = $derived.by(() => {
-		return cpuInfoHistorical.map((data) => ({
-			date: new Date(data.createdAt),
-			cpuUsage: Math.floor(data.usage)
-		}));
-	});
-
-	let ioDelayHistoricalData: HistoricalData[] = $derived.by(() => {
-		return ioDelayHistorical.map((data) => ({
-			date: new Date(data.createdAt),
-			ioDelay: Math.floor(data.delay)
-		}));
+	let chartElements = $derived.by(() => {
+		return [
+			{
+				field: 'cpuUsage',
+				label: getTranslation('summary.cpu_usage', 'CPU Usage'),
+				color: 'var(--blue-500)',
+				data: cpuInfoHistorical.map((data) => ({
+					date: new Date(data.createdAt),
+					value: Math.floor(data.usage)
+				}))
+			},
+			{
+				field: 'ioDelay',
+				label: getTranslation('summary.io_delay', 'I/O Delay'),
+				color: 'var(--red-500)',
+				data: ioDelayHistorical.map((data) => ({
+					date: new Date(data.createdAt),
+					value: Math.floor(data.delay)
+				}))
+			}
+		];
 	});
 </script>
 
@@ -146,14 +155,14 @@
 		<ScrollArea orientation="both" class="h-full w-full">
 			<div class="space-y-3 p-3">
 				<Card.Root class="w-full">
-					<Card.Header class="p-2 ">
+					<Card.Header class="-mb-3 -mt-3 p-0">
 						<Card.Description class="text-md ml-3 font-normal text-blue-600 dark:text-blue-500"
 							>{basicInfo.hostname} (Started {secondsToHoursAgo(
 								basicInfo.uptime
 							)})</Card.Description
 						>
 					</Card.Header>
-					<Card.Content class="p-2">
+					<Card.Content class="p-0">
 						<div class="ml-3 grid grid-cols-1 gap-4 md:grid-cols-2">
 							<div>
 								<div class="flex w-full justify-between pb-1">
@@ -272,7 +281,8 @@
 					</Card.Content>
 				</Card.Root>
 
-				<Card.Root class="w-full">
+				<!-- <AreaChart title="CPU Usage" elements={chartElements} /> -->
+				<!-- <Card.Root class="w-full">
 					<Card.Header>
 						<Card.Title>
 							<div class="flex items-center space-x-2">
@@ -299,7 +309,7 @@
 							]}
 						/>
 					</Card.Content>
-				</Card.Root>
+				</Card.Root> -->
 			</div>
 		</ScrollArea>
 	</div>

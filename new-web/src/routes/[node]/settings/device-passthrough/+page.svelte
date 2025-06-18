@@ -90,7 +90,7 @@
 	{#if activeRow !== null && activeRow.length === 1}
 		{#if type === 'enable-passthrough' && !activeRow[0].name.startsWith('ppt')}
 			<Button
-				on:click={() =>
+				onclick={() =>
 					activeRow && addDevice(activeRow[0].domain.toString(), activeRow[0].deviceId)}
 				size="sm"
 				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
@@ -102,7 +102,7 @@
 
 		{#if type === 'disable-passthrough' && activeRow[0].name.startsWith('ppt')}
 			<Button
-				on:click={() => activeRow && removeDevice(activeRow[0].pptId)}
+				onclick={() => activeRow && removeDevice(activeRow[0].pptId)}
 				size="sm"
 				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 			>

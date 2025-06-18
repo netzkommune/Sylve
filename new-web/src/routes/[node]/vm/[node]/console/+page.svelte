@@ -107,8 +107,4 @@
 		width: 100% !important;
 		height: 100% !important;
 	}
-
-	:global(#screen > div) {
-		@apply !bg-black p-4 !important;
-	}
 </style>

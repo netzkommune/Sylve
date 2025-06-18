@@ -34,7 +34,7 @@
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
 	import humanFormat from 'human-format';
-	import toast from 'svelte-french-toast';
+	import { toast } from 'svelte-sonner';
 
 	interface Data {
 		vms: VM[];

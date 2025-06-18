@@ -52,6 +52,7 @@
 		"@fontsource/noto-sans": "^5.2.7",
 		"@layerstack/svelte-stores": "^1.0.2",
 		"@lucide/svelte": "^0.516.0",
+		"@novnc/novnc": "1.5.0",
 		"@svelte-put/shortcut": "^4.1.0",
 		"@sveltestack/svelte-query": "^1.6.0",
 		"adze": "^2.2.4",

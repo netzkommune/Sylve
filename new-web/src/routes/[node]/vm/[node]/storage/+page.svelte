@@ -32,8 +32,8 @@
 	import { generateTableData } from '$lib/utils/vm/storage';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
-	import { toast } from 'svelte-french-toast';
 	import { t } from 'svelte-i18n';
+	import { toast } from 'svelte-sonner';
 
 	interface Data {
 		vms: VM[];

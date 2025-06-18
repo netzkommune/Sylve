@@ -53,6 +53,7 @@
 
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import Search from '$lib/components/custom/TreeTable/Search.svelte';
+	import type { APIResponse } from '$lib/types/common';
 	import { updateCache } from '$lib/utils/http';
 	import { getTranslation } from '$lib/utils/i18n';
 	import { capitalizeFirstLetter } from '$lib/utils/string';
@@ -711,7 +712,7 @@
 			replaceInProgress = true;
 
 			try {
-				await toast.promise(
+				toast.promise(
 					replaceDevice({
 						name: poolName,
 						old: oldName,
@@ -723,10 +724,11 @@
 							return getTranslation(`zfs.pool.${response.message}`, 'Device replacement started');
 						},
 						error: (error) => {
-							return getTranslation(`zfs.pool.${error.message}`, 'Error replacing device');
-						}
-					},
-					{
+							return getTranslation(
+								`zfs.pool.${(error as APIResponse).message}`,
+								'Error replacing device'
+							);
+						},
 						position: 'bottom-center'
 					}
 				);
@@ -778,6 +780,27 @@
 	});
 
 	let query: string = $state('');
+	let sparesArr: string[] = $state([]);
+
+	$effect(() => {
+		if (sparesArr.length > 0) {
+			modal.spares = sparesArr.map((spare) => ({
+				value: spare,
+				label: stripDev(spare),
+				disabled: isDiskInVdev(spare)
+			}));
+		} else {
+			modal.spares = [];
+		}
+	});
+
+	$effect(() => {
+		if (modal.raidType) {
+			setUsableSpace();
+		}
+	});
+
+	$inspect(modal.spares);
 </script>
 
 {#snippet button(type: string)}
@@ -1069,7 +1092,7 @@
 	/>
 </div>
 
-<Dialog.Root bind:open={modal.open} closeOnOutsideClick={false}>
+<Dialog.Root bind:open={modal.open}>
 	<Dialog.Content
 		class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-visible overflow-y-auto p-5 transition-all duration-300 ease-in-out lg:max-w-[70%]"
 	>
@@ -1165,7 +1188,7 @@
 									>({humanFormat(modal.useable)})</span
 								></Label
 							>
-							<Select.Root
+							<!-- <Select.Root
 								selected={{
 									label: raidTypes.find((rt) => rt.value === modal.raidType)?.label,
 									value: raidTypes.find((rt) => rt.value === modal.raidType)?.value
@@ -1188,6 +1211,23 @@
 											{/if}
 										{/each}
 									</Select.Group>
+								</Select.Content>
+							</Select.Root> -->
+
+							<Select.Root type="single" bind:value={modal.raidType}>
+								<Select.Trigger class="w-[180px]">
+									{modal.raidType
+										? raidTypes.find((rt) => rt.value === modal.raidType)?.label
+										: 'Select Redundancy'}
+								</Select.Trigger>
+								<Select.Content>
+									{#each raidTypes as raidType (raidType.value)}
+										{#if raidType.available}
+											<Select.Item value={raidType.value} label={raidType.label}>
+												{raidType.label}
+											</Select.Item>
+										{/if}
+									{/each}
 								</Select.Content>
 							</Select.Root>
 						</div>
@@ -1292,37 +1332,17 @@
 								<!-- Ashift -->
 								<div class="h-full space-y-1">
 									<Label class="w-24 whitespace-nowrap text-sm" for="ashift">Ashift</Label>
-									<Select.Root
-										selected={{
-											label: [
-												{ value: 0, label: '0 (auto)' },
-												...Array.from({ length: 8 }, (_, i) => {
-													const val = i + 9;
-													return { value: val, label: `${val}` };
-												})
-											].find((opt) => opt.value === modal.properties.ashift)?.label,
-											value: [
-												{ value: 0, label: '0 (auto)' },
-												...Array.from({ length: 8 }, (_, i) => {
-													const val = i + 9;
-													return { value: val, label: `${val}` };
-												})
-											].find((opt) => opt.value === modal.properties.ashift)?.value
-										}}
-										onSelectedChange={(value) => {
-											modal.properties.ashift = value?.value || 0;
-										}}
-									>
+									{/* @ts-ignore */ null}
+									<Select.Root type="single" bind:value={modal.properties.ashift}>
 										<Select.Trigger class="w-full">
-											<Select.Value placeholder="Select Ashift" />
+											{modal.properties.ashift}
 										</Select.Trigger>
 										<Select.Content class="max-h-36 overflow-y-auto">
-											<Select.Group>
-												<Select.Item value={0} label="0 (auto)">0 (auto)</Select.Item>
-												{#each Array.from({ length: 8 }, (_, i) => i + 9) as val}
-													<Select.Item value={val} label={`${val}`}>{val}</Select.Item>
-												{/each}
-											</Select.Group>
+											{#each Array.from({ length: 8 }, (_, i) => i + 9) as val}
+												<Select.Item value={val.toString()} label={`${val}`}>
+													{val >= 9 ? val.toString() : `9 + ${val - 9}`}
+												</Select.Item>
+											{/each}
 										</Select.Content>
 									</Select.Root>
 								</div>
@@ -1330,22 +1350,13 @@
 								<!-- Auto Expand -->
 								<div class="h-full space-y-1">
 									<Label class="w-24 whitespace-nowrap text-sm" for="autoexpand">Auto Expand</Label>
-									<Select.Root
-										selected={{
-											label:
-												modal.properties.autoexpand === 'on'
-													? 'Yes'
-													: modal.properties.autoexpand === 'off'
-														? 'No'
-														: undefined,
-											value: modal.properties.autoexpand
-										}}
-										onSelectedChange={(value) => {
-											modal.properties.autoexpand = value?.value || 'off';
-										}}
-									>
+									<Select.Root type="single" bind:value={modal.properties.autoexpand}>
 										<Select.Trigger class="w-full">
-											<Select.Value placeholder="Select Autoexpand" />
+											{modal.properties.autoexpand === 'on'
+												? 'Yes'
+												: modal.properties.autoexpand === 'off'
+													? 'No'
+													: 'Select Auto Expand'}
 										</Select.Trigger>
 										<Select.Content class="max-h-36 overflow-y-auto">
 											<Select.Group>
@@ -1359,22 +1370,13 @@
 								<!-- Auto Trim -->
 								<div class="h-full space-y-1">
 									<Label class="w-24 whitespace-nowrap text-sm" for="autotrim">Auto Trim</Label>
-									<Select.Root
-										selected={{
-											label:
-												modal.properties.autotrim === 'on'
-													? 'Yes'
-													: modal.properties.autotrim === 'off'
-														? 'No'
-														: undefined,
-											value: modal.properties.autotrim
-										}}
-										onSelectedChange={(value) => {
-											modal.properties.autotrim = value?.value || 'off';
-										}}
-									>
+									<Select.Root type="single" bind:value={modal.properties.autotrim}>
 										<Select.Trigger class="w-full">
-											<Select.Value placeholder="Select Auto Trim" />
+											{modal.properties.autotrim === 'on'
+												? 'Yes'
+												: modal.properties.autotrim === 'off'
+													? 'No'
+													: 'Select Auto Trim'}
 										</Select.Trigger>
 										<Select.Content class="max-h-36 overflow-y-auto">
 											<Select.Group>
@@ -1388,22 +1390,13 @@
 								<!-- Delegation -->
 								<div class="h-full space-y-1">
 									<Label class="w-24 whitespace-nowrap text-sm" for="delegation">Delegation</Label>
-									<Select.Root
-										selected={{
-											label:
-												modal.properties.delegation === 'on'
-													? 'Yes'
-													: modal.properties.delegation === 'off'
-														? 'No'
-														: undefined,
-											value: modal.properties.delegation
-										}}
-										onSelectedChange={(value) => {
-											modal.properties.delegation = value?.value || 'off';
-										}}
-									>
+									<Select.Root type="single" bind:value={modal.properties.delegation}>
 										<Select.Trigger class="w-full">
-											<Select.Value placeholder="Select Delegation" />
+											{modal.properties.delegation === 'on'
+												? 'Yes'
+												: modal.properties.delegation === 'off'
+													? 'No'
+													: 'Select Delegation'}
 										</Select.Trigger>
 										<Select.Content class="max-h-36 overflow-y-auto">
 											<Select.Group>
@@ -1417,24 +1410,15 @@
 								<!-- Fail Mode -->
 								<div class="h-full space-y-1">
 									<Label class="w-24 whitespace-nowrap text-sm" for="failmode">Fail Mode</Label>
-									<Select.Root
-										selected={{
-											label:
-												modal.properties.failmode === 'wait'
-													? 'Wait'
-													: modal.properties.failmode === 'continue'
-														? 'Continue'
-														: modal.properties.failmode === 'panic'
-															? 'Panic'
-															: undefined,
-											value: modal.properties.failmode
-										}}
-										onSelectedChange={(value) => {
-											modal.properties.failmode = value?.value || 'wait';
-										}}
-									>
+									<Select.Root type="single" bind:value={modal.properties.failmode}>
 										<Select.Trigger class="w-full">
-											<Select.Value placeholder="Select Delegation" />
+											{modal.properties.failmode === 'wait'
+												? 'Wait'
+												: modal.properties.failmode === 'continue'
+													? 'Continue'
+													: modal.properties.failmode === 'panic'
+														? 'Panic'
+														: 'Select Fail Mode'}
 										</Select.Trigger>
 										<Select.Content class="max-h-36 overflow-y-auto">
 											<Select.Group>
@@ -1449,26 +1433,17 @@
 								{#if possibleSpares && possibleSpares.length > 0 && modal.raidType !== 'stripe'}
 									<div class="h-full space-y-1">
 										<Label class="w-24 whitespace-nowrap text-sm" for="spares">Spares</Label>
-										<Select.Root
-											multiple={true}
-											name="spares"
-											selected={modal.spares}
-											onSelectedChange={(v) => {
-												modal.spares = v as SelectSpares[];
-											}}
-										>
-											<Select.Trigger>
-												{#if possibleSpares.length > 0}
+										<Select.Root type="multiple" bind:value={sparesArr}>
+											<Select.Trigger class="w-full">
+												{#if sparesArr.length > 0}
 													<span>
-														{modal.spares.length > 0
-															? modal.spares.map((s) => s.label).join(', ')
-															: 'Select spares'}
+														{sparesArr.join(', ')}
 													</span>
 												{:else}
 													<span>Select spares</span>
 												{/if}
 											</Select.Trigger>
-											<Select.Content>
+											<Select.Content class="max-h-36 overflow-y-auto">
 												<Select.Group>
 													{#each possibleSpares as spare}
 														<Select.Item value={spare} label={spare}>
@@ -1614,15 +1589,11 @@
 {/snippet}
 
 {#if confirmModals.active == 'statusPool'}
-	<Dialog.Root
-		bind:open={confirmModals.statusPool.open}
-		onOutsideClick={() => {
-			confirmModals.statusPool.open = false;
-		}}
-		closeOnOutsideClick={true}
-		closeOnEscape={false}
-	>
+	<Dialog.Root bind:open={confirmModals.statusPool.open}>
 		<Dialog.Content
+			onInteractOutside={() => {
+				confirmModals.statusPool.open = false;
+			}}
 			class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-visible overflow-y-auto p-6 transition-all duration-300 ease-in-out lg:max-w-[45%]"
 		>
 			<div class="flex items-center justify-between pb-3">
@@ -1633,9 +1604,9 @@
 						<span class="text-xl font-medium">{confirmModals.statusPool.data.status.name}</span>
 						<Badge
 							variant={sPool.state === 'ONLINE'
-								? 'success'
+								? 'secondary'
 								: sPool.state === 'DEGRADED'
-									? 'warning'
+									? 'outline'
 									: sPool.state === 'FAULTED'
 										? 'destructive'
 										: 'secondary'}
@@ -1806,11 +1777,7 @@
 {/if}
 
 {#if confirmModals.active == 'replaceDevice'}
-	<AlertDialog.Root
-		bind:open={confirmModals.replaceDevice.open}
-		closeOnOutsideClick={false}
-		closeOnEscape={false}
-	>
+	<AlertDialog.Root bind:open={confirmModals.replaceDevice.open}>
 		<AlertDialog.Content>
 			<AlertDialog.Header>
 				<AlertDialog.Title
@@ -1820,43 +1787,28 @@
 			</AlertDialog.Header>
 
 			<div class="space-y-1 py-1">
-				<div>
-					<Select.Root
-						selected={{
-							label:
-								useableDisks.find((d) => d.device === confirmModals.replaceDevice.data?.new)
-									?.device ||
-								useablePartitions.find((d) => d.name === confirmModals.replaceDevice.data?.new)
-									?.name,
-							value: confirmModals.replaceDevice.data?.new
-						}}
-						onSelectedChange={(value) => {
-							confirmModals.replaceDevice.data = {
-								...confirmModals.replaceDevice.data,
-								new: value?.value as string
-							};
-						}}
-					>
-						<Select.Trigger class="w-full">
-							<Select.Value placeholder="Select replacement device" />
-						</Select.Trigger>
-						<Select.Content class="max-h-36 overflow-y-auto">
-							<Select.Group>
-								{#each useableDisks as disk}
-									<Select.Item value={disk.device} label={disk.device}>
-										{disk.device}
-									</Select.Item>
-								{/each}
+				<Select.Root type="single" bind:value={confirmModals.replaceDevice.data.new}>
+					<Select.Trigger class="w-full">
+						{confirmModals.replaceDevice.data?.new
+							? confirmModals.replaceDevice.data?.new
+							: 'Select Replacement Device'}
+					</Select.Trigger>
+					<Select.Content class="max-h-36 overflow-y-auto">
+						<Select.Group>
+							{#each useableDisks as disk}
+								<Select.Item value={disk.device} label={disk.device}>
+									{disk.device}
+								</Select.Item>
+							{/each}
 
-								{#each useablePartitions as partition}
-									<Select.Item value={partition.name} label={partition.name}>
-										{partition.name}
-									</Select.Item>
-								{/each}
-							</Select.Group>
-						</Select.Content>
-					</Select.Root>
-				</div>
+							{#each useablePartitions as partition}
+								<Select.Item value={partition.name} label={partition.name}>
+									{partition.name}
+								</Select.Item>
+							{/each}
+						</Select.Group>
+					</Select.Content>
+				</Select.Root>
 			</div>
 
 			<AlertDialog.Footer>
@@ -1878,7 +1830,7 @@
 	</AlertDialog.Root>
 {/if}
 
-<Dialog.Root bind:open={editModal.open} closeOnOutsideClick={false}>
+<Dialog.Root bind:open={editModal.open}>
 	<Dialog.Content
 		class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-visible overflow-y-auto p-5 transition-all duration-300 ease-in-out lg:max-w-[70%]"
 	>
@@ -1928,22 +1880,13 @@
 					<div class="grid grid-cols-1 gap-4 md:grid-cols-3">
 						<div class="h-full space-y-1">
 							<Label class="w-24 whitespace-nowrap text-sm" for="autoexpand">Auto Expand</Label>
-							<Select.Root
-								selected={{
-									label:
-										editModal.properties.autoexpand === 'on'
-											? 'Yes'
-											: editModal.properties.autoexpand === 'off'
-												? 'No'
-												: undefined,
-									value: editModal.properties.autoexpand
-								}}
-								onSelectedChange={(value) => {
-									editModal.properties.autoexpand = value?.value || 'off';
-								}}
-							>
+							<Select.Root type="single" bind:value={editModal.properties.autoexpand}>
 								<Select.Trigger class="w-full">
-									<Select.Value placeholder="Select Autoexpand" />
+									{editModal.properties.autoexpand === 'on'
+										? 'Yes'
+										: editModal.properties.autoexpand === 'off'
+											? 'No'
+											: 'Select Auto Expand'}
 								</Select.Trigger>
 								<Select.Content class="max-h-36 overflow-y-auto">
 									<Select.Group>
@@ -1957,22 +1900,13 @@
 						<!-- Auto Trim -->
 						<div class="h-full space-y-1">
 							<Label class="w-24 whitespace-nowrap text-sm" for="autotrim">Auto Trim</Label>
-							<Select.Root
-								selected={{
-									label:
-										editModal.properties.autotrim === 'on'
-											? 'Yes'
-											: editModal.properties.autotrim === 'off'
-												? 'No'
-												: undefined,
-									value: editModal.properties.autotrim
-								}}
-								onSelectedChange={(value) => {
-									editModal.properties.autotrim = value?.value || 'off';
-								}}
-							>
+							<Select.Root type="single" bind:value={editModal.properties.autotrim}>
 								<Select.Trigger class="w-full">
-									<Select.Value placeholder="Select Auto Trim" />
+									{editModal.properties.autotrim === 'on'
+										? 'Yes'
+										: editModal.properties.autotrim === 'off'
+											? 'No'
+											: 'Select Auto Trim'}
 								</Select.Trigger>
 								<Select.Content class="max-h-36 overflow-y-auto">
 									<Select.Group>
@@ -1986,22 +1920,13 @@
 						<!-- Delegation -->
 						<div class="h-full space-y-1">
 							<Label class="w-24 whitespace-nowrap text-sm" for="delegation">Delegation</Label>
-							<Select.Root
-								selected={{
-									label:
-										editModal.properties.delegation === 'on'
-											? 'Yes'
-											: editModal.properties.delegation === 'off'
-												? 'No'
-												: undefined,
-									value: editModal.properties.delegation
-								}}
-								onSelectedChange={(value) => {
-									editModal.properties.delegation = value?.value || 'off';
-								}}
-							>
+							<Select.Root type="single" bind:value={editModal.properties.delegation}>
 								<Select.Trigger class="w-full">
-									<Select.Value placeholder="Select Delegation" />
+									{editModal.properties.delegation === 'on'
+										? 'Yes'
+										: editModal.properties.delegation === 'off'
+											? 'No'
+											: 'Select Delegation'}
 								</Select.Trigger>
 								<Select.Content class="max-h-36 overflow-y-auto">
 									<Select.Group>
@@ -2015,24 +1940,15 @@
 						<!-- Fail Mode -->
 						<div class="h-full space-y-1">
 							<Label class="w-24 whitespace-nowrap text-sm" for="failmode">Fail Mode</Label>
-							<Select.Root
-								selected={{
-									label:
-										editModal.properties.failmode === 'wait'
-											? 'Wait'
-											: editModal.properties.failmode === 'continue'
-												? 'Continue'
-												: editModal.properties.failmode === 'panic'
-													? 'Panic'
-													: undefined,
-									value: editModal.properties.failmode
-								}}
-								onSelectedChange={(value) => {
-									editModal.properties.failmode = value?.value || 'wait';
-								}}
-							>
+							<Select.Root type="single" bind:value={editModal.properties.failmode}>
 								<Select.Trigger class="w-full">
-									<Select.Value placeholder="Select Delegation" />
+									{editModal.properties.failmode === 'wait'
+										? 'Wait'
+										: editModal.properties.failmode === 'continue'
+											? 'Continue'
+											: editModal.properties.failmode === 'panic'
+												? 'Panic'
+												: 'Select Fail Mode'}
 								</Select.Trigger>
 								<Select.Content class="max-h-36 overflow-y-auto">
 									<Select.Group>

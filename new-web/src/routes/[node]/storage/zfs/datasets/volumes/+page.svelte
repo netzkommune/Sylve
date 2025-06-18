@@ -388,7 +388,7 @@
 	{#if activeRows && activeRows.length == 1}
 		{#if type === 'create-snapshot' && activeVolume?.type === 'volume'}
 			<Button
-				on:click={async () => {
+				onclick={async () => {
 					if (activeVolume) {
 						confirmModals.active = 'createSnapshot';
 						confirmModals.parent = 'volume';
@@ -405,7 +405,7 @@
 
 		{#if type === 'delete-snapshot' && activeSnapshot?.type === 'snapshot'}
 			<Button
-				on:click={async () => {
+				onclick={async () => {
 					if (activeSnapshot) {
 						confirmModals.active = 'deleteSnapshot';
 						confirmModals.parent = 'snapshot';
@@ -422,7 +422,7 @@
 
 		{#if type === 'delete-volume' && activeVolume?.type === 'volume'}
 			<Button
-				on:click={async () => {
+				onclick={async () => {
 					if (activeRow) {
 						confirmModals.active = 'deleteVolume';
 						confirmModals.parent = 'volume';
@@ -440,7 +440,7 @@
 	{:else if activeRows && activeRows.length > 1}
 		{#if activeVolumes.length > 0 && type === 'delete-volumes' && !isPoolSelected}
 			<Button
-				on:click={async () => {
+				onclick={async () => {
 					if (activeRow) {
 						confirmModals.active = 'deleteVolumes';
 						confirmModals.parent = 'volume';
@@ -461,7 +461,7 @@
 	<div class="flex h-10 w-full items-center gap-2 border p-2">
 		<Search bind:query />
 		<Button
-			on:click={() => {
+			onclick={() => {
 				confirmModals.active = 'createVolume';
 				confirmModals.createVolume.open = true;
 				confirmModals.createVolume.title = '';
@@ -487,23 +487,14 @@
 	/>
 </div>
 
-{#snippet simpleSlect(prop: keyof props, label: string, placeholder: string)}
+{#snippet simpleSelect(prop: keyof props, label: string, placeholder: string)}
 	<div class="space-y-1">
-		<Label class="w-24 whitespace-nowrap text-sm">{label}</Label>
-		<Select.Root
-			selected={{
-				label:
-					zfsProperties[prop].find(
-						(option) => option.value === confirmModals.createVolume.data.properties[prop]
-					)?.label || confirmModals.createVolume.data.properties[prop],
-				value: confirmModals.createVolume.data.properties[prop]
-			}}
-			onSelectedChange={(value) => {
-				confirmModals.createVolume.data.properties[prop] = value?.value || '';
-			}}
-		>
+		<Label class="whitespace-nowrap text-sm">{label}</Label>
+		<Select.Root type="single" bind:value={confirmModals.createVolume.data.properties[prop]}>
 			<Select.Trigger class="w-full">
-				<Select.Value {placeholder} />
+				{zfsProperties[prop].find(
+					(option) => option.value === confirmModals.createVolume.data.properties[prop]
+				)?.label || confirmModals.createVolume.data.properties[prop]}
 			</Select.Trigger>
 
 			<Select.Content class="max-h-36 overflow-y-auto">
@@ -518,11 +509,7 @@
 {/snippet}
 
 {#if confirmModals.active === 'createVolume'}
-	<Dialog.Root
-		bind:open={confirmModals.createVolume.open}
-		closeOnOutsideClick={false}
-		closeOnEscape={false}
-	>
+	<Dialog.Root bind:open={confirmModals.createVolume.open}>
 		<Dialog.Content
 			class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-visible overflow-y-auto p-0 transition-all duration-300 ease-in-out lg:max-w-[70%]"
 		>
@@ -580,7 +567,7 @@
 			<div class="w-full p-4">
 				<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
 					<div class="space-y-1">
-						<Label for="name">Name</Label>
+						<Label class="w-24 whitespace-nowrap text-sm">Name</Label>
 						<Input
 							type="text"
 							id="name"
@@ -604,37 +591,31 @@
 					<div class="space-y-1">
 						<Label class="w-24 whitespace-nowrap text-sm">Parent</Label>
 						<Select.Root
-							selected={{
-								label: confirmModals.createVolume.data.properties.parent || activePool?.name,
-								value: confirmModals.createVolume.data.properties.parent || activePool?.name
-							}}
-							onSelectedChange={(value) => {
-								confirmModals.createVolume.data.properties.parent = value?.value || '';
-							}}
+							type="single"
+							bind:value={confirmModals.createVolume.data.properties.parent}
 						>
 							<Select.Trigger class="w-full">
-								<Select.Value placeholder="Select Parent" />
+								{confirmModals.createVolume.data.properties.parent ||
+									activePool?.name ||
+									'Select Parent'}
 							</Select.Trigger>
-
 							<Select.Content class="max-h-36 overflow-y-auto">
 								<Select.Group>
 									{#each grouped as group}
-										<Select.Item value={group.pool.name} label={group.pool.name}
-											>{group.pool.name}</Select.Item
-										>
+										<Select.Item value={group.pool.name} label={group.pool.name}>
+											{group.pool.name}
+										</Select.Item>
 									{/each}
 								</Select.Group>
 							</Select.Content>
 						</Select.Root>
 					</div>
 
-					{@render simpleSlect('volblocksize', 'Block Size', 'Select block size')}
-					{@render simpleSlect('checksum', 'Checksum', 'Select checksum algorithm')}
-					{@render simpleSlect('compression', 'Compression', 'Select compression type')}
-					{@render simpleSlect('dedup', 'Deduplication', 'Select deduplication mode')}
-					{@render simpleSlect('encryption', 'Encryption', 'Select encryption')}
-					{@render simpleSlect('primarycache', 'Primary Cache', 'Select primary cache mode')}
-					{@render simpleSlect('volmode', 'Volume Mode', 'Select volume mode')}
+					{@render simpleSelect('volblocksize', 'Block Size', 'Select block size')}
+					{@render simpleSelect('checksum', 'Checksum', 'Select checksum algorithm')}
+					{@render simpleSelect('compression', 'Compression', 'Select compression type')}
+					{@render simpleSelect('dedup', 'Deduplication', 'Select deduplication mode')}
+					{@render simpleSelect('encryption', 'Encryption', 'Select encryption')}
 
 					{#if confirmModals.createVolume.data.properties.encryption !== 'off'}
 						<div class="space-y-1">
@@ -666,6 +647,9 @@
 							</div>
 						</div>
 					{/if}
+
+					{@render simpleSelect('primarycache', 'Primary Cache', 'Select primary cache mode')}
+					{@render simpleSelect('volmode', 'Volume Mode', 'Select volume mode')}
 				</div>
 			</div>
 
@@ -733,11 +717,7 @@
 {/if}
 
 {#if confirmModals.active === 'createSnapshot'}
-	<Dialog.Root
-		bind:open={confirmModals.createSnapshot.open}
-		closeOnOutsideClick={false}
-		closeOnEscape={false}
-	>
+	<Dialog.Root bind:open={confirmModals.createSnapshot.open}>
 		<Dialog.Content class="p-5">
 			<div class="flex items-center justify-between">
 				<Dialog.Header class="flex-1">

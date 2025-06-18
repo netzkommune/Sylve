@@ -74,15 +74,12 @@
 			color: element.color
 		}));
 	});
-
-	$inspect(data);
 </script>
 
 <Card.Root>
 	<Card.Header class="flex items-center gap-2 space-y-0 border-b py-0 sm:flex-row">
 		<div class="grid flex-1 gap-1 text-center sm:text-left">
 			<Card.Title>
-				<!-- Icon and {title} -->
 				<div class="flex items-center gap-2">
 					<Icon icon="solar:cpu-bold" class="h-5 w-5" />
 					{title}

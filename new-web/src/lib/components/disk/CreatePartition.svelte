@@ -11,7 +11,7 @@
 	import { capitalizeFirstLetter } from '$lib/utils/string';
 	import Icon from '@iconify/svelte';
 	import humanFormat from 'human-format';
-	import { tick } from 'svelte';
+	import { tick, untrack } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import { slide } from 'svelte/transition';
 
@@ -24,20 +24,13 @@
 	let { open, disk, onCancel }: Data = $props();
 
 	let newPartitions: { name: string; size: number }[] = $state([]);
-	let remainingSpace = $state(0);
-	let currentPartitionInput = $state('');
+	let currentPartitionInput = $state('0 B');
 	let currentPartition = $derived.by(() => {
 		try {
 			const parsed = humanFormat.parse.raw(currentPartitionInput);
 			return parsed.factor * parsed.value;
 		} catch (e) {
 			return 0;
-		}
-	});
-
-	$effect(() => {
-		if (disk) {
-			remainingSpace = calculateRemainingSpace(disk);
 		}
 	});
 
@@ -60,7 +53,9 @@
 
 				successMessage += ` ${getTranslation('common.created', 'created')}`;
 
-				toast.success(successMessage);
+				toast.success(successMessage, {
+					position: 'bottom-center'
+				});
 			} else {
 				handleAPIError(result);
 				let errorMessage =
@@ -123,9 +118,11 @@
 
 		return actual;
 	}
+
+	let remainingSpace = $derived.by(() => (disk ? calculateRemainingSpace(disk) : 0));
 </script>
 
-<Dialog.Root bind:open onOutsideClick={(e) => close()}>
+<Dialog.Root bind:open>
 	<Dialog.Content
 		class="fixed left-1/2 top-1/2 w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-4 overflow-hidden p-5 lg:max-w-3xl"
 	>
@@ -141,7 +138,7 @@
 					variant="ghost"
 					class="h-8"
 					title={capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}
-					on:click={() => {
+					onclick={() => {
 						newPartitions = [];
 						remainingSpace = disk ? calculateRemainingSpace(disk) : 0;
 						currentPartition = 0;
@@ -221,16 +218,20 @@
 		<div class="space-y-2 border-t px-6 pt-4">
 			<div class="flex items-center gap-6">
 				<div class="flex-1">
-					<Slider
-						value={[currentPartition]}
-						max={remainingSpace}
-						step={0.1}
-						onValueChange={(e) => {
-							const value = Math.floor(e[0]);
-							currentPartition = value <= 0 ? 0 : value;
-							currentPartitionInput = humanFormat(currentPartition);
-						}}
-					/>
+					{#if remainingSpace > 0}
+						<!-- <Slider
+							type="single"
+							bind:value={currentPartition}
+							max={remainingSpace}
+							step={0.1}
+							onValueCommit={(value: number) => {
+								currentPartition = value <= 0 ? 0 : value;
+								currentPartitionInput = humanFormat(currentPartition);
+
+								console.log('Slider value committed:', value);
+							}}
+						/> -->
+					{/if}
 				</div>
 
 				<Input

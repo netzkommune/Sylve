@@ -285,7 +285,7 @@
 {#snippet button(type: string)}
 	{#if type === 'delete-snapshot' && activeDataset !== null}
 		<Button
-			on:click={async () => {
+			onclick={async () => {
 				confirmModals.active = 'deleteSnapshot';
 				confirmModals.parent = 'snapshot';
 				confirmModals.deleteSnapshot.open = true;
@@ -301,7 +301,7 @@
 
 	{#if type === 'view-periodics' && activePeriodics.length > 0}
 		<Button
-			on:click={async () => {
+			onclick={async () => {
 				confirmModals.active = 'viewSnapshotJobs';
 				confirmModals.parent = 'snapshot';
 				// confirmModals.deleteSnapshot.open = true;
@@ -322,7 +322,7 @@
 		<Search bind:query />
 
 		<Button
-			on:click={() => {
+			onclick={() => {
 				confirmModals.active = 'createSnapshot';
 				confirmModals.parent = 'snapshot';
 				confirmModals.createSnapshot.open = true;
@@ -357,11 +357,7 @@
 </div>
 
 {#if confirmModals.active === 'createSnapshot'}
-	<Dialog.Root
-		bind:open={confirmModals[confirmModals.active].open}
-		closeOnOutsideClick={false}
-		closeOnEscape={false}
-	>
+	<Dialog.Root bind:open={confirmModals[confirmModals.active].open}>
 		<Dialog.Content>
 			<div class="flex items-center justify-between">
 				<Dialog.Header class="flex-1">
@@ -472,11 +468,7 @@
 {/if}
 
 {#if confirmModals.active === 'deleteSnapshot'}
-	<AlertDialog.Root
-		bind:open={confirmModals[confirmModals.active].open}
-		closeOnOutsideClick={false}
-		closeOnEscape={false}
-	>
+	<AlertDialog.Root bind:open={confirmModals[confirmModals.active].open}>
 		<AlertDialog.Content>
 			<AlertDialog.Header>
 				<AlertDialog.Title>{getTranslation('are_you_sure', 'Are you sure?')}</AlertDialog.Title>
@@ -502,8 +494,7 @@
 					for="deleteRecursive"
 					class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
 					onclick={() => {
-						confirmModals[confirmModals.active].recursive =
-							!confirmModals[confirmModals.active].recursive;
+						confirmModals['deleteSnapshot'].recursive = !confirmModals['deleteSnapshot'].recursive;
 					}}
 				>
 					Recursive
@@ -512,14 +503,14 @@
 
 			<AlertDialog.Footer>
 				<AlertDialog.Cancel
-					on:click={() => {
+					onclick={() => {
 						confirmModals[confirmModals.active].open = false;
 					}}
 				>
 					Cancel
 				</AlertDialog.Cancel>
 				<AlertDialog.Action
-					on:click={() => {
+					onclick={() => {
 						confirmAction();
 					}}
 				>

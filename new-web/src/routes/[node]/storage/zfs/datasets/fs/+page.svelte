@@ -615,11 +615,7 @@
 {/if}
 
 {#if confirmModals.active === 'createSnapshot'}
-	<Dialog.Root
-		bind:open={confirmModals.createSnapshot.open}
-		closeOnOutsideClick={false}
-		closeOnEscape={false}
-	>
+	<Dialog.Root bind:open={confirmModals.createSnapshot.open}>
 		<Dialog.Content class="p-5">
 			<div class="flex items-center justify-between">
 				<Dialog.Header class="flex-1">
@@ -707,11 +703,7 @@
 {/if}
 
 {#if confirmModals.active === 'createFilesystem'}
-	<Dialog.Root
-		bind:open={confirmModals.createFilesystem.open}
-		closeOnOutsideClick={false}
-		closeOnEscape={false}
-	>
+	<Dialog.Root bind:open={confirmModals.createFilesystem.open}>
 		<Dialog.Content
 			class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-visible overflow-y-auto p-5 transition-all duration-300 ease-in-out lg:max-w-[70%]"
 		>
@@ -768,7 +760,7 @@
 			<div class="w-full">
 				<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
 					<div class="space-y-1">
-						<Label for="name">Name</Label>
+						<Label for="name" class="w-24 whitespace-nowrap text-sm">Name</Label>
 						<Input
 							type="text"
 							id="name"
@@ -781,18 +773,13 @@
 					<div class="space-y-1">
 						<Label class="w-24 whitespace-nowrap text-sm">Parent</Label>
 						<Select.Root
-							selected={{
-								label: confirmModals.createFilesystem.data.properties.parent || activeDataset?.name,
-								value: confirmModals.createFilesystem.data.properties.parent || activeDataset?.name
-							}}
-							onSelectedChange={(value) => {
-								confirmModals.createFilesystem.data.properties.parent = value?.value || '';
-							}}
+							type="single"
+							bind:value={confirmModals.createFilesystem.data.properties.parent}
 						>
 							<Select.Trigger class="w-full">
-								<Select.Value placeholder="Select Parent" />
+								{confirmModals.createFilesystem.data.properties.parent ||
+									(activeDataset ? activeDataset.name : 'Select Parent')}
 							</Select.Trigger>
-
 							<Select.Content class="max-h-36 overflow-y-auto">
 								<Select.Group>
 									{#each grouped as pool}
@@ -808,18 +795,17 @@
 					<div class="space-y-1">
 						<Label class="w-24 whitespace-nowrap text-sm">ATime</Label>
 						<Select.Root
-							selected={{
-								label: confirmModals.createFilesystem.data.properties.atime,
-								value: confirmModals.createFilesystem.data.properties.atime
-							}}
-							onSelectedChange={(value) => {
-								confirmModals.createFilesystem.data.properties.atime = value?.value || '';
-							}}
+							type="single"
+							bind:value={confirmModals.createFilesystem.data.properties.atime}
 						>
 							<Select.Trigger class="w-full">
-								<Select.Value placeholder="Select access time mode" />
+								{confirmModals.createFilesystem.data.properties.atime === 'on'
+									? 'Yes'
+									: confirmModals.createFilesystem.data.properties.atime === 'off'
+										? 'No'
+										: 'Select ATime'}
 							</Select.Trigger>
-							<Select.Content class="max-h-36 overflow-y-auto">
+							<Select.Content>
 								<Select.Group>
 									{#each zfsProperties.atime as option}
 										<Select.Item value={option.value} label={option.label}
@@ -828,25 +814,19 @@
 									{/each}
 								</Select.Group>
 							</Select.Content>
-							<Select.Input />
 						</Select.Root>
 					</div>
 
 					<div class="space-y-1">
 						<Label class="w-24 whitespace-nowrap text-sm">Checkum</Label>
 						<Select.Root
-							selected={{
-								label: confirmModals.createFilesystem.data.properties.checksum,
-								value: confirmModals.createFilesystem.data.properties.checksum
-							}}
-							onSelectedChange={(value) => {
-								confirmModals.createFilesystem.data.properties.checksum = value?.value || '';
-							}}
+							type="single"
+							bind:value={confirmModals.createFilesystem.data.properties.checksum}
 						>
 							<Select.Trigger class="w-full">
-								<Select.Value placeholder="Select checksum algorithm" />
+								{confirmModals.createFilesystem.data.properties.checksum}
 							</Select.Trigger>
-							<Select.Content class="max-h-36 overflow-y-auto">
+							<Select.Content>
 								<Select.Group>
 									{#each zfsProperties.checksum as option}
 										<Select.Item value={option.value} label={option.label}
@@ -855,25 +835,20 @@
 									{/each}
 								</Select.Group>
 							</Select.Content>
-							<Select.Input />
 						</Select.Root>
 					</div>
 
 					<div class="space-y-1">
 						<Label class="w-24 whitespace-nowrap text-sm">Compression</Label>
 						<Select.Root
-							selected={{
-								label: confirmModals.createFilesystem.data.properties.compression,
-								value: confirmModals.createFilesystem.data.properties.compression
-							}}
-							onSelectedChange={(value) => {
-								confirmModals.createFilesystem.data.properties.compression = value?.value || '';
-							}}
+							type="single"
+							bind:value={confirmModals.createFilesystem.data.properties.compression}
 						>
 							<Select.Trigger class="w-full">
-								<Select.Value placeholder="Select compression type" />
+								{confirmModals.createFilesystem.data.properties.compression}
 							</Select.Trigger>
-							<Select.Content class="max-h-36 overflow-y-auto">
+
+							<Select.Content>
 								<Select.Group>
 									{#each zfsProperties.compression as option}
 										<Select.Item value={option.value} label={option.label}
@@ -882,26 +857,25 @@
 									{/each}
 								</Select.Group>
 							</Select.Content>
-							<Select.Input />
 						</Select.Root>
 					</div>
 
 					<div class="space-y-1">
 						<Label class="w-24 whitespace-nowrap text-sm">Deduplication</Label>
 						<Select.Root
-							portal={null}
-							selected={{
-								label: confirmModals.createFilesystem.data.properties.dedup,
-								value: confirmModals.createFilesystem.data.properties.dedup
-							}}
-							onSelectedChange={(value) => {
-								confirmModals.createFilesystem.data.properties.dedup = value?.value || '';
-							}}
+							type="single"
+							bind:value={confirmModals.createFilesystem.data.properties.dedup}
 						>
 							<Select.Trigger class="w-full">
-								<Select.Value placeholder="Select dedup mode" />
+								{#if confirmModals.createFilesystem.data.properties.dedup === 'off'}
+									No
+								{:else if confirmModals.createFilesystem.data.properties.dedup === 'on'}
+									Yes
+								{:else}
+									{confirmModals.createFilesystem.data.properties.dedup}
+								{/if}
 							</Select.Trigger>
-							<Select.Content class="max-h-36 overflow-y-auto">
+							<Select.Content>
 								<Select.Group>
 									{#each zfsProperties.dedup as option}
 										<Select.Item value={option.value} label={option.label}
@@ -910,26 +884,23 @@
 									{/each}
 								</Select.Group>
 							</Select.Content>
-							<Select.Input />
 						</Select.Root>
 					</div>
 
 					<div class="space-y-1">
 						<Label class="w-24 whitespace-nowrap text-sm">Encryption</Label>
 						<Select.Root
-							portal={null}
-							selected={{
-								label: confirmModals.createFilesystem.data.properties.encryption,
-								value: confirmModals.createFilesystem.data.properties.encryption
-							}}
-							onSelectedChange={(value) => {
-								confirmModals.createFilesystem.data.properties.encryption = value?.value || '';
-							}}
+							type="single"
+							bind:value={confirmModals.createFilesystem.data.properties.encryption}
 						>
 							<Select.Trigger class="w-full">
-								<Select.Value placeholder="Select encryption standard" />
+								{confirmModals.createFilesystem.data.properties.encryption === 'off'
+									? 'No'
+									: confirmModals.createFilesystem.data.properties.encryption === 'on'
+										? 'Yes'
+										: confirmModals.createFilesystem.data.properties.encryption}
 							</Select.Trigger>
-							<Select.Content class="max-h-36 overflow-y-auto">
+							<Select.Content>
 								<Select.Group>
 									{#each zfsProperties.encryption as option}
 										<Select.Item value={option.value} label={option.label}
@@ -938,7 +909,6 @@
 									{/each}
 								</Select.Group>
 							</Select.Content>
-							<Select.Input />
 						</Select.Root>
 					</div>
 

@@ -32,7 +32,7 @@
 		label="Description"
 		placeholder="Optional description for this virtual machine"
 		type="textarea"
-		textAreaCLasses="min-h-28"
+		textAreaCLasses="min-h-40"
 		bind:value={description}
 		classes="flex-1 space-y-1"
 	/>

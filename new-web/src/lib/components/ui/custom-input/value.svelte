@@ -32,7 +32,7 @@
 
 <div class={`${classes}`}>
 	{#if label}
-		<Label for={nanoId}>{label}</Label>
+		<Label class="w-full whitespace-nowrap text-sm" for={nanoId}>{label}</Label>
 	{/if}
 	{#if type === 'textarea'}
 		<Textarea

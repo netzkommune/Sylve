@@ -42,16 +42,16 @@
 	];
 </script>
 
-<div class="flex flex-col gap-4 p-4">
+<div class="flex flex-col gap-4 space-y-1.5 p-4">
 	<div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
 		<CustomValueInput
 			label="VNC Port"
 			placeholder="5900"
 			bind:value={vncPort}
-			classes="flex-1 space-y-1"
+			classes="flex-1 space-y-1.5"
 		/>
 
-		<div class="space-y-1">
+		<div class="space-y-1.5">
 			<Label class="w-24 whitespace-nowrap text-sm">VNC Password</Label>
 			<div class="flex w-full max-w-sm items-center space-x-2">
 				<Input
@@ -61,7 +61,6 @@
 					class="w-full"
 					autocomplete="off"
 					bind:value={vncPassword}
-					showPasswordOnFocus={true}
 				/>
 
 				<Button
@@ -81,25 +80,17 @@
 		</div>
 	</div>
 
-	<CustomComboBox
-		bind:open={resolutionOpen}
-		label="VNC Resolution"
-		bind:value={vncResolution}
-		data={resolutions}
-		classes="flex-1 space-y-1"
-		placeholder="Select VNC resolution"
-		width="w-[85%]"
-	></CustomComboBox>
-
-	<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
-		<CustomCheckbox label="VNC Wait" bind:checked={vncWait} classes="flex items-center gap-2"
-		></CustomCheckbox>
-
-		<CustomCheckbox
-			label="Start On Boot"
-			bind:checked={startAtBoot}
-			classes="flex items-center gap-2"
-		></CustomCheckbox>
+	<div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+		<CustomComboBox
+			bind:open={resolutionOpen}
+			label="VNC Resolution"
+			bind:value={vncResolution}
+			data={resolutions}
+			classes="flex-1 space-y-1.5"
+			placeholder="Select VNC resolution"
+			triggerWidth="w-full "
+			width="w-full"
+		></CustomComboBox>
 
 		<CustomValueInput
 			label="Startup/Shutdown Order"
@@ -108,5 +99,16 @@
 			bind:value={bootOrder}
 			classes="flex-1 space-y-1"
 		/>
+	</div>
+
+	<div class="mt-1 grid grid-cols-1 gap-4 lg:grid-cols-3">
+		<CustomCheckbox label="VNC Wait" bind:checked={vncWait} classes="flex items-center gap-2"
+		></CustomCheckbox>
+
+		<CustomCheckbox
+			label="Start On Boot"
+			bind:checked={startAtBoot}
+			classes="flex items-center gap-2"
+		></CustomCheckbox>
 	</div>
 </div>

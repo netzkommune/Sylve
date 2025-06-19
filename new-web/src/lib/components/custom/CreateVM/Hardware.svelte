@@ -62,27 +62,27 @@
 			placeholder="1"
 			type="number"
 			bind:value={sockets}
-			classes="flex-1"
+			classes="flex-1 space-y-1.5"
 		/>
 		<CustomValueInput
 			label="CPU Cores"
 			placeholder="1"
 			type="number"
 			bind:value={cores}
-			classes="flex-1"
+			classes="flex-1 space-y-1.5"
 		/>
 		<CustomValueInput
 			label="CPU Threads"
 			placeholder="1"
 			type="number"
 			bind:value={threads}
-			classes="flex-1"
+			classes="flex-1 space-y-1.5"
 		/>
 		<CustomValueInput
 			label="Memory Size"
 			placeholder="10G"
 			bind:value={humanSize}
-			classes="flex-1"
+			classes="flex-1 space-y-1.5"
 		/>
 	</div>
 

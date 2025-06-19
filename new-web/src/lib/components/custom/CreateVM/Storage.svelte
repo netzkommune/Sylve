@@ -6,7 +6,6 @@
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 	import { type Download } from '$lib/types/utilities/downloader';
 	import type { Dataset } from '$lib/types/zfs/dataset';
-
 	import humanFormat from 'human-format';
 
 	interface Props {
@@ -149,14 +148,16 @@
 </script>
 
 {#snippet radioItem(type: string)}
-	<div class="mb-2 flex items-center space-x-3 rounded-lg border p-4">
+	<div class="mb-2 flex items-center space-x-3 rounded-lg border p-2.5">
 		<RadioGroup.Item value={type} id={type} />
-		<Label for={type} class="flex flex-col gap-2">
-			<p>{details(type)[0]}</p>
-			<p class="text-muted-foreground text-sm">
-				{details(type)[1]}
-			</p>
-		</Label>
+		<div class=" flex-1">
+			<Label for={type} class="flex flex-col gap-2">
+				<p>{details(type)[0]}</p>
+				<p class="text-muted-foreground text-sm font-normal">
+					{details(type)[1]}
+				</p>
+			</Label>
+		</div>
 	</div>
 {/snippet}
 
@@ -169,29 +170,29 @@
 			data={comboBoxes.volumes.options}
 			classes="flex-1 space-y-1"
 			placeholder="Select ZFS volume"
-			width="w-[70%]"
+			triggerWidth="w-full "
+			width="w-full lg:w-[75%]"
 		></CustomComboBox>
 	{/if}
 
 	{#if type === 'raw'}
-		<div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
-			<CustomValueInput
-				label="Disk Size"
-				placeholder="10G"
-				bind:value={humanSize}
-				classes="flex-1 space-y-1"
-			/>
+		<CustomValueInput
+			label="Disk Size"
+			placeholder="10G"
+			bind:value={humanSize}
+			classes="flex-1 space-y-1"
+		/>
 
-			<CustomComboBox
-				bind:open={comboBoxes.filesystems.open}
-				label="Filesystem Dataset"
-				bind:value={guid}
-				data={comboBoxes.filesystems.options}
-				classes="flex-1 space-y-1"
-				placeholder="Select filesystem"
-				width="w-[60%]"
-			></CustomComboBox>
-		</div>
+		<CustomComboBox
+			bind:open={comboBoxes.filesystems.open}
+			label="Filesystem Dataset"
+			bind:value={guid}
+			data={comboBoxes.filesystems.options}
+			classes="flex-1 space-y-1"
+			placeholder="Select filesystem"
+			triggerWidth="w-full"
+			width="w-full lg:w-[75%]"
+		></CustomComboBox>
 	{/if}
 
 	<CustomComboBox
@@ -201,30 +202,34 @@
 		data={comboBoxes.emulationType.options}
 		classes="flex-1 space-y-1"
 		placeholder="Select emulation type"
-		width="w-[40%]"
+		triggerWidth="w-full "
+		width="w-full lg:w-[75%]"
 	></CustomComboBox>
 {/snippet}
 
 <div class="flex flex-col gap-4 p-4">
 	<RadioGroup.Root bind:value={type} class="border p-2">
-		<ScrollArea orientation="vertical" class="h-60 w-full max-w-full">
+		<ScrollArea orientation="vertical" class="h-52 w-full max-w-full">
 			{#each ['zvol', 'raw', 'none'] as storageType}
 				{@render radioItem(storageType)}
 			{/each}
 		</ScrollArea>
 	</RadioGroup.Root>
 
-	{#if type !== 'none'}
-		{@render storageDetail(type)}
-	{/if}
+	<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+		{#if type !== 'none'}
+			{@render storageDetail(type)}
+		{/if}
 
-	<CustomComboBox
-		bind:open={comboBoxes.isos.open}
-		label="Installation Media"
-		bind:value={iso}
-		data={comboBoxes.isos.options}
-		classes="flex-1 space-y-1"
-		placeholder="Select installation media"
-		width="w-[70%]"
-	></CustomComboBox>
+		<CustomComboBox
+			bind:open={comboBoxes.isos.open}
+			label="Installation Media"
+			bind:value={iso}
+			data={comboBoxes.isos.options}
+			classes="flex-1 space-y-1"
+			placeholder="Select installation media"
+			triggerWidth="w-full "
+			width="w-full lg:w-[75%]"
+		></CustomComboBox>
+	</div>
 </div>

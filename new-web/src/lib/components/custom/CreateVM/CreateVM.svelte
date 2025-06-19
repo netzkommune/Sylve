@@ -186,9 +186,9 @@
 
 <Dialog.Root bind:open>
 	<Dialog.Content
-		class="fixed left-1/2 top-1/2 max-h-[90vh] w-full max-w-[90%] -translate-x-1/2 -translate-y-1/2 transform overflow-visible overflow-y-auto p-5 transition-all duration-300 ease-in-out lg:max-w-xl"
+		class="fixed left-1/2 top-1/2 flex h-[73vh] w-full max-w-[90%] -translate-x-1/2 -translate-y-1/2 transform flex-col overflow-hidden p-0 lg:max-w-2xl"
 	>
-		<div class="flex items-center justify-between px-2 py-3">
+		<div class="flex items-center justify-between px-4 py-3">
 			<Dialog.Header class="p-0">
 				<Dialog.Title class="flex flex-col gap-1 text-left">
 					<div class="flex items-center gap-2">
@@ -227,67 +227,68 @@
 				</Button>
 			</div>
 		</div>
+		<div class="flex-1 overflow-y-auto px-4 py-3">
+			<Tabs.Root value="basic" class="w-full overflow-hidden">
+				<Tabs.List class="grid w-full grid-cols-5 p-0 ">
+					{#each tabs as { value, label }}
+						<Tabs.Trigger class="border-b" {value}>{label}</Tabs.Trigger>
+					{/each}
+				</Tabs.List>
 
-		<Tabs.Root value="basic" class="w-full overflow-hidden">
-			<Tabs.List class="grid w-full grid-cols-5 p-0 px-2">
 				{#each tabs as { value, label }}
-					<Tabs.Trigger class="border-b" {value}>{label}</Tabs.Trigger>
+					<Tabs.Content {value} class="">
+						<div class="">
+							{#if value === 'basic'}
+								<Basic
+									bind:name={modal.name}
+									bind:id={modal.id}
+									bind:description={modal.description}
+								/>
+							{:else if value === 'storage'}
+								<Storage
+									{volumes}
+									{filesystems}
+									{downloads}
+									bind:type={modal.storage.type}
+									bind:guid={modal.storage.guid}
+									bind:size={modal.storage.size}
+									bind:emulation={modal.storage.emulation}
+									bind:iso={modal.storage.iso}
+								/>
+							{:else if value === 'network'}
+								<Network
+									switches={networkSwitches}
+									bind:switch={modal.network.switch}
+									bind:mac={modal.network.mac}
+									bind:emulation={modal.network.emulation}
+								/>
+							{:else if value === 'hardware'}
+								<Hardware
+									devices={passablePci}
+									{pptDevices}
+									bind:sockets={modal.hardware.sockets}
+									bind:cores={modal.hardware.cores}
+									bind:threads={modal.hardware.threads}
+									bind:memory={modal.hardware.memory}
+									bind:passthroughIds={modal.hardware.passthroughIds}
+								/>
+							{:else if value === 'advanced'}
+								<Advanced
+									bind:vncPort={modal.advanced.vncPort}
+									bind:vncPassword={modal.advanced.vncPassword}
+									bind:vncWait={modal.advanced.vncWait}
+									bind:startAtBoot={modal.advanced.startAtBoot}
+									bind:bootOrder={modal.advanced.bootOrder}
+									bind:vncResolution={modal.advanced.vncResolution}
+								/>
+							{/if}
+						</div>
+					</Tabs.Content>
 				{/each}
-			</Tabs.List>
+			</Tabs.Root>
+		</div>
 
-			{#each tabs as { value, label }}
-				<Tabs.Content {value} class="">
-					<div class="">
-						{#if value === 'basic'}
-							<Basic
-								bind:name={modal.name}
-								bind:id={modal.id}
-								bind:description={modal.description}
-							/>
-						{:else if value === 'storage'}
-							<Storage
-								{volumes}
-								{filesystems}
-								{downloads}
-								bind:type={modal.storage.type}
-								bind:guid={modal.storage.guid}
-								bind:size={modal.storage.size}
-								bind:emulation={modal.storage.emulation}
-								bind:iso={modal.storage.iso}
-							/>
-						{:else if value === 'network'}
-							<Network
-								switches={networkSwitches}
-								bind:switch={modal.network.switch}
-								bind:mac={modal.network.mac}
-								bind:emulation={modal.network.emulation}
-							/>
-						{:else if value === 'hardware'}
-							<Hardware
-								devices={passablePci}
-								{pptDevices}
-								bind:sockets={modal.hardware.sockets}
-								bind:cores={modal.hardware.cores}
-								bind:threads={modal.hardware.threads}
-								bind:memory={modal.hardware.memory}
-								bind:passthroughIds={modal.hardware.passthroughIds}
-							/>
-						{:else if value === 'advanced'}
-							<Advanced
-								bind:vncPort={modal.advanced.vncPort}
-								bind:vncPassword={modal.advanced.vncPassword}
-								bind:vncWait={modal.advanced.vncWait}
-								bind:startAtBoot={modal.advanced.startAtBoot}
-								bind:bootOrder={modal.advanced.bootOrder}
-								bind:vncResolution={modal.advanced.vncResolution}
-							/>
-						{/if}
-					</div>
-				</Tabs.Content>
-			{/each}
-		</Tabs.Root>
-
-		<Dialog.Footer>
+		<Dialog.Footer class="px-4 py-3">
 			<div class="flex w-full justify-end px-1 py-3 md:flex-row">
 				<Button size="sm" type="button" class="h-8" onclick={() => create()}
 					>Create Virtual Machine</Button

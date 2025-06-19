@@ -118,7 +118,7 @@
 		vdevContainers: [] as VdevContainer[],
 		raidType: 'stripe' as ZpoolRaidType,
 		mountPoint: '',
-		advanced: false,
+		advanced: true,
 		forceCreate: false,
 		properties: {
 			comment: '',
@@ -1094,7 +1094,7 @@
 
 <Dialog.Root bind:open={modal.open}>
 	<Dialog.Content
-		class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-visible overflow-y-auto p-5 transition-all duration-300 ease-in-out lg:max-w-[70%]"
+		class="fixed left-1/2 top-1/2 flex h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform flex-col gap-0 overflow-auto p-0 transition-all duration-300 ease-in-out lg:max-w-[70%]"
 	>
 		<div class="flex items-center justify-between px-4 py-3">
 			<Dialog.Header class="p-0">
@@ -1116,7 +1116,7 @@
 						modal.name = '';
 						modal.vdevCount = 1;
 						modal.vdevContainers = [];
-						modal.advanced = false;
+						modal.advanced = true;
 						modal.properties = {
 							comment: '',
 							ashift: 12,
@@ -1150,8 +1150,8 @@
 				</Button>
 			</div>
 		</div>
-		<Tabs.Root value="tab-devices" class="w-full overflow-hidden">
-			<Tabs.List class="grid w-full grid-cols-2 p-0 px-4">
+		<Tabs.Root value="tab-devices" class="flex h-full flex-col overflow-y-auto px-4">
+			<Tabs.List class="grid w-full grid-cols-2 p-0 ">
 				<Tabs.Trigger value="tab-devices" class="border-b">
 					{capitalizeFirstLetter(getTranslation('common.devices', 'Devices'))}
 				</Tabs.Trigger>
@@ -1161,7 +1161,7 @@
 			</Tabs.List>
 			<Tabs.Content class="mt-0" value="tab-devices">
 				<Card.Root class="border-none pb-4">
-					<Card.Content class="flex gap-4 p-4 !pb-0">
+					<Card.Content class="grid grid-cols-1 gap-4 p-4 !pb-0 lg:grid-cols-3">
 						<CustomValueInput
 							label={capitalizeFirstLetter(getTranslation('common.name', 'Name'))}
 							placeholder="tank"
@@ -1215,7 +1215,7 @@
 							</Select.Root> -->
 
 							<Select.Root type="single" bind:value={modal.raidType}>
-								<Select.Trigger class="w-[180px]">
+								<Select.Trigger class="w-full">
 									{modal.raidType
 										? raidTypes.find((rt) => rt.value === modal.raidType)?.label
 										: 'Select Redundancy'}
@@ -1275,7 +1275,7 @@
 						<div id="disk-containers">
 							<Label>Disks</Label>
 							<div
-								class="bg-muted mt-1 grid grid-cols-4 gap-6 overflow-hidden border-y border-none p-4"
+								class="bg-muted mt-1 grid grid-cols-2 gap-6 overflow-hidden border-y border-none p-4 lg:grid-cols-4"
 							>
 								{@render diskContainer('HDD')}
 								{@render diskContainer('SSD')}
@@ -1291,14 +1291,23 @@
 				<Card.Root class="min-h-[20vh] border-none pb-6">
 					<Card.Content class="flex flex-col gap-4 p-4 !pb-0">
 						<div transition:slide class="grid grid-cols-1 gap-4">
-							<div class="flex-1 space-y-1">
+							<!-- <div class="flex-1 space-y-1">
 								<Label for="comment">Comment</Label>
 								<Textarea
 									id="comment"
 									placeholder="Comments about the pool"
 									bind:value={modal.properties.comment}
 								/>
-							</div>
+							</div> -->
+
+							<CustomValueInput
+								label="Comment"
+								placeholder="Comments about the pool"
+								type="textarea"
+								textAreaCLasses="min-h-0 h-52"
+								bind:value={modal.properties.comment}
+								classes="flex-1 space-y-1"
+							/>
 
 							<div transition:slide class="grid grid-cols-1 items-center gap-4 md:grid-cols-3">
 								<CustomValueInput
@@ -1462,16 +1471,14 @@
 			</Tabs.Content>
 		</Tabs.Root>
 
-		<Dialog.Footer class="flex justify-between gap-2 border-t px-4 py-3">
-			<div class="flex gap-2">
-				<Button size="sm" class="h-8 " onclick={() => makePool()}>
-					{#if modal.creating}
-						<Icon icon="mdi:loading" class="mr-1 h-4 w-4 animate-spin" />
-					{:else}
-						{capitalizeFirstLetter(getTranslation('common.create', 'Create'))}
-					{/if}
-				</Button>
-			</div>
+		<Dialog.Footer class="flex w-full items-end gap-2 border-t px-4 py-3">
+			<Button size="sm" class="h-8 w-24" onclick={() => makePool()}>
+				{#if modal.creating}
+					<Icon icon="mdi:loading" class="mr-1 h-4 w-4 animate-spin" />
+				{:else}
+					{capitalizeFirstLetter(getTranslation('common.create', 'Create'))}
+				{/if}
+			</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

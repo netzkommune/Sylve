@@ -148,16 +148,14 @@
 </script>
 
 {#snippet radioItem(type: string)}
-	<div class="mb-2 flex items-center space-x-3 rounded-lg border p-2.5">
+	<div class="mb-2 flex items-center space-x-5 rounded-lg border p-2.5">
 		<RadioGroup.Item value={type} id={type} />
-		<div class=" flex-1">
-			<Label for={type} class="flex flex-col gap-2">
-				<p>{details(type)[0]}</p>
-				<p class="text-muted-foreground text-sm font-normal">
-					{details(type)[1]}
-				</p>
-			</Label>
-		</div>
+		<Label for={type} class="flex flex-col items-start  gap-2">
+			<p class="">{details(type)[0]}</p>
+			<p class="text-muted-foreground text-sm font-normal">
+				{details(type)[1]}
+			</p>
+		</Label>
 	</div>
 {/snippet}
 

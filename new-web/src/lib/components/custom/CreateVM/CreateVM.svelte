@@ -182,11 +182,46 @@
 			}
 		}
 	}
+
+	function resetModal() {
+		modal = {
+			name: '',
+			id: 0,
+			description: '',
+			storage: {
+				type: 'zvol',
+				guid: '',
+				size: 0,
+				emulation: 'ahci-hd',
+				iso: ''
+			},
+			network: {
+				switch: 0,
+				mac: '',
+				emulation: 'e1000'
+			},
+			hardware: {
+				sockets: 1,
+				cores: 1,
+				threads: 1,
+				memory: 0,
+				passthroughIds: [] as number[]
+			},
+			advanced: {
+				vncPort: 0,
+				vncPassword: generatePassword(),
+				vncWait: false,
+				vncResolution: '1024x768',
+				startAtBoot: false,
+				bootOrder: 0
+			}
+		};
+	}
 </script>
 
 <Dialog.Root bind:open>
 	<Dialog.Content
-		class="fixed left-1/2 top-1/2 flex h-[73vh] w-full max-w-[90%] -translate-x-1/2 -translate-y-1/2 transform flex-col overflow-hidden p-0 lg:max-w-2xl"
+		class="fixed left-1/2 top-1/2 flex h-[85vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform flex-col gap-0 overflow-auto p-0 transition-all duration-300 ease-in-out lg:h-[72vh] lg:max-w-2xl"
 	>
 		<div class="flex items-center justify-between px-4 py-3">
 			<Dialog.Header class="p-0">
@@ -206,6 +241,7 @@
 					size="sm"
 					variant="ghost"
 					class="h-8"
+					onclick={() => resetModal()}
 					title={capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}
 				>
 					<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />

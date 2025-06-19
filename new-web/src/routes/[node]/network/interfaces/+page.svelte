@@ -69,7 +69,8 @@
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
 			<Icon icon="mdi:eye" class="mr-1 h-4 w-4" />
-			{capitalizeFirstLetter(getTranslation('common.view', 'View'))}
+			<!-- {capitalizeFirstLetter(getTranslation('common.view', 'View'))} -->
+			{'View'}
 		</Button>
 	{/if}
 {/snippet}

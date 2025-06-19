@@ -346,7 +346,7 @@
 				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 			>
 				<Icon icon="mdi:pencil" class="mr-1 h-4 w-4" />
-				{capitalizeFirstLetter(getTranslation('common.edit', 'Edit'))}
+				{'Edit'}
 			</Button>
 		{:else if type === 'delete'}
 			<Button
@@ -355,7 +355,7 @@
 				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 			>
 				<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
-				{capitalizeFirstLetter(getTranslation('common.delete', 'Delete'))}
+				{'Delete'}
 			</Button>
 		{/if}
 	{/if}
@@ -373,7 +373,7 @@
 			class="h-6"
 		>
 			<Icon icon="gg:add" class="mr-1 h-4 w-4" />
-			{capitalizeFirstLetter(getTranslation('common.new', 'New'))}
+			{'New'}
 		</Button>
 
 		{@render button('edit')}

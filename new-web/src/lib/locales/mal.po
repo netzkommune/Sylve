@@ -926,3 +926,19 @@ msgstr ""
 #: src/routes/[node]/summary/+page.svelte
 msgid "Uptime"
 msgstr "അപ്പ് ടൈം"
+
+#: src/routes/[node]/network/interfaces/+page.svelte
+msgid "<0></0> View"
+msgstr ""
+
+#: src/lib/components/custom/TreeTable/Search.svelte
+msgid "Search"
+msgstr ""
+
+#: src/lib/components/custom/TreeTable/Search.svelte
+msgid "Search..."
+msgstr ""
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "New Switch"
+msgstr ""

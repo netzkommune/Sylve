@@ -946,3 +946,19 @@ msgstr "{0} ( {1} {2} )"
 #: src/routes/[node]/summary/+page.svelte
 msgid "Uptime"
 msgstr "Uptime"
+
+#: src/routes/[node]/network/interfaces/+page.svelte
+msgid "<0></0> View"
+msgstr "<0></0> View"
+
+#: src/lib/components/custom/TreeTable/Search.svelte
+msgid "Search"
+msgstr "Search"
+
+#: src/lib/components/custom/TreeTable/Search.svelte
+msgid "Search..."
+msgstr "Search..."
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "New Switch"
+msgstr "New Switch"

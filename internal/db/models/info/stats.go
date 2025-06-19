@@ -16,6 +16,18 @@ type CPU struct {
 	CreatedAt time.Time `gorm:"autoCreateTime" json:"createdAt,omitempty"`
 }
 
+type RAM struct {
+	ID        uint      `gorm:"primarykey" json:"id,omitempty"`
+	Usage     float64   `json:"usage"`
+	CreatedAt time.Time `gorm:"autoCreateTime" json:"createdAt,omitempty"`
+}
+
+type Swap struct {
+	ID        uint      `gorm:"primarykey" json:"id,omitempty"`
+	Usage     float64   `json:"usage"`
+	CreatedAt time.Time `gorm:"autoCreateTime" json:"createdAt,omitempty"`
+}
+
 type IODelay struct {
 	ID        uint      `gorm:"primarykey" json:"id,omitempty"`
 	Delay     float64   `json:"delay"`

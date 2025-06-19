@@ -13,7 +13,9 @@ export async function load() {
 		cpuInfo,
 		cpuInfoHistorical,
 		ramInfo,
+		ramInfoHistorical,
 		swapInfo,
+		swapInfoHistorical,
 		ioDelay,
 		ioDelayHistorical,
 		totalDiskUsage
@@ -30,7 +32,17 @@ export async function load() {
 			cacheDuration
 		),
 		cachedFetch('ramInfo', getRAMInfo, cacheDuration),
+		cachedFetch(
+			'ramInfoHistorical',
+			() => getRAMInfo({ queryKey: ['ramInfoHistorical'], meta: undefined }),
+			cacheDuration
+		),
 		cachedFetch('swapInfo', getSwapInfo, cacheDuration),
+		cachedFetch(
+			'swapInfoHistorical',
+			() => getSwapInfo({ queryKey: ['swapInfoHistorical'], meta: undefined }),
+			cacheDuration
+		),
 		cachedFetch(
 			'ioDelay',
 			() => getIODelay({ queryKey: ['ioDelay'], meta: undefined }),
@@ -49,7 +61,9 @@ export async function load() {
 		cpuInfo,
 		cpuInfoHistorical,
 		ramInfo,
+		ramInfoHistorical,
 		swapInfo,
+		swapInfoHistorical,
 		ioDelay,
 		ioDelayHistorical,
 		totalDiskUsage

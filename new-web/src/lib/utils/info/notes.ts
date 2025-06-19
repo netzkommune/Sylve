@@ -5,35 +5,10 @@ import { getTranslation } from '../i18n';
 import { capitalizeFirstLetter } from '../string';
 import { convertDbTime } from '../time';
 
-export function generateTableData(notes: Note[]): { rows: Row[]; columns: Column[] } {
-	const columns: Column[] = [
-		{
-			field: 'id',
-			title: getTranslation('common.ID', 'ID'),
-			visible: false
-		},
-		{
-			field: 'name',
-			title: capitalizeFirstLetter(getTranslation('common.name', 'Name'))
-		},
-		{
-			field: 'createdAt',
-			title: capitalizeFirstLetter(getTranslation('common.created', 'Created')),
-			formatter: (cell: CellComponent) => {
-				const value = cell.getValue();
-				return convertDbTime(value);
-			}
-		},
-		{
-			field: 'updatedAt',
-			title: capitalizeFirstLetter(getTranslation('common.updated', 'Updated')),
-			formatter: (cell: CellComponent) => {
-				const value = cell.getValue();
-				return convertDbTime(value);
-			}
-		}
-	];
-
+export function generateTableData(
+	columns: Column[],
+	notes: Note[]
+): { rows: Row[]; columns: Column[] } {
 	const rows: Row[] = [];
 
 	for (const note of notes) {

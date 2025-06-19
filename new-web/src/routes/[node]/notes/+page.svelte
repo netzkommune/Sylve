@@ -8,15 +8,15 @@
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import ScrollArea from '$lib/components/ui/scroll-area/scroll-area.svelte';
 	import type { APIResponse } from '$lib/types/common';
-	import type { Row } from '$lib/types/components/tree-table';
+	import type { Column, Row } from '$lib/types/components/tree-table';
 	import type { Note } from '$lib/types/info/notes';
 	import { handleValidationErrors, isAPIResponse, updateCache } from '$lib/utils/http';
-	import { getTranslation } from '$lib/utils/i18n';
 	import { generateTableData, markdownToTailwindHTML } from '$lib/utils/info/notes';
-	import { capitalizeFirstLetter } from '$lib/utils/string';
+	import { convertDbTime } from '$lib/utils/time';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
 	import { toast } from 'svelte-sonner';
+	import type { CellComponent } from 'tabulator-tables';
 
 	interface Data {
 		notes: Note[];
@@ -74,10 +74,7 @@
 		if (modalState.isEditMode && selectedId !== null) {
 			const response = await updateNote(selectedId, modalState.title, modalState.content);
 			if (response.status === 'success') {
-				toast.success(
-					`${capitalizeFirstLetter(getTranslation('notes.note', 'Note'))} ${modalState.title} ${getTranslation('common.updated', 'updated')}`,
-					{ position: 'bottom-center' }
-				);
+				toast.success('Note updated', { position: 'bottom-center' });
 				handleNote(undefined, false, true);
 			} else {
 				handleValidationErrors(response, 'notes');
@@ -85,10 +82,7 @@
 		} else {
 			const response = await createNote(modalState.title, modalState.content);
 			if ((response as Note).id) {
-				toast.success(
-					`${capitalizeFirstLetter(getTranslation('notes.note', 'Note'))} ${modalState.title} ${getTranslation('common.created', 'created')}`,
-					{ position: 'bottom-center' }
-				);
+				toast.success('Note created', { position: 'bottom-center' });
 				handleNote(undefined, false, true);
 			}
 
@@ -121,13 +115,41 @@
 	function handleBulkDelete(ids: number[]) {
 		const notesToDelete = notes.filter((note) => ids.includes(note.id));
 		if (notesToDelete.length > 0) {
-			modalState.title = `${notesToDelete.length} ${getTranslation('notes.notes', 'notes')}`;
+			modalState.title = `${notesToDelete.length} notes`;
 			modalState.isBulkDeleteOpen = true;
 		}
 	}
 
 	let tableName = 'tt-notes';
-	let tableData = $derived(generateTableData(notes));
+	let columns: Column[] = $derived([
+		{
+			field: 'id',
+			title: 'ID',
+			visible: false
+		},
+		{
+			field: 'name',
+			title: 'Name'
+		},
+		{
+			field: 'createdAt',
+			title: 'Created',
+			formatter: (cell: CellComponent) => {
+				const value = cell.getValue();
+				return convertDbTime(value);
+			}
+		},
+		{
+			field: 'updatedAt',
+			title: 'Updated',
+			formatter: (cell: CellComponent) => {
+				const value = cell.getValue();
+				return convertDbTime(value);
+			}
+		}
+	]);
+
+	let tableData = $derived(generateTableData(columns, notes));
 	let activeRow: Row[] | null = $state(null);
 	let query: string = $state('');
 </script>
@@ -141,7 +163,7 @@
 				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 			>
 				<Icon icon="mdi:eye" class="mr-1 h-4 w-4" />
-				{capitalizeFirstLetter(getTranslation('common.view', 'View'))}
+				{'View'}
 			</Button>
 		{/if}
 
@@ -152,7 +174,7 @@
 				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 			>
 				<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
-				{capitalizeFirstLetter(getTranslation('common.delete', 'Delete'))}
+				{'Delete'}
 			</Button>
 		{/if}
 
@@ -166,7 +188,7 @@
 				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 			>
 				<Icon icon="mdi:note-edit" class="mr-1 h-4 w-4" />
-				{capitalizeFirstLetter(getTranslation('common.edit', 'Edit'))}
+				{'Edit'}
 			</Button>
 		{/if}
 	{/if}
@@ -182,8 +204,7 @@
 				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 			>
 				<Icon icon="material-symbols:delete-sweep" class="mr-1 h-4 w-4" />
-				{capitalizeFirstLetter(getTranslation('common.bulk', 'Bulk'))}
-				{capitalizeFirstLetter(getTranslation('common.delete', 'Delete'))}
+				{'Bulk Delete'}
 			</Button>
 		{/if}
 	{/if}
@@ -194,8 +215,8 @@
 		<Search bind:query />
 
 		<Button onclick={() => handleNote()} size="sm" class="h-6  ">
-			<Icon icon="gg:add" class="mr-1 h-4 w-4" />
-			{capitalizeFirstLetter(getTranslation('common.new', 'New'))}
+			<Icon icon="gg:add" class="mr-0 h-4 w-4" />
+			{'New'}
 		</Button>
 
 		{@render button('view-note')}
@@ -211,14 +232,19 @@
 					<Dialog.Title>
 						<div class="flex items-center gap-2">
 							<Icon icon={modalState.isEditMode ? 'mdi:note-edit' : 'mdi:note'} class="h-5 w-5" />
-							<span
-								>{modalState.isEditMode
-									? selectedId
-										? capitalizeFirstLetter(getTranslation('common.edit', 'Edit'))
-										: capitalizeFirstLetter(getTranslation('common.new', 'New'))
-									: capitalizeFirstLetter(getTranslation('common.view', 'View'))}
-								{capitalizeFirstLetter(getTranslation('notes.note', 'Note'))}</span
-							>
+							<span>
+								{#if modalState.isEditMode}
+									{#if selectedId}
+										Edit
+									{:else}
+										New
+									{/if}
+								{:else}
+									View
+								{/if}
+
+								{'Note'}
+							</span>
 						</div>
 					</Dialog.Title>
 				</Dialog.Header>
@@ -227,22 +253,20 @@
 						size="sm"
 						variant="ghost"
 						class="h-8"
-						title={capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}
+						title={'Reset'}
 						onclick={() => {
 							modalState.title = '';
 							modalState.content = '';
 						}}
 					>
 						<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
-						<span class="sr-only"
-							>{capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}</span
-						>
+						<span class="sr-only">{'Reset'}</span>
 					</Button>
 					<Button
 						size="sm"
 						variant="ghost"
 						class="h-8"
-						title={capitalizeFirstLetter(getTranslation('common.close', 'Close'))}
+						title={'Close'}
 						onclick={() => {
 							modalState.isOpen = false;
 							modalState.title = '';
@@ -250,15 +274,13 @@
 						}}
 					>
 						<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
-						<span class="sr-only"
-							>{capitalizeFirstLetter(getTranslation('common.close', 'Close'))}</span
-						>
+						<span class="sr-only">{'Close'}</span>
 					</Button>
 				</div>
 			</div>
 
 			<CustomValueInput
-				label={capitalizeFirstLetter(getTranslation('common.name', 'Name'))}
+				label={'Name'}
 				placeholder="Post Upgrade Summary"
 				bind:value={modalState.title}
 				classes="flex-1 space-y-1"
@@ -269,7 +291,7 @@
 					{#if modalState.isEditMode}
 						<div>
 							<CustomValueInput
-								label={capitalizeFirstLetter(getTranslation('common.content', 'Content'))}
+								label={'Content'}
 								placeholder="This is a note"
 								bind:value={modalState.content}
 								classes="flex-1 space-y-1 "
@@ -281,7 +303,7 @@
 							<p
 								class="mb-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
 							>
-								{capitalizeFirstLetter(getTranslation('common.content', 'Content'))}
+								Content
 							</p>
 							<article class="prose lg:prose-xl rounded-md border p-3">
 								{@html markdownToTailwindHTML(modalState.content)}
@@ -293,9 +315,7 @@
 			<Dialog.Footer class="flex justify-end">
 				<div class="flex w-full items-center justify-end gap-2 px-1 py-2">
 					{#if modalState.isEditMode}
-						<Button onclick={saveNote} type="submit" size="sm"
-							>{capitalizeFirstLetter(getTranslation('common.save', 'Save'))}</Button
-						>
+						<Button onclick={saveNote} type="submit" size="sm">{'Save'}</Button>
 					{/if}
 				</div>
 			</Dialog.Footer>

@@ -48,3 +48,4 @@ export interface SeriesDataWithBaseline {
 }
 
 export type APIResponse = z.infer<typeof APIResponseSchema>;
+export type Locales = 'en' | 'mal';

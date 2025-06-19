@@ -48,6 +48,36 @@ func RAMInfo(infoService *info.Service) gin.HandlerFunc {
 	}
 }
 
+// @Summary Get Historical RAM information
+// @Description Retrieves historical RAM info
+// @Tags system
+// @Accept json
+// @Produce json
+// @Success 200 {object} internal.APIResponse[[]infoModels.RAM]
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /info/ram/historical [get]
+func HistoricalRAMInfoHandler(infoService *info.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		info, err := infoService.GetRAMUsageHistorical()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "ram_info",
+			Error:   "",
+			Data:    info,
+		})
+	}
+}
+
 // @Summary Get Swap Info
 // @Description Get the Swap information about the system
 // @Tags Info
@@ -71,6 +101,36 @@ func SwapInfo(infoService *info.Service) gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, internal.APIResponse[infoServiceInterfaces.SwapInfo]{
+			Status:  "success",
+			Message: "swap_info",
+			Error:   "",
+			Data:    info,
+		})
+	}
+}
+
+// @Summary Get Historical Swap information
+// @Description Retrieves historical Swap info
+// @Tags system
+// @Accept json
+// @Produce json
+// @Success 200 {object} internal.APIResponse[[]infoModels.Swap]
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /info/swap/historical [get]
+func HistoricalSwapInfoHandler(infoService *info.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		info, err := infoService.GetSwapUsageHistorical()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
 			Status:  "success",
 			Message: "swap_info",
 			Error:   "",

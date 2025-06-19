@@ -66,3 +66,26 @@ export function convertDbTime(time: string): string {
 		return time;
 	}
 }
+
+export function formatUptime(seconds: number): string {
+	const units = [
+		{ label: 'y', secs: 12 * 30 * 24 * 60 * 60 },
+		{ label: 'mo', secs: 30 * 24 * 60 * 60 },
+		{ label: 'd', secs: 24 * 60 * 60 },
+		{ label: 'h', secs: 60 * 60 },
+		{ label: 'm', secs: 60 },
+		{ label: 's', secs: 1 }
+	];
+
+	const parts = [];
+
+	for (const { label, secs } of units) {
+		if (seconds >= secs) {
+			const val = Math.floor(seconds / secs);
+			seconds %= secs;
+			parts.push(`${val}${label}`);
+		}
+	}
+
+	return parts.length ? parts.join(' ') : '0s';
+}

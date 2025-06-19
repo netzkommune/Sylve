@@ -61,6 +61,8 @@ func SetupDatabase(cfg *internal.SylveConfig, isTest bool) *gorm.DB {
 		&models.PassedThroughIDs{},
 
 		&infoModels.CPU{},
+		&infoModels.RAM{},
+		&infoModels.Swap{},
 		&infoModels.IODelay{},
 		&infoModels.Note{},
 		&infoModels.AuditLog{},

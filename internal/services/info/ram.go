@@ -9,6 +9,8 @@
 package info
 
 import (
+	"sylve/internal/db"
+	infoModels "sylve/internal/db/models/info"
 	infoServiceInterfaces "sylve/internal/interfaces/services/info"
 
 	ram "github.com/shirou/gopsutil/mem"
@@ -39,4 +41,24 @@ func (s *Service) GetSwapInfo() (infoServiceInterfaces.SwapInfo, error) {
 		Free:        swapInfo.Free,
 		UsedPercent: swapInfo.UsedPercent,
 	}, nil
+}
+
+func (s *Service) GetRAMUsageHistorical() ([]infoModels.RAM, error) {
+	historicalData, err := db.GetHistorical[infoModels.RAM](s.DB, 128)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return historicalData, nil
+}
+
+func (s *Service) GetSwapUsageHistorical() ([]infoModels.Swap, error) {
+	historicalData, err := db.GetHistorical[infoModels.Swap](s.DB, 128)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return historicalData, nil
 }

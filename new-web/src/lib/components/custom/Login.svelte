@@ -46,7 +46,7 @@
 			loading = true;
 
 			try {
-				await onLogin(username, password, authType, language, remember);
+				onLogin(username, password, authType, language, remember);
 			} catch (error) {
 				console.error('Login error:', error);
 			} finally {

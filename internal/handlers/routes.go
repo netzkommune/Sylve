@@ -84,7 +84,10 @@ func RegisterRoutes(r *gin.Engine,
 		info.GET("/cpu/historical", infoHandlers.HistoricalCPUInfoHandler(infoService))
 
 		info.GET("/ram", infoHandlers.RAMInfo(infoService))
+		info.GET("/ram/historical", infoHandlers.HistoricalRAMInfoHandler(infoService))
+
 		info.GET("/swap", infoHandlers.SwapInfo(infoService))
+		info.GET("/swap/historical", infoHandlers.HistoricalSwapInfoHandler(infoService))
 
 		notes := info.Group("/notes")
 		{

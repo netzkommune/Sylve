@@ -17,7 +17,7 @@
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
 	import { ModeWatcher } from 'mode-watcher';
 	import { onMount, tick } from 'svelte';
-	import { setTranslations } from 'wuchale/runtime.svelte';
+	import { setTranslations } from 'wuchale/runtime.svelte.js';
 
 	import type { Locales } from '$lib/types/common';
 	import { toast } from 'svelte-sonner';

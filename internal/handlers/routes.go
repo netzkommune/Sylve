@@ -76,6 +76,7 @@ func RegisterRoutes(r *gin.Engine,
 	}
 
 	info := api.Group("/info")
+
 	info.Use(middleware.EnsureAuthenticated(authService))
 	{
 		info.GET("/basic", infoHandlers.BasicInfo(infoService))

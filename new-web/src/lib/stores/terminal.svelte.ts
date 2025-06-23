@@ -37,7 +37,8 @@ export const terminalStore = localStore<Terminal>('terminal', {
 });
 
 export function getDefaultTitle() {
-	return `${getUsername()}@${get(hostname)}:~`;
+	// return `${getUsername()}@${get(hostname)}:~`;
+	return '';
 }
 
 export function openTerminal() {

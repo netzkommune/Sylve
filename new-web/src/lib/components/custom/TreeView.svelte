@@ -79,7 +79,7 @@
 		<div class="flex items-center space-x-1 text-sm">
 			<Icon icon={item.icon} width="18" />
 			<p class="font-inter cursor-pointer whitespace-nowrap">
-				{getTranslation(`node.${item.label}`, item.label)}
+				{item.label}
 			</p>
 		</div>
 		{#if item.children}

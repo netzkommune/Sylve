@@ -6,88 +6,13 @@ import { generateNumberFromString } from '../numbers';
 import { capitalizeFirstLetter } from '../string';
 import { renderWithIcon } from '../table';
 
-export function generateTableData(interfaces: Iface[]): {
+export function generateTableData(
+	columns: Column[],
+	interfaces: Iface[]
+): {
 	rows: Row[];
 	columns: Column[];
 } {
-	const columns: Column[] = [
-		{
-			field: 'id',
-			title: 'ID',
-			visible: false
-		},
-		{
-			field: 'name',
-			title: 'Name',
-			formatter(cell: CellComponent) {
-				const value = cell.getValue();
-				const row = cell.getRow();
-				const data = row.getData();
-
-				if (data.isBridge) {
-					const name = data.description || value;
-					return renderWithIcon('clarity:network-switch-line', name);
-				}
-
-				if (value === 'lo0') {
-					return renderWithIcon('ic:baseline-loop', value);
-				}
-
-				return renderWithIcon('mdi:ethernet', value);
-			}
-		},
-		{
-			field: 'model',
-			title: 'Model'
-		},
-		{
-			field: 'description',
-			title: 'Description',
-			formatter: (cell: CellComponent) => {
-				const value = cell.getValue();
-				if (value) {
-					return value;
-				}
-
-				return '-';
-			}
-		},
-		{
-			field: 'ether',
-			title: 'MAC Address',
-			formatter: (cell: CellComponent) => {
-				const value = cell.getValue();
-				return value || '-';
-			}
-		},
-		{
-			field: 'metric',
-			title: 'Metric'
-		},
-		{
-			field: 'mtu',
-			title: 'MTU'
-		},
-		{
-			field: 'media',
-			title: 'Status',
-			formatter: (cell: CellComponent) => {
-				const value = cell.getValue();
-				const status = value?.status || '-';
-				if (status === 'active') {
-					return 'Active';
-				}
-
-				return status;
-			}
-		},
-		{
-			field: 'isBridge',
-			title: 'isBridge',
-			visible: false
-		}
-	];
-
 	const rows: Row[] = [];
 	for (const iface of interfaces) {
 		let isBridge = false;

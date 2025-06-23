@@ -8,13 +8,13 @@
  * under sponsorship from the FreeBSD Foundation.
  */
 
-import en from '$lib/locale/en.json';
-import mal from '$lib/locale/mal.json';
+// import en from '$lib/locale/en.json';
+// import mal from '$lib/locale/mal.json';
 import { _, addMessages, init } from 'svelte-i18n';
 import { get } from 'svelte/store';
 
-addMessages('en', en);
-addMessages('mal', mal);
+// addMessages('en', en);
+// addMessages('mal', mal);
 
 let savedLang: string = 'en';
 

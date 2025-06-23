@@ -24,8 +24,8 @@
 	import '../app.css';
 
 	const locales = {
-		en: () => import('$lib/locales/en.json'),
-		mal: () => import('$lib/locales/mal.json')
+		en: () => import('$lib/locales/en.js'),
+		mal: () => import('$lib/locales/mal.js')
 	};
 
 	function setLocale(locale: Locales) {

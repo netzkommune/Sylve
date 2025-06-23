@@ -1,46 +1,113 @@
 msgid ""
 msgstr ""
 
-#: src/lib/components/custom/Login.svelte
-#: src/lib/components/custom/Header.svelte
-msgid "Sylve Logo"
-msgstr "Sylve Logo"
+#: src/routes/+layout.svelte
+msgid "Logged out"
+msgstr "Logged out"
 
-#: src/lib/components/custom/Login.svelte
-#: src/lib/components/custom/Throbber.svelte
-#: src/lib/components/custom/Header.svelte
-msgid "SYLVE"
-msgstr "SYLVE"
+#: src/routes/+page.svelte
+msgid "Button"
+msgstr "Button"
 
-#: src/lib/components/custom/Login.svelte
-msgid "English"
-msgstr "English"
+#: src/routes/[node]/+layout.svelte
+msgid "Datacenter"
+msgstr "Datacenter"
 
-#: src/lib/components/custom/Login.svelte
-msgid "Malayalam"
-msgstr "Malayalam"
+#: src/routes/[node]/+layout.svelte
+msgid "<0/> Help"
+msgstr "<0/> Help"
 
-#: src/lib/components/custom/Login.svelte
-msgid "Remember Me"
-msgstr "Remember Me"
+#: src/routes/[node]/+layout.svelte
+#: src/lib/components/skeleton/LeftPanel.svelte
+msgid "Difuse-sidebar"
+msgstr "Difuse-sidebar"
 
-#: src/lib/components/custom/Login.svelte
-msgid "Login"
-msgstr "Login"
+#: src/routes/[node]/+layout.svelte
+msgid "Summary"
+msgstr "Summary"
 
-#: src/lib/components/custom/Throbber.svelte
-msgid "M 0,2000 H 2000 V 0 H 0 Z"
-msgstr "M 0,2000 H 2000 V 0 H 0 Z"
+#: src/routes/[node]/+layout.svelte
+msgid "Console"
+msgstr "Console"
 
-#: src/lib/components/custom/Throbber.svelte
-msgid "M 0,0 C 0,-3.13 -1.67,-6.021 -4.38,-7.58 L -63.94,-41.97 V -53.521 L 0.62,-16.24 C 6.42,-12.89 10,-6.7 10,0 V 86.99 L 0,81.19 Z"
-msgstr "M 0,0 C 0,-3.13 -1.67,-6.021 -4.38,-7.58 L -63.94,-41.97 V -53.521 L 0.62,-16.24 C 6.42,-12.89 10,-6.7 10,0 V 86.99 L 0,81.19 Z"
+#: src/routes/[node]/+layout.svelte
+msgid "Storage"
+msgstr "Storage"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Notes"
+msgstr "Notes"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Network"
+msgstr "Network"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Interfaces"
+msgstr "Interfaces"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Switches"
+msgstr "Switches"
+
+#: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Disks"
+msgstr "Disks"
+
+#: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "ZFS"
+msgstr "ZFS"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Dashboard"
+msgstr "Dashboard"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Pools"
+msgstr "Pools"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Datasets"
+msgstr "Datasets"
+
+#: src/routes/[node]/+layout.svelte
+msgid "File Systems"
+msgstr "File Systems"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Volumes"
+msgstr "Volumes"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Snapshots"
+msgstr "Snapshots"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Utilities"
+msgstr "Utilities"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Downloader"
+msgstr "Downloader"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Settings"
+msgstr "Settings"
+
+#: src/routes/[node]/+layout.svelte
+#: src/lib/components/custom/CreateVM/Hardware.svelte
+msgid "PCI Passthrough"
+msgstr "PCI Passthrough"
 
 #: src/lib/components/custom/AlertDialog.svelte
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 msgid "Are you sure?"
 msgstr "Are you sure?"
 
 #: src/lib/components/custom/AlertDialog.svelte
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 msgid "This action cannot be undone. This will permanently delete"
 msgstr "This action cannot be undone. This will permanently delete"
 
@@ -49,16 +116,27 @@ msgid "."
 msgstr "."
 
 #: src/lib/components/custom/AlertDialog.svelte
+#: src/lib/components/zfs/ViewSnapshotJobs.svelte
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 msgid "Cancel"
 msgstr "Cancel"
 
 #: src/lib/components/custom/AlertDialog.svelte
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
 msgid "Continue"
 msgstr "Continue"
 
-#: src/lib/components/custom/TreeTable/Search.svelte
-msgid "Escape"
-msgstr "Escape"
+#: src/lib/components/custom/Header.svelte
+#: src/lib/components/custom/Login.svelte
+msgid "Sylve Logo"
+msgstr "Sylve Logo"
+
+#: src/lib/components/custom/Header.svelte
+#: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/Throbber.svelte
+msgid "SYLVE"
+msgstr "SYLVE"
 
 #: src/lib/components/custom/Header.svelte
 msgid "Toggle navigation menu"
@@ -84,20 +162,128 @@ msgstr "Log out"
 msgid "⌘⇧Q"
 msgstr "⌘⇧Q"
 
+#: src/lib/components/custom/KVTableModal.svelte
+msgid "Object ( {0} properties)"
+msgstr "Object ( {0} properties)"
+
+#: src/lib/components/custom/Login.svelte
+msgid "English"
+msgstr "English"
+
+#: src/lib/components/custom/Login.svelte
+msgid "Malayalam"
+msgstr "Malayalam"
+
+#: src/lib/components/custom/Login.svelte
+msgid "Remember Me"
+msgstr "Remember Me"
+
+#: src/lib/components/custom/Login.svelte
+msgid "Login"
+msgstr "Login"
+
 #: src/lib/components/custom/Terminal.svelte
 msgid "Minimize"
 msgstr "Minimize"
 
 #: src/lib/components/custom/Terminal.svelte
-#: src/lib/components/ui/dialog/dialog-content.svelte
+#: src/lib/components/disk/CreatePartition.svelte
+#: src/routes/[node]/notes/+page.svelte
 #: src/lib/components/custom/CreateVM/CreateVM.svelte
+#: src/lib/components/ui/dialog/dialog-content.svelte
 #: src/lib/components/ui/sheet/sheet-content.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "Close"
 msgstr "Close"
 
 #: src/lib/components/custom/Terminal.svelte
 msgid "Add new tab"
 msgstr "Add new tab"
+
+#: src/lib/components/custom/Throbber.svelte
+msgid "M 0,2000 H 2000 V 0 H 0 Z"
+msgstr "M 0,2000 H 2000 V 0 H 0 Z"
+
+#: src/lib/components/custom/Throbber.svelte
+msgid "M 0,0 C 0,-3.13 -1.67,-6.021 -4.38,-7.58 L -63.94,-41.97 V -53.521 L 0.62,-16.24 C 6.42,-12.89 10,-6.7 10,0 V 86.99 L 0,81.19 Z"
+msgstr "M 0,0 C 0,-3.13 -1.67,-6.021 -4.38,-7.58 L -63.94,-41.97 V -53.521 L 0.62,-16.24 C 6.42,-12.89 10,-6.7 10,0 V 86.99 L 0,81.19 Z"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Create Partitions"
+msgstr "Create Partitions"
+
+#: src/lib/components/disk/CreatePartition.svelte
+#: src/routes/[node]/notes/+page.svelte
+#: src/lib/components/custom/CreateVM/CreateVM.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Reset"
+msgstr "Reset"
+
+#: src/lib/components/disk/CreatePartition.svelte
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Name"
+msgstr "Name"
+
+#: src/lib/components/disk/CreatePartition.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Size"
+msgstr "Size"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Usage"
+msgstr "Usage"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Actions"
+msgstr "Actions"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Existing"
+msgstr "Existing"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "-"
+msgstr "-"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "No partitions created yet"
+msgstr "No partitions created yet"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Add Partition"
+msgstr "Add Partition"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "No space left"
+msgstr "No space left"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Size: {0}"
+msgstr "Size: {0}"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Remaining space: {0}"
+msgstr "Remaining space: {0}"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Save Partitions"
+msgstr "Save Partitions"
 
 #: src/lib/components/skeleton/BottomPanel.svelte
 msgid "Start Time"
@@ -120,50 +306,127 @@ msgid "Action"
 msgstr "Action"
 
 #: src/lib/components/skeleton/BottomPanel.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Status"
 msgstr "Status"
-
-#: src/lib/components/skeleton/LeftPanel.svelte
-msgid "Difuse-sidebar"
-msgstr "Difuse-sidebar"
 
 #: src/lib/components/skeleton/LeftPanel.svelte
 msgid "Data Center"
 msgstr "Data Center"
 
-#: src/lib/components/custom/CreateVM/CreateVM.svelte
-msgid "<0/> Create Virtual Machine"
-msgstr "<0/> Create Virtual Machine"
+#: src/lib/components/zfs/ViewSnapshotJobs.svelte
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "View Snapshot Jobs"
+msgstr "View Snapshot Jobs"
 
-#: src/lib/components/custom/CreateVM/CreateVM.svelte
-msgid "Configure your virtual machine with custom hardware and network settings"
-msgstr "Configure your virtual machine with custom hardware and network settings"
+#: src/lib/components/zfs/ViewSnapshotJobs.svelte
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
+msgid "ID"
+msgstr "ID"
 
-#: src/lib/components/custom/CreateVM/CreateVM.svelte
-msgid "Reset"
-msgstr "Reset"
+#: src/lib/components/zfs/ViewSnapshotJobs.svelte
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "Dataset"
+msgstr "Dataset"
 
-#: src/lib/components/custom/CreateVM/CreateVM.svelte
-msgid "Create Virtual Machine"
-msgstr "Create Virtual Machine"
+#: src/lib/components/zfs/ViewSnapshotJobs.svelte
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "Prefix"
+msgstr "Prefix"
 
-#: src/lib/components/ui/custom-input/combobox.svelte
-msgid "No data"
-msgstr "No data"
+#: src/lib/components/zfs/ViewSnapshotJobs.svelte
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "Interval"
+msgstr "Interval"
 
-#: src/lib/components/ui/custom-input/combobox.svelte
-msgid "Enter"
-msgstr "Enter"
+#: src/lib/components/zfs/ViewSnapshotJobs.svelte
+msgid "Last Run"
+msgstr "Last Run"
 
-#: src/routes/+layout.svelte
-msgid "Logged out"
-msgstr "Logged out"
+#: src/lib/components/zfs/ViewSnapshotJobs.svelte
+msgid "Deleted"
+msgstr "Deleted"
+
+#: src/lib/components/zfs/ViewSnapshotJobs.svelte
+msgid "No snapshot jobs"
+msgstr "No snapshot jobs"
+
+#: src/lib/components/zfs/ViewSnapshotJobs.svelte
+msgid "Save Snapshot Jobs"
+msgstr "Save Snapshot Jobs"
+
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
+msgid "View"
+msgstr "View"
+
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "Delete"
+msgstr "Delete"
+
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Edit"
+msgstr "Edit"
+
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Bulk Delete"
+msgstr "Bulk Delete"
+
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+msgid "New"
+msgstr "New"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Note"
+msgstr "Note"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Post Upgrade Summary"
+msgstr "Post Upgrade Summary"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Content"
+msgstr "Content"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "This is a note"
+msgstr "This is a note"
+
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Save"
+msgstr "Save"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Created"
+msgstr "Created"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Updated"
+msgstr "Updated"
 
 #: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "CPU Usage"
 msgstr "CPU Usage"
 
 #: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "RAM Usage"
 msgstr "RAM Usage"
 
@@ -208,6 +471,7 @@ msgid "Sylve Version"
 msgstr "Sylve Version"
 
 #: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Memory Usage"
 msgstr "Memory Usage"
 
@@ -220,6 +484,8 @@ msgid "VNC Password"
 msgstr "VNC Password"
 
 #: src/lib/components/custom/CreateVM/Advanced.svelte
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "Enter or generate passphrase"
 msgstr "Enter or generate passphrase"
 
@@ -252,12 +518,26 @@ msgid "VM ID"
 msgstr "VM ID"
 
 #: src/lib/components/custom/CreateVM/Basic.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Description"
 msgstr "Description"
 
 #: src/lib/components/custom/CreateVM/Basic.svelte
 msgid "Optional description for this virtual machine"
 msgstr "Optional description for this virtual machine"
+
+#: src/lib/components/custom/CreateVM/CreateVM.svelte
+msgid "<0/> Create Virtual Machine"
+msgstr "<0/> Create Virtual Machine"
+
+#: src/lib/components/custom/CreateVM/CreateVM.svelte
+msgid "Configure your virtual machine with custom hardware and network settings"
+msgstr "Configure your virtual machine with custom hardware and network settings"
+
+#: src/lib/components/custom/CreateVM/CreateVM.svelte
+msgid "Create Virtual Machine"
+msgstr "Create Virtual Machine"
 
 #: src/lib/components/custom/CreateVM/Hardware.svelte
 msgid "CPU Sockets"
@@ -274,10 +554,6 @@ msgstr "CPU Threads"
 #: src/lib/components/custom/CreateVM/Hardware.svelte
 msgid "Memory Size"
 msgstr "Memory Size"
-
-#: src/lib/components/custom/CreateVM/Hardware.svelte
-msgid "PCI Passthrough"
-msgstr "PCI Passthrough"
 
 #: src/lib/components/custom/CreateVM/Hardware.svelte
 msgid "{0} — {1}"
@@ -298,6 +574,7 @@ msgid "Select emulation type"
 msgstr "Select emulation type"
 
 #: src/lib/components/custom/CreateVM/Network.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
 msgid "MAC Address"
 msgstr "MAC Address"
 
@@ -332,3 +609,544 @@ msgstr "Select installation media"
 #: src/lib/components/custom/CreateVM/Storage.svelte
 msgid "None"
 msgstr "None"
+
+#: src/lib/components/custom/TreeTable/Search.svelte
+msgid "Escape"
+msgstr "Escape"
+
+#: src/lib/components/ui/custom-input/combobox.svelte
+msgid "No data"
+msgstr "No data"
+
+#: src/lib/components/ui/custom-input/combobox.svelte
+msgid "Enter"
+msgstr "Enter"
+
+#: src/routes/[node]/network/interfaces/+page.svelte
+msgid "Model"
+msgstr "Model"
+
+#: src/routes/[node]/network/interfaces/+page.svelte
+msgid "Metric"
+msgstr "Metric"
+
+#: src/routes/[node]/network/interfaces/+page.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "MTU"
+msgstr "MTU"
+
+#: src/routes/[node]/network/interfaces/+page.svelte
+msgid "Active"
+msgstr "Active"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Switch"
+msgstr "Switch"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "VLAN"
+msgstr "VLAN"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "IPv4"
+msgstr "IPv4"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "IPv6"
+msgstr "IPv6"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Ports"
+msgstr "Ports"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Select ports"
+msgstr "Select ports"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Private"
+msgstr "Private"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "DHCP"
+msgstr "DHCP"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "SLAAC"
+msgstr "SLAAC"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Disable IPV6"
+msgstr "Disable IPV6"
+
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Create"
+msgstr "Create"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Switch is in use by a VM"
+msgstr "Switch is in use by a VM"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Error deleting switch"
+msgstr "Error deleting switch"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "<0/> Enable Passthrough"
+msgstr "<0/> Enable Passthrough"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "<0/> Disable Passthrough"
+msgstr "<0/> Disable Passthrough"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Device added to passthrough"
+msgstr "Device added to passthrough"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Failed to add device to passthrough"
+msgstr "Failed to add device to passthrough"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Device removed from passthrough"
+msgstr "Device removed from passthrough"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Failed to remove device from passthrough"
+msgstr "Failed to remove device from passthrough"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "S.M.A.R.T Values"
+msgstr "S.M.A.R.T Values"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Initialize GPT"
+msgstr "Initialize GPT"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Wipe Disk"
+msgstr "Wipe Disk"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Delete Partition"
+msgstr "Delete Partition"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Create Partition"
+msgstr "Create Partition"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Attribute"
+msgstr "Attribute"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Value"
+msgstr "Value"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Download"
+msgstr "Download"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Magnet"
+msgstr "Magnet"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "HTTP"
+msgstr "HTTP"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "URL"
+msgstr "URL"
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "Pool Usage"
+msgstr "Pool Usage"
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "Select a pool"
+msgstr "Select a pool"
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "Dataset Compression"
+msgstr "Dataset Compression"
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "No data available"
+msgstr "No data available"
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "PoolStats"
+msgstr "PoolStats"
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "Select a stat type"
+msgstr "Select a stat type"
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "Select a interval"
+msgstr "Select a interval"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Scrub started"
+msgstr "Scrub started"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Scrub"
+msgstr "Scrub"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Replace Device"
+msgstr "Replace Device"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "HDD"
+msgstr "HDD"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "SSD"
+msgstr "SSD"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "NVMe"
+msgstr "NVMe"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "No available disks"
+msgstr "No available disks"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Partitions"
+msgstr "Partitions"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "No available partitions"
+msgstr "No available partitions"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Create ZFS Pool"
+msgstr "Create ZFS Pool"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Devices"
+msgstr "Devices"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Options"
+msgstr "Options"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Virtual"
+msgstr "Virtual"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Redundancy"
+msgstr "Redundancy"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "( {0} )"
+msgstr "( {0} )"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "VDEVs"
+msgstr "VDEVs"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Drop disks here"
+msgstr "Drop disks here"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Comment"
+msgstr "Comment"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Comments about the pool"
+msgstr "Comments about the pool"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Mount Point"
+msgstr "Mount Point"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Force Create"
+msgstr "Force Create"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Advanced"
+msgstr "Advanced"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Ashift"
+msgstr "Ashift"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Auto Expand"
+msgstr "Auto Expand"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Yes"
+msgstr "Yes"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "No"
+msgstr "No"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Auto Trim"
+msgstr "Auto Trim"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Delegation"
+msgstr "Delegation"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Fail Mode"
+msgstr "Fail Mode"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Wait"
+msgstr "Wait"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Panic"
+msgstr "Panic"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Spares"
+msgstr "Spares"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Select spares"
+msgstr "Select spares"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Resilvering"
+msgstr "Resilvering"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "READ: {0}"
+msgstr "READ: {0}"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "WRITE: {0}"
+msgstr "WRITE: {0}"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "CKSUM: {0}"
+msgstr "CKSUM: {0}"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Pool Status"
+msgstr "Pool Status"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "•"
+msgstr "•"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Scan Activity"
+msgstr "Scan Activity"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "No recent scan activity"
+msgstr "No recent scan activity"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Device Topology"
+msgstr "Device Topology"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "No devices found"
+msgstr "No devices found"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Error Status"
+msgstr "Error Status"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Replace {0} in {1}"
+msgstr "Replace {0} in {1}"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Replace"
+msgstr "Replace"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Edit ZFS Pool"
+msgstr "Edit ZFS Pool"
+
+#: src/routes/[node]/vm/[node]/console/+page.svelte
+msgid "Reconnect"
+msgstr "Reconnect"
+
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+msgid "Detach"
+msgstr "Detach"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Start"
+msgstr "Start"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Stop"
+msgstr "Stop"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "{0} % {1} {2} vCPU(s)"
+msgstr "{0} % {1} {2} vCPU(s)"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "{0} % {1} {2}"
+msgstr "{0} % {1} {2}"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Notes about VM"
+msgstr "Notes about VM"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "VM"
+msgstr "VM"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Running"
+msgstr "Running"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Started{0}"
+msgstr "Started{0}"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Stopped{0}"
+msgstr "Stopped{0}"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "<0/> Rollback To Snapshot"
+msgstr "<0/> Rollback To Snapshot"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "<0/> Delete Snapshot"
+msgstr "<0/> Delete Snapshot"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "<0/> Create Snapshot"
+msgstr "<0/> Create Snapshot"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "<0/> Delete Filesystem"
+msgstr "<0/> Delete Filesystem"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "<0/> Delete Datasets"
+msgstr "<0/> Delete Datasets"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "<0/> New"
+msgstr "<0/> New"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Are you sure you would like to rollback to <b>{0}</b>?"
+msgstr "Are you sure you would like to rollback to <b>{0}</b>?"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "<0/> Snapshot - {0}"
+msgstr "<0/> Snapshot - {0}"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "Recursive"
+msgstr "Recursive"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "<0/> Create Filesystem"
+msgstr "<0/> Create Filesystem"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Parent"
+msgstr "Parent"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "ATime"
+msgstr "ATime"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Checkum"
+msgstr "Checkum"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Compression"
+msgstr "Compression"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Deduplication"
+msgstr "Deduplication"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Encryption"
+msgstr "Encryption"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Passphrase"
+msgstr "Passphrase"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Quota"
+msgstr "Quota"
+
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "<0/> View Snapshot Jobs"
+msgstr "<0/> View Snapshot Jobs"
+
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "<0/> Snapshot {0}"
+msgstr "<0/> Snapshot {0}"
+
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "Pool"
+msgstr "Pool"
+
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "Select a dataset"
+msgstr "Select a dataset"
+
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "Select an interval"
+msgstr "Select an interval"
+
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "{0} {1} <0>{0}</0> ."
+msgstr "{0} {1} <0>{0}</0> ."
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "<0/> Delete Volume"
+msgstr "<0/> Delete Volume"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "<0/> Delete Volumes"
+msgstr "<0/> Delete Volumes"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "<0/> Create Volume"
+msgstr "<0/> Create Volume"
+
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "Delete Snapshot"
+msgstr "Delete Snapshot"
+
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "{0} <0>{0}</0> ."
+msgstr "{0} <0>{0}</0> ."

@@ -109,11 +109,9 @@
 	async function handleDelete() {
 		modalState.isDeleteOpen = false;
 		modalState.loading.open = true;
-		modalState.loading.title = capitalizeFirstLetter(
-			getTranslation('vm.deleting_vm_full', 'Deleting Virtual Machine')
-		);
-
+		modalState.loading.title = 'Deleting Virtual Machine';
 		modalState.loading.description = `Please wait while VM <b>${vm.name} (${vm.vmId})</b> is being deleted.`;
+
 		await sleep(1000);
 		const result = await deleteVM(vm.id);
 		modalState.loading.open = false;
@@ -134,9 +132,7 @@
 
 	async function handleStart() {
 		modalState.loading.open = true;
-		modalState.loading.title = capitalizeFirstLetter(
-			getTranslation('vm.starting_vm_full', 'Starting Virtual Machine')
-		);
+		modalState.loading.title = 'Starting Virtual Machine';
 		modalState.loading.description = `Please wait while VM <b>${vm.name} (${vm.vmId})</b> is being started.`;
 		modalState.loading.iconColor = 'text-green-500';
 
@@ -161,9 +157,7 @@
 
 	async function handleStop() {
 		modalState.loading.open = true;
-		modalState.loading.title = capitalizeFirstLetter(
-			getTranslation('vm.stopping_vm_full', 'Stopping Virtual Machine')
-		);
+		modalState.loading.title = 'Stopping Virtual Machine';
 		modalState.loading.description = `Please wait while VM <b>${vm.name} (${vm.vmId})</b> is being stopped.`;
 		modalState.loading.iconColor = 'text-red-500';
 
@@ -222,16 +216,16 @@
 {#snippet button(type: string)}
 	{#if type === 'start' && domain.id == -1 && domain.status !== 'Running'}
 		<Button
-			on:click={() => handleStart()}
+			onclick={() => handleStart()}
 			size="sm"
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
 			<Icon icon="mdi:play" class="mr-1 h-4 w-4" />
-			{capitalizeFirstLetter(getTranslation('common.start', 'Start'))}
+			{'Start'}
 		</Button>
 
 		<Button
-			on:click={() => {
+			onclick={() => {
 				modalState.isDeleteOpen = true;
 				modalState.title = `${vm.name} (${vm.vmId})`;
 			}}
@@ -239,16 +233,16 @@
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
 			<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
-			{capitalizeFirstLetter(getTranslation('common.delete', 'Delete'))}
+			{'Delete'}
 		</Button>
 	{:else if type === 'stop' && domain.id !== -1 && domain.status === 'Running'}
 		<Button
-			on:click={() => handleStop()}
+			onclick={() => handleStop()}
 			size="sm"
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
 			<Icon icon="mdi:stop" class="mr-1 h-4 w-4" />
-			{capitalizeFirstLetter(getTranslation('common.stop', 'Stop'))}
+			{'Stop'}
 		</Button>
 	{/if}
 {/snippet}
@@ -272,7 +266,7 @@
 						<div class="flex items-start">
 							<div class="flex items-center">
 								<Icon icon="fluent:status-12-filled" class="mr-1 h-5 w-5" />
-								{getTranslation('vm.stats', 'Status')}
+								{'Status'}
 							</div>
 							<div class="ml-auto">
 								{domain.status}
@@ -283,12 +277,10 @@
 							<div class="flex w-full justify-between pb-1">
 								<p class="inline-flex items-center">
 									<Icon icon="solar:cpu-bold" class="mr-1 h-5 w-5" />
-									{getTranslation('summary.cpu_usage', 'CPU Usage')}
+									{'CPU Usage'}
 								</p>
 								<p class="ml-auto">
-									{floatToNDecimals(recentStat.cpuUsage, 2)}% {getTranslation('common.of', 'of')}
-									{vm.cpuCores * vm.cpuThreads * vm.cpuSockets}
-									vCPU(s)
+									{`${floatToNDecimals(recentStat.cpuUsage, 2)}% of ${vm.cpuCores * vm.cpuThreads * vm.cpuSockets} vCPU(s)`}
 								</p>
 							</div>
 							<Progress value={recentStat.cpuUsage || 0} max={100} class="ml-auto h-2" />
@@ -298,11 +290,10 @@
 							<div class="flex w-full justify-between pb-1">
 								<p class="inline-flex items-center">
 									<Icon icon="ph:memory" class="mr-1 h-5 w-5" />
-									{getTranslation('summary.ram_usage', 'RAM Usage')}
+									{'RAM Usage'}
 								</p>
 								<p class="ml-auto">
-									{floatToNDecimals(recentStat.memoryUsage, 2)}% {getTranslation('common.of', 'of')}
-									{humanFormat(vm.ram)}
+									{`${floatToNDecimals(recentStat.memoryUsage, 2)}% of ${humanFormat(vm.ram)}`}
 								</p>
 							</div>
 							<Progress value={recentStat.memoryUsage || 0} max={100} class="ml-auto h-2" />
@@ -335,7 +326,7 @@
 						<Card.Title>
 							<div class="flex items-center space-x-2">
 								<Icon icon="solar:cpu-bold" class="h-5 w-5" />
-								<p>{getTranslation('summary.cpu_usage', 'CPU Usage')}</p>
+								<p>{'CPU Usage'}</p>
 							</div>
 						</Card.Title>
 					</Card.Header>
@@ -346,7 +337,7 @@
 							keys={[
 								{
 									key: 'cpuUsage',
-									title: getTranslation('summary.cpu_usage', 'CPU Usage'),
+									title: 'CPU Usage',
 									color: 'hsl(0, 50%, 50%)'
 								}
 							]}
@@ -361,7 +352,7 @@
 						<Card.Title>
 							<div class="flex items-center space-x-2">
 								<Icon icon="ph:memory" class="h-5 w-5" />
-								<p>{getTranslation('summary.memory_usage', 'Memory Usage')}</p>
+								<p>{'Memory Usage'}</p>
 							</div>
 						</Card.Title>
 					</Card.Header>
@@ -372,7 +363,7 @@
 							keys={[
 								{
 									key: 'memoryUsage',
-									title: getTranslation('summary.memory_usage', 'Memory Usage'),
+									title: 'Memory Usage',
 									color: 'hsl(50, 50%, 50%)'
 								}
 							]}

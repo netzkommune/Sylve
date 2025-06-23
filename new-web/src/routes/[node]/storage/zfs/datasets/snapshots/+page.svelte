@@ -231,12 +231,9 @@
 					return;
 				}
 
-				toast.success(
-					`${capitalizeFirstLetter(getTranslation('common.snapshot', 'snapshot'))} ${activeDataset.name} ${getTranslation('common.deleted', 'deleted')}`,
-					{
-						position: 'bottom-center'
-					}
-				);
+				toast.success(`Snapshot ${activeDataset.name} deleted`, {
+					position: 'bottom-center'
+				});
 
 				activeDataset = null;
 				activeRow = null;
@@ -295,7 +292,8 @@
 			size="sm"
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
-			<Icon icon="mdi:delete" class="mr-1 h-4 w-4" /> Delete Snapshot
+			<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
+			{'Delete Snapshot'}
 		</Button>
 	{/if}
 
@@ -312,7 +310,8 @@
 			size="sm"
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
-			<Icon icon="material-symbols:save-clock" class="mr-1 h-4 w-4" /> View Snapshot Jobs
+			<Icon icon="material-symbols:save-clock" class="mr-1 h-4 w-4" />
+			{'View Snapshot Jobs'}
 		</Button>
 	{/if}
 {/snippet}
@@ -373,7 +372,7 @@
 						size="sm"
 						variant="ghost"
 						class="h-8"
-						title={capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}
+						title={'Reset'}
 						onclick={() => {
 							confirmModals.createSnapshot = {
 								open: true,
@@ -389,30 +388,24 @@
 						}}
 					>
 						<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
-						<span class="sr-only"
-							>{capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}</span
-						>
+						<span class="sr-only">{'Reset'}</span>
 					</Button>
 					<Button
 						size="sm"
 						variant="ghost"
 						class="h-8"
-						title={capitalizeFirstLetter(getTranslation('common.close', 'Close'))}
+						title={'Close'}
 						onclick={() => {
 							closeModal();
 						}}
 					>
 						<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
-						<span class="sr-only"
-							>{capitalizeFirstLetter(getTranslation('common.close', 'Close'))}</span
-						>
+						<span class="sr-only">{'Close'}</span>
 					</Button>
 				</div>
 			</div>
 			<CustomValueInput
-				label={capitalizeFirstLetter(getTranslation('common.name', 'Name')) +
-					' | ' +
-					capitalizeFirstLetter(getTranslation('common.prefix', 'Prefix'))}
+				label={`${'Name'} | ${'Prefix'}`}
 				placeholder="after-upgrade"
 				bind:value={confirmModals.createSnapshot.name}
 				classes="flex-1 space-y-1"
@@ -471,15 +464,11 @@
 	<AlertDialog.Root bind:open={confirmModals[confirmModals.active].open}>
 		<AlertDialog.Content>
 			<AlertDialog.Header>
-				<AlertDialog.Title>{getTranslation('are_you_sure', 'Are you sure?')}</AlertDialog.Title>
+				<AlertDialog.Title>{'Are you sure?'}</AlertDialog.Title>
 			</AlertDialog.Header>
 
 			<div class="text-muted-foreground mb-2 text-sm">
-				{getTranslation(
-					'common.permanent_delete_msg',
-					'This action cannot be undone. This will permanently delete'
-				)}
-				{confirmModals.parent}
+				{'This action cannot be undone. This will permanently delete' + confirmModals.parent}
 				<span class="font-semibold">{confirmModals[confirmModals.active].title}</span>.
 			</div>
 
@@ -497,7 +486,7 @@
 						confirmModals['deleteSnapshot'].recursive = !confirmModals['deleteSnapshot'].recursive;
 					}}
 				>
-					Recursive
+					{'Recursive'}
 				</Label>
 			</div>
 
@@ -507,14 +496,14 @@
 						confirmModals[confirmModals.active].open = false;
 					}}
 				>
-					Cancel
+					{'Cancel'}
 				</AlertDialog.Cancel>
 				<AlertDialog.Action
 					onclick={() => {
 						confirmAction();
 					}}
 				>
-					Delete
+					{'Delete'}
 				</AlertDialog.Action>
 			</AlertDialog.Footer>
 		</AlertDialog.Content>

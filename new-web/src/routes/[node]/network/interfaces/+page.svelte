@@ -7,11 +7,8 @@
 	import type { Column, Row } from '$lib/types/components/tree-table';
 	import { type Iface } from '$lib/types/network/iface';
 	import { updateCache } from '$lib/utils/http';
-	import { getTranslation } from '$lib/utils/i18n';
 	import { generateTableData, getCleanIfaceData } from '$lib/utils/network/iface';
-	import { capitalizeFirstLetter } from '$lib/utils/string';
 	import { renderWithIcon } from '$lib/utils/table';
-	import { convertDbTime } from '$lib/utils/time';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
 	import type { CellComponent } from 'tabulator-tables';

@@ -29,7 +29,7 @@ export function generateTableData(
 		}
 
 		const row: Row = {
-			id: generateNumberFromString(iface.ether),
+			id: generateNumberFromString(iface.ether + iface.name),
 			ether: iface.ether,
 			name: iface.name,
 			model: iface.model,

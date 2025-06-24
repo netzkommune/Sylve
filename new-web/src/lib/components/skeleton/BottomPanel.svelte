@@ -21,7 +21,7 @@
 </script>
 
 <Tabs.Root value="cluster" class="flex h-full w-full flex-col">
-	<Tabs.Content value="cluster" class="flex h-full flex-col border">
+	<Tabs.Content value="cluster" class="flex h-full flex-col border-x border-b">
 		<div class="flex h-full flex-col overflow-hidden">
 			<Table.Root class="w-full table-fixed border-collapse">
 				<Table.Header class="bg-background sticky top-0 z-[50] ">

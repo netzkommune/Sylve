@@ -22,7 +22,7 @@
 	});
 </script>
 
-<header class="sticky top-0 flex h-[5vh] items-center gap-4 border-b px-2 md:h-[4vh]">
+<header class="sticky top-0 flex h-[5vh] items-center gap-4 border-x border-b px-2 md:h-[4vh]">
 	<nav
 		class="hidden flex-col gap-2 text-lg font-medium md:items-center md:gap-2 md:text-sm lg:flex lg:flex-row lg:gap-4"
 	>

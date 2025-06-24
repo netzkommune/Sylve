@@ -458,7 +458,7 @@
 {/snippet}
 
 <div class="flex h-full w-full flex-col">
-	<div class="flex h-10 w-full items-center gap-2 border p-2">
+	<div class="flex h-10 w-full items-center gap-2 border-b p-2">
 		<Search bind:query />
 		<Button
 			onclick={() => {

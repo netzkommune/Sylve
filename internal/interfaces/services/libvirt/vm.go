@@ -17,6 +17,7 @@ type CreateVMRequest struct {
 	CPUSockets           int     `json:"cpuSockets" binding:"required"`
 	CPUCores             int     `json:"cpuCores" binding:"required"`
 	CPUThreads           int     `json:"cpuThreads" binding:"required"`
+	CPUPinning           []int   `json:"cpuPinning" binding:"required"`
 	RAM                  int     `json:"ram" binding:"required"`
 	PCIDevices           []int   `json:"pciDevices"`
 	VNCPort              int     `json:"vncPort" binding:"required"`

@@ -219,6 +219,20 @@ func (s *Service) CreateVmXML(vm vmModels.VM, vmPath string) (string, error) {
 		}
 	}
 
+	if vm.CPUPinning != nil && len(vm.CPUPinning) > 0 {
+		for i, cpu := range vm.CPUPinning {
+			if cpu < 0 {
+				return "", fmt.Errorf("invalid_cpu_pinning_value: %d", cpu)
+			}
+
+			bhyveArgs = append(bhyveArgs, []libvirtServiceInterfaces.BhyveArg{
+				{
+					Value: fmt.Sprintf("-p %d:%d", i, cpu),
+				},
+			})
+		}
+	}
+
 	width, height, f := strings.Cut(vm.VNCResolution, "x")
 	if f != true {
 		return "", fmt.Errorf("invalid_vnc_resolution")

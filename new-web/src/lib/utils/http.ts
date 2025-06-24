@@ -101,6 +101,19 @@ export async function cachedFetch<T>(
 	return data;
 }
 
+export function getCache<T>(key: string): T | null {
+	const storedEntry = localStorage.getItem(key);
+	if (storedEntry) {
+		try {
+			const entry: CacheEntry<T> = JSON.parse(storedEntry);
+			return entry.data;
+		} catch (error) {
+			console.error(`Failed to parse cached data for key "${key}"`, error);
+		}
+	}
+	return null;
+}
+
 export async function updateCache<T>(key: string, obj: T): Promise<void> {
 	const now = Date.now();
 	const storedEntry = localStorage.getItem(key);

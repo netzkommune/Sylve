@@ -1150,3 +1150,31 @@ msgstr "Delete Snapshot"
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 msgid "{0} <0>{0}</0> ."
 msgstr "{0} <0>{0}</0> ."
+
+#: src/lib/components/custom/CreateVM/Hardware.svelte
+msgid "CPU Pinning"
+msgstr "CPU Pinning"
+
+#: src/lib/components/custom/CreateVM/Hardware.svelte
+msgid "// use cpuInfo.logicalCores"
+msgstr "// use cpuInfo.logicalCores"
+
+#: src/lib/components/custom/CreateVM/Hardware.svelte
+msgid "CPU Pinning {0}"
+msgstr "CPU Pinning {0}"
+
+#: src/lib/components/custom/CreateVM/Hardware.svelte
+msgid "CPU{0} — {1}"
+msgstr "CPU{0} — {1}"
+
+#: src/lib/components/custom/CreateVM/Hardware.svelte
+msgid "CPU{0}"
+msgstr "CPU{0}"
+
+#: src/lib/components/custom/CreateVM/Hardware.svelte
+msgid "Pinned CPUs have been limited to{0} vCPU{1}"
+msgstr "Pinned CPUs have been limited to{0} vCPU{1}"
+
+#: src/lib/components/custom/CreateVM/Hardware.svelte
+msgid "At least one CPU must be left unpinned"
+msgstr "At least one CPU must be left unpinned"

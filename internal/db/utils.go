@@ -32,7 +32,7 @@ func GetHistorical[T any](db *gorm.DB, limit int) ([]T, error) {
 	return records, nil
 }
 
-func StoreAndTrimRecords(db *gorm.DB, model interface{}, limit int) {
+func StoreAndTrimRecords[T any](db *gorm.DB, model *T, limit int) {
 	db.Create(model)
 
 	var count int64
@@ -46,7 +46,8 @@ func StoreAndTrimRecords(db *gorm.DB, model interface{}, limit int) {
 			Pluck("id", &oldestIDs)
 
 		if len(oldestIDs) > 0 {
-			db.Where("id IN (?)", oldestIDs).Delete(model)
+			var emptyModel T
+			db.Where("id IN ?", oldestIDs).Delete(&emptyModel)
 		}
 	}
 }

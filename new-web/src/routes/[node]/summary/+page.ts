@@ -1,5 +1,6 @@
 import { getBasicInfo } from '$lib/api/info/basic';
 import { getCPUInfo } from '$lib/api/info/cpu';
+import { getNetworkInterfaceInfoHistorical } from '$lib/api/info/network';
 import { getRAMInfo, getSwapInfo } from '$lib/api/info/ram';
 import { getIODelay } from '$lib/api/zfs/pool';
 import { SEVEN_DAYS } from '$lib/utils';
@@ -18,7 +19,8 @@ export async function load() {
 		swapInfoHistorical,
 		ioDelay,
 		ioDelayHistorical,
-		totalDiskUsage
+		totalDiskUsage,
+		networkUsageHistorical
 	] = await Promise.all([
 		cachedFetch('basicInfo', getBasicInfo, cacheDuration),
 		cachedFetch('cpuInfo', getCPUInfo, cacheDuration),
@@ -53,7 +55,8 @@ export async function load() {
 			() => getIODelay({ queryKey: ['ioDelayHistorical'], meta: undefined }),
 			cacheDuration
 		),
-		cachedFetch('totalDiskUsage', getTotalDiskUsage, cacheDuration)
+		cachedFetch('totalDiskUsage', getTotalDiskUsage, cacheDuration),
+		cachedFetch('networkUsageHistorical', getNetworkInterfaceInfoHistorical, cacheDuration)
 	]);
 
 	return {
@@ -66,6 +69,7 @@ export async function load() {
 		swapInfoHistorical,
 		ioDelay,
 		ioDelayHistorical,
-		totalDiskUsage
+		totalDiskUsage,
+		networkUsageHistorical
 	};
 }

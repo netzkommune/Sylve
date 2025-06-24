@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getBasicInfo } from '$lib/api/info/basic';
 	import { getCPUInfo } from '$lib/api/info/cpu';
+	import { getNetworkInterfaceInfoHistorical } from '$lib/api/info/network';
 	import { getRAMInfo, getSwapInfo } from '$lib/api/info/ram';
 	import { getIODelay } from '$lib/api/zfs/pool';
 	import AreaChart from '$lib/components/custom/Charts/Area.svelte';
@@ -10,6 +11,7 @@
 	import * as Table from '$lib/components/ui/table/index.js';
 	import type { BasicInfo } from '$lib/types/info/basic';
 	import type { CPUInfo, CPUInfoHistorical } from '$lib/types/info/cpu';
+	import type { HistoricalNetworkInterface } from '$lib/types/info/network';
 	import type { RAMInfo, RAMInfoHistorical } from '$lib/types/info/ram';
 	import type { IODelay, IODelayHistorical } from '$lib/types/zfs/pool';
 	import { updateCache } from '$lib/utils/http';
@@ -30,6 +32,7 @@
 		ioDelay: IODelay;
 		totalDiskUsage: number;
 		ioDelayHistorical: IODelayHistorical;
+		networkUsageHistorical: HistoricalNetworkInterface[];
 	}
 
 	let { data }: { data: Data } = $props();
@@ -134,6 +137,16 @@
 			onSuccess: (data: RAMInfo | RAMInfoHistorical) => {
 				updateCache('swapInfoHistorical', data as RAMInfoHistorical);
 			}
+		},
+		{
+			queryKey: ['networkUsageHistorical'],
+			queryFn: getNetworkInterfaceInfoHistorical,
+			refetchInterval: 1000,
+			keepPreviousData: true,
+			initialData: data.networkUsageHistorical,
+			onSuccess: (data: HistoricalNetworkInterface[]) => {
+				updateCache('networkUsageHistorical', data);
+			}
 		}
 	]);
 
@@ -147,6 +160,7 @@
 	let ioDelayHistorical = $derived($results[7].data as IODelayHistorical);
 	let ramInfoHistorical = $derived($results[8].data as RAMInfoHistorical);
 	let swapInfoHistorical = $derived($results[9].data as RAMInfoHistorical);
+	let networkUsageHistorical = $derived($results[10].data as HistoricalNetworkInterface[]);
 
 	let chartElements = $derived.by(() => {
 		return [
@@ -191,6 +205,28 @@
 					.map((data) => ({
 						date: new Date(data.createdAt),
 						value: data.usage.toFixed(2)
+					}))
+					.slice(-16)
+			},
+			{
+				field: 'networkUsageRx',
+				label: 'Network RX',
+				color: 'var(--chart-1)',
+				data: networkUsageHistorical
+					.map((data) => ({
+						date: new Date(data.createdAt),
+						value: data.receivedBytes.toFixed(2)
+					}))
+					.slice(-16)
+			},
+			{
+				field: 'networkUsageTx',
+				label: 'Network TX',
+				color: 'var(--chart-4)',
+				data: networkUsageHistorical
+					.map((data) => ({
+						date: new Date(data.createdAt),
+						value: data.sentBytes.toFixed(2)
 					}))
 					.slice(-16)
 			}
@@ -313,6 +349,7 @@
 
 				<AreaChart title="CPU Usage" elements={[chartElements[1], chartElements[0]]} />
 				<AreaChart title="Memory Usage" elements={[chartElements[3], chartElements[2]]} />
+				<AreaChart title="Network Usage" elements={[chartElements[4], chartElements[5]]} />
 			</div>
 		</ScrollArea>
 	</div>

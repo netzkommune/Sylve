@@ -12,9 +12,10 @@
 		title: string;
 		description?: string;
 		elements: AreaChartElement[];
+		formatSize?: boolean;
 	}
 
-	let { title, description = '', elements }: Props = $props();
+	let { title, description = '', elements, formatSize = false }: Props = $props();
 	let config = $derived(
 		elements.reduce((acc, element) => {
 			acc[element.field] = { label: element.label, color: element.color };

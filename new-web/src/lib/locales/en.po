@@ -1178,3 +1178,19 @@ msgstr "Pinned CPUs have been limited to{0} vCPU{1}"
 #: src/lib/components/custom/CreateVM/Hardware.svelte
 msgid "At least one CPU must be left unpinned"
 msgstr "At least one CPU must be left unpinned"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Network Usage"
+msgstr "Network Usage"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Network RX"
+msgstr "Network RX"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Network TX"
+msgstr "Network TX"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Sorting network interfaces by date:{0} vs {1} = {2}"
+msgstr "Sorting network interfaces by date:{0} vs {1} = {2}"

@@ -11,6 +11,21 @@ import (
 	"time"
 )
 
+func (s *Service) PruneOrphanedVMStats() error {
+	if err := s.DB.
+		Where(
+			"vm_id NOT IN (?)",
+			s.DB.
+				Model(&vmModels.VM{}).
+				Select("vm_id"),
+		).
+		Delete(&vmModels.VMStats{}).
+		Error; err != nil {
+		return fmt.Errorf("failed to prune orphaned VMStats: %w", err)
+	}
+	return nil
+}
+
 func (s *Service) StoreVMUsage() error {
 	if s.crudMutex.TryLock() == false {
 		return nil
@@ -84,6 +99,36 @@ func (s *Service) StoreVMUsage() error {
 		if err := s.DB.Save(vmStats).Error; err != nil {
 			continue
 		}
+	}
+
+	var vmIdsToKeep []int
+	if err := s.DB.Model(&vmModels.VMStats{}).
+		Select("DISTINCT vm_id").
+		Pluck("vm_id", &vmIdsToKeep).Error; err != nil {
+		return fmt.Errorf("failed_to_get_vm_ids_to_keep: %w", err)
+	}
+
+	for _, vmId := range vmIdsToKeep {
+		var vmStats []vmModels.VMStats
+		if err := s.DB.Where("vm_id = ?", vmId).
+			Order("id DESC").
+			Limit(256).
+			Find(&vmStats).Error; err != nil {
+			return fmt.Errorf("failed_to_get_vm_stats: %w", err)
+		}
+
+		if len(vmStats) < 256 {
+			continue
+		}
+
+		if err := s.DB.Where("vm_id = ? AND id < ?", vmId, vmStats[255].ID).
+			Delete(&vmModels.VMStats{}).Error; err != nil {
+			return fmt.Errorf("failed_to_delete_old_vm_stats: %w", err)
+		}
+	}
+
+	if err := s.PruneOrphanedVMStats(); err != nil {
+		return err
 	}
 
 	return nil

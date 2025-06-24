@@ -64,6 +64,7 @@ func SetupDatabase(cfg *internal.SylveConfig, isTest bool) *gorm.DB {
 		&infoModels.RAM{},
 		&infoModels.Swap{},
 		&infoModels.IODelay{},
+		&infoModels.NetworkInterface{},
 		&infoModels.Note{},
 		&infoModels.AuditLog{},
 
@@ -86,6 +87,12 @@ func SetupDatabase(cfg *internal.SylveConfig, isTest bool) *gorm.DB {
 
 	if err != nil {
 		logger.L.Fatal().Msgf("Error setting up initial users: %v", err)
+	}
+
+	if !isTest {
+		if err := db.Exec("VACUUM").Error; err != nil {
+			logger.L.Warn().Msgf("VACUUM failed: %v", err)
+		}
 	}
 
 	return db

@@ -42,11 +42,44 @@ func (s *Service) StoreStats() {
 		go func(j task) {
 			defer wg.Done()
 			if v, err := j.get(); err == nil {
-				db.StoreAndTrimRecords(s.DB, j.ptr(v), 128)
+				switch ptr := j.ptr(v).(type) {
+				case *infoModels.CPU:
+					db.StoreAndTrimRecords[*infoModels.CPU](s.DB, &ptr, 128)
+				case *infoModels.RAM:
+					db.StoreAndTrimRecords[*infoModels.RAM](s.DB, &ptr, 128)
+				case *infoModels.Swap:
+					db.StoreAndTrimRecords[*infoModels.Swap](s.DB, &ptr, 128)
+				}
 			}
 		}(job)
 	}
 	wg.Wait()
+}
+
+func (s *Service) StoreNetworkInterfaceStats() {
+	interfaces, err := s.GetNetworkInterfacesInfo()
+	if err != nil {
+		return
+	}
+
+	for _, iface := range interfaces {
+		ifaceModel := &infoModels.NetworkInterface{
+			Name:            iface.Name,
+			Flags:           iface.Flags,
+			Network:         iface.Network,
+			Address:         iface.Address,
+			ReceivedPackets: iface.ReceivedPackets,
+			ReceivedErrors:  iface.ReceivedErrors,
+			DroppedPackets:  iface.DroppedPackets,
+			ReceivedBytes:   iface.ReceivedBytes,
+			SentPackets:     iface.SentPackets,
+			SendErrors:      iface.SendErrors,
+			SentBytes:       iface.SentBytes,
+			Collisions:      iface.Collisions,
+		}
+
+		db.StoreAndTrimRecords(s.DB, ifaceModel, len(interfaces)*128)
+	}
 }
 
 func (s *Service) Cron() {
@@ -54,8 +87,10 @@ func (s *Service) Cron() {
 	defer ticker.Stop()
 
 	s.StoreStats()
+	s.StoreNetworkInterfaceStats()
 
 	for range ticker.C {
 		s.StoreStats()
+		s.StoreNetworkInterfaceStats()
 	}
 }

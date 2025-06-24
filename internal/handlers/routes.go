@@ -90,6 +90,8 @@ func RegisterRoutes(r *gin.Engine,
 		info.GET("/swap", infoHandlers.SwapInfo(infoService))
 		info.GET("/swap/historical", infoHandlers.HistoricalSwapInfoHandler(infoService))
 
+		info.GET("/network-interfaces/historical", infoHandlers.HistoricalNetworkInterfacesInfoHandler(infoService))
+
 		notes := info.Group("/notes")
 		{
 			notes.GET("", infoHandlers.NotesHandler(infoService))

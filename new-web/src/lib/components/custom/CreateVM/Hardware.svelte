@@ -1,11 +1,18 @@
 <script lang="ts">
+	import { getCPUInfo } from '$lib/api/info/cpu';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
+	import type { CPUInfo } from '$lib/types/info/cpu';
 	import type { PCIDevice, PPTDevice } from '$lib/types/system/pci';
+	import type { VM } from '$lib/types/vm/vm';
+	import { getCache } from '$lib/utils/http';
 	import { getPCIDeviceId } from '$lib/utils/system/pci';
+	import Icon from '@iconify/svelte';
 	import humanFormat from 'human-format';
+	import { onMount } from 'svelte';
+	import { toast } from 'svelte-sonner';
 
 	interface Props {
 		sockets: number;
@@ -15,6 +22,8 @@
 		devices: PCIDevice[];
 		pptDevices: PPTDevice[];
 		passthroughIds: number[];
+		vms: VM[];
+		pinnedCPUs: number[];
 	}
 
 	let {
@@ -24,7 +33,9 @@
 		memory = $bindable(),
 		devices = $bindable(),
 		pptDevices = $bindable(),
-		passthroughIds = $bindable()
+		passthroughIds = $bindable(),
+		pinnedCPUs = $bindable(),
+		vms
 	}: Props = $props();
 
 	let humanSize = $state('1024 M');
@@ -48,11 +59,43 @@
 	);
 
 	let selectedPptIds = $state<string[]>([]);
+	let cpuInfo: CPUInfo | null = $state(getCache('cpuInfo') || null);
 
 	function toggle(id: string, on: boolean) {
 		selectedPptIds = on ? [...selectedPptIds, id] : selectedPptIds.filter((x) => x !== id);
 		passthroughIds = selectedPptIds.map((x) => parseInt(x));
 	}
+
+	let pinnedIndices = $derived.by(() => {
+		return vms.flatMap((vm, index) => (vm.cpuPinning ? vm.cpuPinning.map((id) => id) : []));
+	});
+
+	let vCPUs = $derived(sockets * cores * threads);
+
+	function pinCPU(index: number) {
+		if (pinnedCPUs.includes(index)) {
+			pinnedCPUs = pinnedCPUs.filter((cpu) => cpu !== index);
+		} else {
+			if (pinnedCPUs.length >= vCPUs) {
+				toast.info(`You can only pin up to ${vCPUs} vCPU${vCPUs > 1 ? 's' : ''}`);
+				return;
+			}
+			pinnedCPUs = [...pinnedCPUs, index];
+		}
+	}
+
+	$effect(() => {
+		if (pinnedCPUs.length > vCPUs) {
+			pinnedCPUs = pinnedCPUs.slice(0, vCPUs);
+		}
+
+		let totalPinned = pinnedIndices.length + pinnedCPUs.length;
+
+		if (totalPinned === cpuInfo?.logicalCores) {
+			pinnedCPUs = pinnedCPUs.slice(0, -1);
+			toast.info('At least one CPU must be left unpinned');
+		}
+	});
 </script>
 
 <div class="flex flex-col gap-4 p-4">
@@ -84,6 +127,31 @@
 			bind:value={humanSize}
 			classes="flex-1 space-y-1.5"
 		/>
+	</div>
+
+	<div>
+		{#if cpuInfo}
+			<Label class="mb-4 flex justify-center">CPU Pinning</Label>
+
+			<ScrollArea orientation="vertical" class="h-32 w-full max-w-full">
+				<div
+					class="grid grid-cols-6 justify-items-center gap-1 text-xs sm:grid-cols-8 md:grid-cols-10"
+				>
+					{#each Array(cpuInfo.logicalCores).fill(0) as _, index (index)}
+						{#if pinnedIndices.includes(index)}
+							<Icon icon="iconoir:cpu" class="h-5 w-5 cursor-pointer text-red-600" />
+						{:else}
+							<Icon
+								icon="iconoir:cpu"
+								class={`h-5 w-5 cursor-pointer
+                                ${pinnedCPUs.includes(index) ? 'text-yellow-600' : 'text-green-400'}`}
+								onclick={() => pinCPU(index)}
+							/>
+						{/if}
+					{/each}
+				</div>
+			</ScrollArea>
+		{/if}
 	</div>
 
 	{#if pptDevices && pptDevices.length > 0}

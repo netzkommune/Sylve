@@ -31,6 +31,7 @@ export async function newVM(data: CreateData): Promise<APIResponse> {
 		cpuCores: data.hardware.cores,
 		cpuThreads: data.hardware.threads,
 		ram: data.hardware.memory,
+		cpuPinning: data.hardware.pinnedCPUs,
 		vncPort: data.advanced.vncPort,
 		vncPassword: data.advanced.vncPassword,
 		vncWait: data.advanced.vncWait,

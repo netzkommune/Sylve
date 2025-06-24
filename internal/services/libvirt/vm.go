@@ -9,6 +9,7 @@ import (
 	"sylve/pkg/utils"
 	"sylve/pkg/zfs"
 
+	"github.com/klauspost/cpuid/v2"
 	"gorm.io/gorm"
 
 	sdb "sylve/internal/db"
@@ -222,6 +223,32 @@ func validateCreate(data libvirtServiceInterfaces.CreateVMRequest, db *gorm.DB) 
 		}
 	}
 
+	if len(data.CPUPinning) > 0 {
+		vcpu := data.CPUSockets * data.CPUCores * data.CPUThreads
+		if len(data.CPUPinning) > vcpu {
+			return fmt.Errorf("cpu_pinning_exceeds_total_vcpus: %d", vcpu)
+		}
+
+		if len(data.CPUPinning) > cpuid.CPU.LogicalCores {
+			return fmt.Errorf("cpu_pinning_exceeds_logical_cores: %d", cpuid.CPU.LogicalCores)
+		}
+
+		var vms []vmModels.VM
+		if err := db.Find(&vms).Error; err != nil {
+			return fmt.Errorf("failed_to_fetch_vms: %w", err)
+		}
+
+		for _, vm := range vms {
+			for _, cPin := range vm.CPUPinning {
+				for _, nPin := range data.CPUPinning {
+					if cPin == nPin {
+						return fmt.Errorf("vcpu_already_pinned: %d", nPin)
+					}
+				}
+			}
+		}
+	}
+
 	if data.ISO != "" && data.ISO != "none" {
 		count, err := sdb.Count(db, &utilitiesModels.Downloads{}, "uuid = ?", data.ISO)
 
@@ -302,6 +329,7 @@ func (s *Service) CreateVM(data libvirtServiceInterfaces.CreateVMRequest) error 
 		CPUSockets:    data.CPUSockets,
 		CPUCores:      data.CPUCores,
 		CPUsThreads:   data.CPUThreads,
+		CPUPinning:    data.CPUPinning,
 		RAM:           data.RAM,
 		VNCPort:       data.VNCPort,
 		VNCPassword:   data.VNCPassword,

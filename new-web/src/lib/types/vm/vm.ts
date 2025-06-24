@@ -22,6 +22,7 @@ export interface CreateData {
 		threads: number;
 		memory: number;
 		passthroughIds: number[];
+		pinnedCPUs: number[];
 	};
 	advanced: {
 		vncPort: number;
@@ -69,7 +70,8 @@ export const VMSchema = z.object({
 
 	storages: z.array(VMStorageSchema),
 	networks: z.array(VMNetworkSchema),
-	pciDevices: z.array(z.number().int()),
+	pciDevices: z.union([z.array(z.number().int()), z.null()]),
+	cpuPinning: z.union([z.array(z.number().int()), z.null()]),
 
 	createdAt: z.string(),
 	updatedAt: z.string(),

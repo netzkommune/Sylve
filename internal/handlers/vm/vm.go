@@ -27,6 +27,16 @@ type VMEditDescRequest struct {
 func ListVMs(libvirtService *libvirt.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		vms, err := libvirtService.ListVMs()
+
+		for i := range vms {
+			if vms[i].PCIDevices == nil {
+				vms[i].PCIDevices = []int{}
+			}
+			if vms[i].CPUPinning == nil {
+				vms[i].CPUPinning = []int{}
+			}
+		}
+
 		if err != nil {
 			c.JSON(500, internal.APIResponse[any]{Error: "failed_to_list_vms: " + err.Error()})
 			return

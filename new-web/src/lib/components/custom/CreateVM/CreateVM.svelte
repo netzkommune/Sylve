@@ -3,7 +3,7 @@
 	import { getSwitches } from '$lib/api/network/switch';
 	import { getPCIDevices, getPPTDevices } from '$lib/api/system/pci';
 	import { getDownloads } from '$lib/api/utilities/downloader';
-	import { newVM } from '$lib/api/vm/vm';
+	import { getVMs, newVM } from '$lib/api/vm/vm';
 	import { getDatasets } from '$lib/api/zfs/datasets';
 	import { getPools } from '$lib/api/zfs/pool';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -24,7 +24,7 @@
 	import Network from './Network.svelte';
 	import Storage from './Storage.svelte';
 
-	import { type CreateData } from '$lib/types/vm/vm';
+	import { type CreateData, type VM } from '$lib/types/vm/vm';
 	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
 
@@ -105,9 +105,20 @@
 			keepPreviousData: true,
 			initialData: [],
 			refetchOnMount: 'always'
+		},
+		{
+			queryKey: ['vms-svm'],
+			queryFn: async () => {
+				return await getVMs();
+			},
+			refetchInterval: 1000,
+			keepPreviousData: true,
+			initialData: [],
+			refetchOnMount: 'always'
 		}
 	]);
 
+	let vms: VM[] = $derived($results[7].data as VM[]);
 	let datasets: Dataset[] = $derived($results[1].data as Dataset[]);
 	let volumes: Dataset[] = $derived(datasets.filter((dataset) => dataset.type === 'volume'));
 	let filesystems: Dataset[] = $derived(
@@ -152,7 +163,8 @@
 			cores: 1,
 			threads: 1,
 			memory: 0,
-			passthroughIds: [] as number[]
+			passthroughIds: [] as number[],
+			pinnedCPUs: [] as number[]
 		},
 		advanced: {
 			vncPort: 0,
@@ -205,7 +217,8 @@
 				cores: 1,
 				threads: 1,
 				memory: 0,
-				passthroughIds: [] as number[]
+				passthroughIds: [] as number[],
+				pinnedCPUs: [] as number[]
 			},
 			advanced: {
 				vncPort: 0,
@@ -301,12 +314,14 @@
 							{:else if value === 'hardware'}
 								<Hardware
 									devices={passablePci}
+									{vms}
 									{pptDevices}
 									bind:sockets={modal.hardware.sockets}
 									bind:cores={modal.hardware.cores}
 									bind:threads={modal.hardware.threads}
 									bind:memory={modal.hardware.memory}
 									bind:passthroughIds={modal.hardware.passthroughIds}
+									bind:pinnedCPUs={modal.hardware.pinnedCPUs}
 								/>
 							{:else if value === 'advanced'}
 								<Advanced

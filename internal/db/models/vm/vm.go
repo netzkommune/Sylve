@@ -58,6 +58,7 @@ type VM struct {
 	Storages   []Storage `json:"storages" gorm:"foreignKey:VMID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Networks   []Network `json:"networks" gorm:"foreignKey:VMID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	PCIDevices []int     `json:"pciDevices" gorm:"serializer:json;type:json"`
+	CPUPinning []int     `json:"cpuPinning" gorm:"serializer:json;type:json"`
 
 	Stats []VMStats `json:"-" gorm:"foreignKey:VMID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 

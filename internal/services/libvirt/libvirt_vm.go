@@ -74,7 +74,7 @@ func (s *Service) CreateVmXML(vm vmModels.VM, vmPath string) (string, error) {
 			}
 
 			if storage.Type == "iso" {
-				isoPath, err := s.FindISOByUUID(storage.Dataset)
+				isoPath, err := s.FindISOByUUID(storage.Dataset, false)
 				if err != nil {
 					return "", fmt.Errorf("failed to find ISO: %w", err)
 				}

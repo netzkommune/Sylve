@@ -1,10 +1,12 @@
 <script lang="ts">
+	import { getDownloads } from '$lib/api/utilities/downloader';
 	import {
 		bulkDelete,
 		createSnapshot,
 		createVolume,
 		deleteSnapshot,
 		deleteVolume,
+		flashVolume,
 		getDatasets
 	} from '$lib/api/zfs/datasets';
 	import { getPools } from '$lib/api/zfs/pool';
@@ -12,27 +14,34 @@
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import Search from '$lib/components/custom/TreeTable/Search.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import CustomComboBox from '$lib/components/ui/custom-input/combobox.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import type { Column, Row } from '$lib/types/components/tree-table';
+	import type { Download } from '$lib/types/utilities/downloader';
 	import type { Dataset, GroupedByPool } from '$lib/types/zfs/dataset';
 	import type { Zpool } from '$lib/types/zfs/pool';
+	import { sleep } from '$lib/utils';
+	import { updateCache } from '$lib/utils/http';
 	import { getTranslation } from '$lib/utils/i18n';
 	import { isValidSize } from '$lib/utils/numbers';
 	import { capitalizeFirstLetter, generatePassword } from '$lib/utils/string';
+	import { getISOs } from '$lib/utils/utilities/downloader';
 	import { isValidPoolName } from '$lib/utils/zfs';
 	import { groupByPool } from '$lib/utils/zfs/dataset/dataset';
 	import { createVolProps, generateTableData, handleError } from '$lib/utils/zfs/dataset/volume';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
 	import humanFormat from 'human-format';
-	import { toast } from 'svelte-sonner';
+
+	import { toast, Toaster } from 'svelte-sonner';
 
 	interface Data {
 		pools: Zpool[];
 		datasets: Dataset[];
+		downloads: Download[];
 	}
 
 	let { data }: { data: Data } = $props();
@@ -56,9 +65,22 @@
 			refetchInterval: 1000,
 			keepPreviousData: false,
 			initialData: data.datasets
+		},
+		{
+			queryKey: ['downloads'],
+			queryFn: async () => {
+				return await getDownloads();
+			},
+			refetchInterval: 1000,
+			keepPreviousData: true,
+			initialData: data.downloads,
+			onSuccess: (data: Download[]) => {
+				updateCache('downloads', data);
+			}
 		}
 	]);
 
+	let downloads = $derived($results[2].data as Download[]);
 	let grouped: GroupedByPool[] = $derived(groupByPool($results[0].data, $results[1].data));
 	let table: {
 		rows: Row[];
@@ -125,7 +147,8 @@
 			| 'deleteVolume'
 			| 'deleteSnapshot'
 			| 'createSnapshot'
-			| 'deleteVolumes',
+			| 'deleteVolumes'
+			| 'flashFile',
 		parent: '',
 		createVolume: {
 			open: false,
@@ -167,6 +190,20 @@
 			open: false,
 			data: '',
 			title: ''
+		},
+		flashFile: {
+			open: false,
+			loading: false,
+			data: {
+				guid: '',
+				uuid: ''
+			},
+			title: '',
+			combobox: {
+				open: false,
+				value: '',
+				data: getISOs(downloads, true)
+			}
 		}
 	});
 
@@ -386,6 +423,30 @@
 
 {#snippet button(type: string)}
 	{#if activeRows && activeRows.length == 1}
+		{#if type === 'flash-file' && activeVolume?.type === 'volume'}
+			<Button
+				onclick={async () => {
+					if (activeVolume) {
+						confirmModals.active = 'flashFile';
+						confirmModals.parent = 'volume';
+						confirmModals['flashFile'].open = true;
+						confirmModals['flashFile'].title = activeVolume.name;
+						confirmModals['flashFile'].data = {
+							guid: activeVolume.properties.guid || '',
+							uuid: ''
+						};
+					}
+				}}
+				size="sm"
+				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+			>
+				<div class="flex items-center">
+					<Icon icon="mdi:usb-flash-drive-outline" class="mr-1 h-4 w-4" />
+					<span>Flash File</span>
+				</div>
+			</Button>
+		{/if}
+
 		{#if type === 'create-snapshot' && activeVolume?.type === 'volume'}
 			<Button
 				onclick={async () => {
@@ -399,7 +460,10 @@
 				size="sm"
 				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 			>
-				<Icon icon="carbon:ibm-cloud-vpc-block-storage-snapshots" class="mr-1 h-4 w-4" /> Create Snapshot
+				<div class="flex items-center">
+					<Icon icon="carbon:ibm-cloud-vpc-block-storage-snapshots" class="mr-1 h-4 w-4" />
+					<span>Create Snapshot</span>
+				</div>
 			</Button>
 		{/if}
 
@@ -416,7 +480,10 @@
 				size="sm"
 				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 			>
-				<Icon icon="mdi:delete" class="mr-1 h-4 w-4" /> Delete Snapshot
+				<div class="flex items-center">
+					<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
+					<span>Delete Snapshot</span>
+				</div>
 			</Button>
 		{/if}
 
@@ -434,7 +501,10 @@
 				size="sm"
 				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 			>
-				<Icon icon="mdi:delete" class="mr-1 h-4 w-4" /> Delete Volume
+				<div class="flex items-center">
+					<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
+					<span>Delete Volume</span>
+				</div>
 			</Button>
 		{/if}
 	{:else if activeRows && activeRows.length > 1}
@@ -451,7 +521,10 @@
 				size="sm"
 				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 			>
-				<Icon icon="mdi:delete" class="mr-1 h-4 w-4" /> Delete Volumes
+				<div class="flex items-center">
+					<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
+					<span>Delete Volumes</span>
+				</div>
 			</Button>
 		{/if}
 	{/if}
@@ -472,6 +545,7 @@
 			<Icon icon="gg:add" class="mr-1 h-4 w-4" /> New
 		</Button>
 
+		{@render button('flash-file')}
 		{@render button('create-snapshot')}
 		{@render button('delete-snapshot')}
 		{@render button('delete-volume')}
@@ -813,4 +887,95 @@
 			}
 		}}
 	></AlertDialogModal>
+{/if}
+
+{#if confirmModals.active === 'flashFile'}
+	<Dialog.Root bind:open={confirmModals.flashFile.open}>
+		<Dialog.Content
+			class="p-5"
+			onInteractOutside={(e) => e.preventDefault()}
+			onEscapeKeydown={(e) => e.preventDefault()}
+		>
+			<div class="flex items-center justify-between">
+				<Dialog.Header class="flex-1">
+					<Dialog.Title>
+						<div class="flex items-center">
+							<Icon icon="mdi:usb-flash-drive-outline" class="mr-2 h-6 w-6" />
+							Flash File to {confirmModals.flashFile.title}
+						</div>
+					</Dialog.Title>
+				</Dialog.Header>
+				<Dialog.Close>
+					<Button
+						size="sm"
+						variant="ghost"
+						class="h-8"
+						title={'Close'}
+						onclick={() => {
+							confirmModals.flashFile.open = false;
+							confirmModals.flashFile.data = {
+								guid: '',
+								uuid: ''
+							};
+							confirmModals.flashFile.title = '';
+						}}
+					>
+						<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only">{'Close'}</span>
+					</Button>
+				</Dialog.Close>
+			</div>
+
+			<div class="flex-1 space-y-1">
+				<CustomComboBox
+					bind:open={confirmModals.flashFile.combobox.open}
+					label="Select File"
+					bind:value={confirmModals.flashFile.data.uuid}
+					data={confirmModals.flashFile.combobox.data}
+					classes="flex-1 space-y-1.5"
+					placeholder="File"
+					triggerWidth="w-full"
+					width="w-full"
+				></CustomComboBox>
+			</div>
+
+			<Dialog.Footer class="flex justify-end">
+				<div class="flex w-full items-center justify-end gap-2 px-1 py-2">
+					<Button
+						onclick={async () => {
+							confirmModals.flashFile.loading = true;
+							await sleep(1000);
+
+							const response = await flashVolume(
+								confirmModals.flashFile.data.guid,
+								confirmModals.flashFile.data.uuid
+							);
+
+							if (response.status === 'error') {
+								handleError(response);
+							} else {
+								toast.success(`${'Volume ' + confirmModals.flashFile.title + ' flashed'}`);
+							}
+
+							confirmModals.flashFile.open = false;
+							confirmModals.flashFile.loading = false;
+							confirmModals.flashFile.data = {
+								guid: '',
+								uuid: ''
+							};
+						}}
+						type="submit"
+						size="sm"
+						disabled={!confirmModals.flashFile.data.uuid || confirmModals.flashFile.loading}
+					>
+						{#if confirmModals.flashFile.loading}
+							<Icon icon="mdi:loading" class="h-4 w-4 animate-spin" />
+						{:else}
+							<span>Flash</span>
+						{/if}
+					</Button>
+				</div>
+			</Dialog.Footer>
+		</Dialog.Content>
+	</Dialog.Root>
 {/if}

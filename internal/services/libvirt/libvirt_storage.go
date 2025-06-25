@@ -114,7 +114,7 @@ func (s *Service) StorageDetach(vmId int, storageId int) error {
 	}
 
 	if storage.Type == "iso" {
-		filePath, err := s.FindISOByUUID(storage.Dataset)
+		filePath, err := s.FindISOByUUID(storage.Dataset, false)
 		if err != nil {
 			return fmt.Errorf("failed_to_find_iso_by_uuid: %w", err)
 		}

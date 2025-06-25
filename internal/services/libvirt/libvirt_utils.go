@@ -8,7 +8,7 @@ import (
 	utilitiesModels "sylve/internal/db/models/utilities"
 )
 
-func (s *Service) FindISOByUUID(uuid string) (string, error) {
+func (s *Service) FindISOByUUID(uuid string, includeImg bool) (string, error) {
 	var download utilitiesModels.Downloads
 	if err := s.DB.
 		Preload("Files").
@@ -29,7 +29,7 @@ func (s *Service) FindISOByUUID(uuid string) (string, error) {
 	case "torrent":
 		torrentsDir := config.GetDownloadsPath("torrents")
 		for _, file := range download.Files {
-			if strings.HasSuffix(file.Name, ".iso") {
+			if strings.HasSuffix(file.Name, ".iso") || (includeImg && strings.HasSuffix(file.Name, ".img")) {
 				isoPath := fmt.Sprintf("%s/%s/%s", torrentsDir, uuid, file.Name)
 				if _, err := os.Stat(isoPath); os.IsNotExist(err) {
 					return "", fmt.Errorf("iso_not_found: %s", isoPath)
@@ -38,7 +38,7 @@ func (s *Service) FindISOByUUID(uuid string) (string, error) {
 			}
 		}
 
-		return "", fmt.Errorf("iso_not_found_in_torrent: %s", uuid)
+		return "", fmt.Errorf("iso_or_img_not_found_in_torrent: %s", uuid)
 
 	default:
 		return "", fmt.Errorf("unsupported_download_type: %s", download.Type)

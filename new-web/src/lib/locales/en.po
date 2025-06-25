@@ -490,10 +490,12 @@ msgid "Enter or generate passphrase"
 msgstr "Enter or generate passphrase"
 
 #: src/lib/components/custom/CreateVM/Advanced.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "VNC Resolution"
 msgstr "VNC Resolution"
 
 #: src/lib/components/custom/CreateVM/Advanced.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "Select VNC resolution"
 msgstr "Select VNC resolution"
 
@@ -1144,6 +1146,7 @@ msgid "<0/> Create Volume"
 msgstr "<0/> Create Volume"
 
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "Delete Snapshot"
 msgstr "Delete Snapshot"
 
@@ -1194,3 +1197,59 @@ msgstr "Network TX"
 #: src/routes/[node]/summary/+page.svelte
 msgid "Sorting network interfaces by date:{0} vs {1} = {2}"
 msgstr "Sorting network interfaces by date:{0} vs {1} = {2}"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "<0/> Flash File"
+msgstr "<0/> Flash File"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Flash File"
+msgstr "Flash File"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Create Snapshot"
+msgstr "Create Snapshot"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Delete Volume"
+msgstr "Delete Volume"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Delete Volumes"
+msgstr "Delete Volumes"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "<0/> Flash File - {0}"
+msgstr "<0/> Flash File - {0}"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "File"
+msgstr "File"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "File flashed successfully"
+msgstr "File flashed successfully"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Flash"
+msgstr "Flash"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "<0/> Flash File to {0}"
+msgstr "<0/> Flash File to {0}"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Select File"
+msgstr "Select File"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Flash Volume"
+msgstr "Flash Volume"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Volume{0} flashed"
+msgstr "Volume{0} flashed"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Volume"
+msgstr "Volume"

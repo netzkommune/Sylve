@@ -6,6 +6,7 @@
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 	import { type Download } from '$lib/types/utilities/downloader';
 	import type { Dataset } from '$lib/types/zfs/dataset';
+	import { getISOs } from '$lib/utils/utilities/downloader';
 	import humanFormat from 'human-format';
 
 	interface Props {
@@ -44,36 +45,11 @@
 	}
 
 	let isos = $derived.by(() => {
-		const options = [];
-		if (downloads && downloads.length > 0) {
-			for (const download of downloads) {
-				if (download.progress === 100) {
-					if (download.type === 'http') {
-						if (download.name.endsWith('.iso')) {
-							options.push({
-								label: download.name,
-								value: download.uuid
-							});
-						}
-					} else if (download.type === 'torrent') {
-						for (const file of download.files) {
-							if (file.name.endsWith('.iso')) {
-								options.push({
-									label: file.name,
-									value: download.uuid
-								});
-							}
-						}
-					}
-				}
-			}
-		}
-
+		const options = getISOs(downloads);
 		options.push({
 			label: 'None',
 			value: 'None'
 		});
-
 		return options;
 	});
 

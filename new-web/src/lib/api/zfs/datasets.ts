@@ -111,3 +111,10 @@ export async function bulkDelete(datasets: Dataset[]): Promise<APIResponse> {
 		guids: guids
 	});
 }
+
+export async function flashVolume(guid: string, uuid: string): Promise<APIResponse> {
+	return await apiRequest('/zfs/datasets/volume/flash', APIResponseSchema, 'POST', {
+		guid: guid,
+		uuid: uuid
+	});
+}

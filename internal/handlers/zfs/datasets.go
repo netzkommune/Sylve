@@ -52,6 +52,11 @@ type BulkDeleteRequest struct {
 	GUIDs []string `json:"guids" binding:"required"`
 }
 
+type FlashVolumeRequest struct {
+	GUID string `json:"guid" binding:"required"`
+	UUID string `json:"uuid" binding:"required"`
+}
+
 // @Summary Get all ZFS datasets
 // @Description Get all ZFS datasets
 // @Tags ZFS
@@ -525,6 +530,53 @@ func BulkDeleteDataset(zfsService *zfs.Service) gin.HandlerFunc {
 		c.JSON(http.StatusOK, internal.APIResponse[any]{
 			Status:  "success",
 			Message: "deleted_datasets",
+			Error:   "",
+			Data:    nil,
+		})
+	}
+}
+
+// flash volume handler
+// @Summary Flash a ZFS volume
+// @Description Flash a ZFS volume with a UUID pointing to a disk iso/img
+// @Tags ZFS
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body FlashVolumeRequest true "Flash Volume Request"
+// @Success 200 {object} internal.APIResponse[any] "OK"
+// @Failure 400 {object} internal.APIResponse[any] "Bad Request"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /zfs/datasets/volume/flash [post]
+func FlashVolume(zfsService *zfs.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var request FlashVolumeRequest
+
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		err := zfsService.FlashVolume(request.GUID, request.UUID)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "flashed_volume",
 			Error:   "",
 			Data:    nil,
 		})

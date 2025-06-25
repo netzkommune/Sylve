@@ -158,10 +158,12 @@ msgid "Enter or generate passphrase"
 msgstr ""
 
 #: src/lib/components/custom/CreateVM/Advanced.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "VNC Resolution"
 msgstr ""
 
 #: src/lib/components/custom/CreateVM/Advanced.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "Select VNC resolution"
 msgstr ""
 
@@ -982,6 +984,7 @@ msgid "<0/> Create Volume"
 msgstr ""
 
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "Delete Snapshot"
 msgstr ""
 
@@ -1154,4 +1157,60 @@ msgstr ""
 
 #: src/routes/[node]/+layout.svelte
 msgid "Settings"
+msgstr ""
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "<0/> Flash File"
+msgstr ""
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Flash File"
+msgstr ""
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Create Snapshot"
+msgstr ""
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Delete Volume"
+msgstr ""
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Delete Volumes"
+msgstr ""
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "<0/> Flash File - {0}"
+msgstr ""
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "File"
+msgstr ""
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "File flashed successfully"
+msgstr ""
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Flash"
+msgstr ""
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "<0/> Flash File to {0}"
+msgstr ""
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Select File"
+msgstr ""
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Flash Volume"
+msgstr ""
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Volume{0} flashed"
+msgstr ""
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Volume"
 msgstr ""

@@ -9,16 +9,11 @@
 package zfs
 
 import (
-	"context"
 	"fmt"
-	"os"
 	vmModels "sylve/internal/db/models/vm"
-	zfsModels "sylve/internal/db/models/zfs"
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
-	"sylve/internal/logger"
 	"sylve/pkg/utils"
 	"sylve/pkg/zfs"
-	"time"
 )
 
 func (s *Service) GetDatasets() ([]zfsServiceInterfaces.Dataset, error) {
@@ -79,396 +74,6 @@ func (s *Service) GetDatasetByGUID(guid string) (*zfsServiceInterfaces.Dataset, 
 	return nil, fmt.Errorf("dataset with guid %s not found", guid)
 }
 
-func (s *Service) DeleteSnapshot(guid string, recursive bool) error {
-	s.syncMutex.Lock()
-	defer s.syncMutex.Unlock()
-
-	datasets, err := zfs.Snapshots("")
-
-	if err != nil {
-		return err
-	}
-
-	for _, dataset := range datasets {
-		properties, err := dataset.GetAllProperties()
-		if err != nil {
-			return err
-		}
-
-		for _, v := range properties {
-			if v == guid {
-				var err error
-
-				if recursive {
-					err = dataset.Destroy(zfs.DestroyRecursive)
-				} else {
-					err = dataset.Destroy(zfs.DestroyDefault)
-				}
-
-				if err != nil {
-					return err
-				}
-
-				return nil
-			}
-		}
-	}
-
-	return fmt.Errorf("snapshot with guid %s not found", guid)
-}
-
-func (s *Service) CreateSnapshot(guid string, name string, recursive bool) error {
-	s.syncMutex.Lock()
-	defer s.syncMutex.Unlock()
-
-	datasets, err := zfs.Datasets("")
-	if err != nil {
-		return err
-	}
-
-	for _, dataset := range datasets {
-		if dataset.Name == dataset.Name+"@"+name {
-			return fmt.Errorf("snapshot with name %s already exists", name)
-		}
-
-		properties, err := dataset.GetAllProperties()
-		if err != nil {
-			return err
-		}
-
-		for k, v := range properties {
-			if k == "guid" {
-				if v == guid {
-					shot, err := dataset.Snapshot(name, recursive)
-					if err != nil {
-						return err
-					}
-
-					if shot.Name == dataset.Name+"@"+name {
-						return nil
-					}
-				}
-			}
-		}
-	}
-
-	return fmt.Errorf("dataset with guid %s not found", guid)
-}
-
-func (s *Service) GetPeriodicSnapshots() ([]zfsModels.PeriodicSnapshot, error) {
-	var snapshots []zfsModels.PeriodicSnapshot
-
-	if err := s.DB.Find(&snapshots).Error; err != nil {
-		return nil, err
-	}
-
-	return snapshots, nil
-}
-
-func (s *Service) AddPeriodicSnapshot(guid string, prefix string, recursive bool, interval int) error {
-	dataset, err := s.GetDatasetByGUID(guid)
-	if err != nil {
-		return err
-	}
-
-	properties, err := dataset.GetAllProperties()
-	if err != nil {
-		return err
-	}
-
-	for k, v := range properties {
-		if k == "guid" && v == guid {
-			snapshot := zfsModels.PeriodicSnapshot{
-				GUID:      guid,
-				Prefix:    prefix,
-				Recursive: recursive,
-				Interval:  interval,
-			}
-
-			if err := s.DB.Create(&snapshot).Error; err != nil {
-				return err
-			}
-
-			return nil
-		}
-	}
-
-	return fmt.Errorf("dataset with guid %s not found", guid)
-}
-
-func (s *Service) DeletePeriodicSnapshot(guid string) error {
-	var snapshot zfsModels.PeriodicSnapshot
-
-	if err := s.DB.Where("guid = ?", guid).First(&snapshot).Error; err != nil {
-		return err
-	}
-
-	if err := s.DB.Delete(&snapshot).Error; err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (s *Service) StartSnapshotScheduler(ctx context.Context) {
-	ticker := time.NewTicker(30 * time.Second)
-
-	go func() {
-		for {
-			select {
-			case <-ticker.C:
-				s.syncMutex.Lock()
-
-				var snapshotJobs []zfsModels.PeriodicSnapshot
-				if err := s.DB.Find(&snapshotJobs).Error; err != nil {
-					logger.L.Debug().Err(err).Msg("Failed to load snapshotJobs")
-					continue
-				}
-
-				now := time.Now()
-
-				for _, job := range snapshotJobs {
-					if job.LastRunAt.IsZero() || now.Sub(job.LastRunAt).Seconds() >= float64(job.Interval) {
-						allSets, err := zfs.Snapshots("")
-						if err != nil {
-							logger.L.Debug().Err(err).Msgf("Failed to get snapshots for %s", job.GUID)
-							s.syncMutex.Unlock()
-							continue
-						}
-
-						name := job.Prefix + "-" + now.Format("2006-01-02-15-04")
-						dataset, err := s.GetDatasetByGUID(job.GUID)
-
-						if err != nil {
-							logger.L.Debug().Err(err).Msgf("Failed to get dataset for %s", job.GUID)
-							continue
-						}
-
-						for _, v := range allSets {
-							if v.Name == dataset.Name+"@"+name {
-								logger.L.Debug().Msgf("Snapshot %s already exists", name)
-								continue
-							}
-						}
-
-						if err := s.CreateSnapshot(job.GUID, name, job.Recursive); err != nil {
-							logger.L.Debug().Err(err).Msgf("Failed to create snapshot for %s", job.GUID)
-							continue
-						}
-
-						if err := s.DB.Model(&job).Update("LastRunAt", now).Error; err != nil {
-							logger.L.Debug().Err(err).Msgf("Failed to update LastRunAt for %d", job.ID)
-						}
-
-						logger.L.Debug().Msgf("Snapshot %s created successfully", name)
-					}
-				}
-
-				s.syncMutex.Unlock()
-			case <-ctx.Done():
-				ticker.Stop()
-				return
-			}
-		}
-	}()
-}
-
-func (s *Service) CreateFilesystem(name string, props map[string]string) error {
-	s.syncMutex.Lock()
-	defer s.syncMutex.Unlock()
-
-	parent := ""
-
-	for k, v := range props {
-		if k == "parent" {
-			parent = v
-			continue
-		}
-	}
-
-	if parent == "" {
-		return fmt.Errorf("parent_not_found")
-	}
-
-	name = fmt.Sprintf("%s/%s", parent, name)
-	delete(props, "parent")
-
-	_, err := zfs.CreateFilesystem(name, props)
-
-	if err != nil {
-		return err
-	}
-
-	datasets, err := zfs.Datasets(name)
-	if err != nil {
-		return err
-	}
-
-	for _, dataset := range datasets {
-		if dataset.Name == name {
-			return nil
-		}
-	}
-
-	return fmt.Errorf("failed to create filesystem %s", name)
-}
-
-func (s *Service) DeleteFilesystem(guid string) error {
-	s.syncMutex.Lock()
-	defer s.syncMutex.Unlock()
-
-	var count int64
-	if err := s.DB.Model(&vmModels.Storage{}).Where("dataset = ?", guid).Count(&count).Error; err != nil {
-		return fmt.Errorf("failed to check if dataset is in use: %w", err)
-	}
-
-	if count > 0 {
-		return fmt.Errorf("dataset_in_use_by_vm")
-	}
-
-	datasets, err := zfs.Datasets("")
-	if err != nil {
-		return err
-	}
-
-	for _, dataset := range datasets {
-		properties, err := dataset.GetAllProperties()
-		if err != nil {
-			return err
-		}
-
-		var keylocation string
-		found := false
-
-		for k, v := range properties {
-			if v == guid {
-				found = true
-			}
-			if k == "keylocation" {
-				keylocation = v
-			}
-		}
-
-		if found {
-			if err := dataset.Destroy(zfs.DestroyDefault); err != nil {
-				return err
-			}
-
-			if keylocation != "" {
-				keylocation = keylocation[7:]
-				if _, err := os.Stat(keylocation); err == nil {
-					if err := os.Remove(keylocation); err != nil {
-						return err
-					}
-				} else {
-					fmt.Println("Keylocation file not found", keylocation)
-				}
-			}
-
-			return nil
-		}
-	}
-
-	return fmt.Errorf("filesystem with guid %s not found", guid)
-}
-
-func (s *Service) RollbackSnapshot(guid string, destroyMoreRecent bool) error {
-	s.syncMutex.Lock()
-	defer s.syncMutex.Unlock()
-
-	datasets, err := zfs.Snapshots("")
-	if err != nil {
-		return err
-	}
-
-	for _, dataset := range datasets {
-		properties, err := dataset.GetAllProperties()
-		if err != nil {
-			return err
-		}
-
-		for _, v := range properties {
-			if v == guid {
-				err := dataset.Rollback(destroyMoreRecent)
-				if err != nil {
-					return err
-				}
-				return nil
-			}
-		}
-	}
-
-	return fmt.Errorf("snapshot with guid %s not found", guid)
-}
-
-func (s *Service) CreateVolume(name string, parent string, props map[string]string) error {
-	s.syncMutex.Lock()
-	defer s.syncMutex.Unlock()
-	defer s.Libvirt.RescanStoragePools()
-
-	datasets, err := zfs.Datasets("")
-	if err != nil {
-		return err
-	}
-
-	for _, dataset := range datasets {
-		if dataset.Name == fmt.Sprintf("%s/%s", parent, name) && dataset.Type == "volume" {
-			return fmt.Errorf("volume with name %s already exists", name)
-		}
-	}
-
-	name = fmt.Sprintf("%s/%s", parent, name)
-
-	if _, ok := props["size"]; !ok {
-		return fmt.Errorf("size property not found")
-	}
-
-	pSize := utils.HumanFormatToSize(props["size"])
-
-	_, err = zfs.CreateVolume(name, pSize, props)
-
-	return err
-}
-
-func (s *Service) DeleteVolume(guid string) error {
-	s.syncMutex.Lock()
-	defer s.syncMutex.Unlock()
-	defer s.Libvirt.RescanStoragePools()
-
-	var count int64
-	if err := s.DB.Model(&vmModels.Storage{}).Where("dataset = ?", guid).Count(&count).Error; err != nil {
-		return fmt.Errorf("failed to check if dataset is in use: %w", err)
-	}
-
-	if count > 0 {
-		return fmt.Errorf("dataset_in_use_by_vm")
-	}
-
-	datasets, err := zfs.Datasets("")
-	if err != nil {
-		return err
-	}
-
-	for _, dataset := range datasets {
-		properties, err := dataset.GetAllProperties()
-		if err != nil {
-			return err
-		}
-
-		for _, v := range properties {
-			if v == guid {
-				err := dataset.Destroy(zfs.DestroyDefault)
-				if err != nil {
-					return err
-				}
-				return nil
-			}
-		}
-	}
-
-	return fmt.Errorf("volume with guid %s not found", guid)
-}
-
 func (s *Service) BulkDeleteDataset(guids []string) error {
 	s.syncMutex.Lock()
 	defer s.syncMutex.Unlock()
@@ -521,4 +126,44 @@ func (s *Service) BulkDeleteDataset(guids []string) error {
 	}
 
 	return nil
+}
+
+func (s *Service) IsDatasetInUse(guid string) bool {
+	var count int64
+	if err := s.DB.Model(&vmModels.Storage{}).Where("dataset = ?", guid).
+		Count(&count).Error; err != nil {
+		return false
+	}
+
+	if count > 0 {
+		var storage vmModels.Storage
+
+		if err := s.DB.Model(&vmModels.Storage{}).Where("dataset = ?", guid).
+			First(&storage).Error; err != nil {
+			return false
+		}
+
+		if storage.VMID > 0 {
+			var vm vmModels.VM
+			if err := s.DB.Model(&vmModels.VM{}).Where("id = ?", storage.VMID).
+				First(&vm).Error; err != nil {
+				return false
+			}
+
+			domain, err := s.Libvirt.GetLvDomain(vm.VmID)
+			if err != nil {
+				return false
+			}
+
+			if domain != nil {
+				if domain.Status == "Running" || domain.Status == "Paused" {
+					return true
+				} else {
+					return false
+				}
+			}
+		}
+	}
+
+	return false
 }

@@ -17,6 +17,10 @@ type LibvirtServiceInterface interface {
 	RescanStoragePools() error
 
 	StoreVMUsage() error
+
+	FindISOByUUID(uuid string, includeImg bool) (string, error)
+
+	GetLvDomain(vmId int) (*LvDomain, error)
 }
 
 type LvDomain struct {

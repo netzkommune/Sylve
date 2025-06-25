@@ -137,6 +137,7 @@ func RegisterRoutes(r *gin.Engine,
 			datasets.DELETE("/filesystem/:guid", zfsHandlers.DeleteFilesystem(zfsService))
 
 			datasets.POST("/volume", zfsHandlers.CreateVolume(zfsService))
+			datasets.POST("/volume/flash", zfsHandlers.FlashVolume(zfsService))
 			datasets.DELETE("/volume/:guid", zfsHandlers.DeleteVolume(zfsService))
 
 			datasets.POST("/bulk-delete", zfsHandlers.BulkDeleteDataset(zfsService))

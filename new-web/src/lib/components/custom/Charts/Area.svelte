@@ -3,8 +3,10 @@
 	import * as Chart from '$lib/components/ui/chart/index.js';
 	import { scaleUtc } from 'd3-scale';
 	import { curveNatural } from 'd3-shape';
+	import humanFormat from 'human-format';
 	import { AreaChart } from 'layerchart';
 
+	import { Item } from '$lib/components/ui/command';
 	import { type AreaChartElement } from '$lib/types/components/chart';
 	import Icon from '@iconify/svelte';
 
@@ -124,12 +126,15 @@
 								})
 							);
 						}
+					},
+					yAxis: {
+						format: (value: number) => (formatSize ? humanFormat(value) : value.toString())
 					}
 				}}
 			>
 				{#snippet tooltip()}
 					<Chart.Tooltip
-						indicator="dot"
+						indicator={formatSize ? undefined : 'dot'}
 						labelFormatter={(v: Date) => {
 							return v.toLocaleDateString('en-US', {
 								month: 'long',
@@ -140,7 +145,20 @@
 								hour12: true
 							});
 						}}
-					/>
+					>
+						{#snippet formatter({ name, value, item })}
+							<div class="text-muted-foreground flex min-w-[130px] items-center text-xs">
+								<span style="background-color: {item.color}" class="mr-2 h-2.5 w-2.5 rounded-md"
+								></span>
+								{name}
+								<div
+									class="text-foreground ml-auto flex items-baseline gap-0.5 pl-5 font-mono font-medium tabular-nums"
+								>
+									{formatSize ? humanFormat(Number(value)) : Number(value).toLocaleString()}
+								</div>
+							</div>
+						{/snippet}
+					</Chart.Tooltip>
 				{/snippet}
 			</AreaChart>
 		</Chart.Container>

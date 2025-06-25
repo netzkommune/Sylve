@@ -349,7 +349,7 @@
 
 				<AreaChart title="CPU Usage" elements={[chartElements[1], chartElements[0]]} />
 				<AreaChart title="Memory Usage" elements={[chartElements[3], chartElements[2]]} />
-				<AreaChart title="Network Usage" elements={[chartElements[4], chartElements[5]]} />
+				<AreaChart title="Network Usage" elements={[chartElements[4], chartElements[5]]} formatSize={true} />
 			</div>
 		</ScrollArea>
 	</div>

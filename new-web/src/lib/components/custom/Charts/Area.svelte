@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card/index.js';
 	import * as Chart from '$lib/components/ui/chart/index.js';
-	import { scaleUtc } from 'd3-scale';
+	import { scalePoint, scaleUtc } from 'd3-scale';
 	import { curveNatural } from 'd3-shape';
 	import humanFormat from 'human-format';
 	import { AreaChart } from 'layerchart';
@@ -100,7 +100,7 @@
 				legend
 				{data}
 				x="date"
-				xScale={scaleUtc()}
+				xScale={scalePoint()}
 				yPadding={[0, 25]}
 				{series}
 				seriesLayout="stack"

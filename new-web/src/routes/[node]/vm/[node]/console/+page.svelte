@@ -104,7 +104,7 @@
 
 <style>
 	:global(#screen canvas) {
-		width: 100% !important;
-		height: 100% !important;
+		width: 95% !important;
+		height: 95% !important;
 	}
 </style>

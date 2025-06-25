@@ -12,8 +12,6 @@
 	import type { Zpool } from '$lib/types/zfs/pool';
 	import { diskSpaceAvailable, generateTableData, parseSMART } from '$lib/utils/disk';
 	import { handleAPIError, updateCache } from '$lib/utils/http';
-	import { getTranslation } from '$lib/utils/i18n';
-	import { capitalizeFirstLetter } from '$lib/utils/string';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
 	import { untrack } from 'svelte';
@@ -104,7 +102,7 @@
 		if (action === 'smart') {
 			if (activeDisk) {
 				smartModal.open = false;
-				smartModal.title = `${getTranslation('disk.smart', 'S.M.A.R.T')} Values (${activeDisk.device})`;
+				smartModal.title = `S.M.A.R.T Values (${activeDisk.device})`;
 				if (activeDisk.type === 'NVMe') {
 					smartModal.KV = parseSMART($state.snapshot(activeDisk));
 					smartModal.open = true;
@@ -120,15 +118,9 @@
 		if (action === 'wipe') {
 			wipeModal.open = true;
 			if (activePartition !== null) {
-				wipeModal.title = `${getTranslation('common.this_action_cannot_be_undone', 'This action cannot be undone')}. ${getTranslation(
-					'common.this_will_permanently',
-					'This will permanently'
-				)} <b>${getTranslation('common.delete', 'delete')}</b> ${getTranslation('disk.partition', 'disk')} <b>${activePartition.name}</b>.`;
+				wipeModal.title = `This action cannot be undone. This will permanently <b>delete</b> partition <b>${activePartition.name}</b>.`;
 			} else if (activeDisk !== null) {
-				wipeModal.title = `${getTranslation('common.this_action_cannot_be_undone', 'This action cannot be undone')}. ${getTranslation(
-					'common.this_will_permanently',
-					'This will permanently'
-				)} <b>${getTranslation('disk.wipe', 'wipe')}</b> ${getTranslation('disk.disk', 'disk')} <b>${activeDisk.device}</b>.`;
+				wipeModal.title = `This action cannot be undone. This will permanently <b>wipe</b> disk <b>${activeDisk.device}</b>.`;
 			}
 		}
 
@@ -136,13 +128,9 @@
 			if (activeDisk) {
 				const response = await initializeGPT(activeDisk.device);
 				if (response.status === 'success') {
-					toast.success(
-						`${capitalizeFirstLetter(getTranslation('disk.disk', 'Disk'))} ${activeDisk.device} ${getTranslation(
-							'disk.gpt_initialized',
-							'initialized with GPT'
-						)}`,
-						{ position: 'bottom-center' }
-					);
+					toast.success(`Disk ${activeDisk.device} initialized with GPT`, {
+						position: 'bottom-center'
+					});
 				} else {
 					handleAPIError(response);
 				}
@@ -221,8 +209,10 @@
 			size="sm"
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
-			<Icon icon="icon-park-outline:hdd" class="mr-1 h-4 w-4" />
-			{getTranslation('disk.smart_values', 'S.M.A.R.T Values')}
+			<div class="flex items-center">
+				<Icon icon="icon-park-outline:hdd" class="mr-1 h-4 w-4" />
+				<span>S.M.A.R.T Values</span>
+			</div>
 		</Button>
 	{/if}
 
@@ -232,8 +222,10 @@
 			size="sm"
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
-			<Icon icon="carbon:logical-partition" class="mr-1 h-4 w-4" />
-			{getTranslation('disk.initialize_gpt', 'Initialize GPT')}
+			<div class="flex items-center">
+				<Icon icon="carbon:logical-partition" class="mr-1 h-4 w-4" />
+				<span>Initialize GPT</span>
+			</div>
 		</Button>
 	{/if}
 
@@ -243,8 +235,10 @@
 			size="sm"
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
-			<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
-			{capitalizeFirstLetter(getTranslation('disk.wipe_disk', 'Wipe Disk'))}
+			<div class="flex items-center">
+				<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
+				<span>Wipe Disk</span>
+			</div>
 		</Button>
 	{/if}
 
@@ -254,8 +248,10 @@
 			size="sm"
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
-			<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
-			{capitalizeFirstLetter(getTranslation('disk.delete_partition', 'Delete Partition'))}
+			<div class="flex items-center">
+				<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
+				<span>Delete Partition</span>
+			</div>
 		</Button>
 	{/if}
 
@@ -265,8 +261,10 @@
 			size="sm"
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
-			<Icon icon="ant-design:partition-outlined" class="mr-1 h-4 w-4" />
-			{capitalizeFirstLetter(getTranslation('disk.create_partition', 'Create Partition'))}
+			<div class="flex items-center">
+				<Icon icon="ant-design:partition-outlined" class="mr-1 h-4 w-4" />
+				<span>Create Partition</span>
+			</div>
 		</Button>
 	{/if}
 {/snippet}
@@ -285,8 +283,8 @@
 	<KvTableModal
 		titles={{
 			main: smartModal.title,
-			key: getTranslation('disk.attribute', 'Attribute'),
-			value: getTranslation('disk.value', 'Value')
+			key: 'Attribute',
+			value: 'Value'
 		}}
 		open={smartModal.open}
 		KV={smartModal.KV}
@@ -316,9 +314,7 @@
 	actions={{
 		onConfirm: async () => {
 			if (activeDisk || activePartition) {
-				const message = activeDisk
-					? getTranslation('disk.full_wipe_success', 'Disk wiped successfully')
-					: getTranslation('disk.partition_wipe_success', 'Disk wiped successfully');
+				const message = activeDisk ? 'Disk Wiped' : 'Partition Deleted';
 
 				const result = activeDisk
 					? await destroyDisk(`/dev/${activeDisk.device}`)
@@ -329,6 +325,23 @@
 					activeRow = null;
 				} else {
 					handleAPIError(result);
+					if (
+						(result.status === 'error' && result.message === 'error_wiping_disk') ||
+						result.message === 'error_deleting_partition'
+					) {
+						let message = '';
+						if (result.error?.includes('Device busy')) {
+							if (activeDisk) {
+								message = 'Unable to wipe busy disk';
+							} else {
+								message = 'Unable to delete busy partition';
+							}
+						} else {
+							message = `Error ${activeDisk ? 'wiping disk' : 'deleting partition'}: ${result.error}`;
+						}
+
+						toast.error(message, { position: 'bottom-center' });
+					}
 				}
 			}
 			wipeModal.title = '';

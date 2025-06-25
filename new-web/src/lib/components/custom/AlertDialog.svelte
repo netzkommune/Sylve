@@ -1,6 +1,5 @@
 <script lang="ts">
 	import * as AlertDialog from '$lib/components/ui/alert-dialog/index.js';
-	import { getTranslation } from '$lib/utils/i18n';
 
 	interface Props {
 		open: boolean;
@@ -21,16 +20,14 @@
 <AlertDialog.Root bind:open>
 	<AlertDialog.Content>
 		<AlertDialog.Header>
-			<AlertDialog.Title>{getTranslation('are_you_sure', 'Are you sure?')}</AlertDialog.Title>
+			<AlertDialog.Title>Are you sure?</AlertDialog.Title>
 			<AlertDialog.Description>
 				{#if customTitle}
 					{@html customTitle}
 				{:else}
-					{getTranslation(
-						'common.permanent_delete_msg',
-						'This action cannot be undone. This will permanently delete'
-					)}
-					{names.parent} <span class="font-semibold">{names.element}</span>.
+					This action cannot be undone. This will permanently delete
+					<span class="font-semibold">{names.parent}</span>
+					<span class="font-semibold">{names.element}</span>.
 				{/if}
 			</AlertDialog.Description>
 		</AlertDialog.Header>

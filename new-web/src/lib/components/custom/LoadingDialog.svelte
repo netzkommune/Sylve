@@ -12,8 +12,12 @@
 	let { open = $bindable(), iconColor = 'text-red-500', title, description }: Props = $props();
 </script>
 
-<Dialog.Root bind:open closeOnOutsideClick={false}>
-	<Dialog.Content class="sm:max-w-[425px]">
+<Dialog.Root bind:open>
+	<Dialog.Content
+		class="sm:max-w-[425px]"
+		onInteractOutside={(e) => e.preventDefault()}
+		onEscapeKeydown={(e) => e.preventDefault()}
+	>
 		<Dialog.Header class="flex flex-col items-center justify-center text-center">
 			<Dialog.Title class="mb-2 text-lg font-semibold">{title}</Dialog.Title>
 			<Icon icon="mdi:loading" class={`mb-4 animate-spin text-4xl ${iconColor}`} />

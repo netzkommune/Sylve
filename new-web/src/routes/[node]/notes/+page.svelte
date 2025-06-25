@@ -162,8 +162,10 @@
 				size="sm"
 				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 			>
-				<Icon icon="mdi:eye" class="mr-1 h-4 w-4" />
-				{'View'}
+				<div class="flex items-center">
+					<Icon icon="mdi:eye" class="mr-1 h-4 w-4" />
+					<span>View</span>
+				</div>
 			</Button>
 		{/if}
 
@@ -173,8 +175,10 @@
 				size="sm"
 				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 			>
-				<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
-				{'Delete'}
+				<div class="flex items-center">
+					<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
+					<span>Delete</span>
+				</div>
 			</Button>
 		{/if}
 
@@ -187,8 +191,10 @@
 				size="sm"
 				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 			>
-				<Icon icon="mdi:note-edit" class="mr-1 h-4 w-4" />
-				{'Edit'}
+				<div class="flex items-center">
+					<Icon icon="mdi:note-edit" class="mr-1 h-4 w-4" />
+					<span>Edit</span>
+				</div>
 			</Button>
 		{/if}
 	{/if}
@@ -203,8 +209,10 @@
 				size="sm"
 				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 			>
-				<Icon icon="material-symbols:delete-sweep" class="mr-1 h-4 w-4" />
-				{'Bulk Delete'}
+				<div class="flex items-center">
+					<Icon icon="material-symbols:delete-sweep" class="mr-1 h-4 w-4" />
+					<span>Bulk Delete</span>
+				</div>
 			</Button>
 		{/if}
 	{/if}
@@ -215,8 +223,10 @@
 		<Search bind:query />
 
 		<Button onclick={() => handleNote()} size="sm" class="h-6  ">
-			<Icon icon="gg:add" class="mr-0 h-4 w-4" />
-			{'New'}
+			<div class="flex items-center">
+				<Icon icon="gg:add" class="mr-1 h-4 w-4" />
+				<span>New</span>
+			</div>
 		</Button>
 
 		{@render button('view-note')}

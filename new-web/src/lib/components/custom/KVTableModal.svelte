@@ -38,8 +38,12 @@
 	}
 </script>
 
-<Dialog.Root bind:open closeOnOutsideClick={false}>
-	<Dialog.Content class="flex max-h-[80vh] w-[90%] flex-col gap-0 overflow-hidden p-5 lg:max-w-4xl">
+<Dialog.Root bind:open>
+	<Dialog.Content
+		class="flex max-h-[80vh] w-[90%] flex-col gap-0 overflow-hidden p-5 lg:max-w-4xl"
+		onInteractOutside={(e) => e.preventDefault()}
+		onEscapeKeydown={(e) => e.preventDefault()}
+	>
 		<div class="flex items-center justify-between">
 			<div class="flex items-center">
 				{#if titles.icon}

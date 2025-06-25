@@ -6,12 +6,9 @@
 	import { Slider } from '$lib/components/ui/slider/index.js';
 	import * as Table from '$lib/components/ui/table';
 	import type { Disk } from '$lib/types/disk/disk';
-	import { handleAPIError } from '$lib/utils/http';
-	import { getTranslation } from '$lib/utils/i18n';
-	import { capitalizeFirstLetter } from '$lib/utils/string';
 	import Icon from '@iconify/svelte';
 	import humanFormat from 'human-format';
-	import { tick, untrack } from 'svelte';
+	import { tick } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import { slide } from 'svelte/transition';
 
@@ -43,31 +40,17 @@
 		if (disk) {
 			const sizes = newPartitions.map((partition) => Math.floor(partition.size));
 			const result = await createPartitions(`/dev/${disk.device}`, sizes);
+			let message = '';
+
 			if (result.status === 'success') {
-				let successMessage = '';
-				if (sizes.length === 1) {
-					successMessage = `${capitalizeFirstLetter(getTranslation('disk.partition', 'Partition'))}`;
-				} else {
-					successMessage = `${capitalizeFirstLetter(getTranslation('disk.partitions', 'Partitions'))}`;
-				}
-
-				successMessage += ` ${getTranslation('common.created', 'created')}`;
-
-				toast.success(successMessage, {
-					position: 'bottom-center'
-				});
+				message = `Partition${sizes.length > 1 ? 's' : ''} created`;
 			} else {
-				handleAPIError(result);
-				let errorMessage =
-					capitalizeFirstLetter(getTranslation('common.error', 'Error')) +
-					getTranslation('common.creating', 'creating');
-
-				if (sizes.length === 1) {
-					errorMessage = `${capitalizeFirstLetter(getTranslation('disk.partition', 'Partition'))}`;
-				} else {
-					errorMessage = `${capitalizeFirstLetter(getTranslation('disk.partitions', 'Partitions'))}`;
-				}
+				message = `Error creating ${sizes.length > 1 ? 'partitions' : 'partition'}`;
 			}
+
+			toast.success(message, {
+				position: 'bottom-center'
+			});
 
 			newPartitions = [];
 		}
@@ -137,7 +120,7 @@
 					size="sm"
 					variant="ghost"
 					class="h-8"
-					title={capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}
+					title={'Reset'}
 					onclick={() => {
 						newPartitions = [];
 						remainingSpace = disk ? calculateRemainingSpace(disk) : 0;
@@ -146,21 +129,11 @@
 					}}
 				>
 					<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
-					<span class="sr-only"
-						>{capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}</span
-					>
+					<span class="sr-only">Reset</span>
 				</Button>
-				<Button
-					size="sm"
-					variant="ghost"
-					class="h-8"
-					title={capitalizeFirstLetter(getTranslation('common.close', 'Close'))}
-					onclick={() => close()}
-				>
+				<Button size="sm" variant="ghost" class="h-8" title={'Close'} onclick={() => close()}>
 					<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
-					<span class="sr-only"
-						>{capitalizeFirstLetter(getTranslation('common.close', 'Close'))}</span
-					>
+					<span class="sr-only">Close</span>
 				</Button>
 			</div>
 		</div>

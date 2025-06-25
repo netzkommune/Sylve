@@ -1214,3 +1214,51 @@ msgstr ""
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "Volume"
 msgstr ""
+
+#: src/lib/components/custom/LoadingDialog.svelte
+msgid "a"
+msgstr ""
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Switch{0} deleted"
+msgstr ""
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Edit Switch -"
+msgstr ""
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "New Switch"
+msgstr ""
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "New Note"
+msgstr ""
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Disk is busy, unable to wipe"
+msgstr ""
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Error wiping disk"
+msgstr ""
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Unable to wipe busy disk"
+msgstr ""
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Unable to wipe busy disk{0}"
+msgstr ""
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Unable to delete busy partition{0}"
+msgstr ""
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Error{0}: {1}"
+msgstr ""
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Unable to delete busy partition"
+msgstr ""

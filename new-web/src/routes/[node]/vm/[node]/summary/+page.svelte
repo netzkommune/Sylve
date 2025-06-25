@@ -3,6 +3,7 @@
 	import AlertDialog from '$lib/components/custom/AlertDialog.svelte';
 
 	import { goto } from '$app/navigation';
+	import AreaChart from '$lib/components/custom/Charts/Area.svelte';
 	import * as Card from '$lib/components/ui/card/index.js';
 
 	import {
@@ -192,18 +193,28 @@
 		return '';
 	});
 
-	let cpuHistoricalData: HistoricalData[] = $derived.by(() => {
-		return stats.map((data) => ({
-			date: new Date(data.createdAt),
-			cpuUsage: Math.floor(data.cpuUsage)
-		}));
+	let cpuHistoricalData = $derived.by(() => {
+		return {
+			field: 'cpuUsage',
+			label: 'CPU Usage',
+			color: 'var(--chart-1)',
+			data: stats.map((data) => ({
+				date: new Date(data.createdAt),
+				value: Math.floor(data.cpuUsage)
+			}))
+		};
 	});
 
-	let memoryUsageData: HistoricalData[] = $derived.by(() => {
-		return stats.map((data) => ({
-			date: new Date(data.createdAt),
-			memoryUsage: Math.floor(data.memoryUsage)
-		}));
+	let memoryUsageData = $derived.by(() => {
+		return {
+			field: 'memoryUsage',
+			label: 'Memory Usage',
+			color: 'var(--chart-2)',
+			data: stats.map((data) => ({
+				date: new Date(data.createdAt),
+				value: Math.floor(data.memoryUsage)
+			}))
+		};
 	});
 
 	$effect(() => {
@@ -320,56 +331,9 @@
 				</Card.Root>
 			</div>
 
-			<div class="p-3">
-				<Card.Root class="w-full">
-					<Card.Header>
-						<Card.Title>
-							<div class="flex items-center space-x-2">
-								<Icon icon="solar:cpu-bold" class="h-5 w-5" />
-								<p>{'CPU Usage'}</p>
-							</div>
-						</Card.Title>
-					</Card.Header>
-					<Card.Content class="h-[300px]">
-						<LineGraph
-							data={[cpuHistoricalData]}
-							valueType="percentage"
-							keys={[
-								{
-									key: 'cpuUsage',
-									title: 'CPU Usage',
-									color: 'hsl(0, 50%, 50%)'
-								}
-							]}
-						/>
-					</Card.Content>
-				</Card.Root>
-			</div>
-
-			<div class="p-3">
-				<Card.Root class="w-full">
-					<Card.Header>
-						<Card.Title>
-							<div class="flex items-center space-x-2">
-								<Icon icon="ph:memory" class="h-5 w-5" />
-								<p>{'Memory Usage'}</p>
-							</div>
-						</Card.Title>
-					</Card.Header>
-					<Card.Content class="h-[300px]">
-						<LineGraph
-							data={[memoryUsageData]}
-							valueType="percentage"
-							keys={[
-								{
-									key: 'memoryUsage',
-									title: 'Memory Usage',
-									color: 'hsl(50, 50%, 50%)'
-								}
-							]}
-						/>
-					</Card.Content>
-				</Card.Root>
+			<div class="space-y-4 p-3">
+				<AreaChart title="CPU Usage" elements={[cpuHistoricalData]} />
+				<AreaChart title="Memory Usage" elements={[memoryUsageData]} />
 			</div>
 		</ScrollArea>
 	</div>

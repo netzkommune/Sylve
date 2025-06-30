@@ -144,7 +144,7 @@
 		poolStats: {
 			interval: {
 				open: false,
-				value: poolStats?.intervalMap[0]?.value || '1',
+				value: '1',
 				data: poolStats?.intervalMap
 			},
 			statType: {

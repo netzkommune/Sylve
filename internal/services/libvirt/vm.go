@@ -2,6 +2,7 @@ package libvirt
 
 import (
 	"fmt"
+	"strings"
 	"sylve/internal/db/models"
 	utilitiesModels "sylve/internal/db/models/utilities"
 	vmModels "sylve/internal/db/models/vm"
@@ -249,7 +250,7 @@ func validateCreate(data libvirtServiceInterfaces.CreateVMRequest, db *gorm.DB) 
 		}
 	}
 
-	if data.ISO != "" && data.ISO != "none" {
+	if data.ISO != "" && strings.ToLower(data.ISO) != "none" {
 		count, err := sdb.Count(db, &utilitiesModels.Downloads{}, "uuid = ?", data.ISO)
 
 		if err != nil {
@@ -313,7 +314,11 @@ func (s *Service) CreateVM(data libvirtServiceInterfaces.CreateVMRequest) error 
 		})
 	}
 
-	if data.ISO != "" && data.ISO != "none" {
+	if strings.ToLower(data.ISO) == "none" {
+		data.ISO = ""
+	}
+
+	if data.ISO != "" {
 		storages = append(storages, vmModels.Storage{
 			Type:      "iso",
 			Dataset:   data.ISO,

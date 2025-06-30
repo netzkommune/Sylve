@@ -44,6 +44,7 @@ type PoolStatPointResponse struct {
 type PoolEditRequest struct {
 	Name       string            `json:"name"`
 	Properties map[string]string `json:"properties"`
+	Spares     []string          `json:"spares,omitempty"`
 }
 
 // @Summary Get Average IO Delay
@@ -183,16 +184,16 @@ func CreatePool(infoService *info.Service, zfsService *zfs.Service) gin.HandlerF
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param name path string true "Pool Name"
+// @Param guid path string true "Pool GUID"
 // @Success 200 {object} internal.APIResponse[any] "Success"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
-// @Router /zfs/pools/{name}/scrub [post]
+// @Router /zfs/pools/{guid}/scrub [post]
 func ScrubPool(infoService *info.Service, zfsService *zfs.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		name := c.Param("name")
+		guid := c.Param("guid")
 
-		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("zfs.pool.scrub_pool|-|%s", name), "started")
-		err := zfsUtils.ScrubPool(name)
+		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("zfs.pool.scrub_pool|-|%s", guid), "started")
+		err := zfsUtils.ScrubPool(guid)
 		if err != nil {
 			if strings.HasPrefix(err.Error(), "error_getting_pool") {
 				c.JSON(http.StatusNotFound, internal.APIResponse[any]{
@@ -234,16 +235,16 @@ func ScrubPool(infoService *info.Service, zfsService *zfs.Service) gin.HandlerFu
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param name path string true "Pool Name"
+// @Param guid path string true "Pool GUID"
 // @Success 200 {object} internal.APIResponse[any] "Success"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
-// @Router /zfs/pools/{name} [delete]
+// @Router /zfs/pools/{guid} [delete]
 func DeletePool(infoService *info.Service, zfsService *zfs.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		name := c.Param("name")
+		guid := c.Param("guid")
 
-		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("zfs.pool.delete_pool|-|%s", name), "started")
-		err := zfsService.DeletePool(name)
+		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("zfs.pool.delete_pool|-|%s", guid), "started")
+		err := zfsService.DeletePool(guid)
 		if err != nil {
 			if strings.HasPrefix(err.Error(), "error_getting_pool") {
 				c.JSON(http.StatusNotFound, internal.APIResponse[any]{
@@ -287,10 +288,10 @@ func DeletePool(infoService *info.Service, zfsService *zfs.Service) gin.HandlerF
 // @Param request body zfsServiceInterfaces.ReplaceDevice true "Request"
 // @Success 200 {object} internal.APIResponse[any] "Success"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
-// @Router /zfs/pools/{name}/replace-device [post]
+// @Router /zfs/pools/{guid}/replace-device [post]
 func ReplaceDevice(infoService *info.Service, zfsService *zfs.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		name := c.Param("name")
+		guid := c.Param("guid")
 		var request zfsServiceInterfaces.ReplaceDevice
 
 		if err := c.ShouldBindJSON(&request); err != nil {
@@ -303,10 +304,10 @@ func ReplaceDevice(infoService *info.Service, zfsService *zfs.Service) gin.Handl
 			return
 		}
 
-		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("zfs.pool.replace_device|-|%s", fmt.Sprintf("%s in %s", request.Old, name)), "started")
-		err := zfsUtils.ReplaceInPool(name, request.Old, request.New)
+		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("zfs.pool.replace_device|-|%s", fmt.Sprintf("%s in %s", request.Old, guid)), "started")
+		err := zfsService.ReplaceDevice(guid, request.Old, request.New)
 		if err != nil {
-			if strings.HasPrefix(err.Error(), "error_getting_pool") {
+			if strings.HasPrefix(err.Error(), "pool_not_found") {
 				c.JSON(http.StatusNotFound, internal.APIResponse[any]{
 					Status:  "error",
 					Message: "pool_not_found",
@@ -428,7 +429,7 @@ func EditPool(infoService *info.Service, zfsService *zfs.Service) gin.HandlerFun
 		}
 
 		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("zfs.pool.edit_pool|-|%s", request.Name), "started")
-		err := zfsService.EditPool(request.Name, request.Properties)
+		err := zfsService.EditPool(request.Name, request.Properties, request.Spares)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 				Status:  "error",

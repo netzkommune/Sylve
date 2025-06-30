@@ -98,6 +98,11 @@ export function generateTableData(
 		{
 			field: 'redundancy',
 			title: 'Redundancy'
+		},
+		{
+			field: 'guid',
+			title: 'GUID',
+			visible: false
 		}
 	];
 
@@ -109,7 +114,8 @@ export function generateTableData(
 			used: pool.allocated,
 			health: pool.health,
 			redundancy: '',
-			children: [] as Row[]
+			children: [] as Row[],
+			guid: pool.guid || ''
 		};
 
 		for (const vdev of pool.vdevs) {

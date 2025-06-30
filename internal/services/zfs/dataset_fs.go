@@ -84,18 +84,18 @@ func (s *Service) DeleteFilesystem(guid string) error {
 		}
 
 		if found {
-			if err := dataset.Destroy(zfs.DestroyDefault); err != nil {
+			if err := dataset.Destroy(zfs.DestroyRecursive); err != nil {
 				return err
 			}
 
-			if keylocation != "" {
+			if keylocation != "" && keylocation != "none" {
 				keylocation = keylocation[7:]
 				if _, err := os.Stat(keylocation); err == nil {
 					if err := os.Remove(keylocation); err != nil {
 						return err
 					}
 				} else {
-					fmt.Println("Keylocation file not found", keylocation)
+					return fmt.Errorf("keylocation_file_not_found: %s", keylocation)
 				}
 			}
 

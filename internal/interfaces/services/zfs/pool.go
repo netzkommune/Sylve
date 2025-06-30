@@ -23,9 +23,8 @@ type Zpool struct {
 }
 
 type ReplaceDevice struct {
-	Name string `json:"name" binding:"required,min=1,max=24,alphanum"`
-	Old  string `json:"old" binding:"required,min=1,max=24"`
-	New  string `json:"new" binding:"required,min=1,max=24"`
+	Old string `json:"old" binding:"required,min=1,max=24"`
+	New string `json:"new" binding:"required,min=1,max=24"`
 }
 
 type PoolStatPoint struct {

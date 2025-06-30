@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"sylve/pkg/disk"
 	"sylve/pkg/utils"
 )
 
@@ -319,14 +320,24 @@ func (z *zfs) GetZpool(name string) (*Zpool, error) {
 	}
 	pool.Vdevs = vdevs
 
-	// Now, iterate through vdevOut again to find the size of the spares
+	seen := make(map[string]struct{})
+
 	for _, line := range vdevOut {
 		if len(line) >= 2 && strings.HasPrefix(line[0], "/dev/") {
 			deviceName := line[0]
+			if _, already := seen[deviceName]; already {
+				continue
+			}
+			seen[deviceName] = struct{}{}
+
 			size := utils.StringToUint64(line[1])
 			if health, ok := potentialSpares[deviceName]; ok {
-				pool.Spares = append(pool.Spares, SpareDevice{Name: deviceName, Size: size, Health: health})
-				delete(potentialSpares, deviceName) // Remove to avoid processing again
+				pool.Spares = append(pool.Spares, SpareDevice{
+					Name:   deviceName,
+					Size:   size,
+					Health: health,
+				})
+				delete(potentialSpares, deviceName)
 			}
 		}
 	}
@@ -342,6 +353,27 @@ func (z *zfs) GetZpool(name string) (*Zpool, error) {
 	}
 
 	return pool, nil
+}
+
+func (z *zfs) GetZpoolByGUID(guid string) (*Zpool, error) {
+	pools, err := z.ListZpools()
+	if err != nil {
+		return nil, fmt.Errorf("failed to list zpools: %w", err)
+	}
+
+	var found *Zpool
+	for _, pool := range pools {
+		if pool.GUID == guid {
+			found = pool
+			break
+		}
+	}
+
+	if found == nil {
+		return nil, fmt.Errorf("pool with GUID %s not found", guid)
+	}
+
+	return found, nil
 }
 
 func (z *zfs) GetZpoolStatus(name string) (ZpoolStatus, error) {
@@ -541,6 +573,62 @@ func (z *Zpool) Destroy() error {
 	return err
 }
 
+func (z *Zpool) RemoveSpare(device string) error {
+	found := false
+
+	for i, spare := range z.Spares {
+		if spare.Name == device {
+			found = true
+			z.Spares = append(z.Spares[:i], z.Spares[i+1:]...)
+			break
+		}
+	}
+
+	if !found {
+		return fmt.Errorf("spare device %s not found in pool %s", device, z.Name)
+	}
+
+	err := z.z.zpool("remove", z.Name, device)
+
+	return err
+}
+
+func (z *Zpool) AddSpare(device string) error {
+	if device == "" {
+		return fmt.Errorf("device cannot be empty")
+	}
+
+	sz, err := disk.GetDiskSize(device)
+
+	if err != nil {
+		return fmt.Errorf("invalid spare device %s: %v", device, err)
+	}
+
+	if sz == 0 {
+		return fmt.Errorf("invalid spare device %s: size is zero", device)
+	}
+
+	err = z.z.zpool("add", "-f", z.Name, "spare", device)
+
+	if err != nil {
+		return fmt.Errorf("failed to add spare device %s to pool %s: %w", device, z.Name, err)
+	}
+
+	return nil
+}
+
+func (p *Zpool) RequiredSpareSize() uint64 {
+	var required uint64
+	for _, v := range p.Vdevs {
+		for _, d := range v.VdevDevices {
+			if d.Size > required {
+				required = d.Size
+			}
+		}
+	}
+	return required
+}
+
 func (z *Zpool) Replace(oldDevice string, newDevice string) error {
 	found := false
 
@@ -648,10 +736,32 @@ func (z *zfs) GetTotalIODelay() float64 {
 	return totalDelay / float64(count)
 }
 
-func (z *zfs) ScrubPool(poolName string) error {
-	_, err := z.zpoolOutput("scrub", poolName)
+func (z *zfs) ScrubPool(guid string) error {
+	if guid == "" {
+		return fmt.Errorf("invalid_guid: guid cannot be empty")
+	}
+
+	pools, err := z.ListZpools()
 	if err != nil {
-		return fmt.Errorf("failed to scrub pool %s: %w", poolName, err)
+		return fmt.Errorf("failed to list pools: %w", err)
+	}
+
+	name := ""
+	for _, pool := range pools {
+		if pool.GUID == guid {
+			name = pool.Name
+			break
+		}
+	}
+
+	if name == "" {
+		return fmt.Errorf("pool_not_found: no pool with guid %s", guid)
+	}
+
+	_, err = z.zpoolOutput("scrub", name)
+
+	if err != nil {
+		return fmt.Errorf("failed to scrub pool %s: %w", name, err)
 	}
 	return nil
 }

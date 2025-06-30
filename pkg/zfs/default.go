@@ -25,6 +25,10 @@ func GetZpool(name string) (*Zpool, error) {
 	return z.GetZpool(name)
 }
 
+func GetZpoolByGUID(guid string) (*Zpool, error) {
+	return z.GetZpoolByGUID(guid)
+}
+
 func CreateZpool(name string, properties map[string]string, args ...string) (*Zpool, error) {
 	return z.CreateZpool(name, properties, args...)
 }
@@ -41,7 +45,7 @@ func GetTotalIODelay() float64 {
 	return z.GetTotalIODelay()
 }
 
-func DestroyPool(poolName string) error {
+func DestroyPool(guid string) error {
 	var pools []*Zpool
 	pools, err := ListZpools()
 	if err != nil {
@@ -51,14 +55,14 @@ func DestroyPool(poolName string) error {
 	var found *Zpool
 
 	for _, pool := range pools {
-		if pool.Name == poolName {
+		if pool.GUID == guid {
 			found = pool
 			break
 		}
 	}
 
 	if found == nil {
-		return fmt.Errorf("error_getting_pool: pool %s not found", poolName)
+		return fmt.Errorf("error_getting_pool: pool %s not found", guid)
 	}
 
 	err = found.Destroy()
@@ -69,8 +73,36 @@ func DestroyPool(poolName string) error {
 	return nil
 }
 
-func ReplaceInPool(poolName string, oldDevice string, newDevice string) error {
-	pool, err := GetZpool(poolName)
+func RemoveSpare(guid string, device string) error {
+	pool, err := GetZpoolByGUID(guid)
+	if err != nil {
+		return fmt.Errorf("failed to get pool by GUID %s: %w", guid, err)
+	}
+
+	err = pool.RemoveSpare(device)
+	if err != nil {
+		return fmt.Errorf("failed to remove spare device %s from pool %s: %w", device, pool.Name, err)
+	}
+
+	return nil
+}
+
+func AddSpare(guid string, device string) error {
+	pool, err := GetZpoolByGUID(guid)
+	if err != nil {
+		return fmt.Errorf("failed to get pool by GUID %s: %w", guid, err)
+	}
+
+	err = pool.AddSpare(device)
+	if err != nil {
+		return fmt.Errorf("failed to add spare device %s to pool %s: %w", device, pool.Name, err)
+	}
+
+	return nil
+}
+
+func ReplaceInPool(guid string, oldDevice string, newDevice string) error {
+	pool, err := GetZpoolByGUID(guid)
 
 	if err != nil {
 		return err
@@ -98,15 +130,11 @@ func GetZpoolStatus(poolName string) (ZpoolStatus, error) {
 	return status, nil
 }
 
-func ScrubPool(poolName string) error {
-	pool, err := GetZpool(poolName)
-	if err != nil {
-		return fmt.Errorf("failed to get pool %s: %w", poolName, err)
-	}
+func ScrubPool(guid string) error {
+	err := z.ScrubPool(guid)
 
-	err = z.ScrubPool(pool.Name)
 	if err != nil {
-		return fmt.Errorf("failed to scrub pool %s: %w", pool.Name, err)
+		return fmt.Errorf("failed to scrub pool %s: %w", guid, err)
 	}
 
 	return nil

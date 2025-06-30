@@ -9,6 +9,7 @@
 	import { getPools } from '$lib/api/zfs/pool';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import Search from '$lib/components/custom/TreeTable/Search.svelte';
+	import SnapshotJobs from '$lib/components/custom/ZFS/SnapshotJobs.svelte';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
@@ -17,7 +18,6 @@
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Label from '$lib/components/ui/label/label.svelte';
-	import ViewSnapshotJobs from '$lib/components/zfs/ViewSnapshotJobs.svelte';
 	import type { Row } from '$lib/types/components/tree-table';
 	import type { Dataset, GroupedByPool, PeriodicSnapshot } from '$lib/types/zfs/dataset';
 	import type { Zpool } from '$lib/types/zfs/pool';
@@ -128,7 +128,7 @@
 
 	let query = $state('');
 	let confirmModals = $state({
-		active: '' as 'createSnapshot' | 'deleteSnapshot' | 'viewSnapshotJobs',
+		active: '' as 'createSnapshot' | 'deleteSnapshot' | 'snapshotJobs',
 		parent: 'filesystem' as 'filesystem' | 'snapshot',
 		deleteSnapshot: {
 			open: false,
@@ -144,7 +144,7 @@
 			title: '',
 			extraTitle: ''
 		},
-		viewSnapshotJobs: {
+		snapshotJobs: {
 			open: false
 		}
 	});
@@ -300,12 +300,12 @@
 	{#if type === 'view-periodics' && activePeriodics.length > 0}
 		<Button
 			onclick={async () => {
-				confirmModals.active = 'viewSnapshotJobs';
+				confirmModals.active = 'snapshotJobs';
 				confirmModals.parent = 'snapshot';
 				// confirmModals.deleteSnapshot.open = true;
 				// confirmModals.deleteSnapshot.data = activeDataset?.name || '';
 				// confirmModals.deleteSnapshot.title = activeDataset?.name || '';
-				confirmModals.viewSnapshotJobs.open = true;
+				confirmModals.snapshotJobs.open = true;
 			}}
 			size="sm"
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
@@ -510,9 +510,9 @@
 	</AlertDialog.Root>
 {/if}
 
-<ViewSnapshotJobs
-	bind:open={confirmModals.viewSnapshotJobs.open}
+<SnapshotJobs
+	bind:open={confirmModals.snapshotJobs.open}
 	{pools}
 	{datasets}
 	periodicSnapshots={activePeriodics}
-></ViewSnapshotJobs>
+></SnapshotJobs>

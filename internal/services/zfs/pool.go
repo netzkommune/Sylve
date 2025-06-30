@@ -10,11 +10,15 @@ package zfs
 
 import (
 	"fmt"
+	"path/filepath"
 	"sort"
+	"strings"
 	"sylve/internal/db"
 	infoModels "sylve/internal/db/models/info"
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
+	"sylve/pkg/disk"
 	"sylve/pkg/zfs"
+	"time"
 )
 
 func (s *Service) GetTotalIODelayHisorical() ([]infoModels.IODelay, error) {
@@ -93,32 +97,141 @@ func (s *Service) CreatePool(pool zfsServiceInterfaces.Zpool) error {
 	return s.SyncToLibvirt()
 }
 
-func (s *Service) DeletePool(poolName string) error {
-	err := zfs.DestroyPool(poolName)
+func (s *Service) DeletePool(guid string) error {
+	s.syncMutex.Lock()
+	defer s.syncMutex.Unlock()
+
+	pool, err := zfs.GetZpoolByGUID(guid)
+
+	if err != nil {
+		return fmt.Errorf("pool_not_found")
+	}
+
+	datasets, err := pool.Datasets()
+	if err != nil {
+		return fmt.Errorf("failed_to_get_datasets: %v", err)
+	}
+
+	if len(datasets) > 0 {
+		for _, ds := range datasets {
+			guid, err := ds.GetProperty("guid")
+
+			if err != nil {
+				return fmt.Errorf("failed_to_get_guid_for_dataset %s: %v", ds.Name, err)
+			}
+
+			inUse := s.IsDatasetInUse(guid, true)
+
+			if inUse {
+				return fmt.Errorf("dataset %s is in use and cannot be deleted", ds.Name)
+			}
+		}
+	}
+
+	err = pool.Destroy()
 
 	if err != nil {
 		return err
 	}
 
-	if err := s.Libvirt.DeleteStoragePool(poolName); err != nil {
-		return err
+	if err := s.Libvirt.DeleteStoragePool(pool.Name); err != nil {
+		if !strings.Contains(err.Error(), "failed to lookup storage pool") &&
+			!strings.Contains(err.Error(), "Storage pool not found") {
+			return err
+		}
 	}
 
 	return s.SyncToLibvirt()
 }
 
-func (s *Service) EditPool(name string, props map[string]string) error {
+func (s *Service) ReplaceDevice(guid, old, latest string) error {
 	s.syncMutex.Lock()
 	defer s.syncMutex.Unlock()
 
-	_, err := zfs.GetZpool(name)
+	pool, err := zfs.GetZpoolByGUID(guid)
 	if err != nil {
 		return fmt.Errorf("pool_not_found")
 	}
 
-	for prop, value := range props {
-		if err := zfs.SetZpoolProperty(name, prop, value); err != nil {
+	if err := pool.Replace(old, latest); err != nil {
+		return fmt.Errorf("failed_to_replace_device %s: %v", old, err)
+	}
+
+	pool, err = zfs.GetZpoolByGUID(guid)
+	if err != nil {
+		return fmt.Errorf("pool_not_found_after_replace")
+	}
+
+	return nil
+}
+
+func (s *Service) EditPool(name string, props map[string]string, spares []string) error {
+	s.syncMutex.Lock()
+	defer s.syncMutex.Unlock()
+
+	pool, err := zfs.GetZpool(name)
+	if err != nil {
+		return fmt.Errorf("pool_not_found")
+	}
+
+	minSize := pool.RequiredSpareSize()
+
+	for _, dev := range spares {
+		sz, err := disk.GetDiskSize(dev)
+		if err != nil {
+			return fmt.Errorf("invalid_spare_device %s: %v", dev, err)
+		}
+
+		if sz == 0 {
+			return fmt.Errorf("invalid_spare_device %s: size is zero", dev)
+		}
+
+		if sz < minSize {
+			return fmt.Errorf("spare_device %s is too small, minimum size is %d bytes", dev, minSize)
+		}
+	}
+
+	for prop, val := range props {
+		if err := zfs.SetZpoolProperty(name, prop, val); err != nil {
 			return fmt.Errorf("failed_to_set_property %s: %v", prop, err)
+		}
+	}
+
+	currentSet := make(map[string]string)
+	for _, dev := range pool.Spares {
+		base := filepath.Base(dev.Name)
+		if _, seen := currentSet[base]; !seen {
+			currentSet[base] = dev.Name
+		}
+	}
+
+	newSet := make(map[string]struct{})
+	for _, dev := range spares {
+		newSet[filepath.Base(dev)] = struct{}{}
+	}
+
+	removed := make(map[string]struct{})
+	for base, full := range currentSet {
+		if _, keep := newSet[base]; !keep {
+			if _, done := removed[base]; done {
+				continue
+			}
+			if err := pool.RemoveSpare(full); err != nil {
+				return fmt.Errorf("failed_to_remove_spare %s: %v", full, err)
+			}
+			removed[base] = struct{}{}
+			time.Sleep(100 * time.Millisecond)
+		}
+	}
+
+	time.Sleep(500 * time.Millisecond)
+
+	for _, dev := range spares {
+		base := filepath.Base(dev)
+		if _, exists := currentSet[base]; !exists {
+			if err := pool.AddSpare(dev); err != nil {
+				return fmt.Errorf("failed_to_add_spare %s: %v", dev, err)
+			}
 		}
 	}
 

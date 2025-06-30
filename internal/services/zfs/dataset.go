@@ -128,7 +128,7 @@ func (s *Service) BulkDeleteDataset(guids []string) error {
 	return nil
 }
 
-func (s *Service) IsDatasetInUse(guid string) bool {
+func (s *Service) IsDatasetInUse(guid string, failEarly bool) bool {
 	var count int64
 	if err := s.DB.Model(&vmModels.Storage{}).Where("dataset = ?", guid).
 		Count(&count).Error; err != nil {
@@ -136,6 +136,10 @@ func (s *Service) IsDatasetInUse(guid string) bool {
 	}
 
 	if count > 0 {
+		if failEarly {
+			return true
+		}
+
 		var storage vmModels.Storage
 
 		if err := s.DB.Model(&vmModels.Storage{}).Where("dataset = ?", guid).

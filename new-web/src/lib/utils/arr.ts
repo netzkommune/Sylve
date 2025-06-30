@@ -41,3 +41,26 @@ export function findValueInArrayByKey<T extends Record<string, any>>(
 	}
 	return array.some((obj) => obj[key] === value);
 }
+
+export function deepSearchKey(obj: any, targetKey: string): any[] {
+	const results: any[] = [];
+
+	function search(current: any): void {
+		if (Array.isArray(current)) {
+			for (const item of current) {
+				search(item);
+			}
+		} else if (typeof current === 'object' && current !== null) {
+			for (const key in current) {
+				if (key === targetKey) {
+					results.push(current[key]);
+				}
+
+				search(current[key]);
+			}
+		}
+	}
+
+	search(obj);
+	return results;
+}

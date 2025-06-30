@@ -5,8 +5,6 @@
 	import * as Table from '$lib/components/ui/table';
 	import type { Dataset, PeriodicSnapshot } from '$lib/types/zfs/dataset';
 	import type { Zpool } from '$lib/types/zfs/pool';
-	import { getTranslation } from '$lib/utils/i18n';
-	import { capitalizeFirstLetter } from '$lib/utils/string';
 	import { dateToAgo } from '$lib/utils/time';
 	import { getDatasetByGUID } from '$lib/utils/zfs/dataset/dataset';
 	import Icon from '@iconify/svelte';
@@ -56,7 +54,6 @@
 	}
 
 	async function saveJobs() {
-		// console.log('Saving jobs:', shadowDeleted);
 		try {
 			for (const id of shadowDeleted) {
 				const snapshot = periodicSnapshots.find((s) => s.id === id);
@@ -69,8 +66,10 @@
 	}
 </script>
 
-<Dialog.Root bind:open onOutsideClick={(e) => close()}>
+<Dialog.Root bind:open>
 	<Dialog.Content
+		onInteractOutside={(e) => e.preventDefault()}
+		onEscapeKeydown={(e) => e.preventDefault()}
 		class="fixed left-1/2 top-1/2 w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-hidden p-0 lg:max-w-3xl"
 	>
 		<div class="flex items-center justify-between p-4">
@@ -121,7 +120,7 @@
 										<Button
 											variant="ghost"
 											class="h-8"
-											on:click={() => shadowDeleted.push(snapshot.id)}
+											onclick={() => shadowDeleted.push(snapshot.id)}
 										>
 											<Icon icon="gg:trash" class="h-4 w-4" />
 										</Button>
@@ -146,9 +145,9 @@
 
 		<Dialog.Footer class="flex justify-between gap-2 border-t px-6 py-4">
 			<div class="flex gap-2">
-				<Button variant="outline" class="h-8" on:click={() => close()}>Cancel</Button>
+				<Button variant="outline" class="h-8" onclick={() => close()}>Cancel</Button>
 				{#if shadowDeleted.length > 0}
-					<Button variant="outline" class="h-8" on:click={saveJobs}>Save Snapshot Jobs</Button>
+					<Button variant="outline" class="h-8" onclick={saveJobs}>Save Snapshot Jobs</Button>
 				{/if}
 			</div>
 		</Dialog.Footer>

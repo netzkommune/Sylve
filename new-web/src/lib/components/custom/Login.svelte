@@ -12,7 +12,6 @@
 	import Icon from '@iconify/svelte';
 	import { mode } from 'mode-watcher';
 	import { onDestroy, onMount } from 'svelte';
-	import { _ } from 'svelte-i18n';
 
 	interface Props {
 		onLogin: (
@@ -80,18 +79,18 @@
 
 		<Card.Content class="space-y-4 p-6">
 			<div class="flex items-center gap-2">
-				<Label for="username" class="w-44">{$_('auth.username')}</Label>
+				<Label for="username" class="w-44">Username</Label>
 				<Input
 					id="username"
 					class="h-8 w-full"
 					type="text"
-					placeholder={$_('common.example')}
+					placeholder="Enter your username"
 					bind:value={username}
 					required
 				/>
 			</div>
 			<div class="flex items-center gap-2">
-				<Label for="password" class="w-44">{$_('auth.password')}</Label>
+				<Label for="password" class="w-44">Password</Label>
 				<Input
 					id="password"
 					type="password"
@@ -103,20 +102,20 @@
 			</div>
 
 			<div class="flex items-center gap-2">
-				<Label for="realm" class="w-44">{$_('auth.realm')}</Label>
+				<Label for="realm" class="w-44">Realm</Label>
 				<Select.Root type="single" bind:value={authType}>
 					<Select.Trigger class="h-8 w-full">
 						{authTypeValue}
 					</Select.Trigger>
 					<Select.Content>
-						<Select.Item value="pam">{$_('auth.pam')}</Select.Item>
-						<Select.Item value="sylve">{$_('auth.sylve')}</Select.Item>
+						<Select.Item value="pam">PAM</Select.Item>
+						<Select.Item value="sylve">Sylve</Select.Item>
 					</Select.Content>
 				</Select.Root>
 			</div>
 
 			<div class="flex items-center gap-2">
-				<Label for="language" class="w-44">{$_('auth.language')}</Label>
+				<Label for="language" class="w-44">Language</Label>
 				<Select.Root type="single" bind:value={language}>
 					<Select.Trigger class="h-8 w-full">
 						{languageValue}

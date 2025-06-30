@@ -18,15 +18,15 @@
 </script>
 
 <AlertDialog.Root bind:open>
-	<AlertDialog.Content>
+	<AlertDialog.Content onInteractOutside={(e) => e.preventDefault()}>
 		<AlertDialog.Header>
 			<AlertDialog.Title>Are you sure?</AlertDialog.Title>
 			<AlertDialog.Description>
 				{#if customTitle}
 					{@html customTitle}
 				{:else}
-					This action cannot be undone. This will permanently delete
-					<span class="font-semibold">{names.parent}</span>
+					{'This action cannot be undone. This will permanently delete '}
+					<span>{names.parent}</span>
 					<span class="font-semibold">{names.element}</span>.
 				{/if}
 			</AlertDialog.Description>

@@ -93,7 +93,7 @@ func (s *Service) FlashVolume(guid string, uuid string) error {
 
 		for _, v := range properties {
 			if v == guid {
-				if s.IsDatasetInUse(guid) {
+				if s.IsDatasetInUse(guid, false) {
 					return fmt.Errorf("dataset_in_use_by_vm")
 				}
 

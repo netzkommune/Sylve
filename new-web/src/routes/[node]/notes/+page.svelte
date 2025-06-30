@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createNote, deleteNote, deleteNotes, getNotes, updateNote } from '$lib/api/info/notes';
-	import AlertDialog from '$lib/components/custom/AlertDialog.svelte';
+	import AlertDialog from '$lib/components/custom/Dialog/Alert.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import Search from '$lib/components/custom/TreeTable/Search.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';

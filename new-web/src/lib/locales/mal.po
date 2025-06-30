@@ -137,27 +137,37 @@ msgstr ""
 
 #: src/lib/components/custom/AlertDialog.svelte
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+#: src/lib/components/custom/Dialog/AlertDialog.svelte
+#: src/lib/components/custom/Dialog/Alert.svelte
 msgid "Are you sure?"
 msgstr ""
 
 #: src/lib/components/custom/AlertDialog.svelte
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+#: src/lib/components/custom/Dialog/AlertDialog.svelte
+#: src/lib/components/custom/Dialog/Alert.svelte
 msgid "This action cannot be undone. This will permanently delete"
 msgstr ""
 
 #: src/lib/components/custom/AlertDialog.svelte
+#: src/lib/components/custom/Dialog/AlertDialog.svelte
+#: src/lib/components/custom/Dialog/Alert.svelte
 msgid "."
 msgstr ""
 
 #: src/lib/components/custom/AlertDialog.svelte
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 #: src/lib/components/custom/ZFS/SnapshotJobs.svelte
+#: src/lib/components/custom/Dialog/AlertDialog.svelte
+#: src/lib/components/custom/Dialog/Alert.svelte
 msgid "Cancel"
 msgstr ""
 
 #: src/lib/components/custom/AlertDialog.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/Dialog/AlertDialog.svelte
+#: src/lib/components/custom/Dialog/Alert.svelte
 msgid "Continue"
 msgstr ""
 
@@ -1266,4 +1276,32 @@ msgstr ""
 
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 msgid "Edit ZFS Pool - {0}"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Filesystems"
+msgstr ""
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "<0/> Enable Passthrough"
+msgstr ""
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "<0/> Disable Passthrough"
+msgstr ""
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Device added to passthrough"
+msgstr ""
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Failed to add device to passthrough"
+msgstr ""
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Device removed from passthrough"
+msgstr ""
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Failed to remove device from passthrough"
 msgstr ""

@@ -2,7 +2,7 @@
 	import { handleAPIResponse } from '$lib/api/common';
 	import { listDisks } from '$lib/api/disk/disk';
 	import { deletePool, getPools, scrubPool } from '$lib/api/zfs/pool';
-	import AlertDialog from '$lib/components/custom/AlertDialog.svelte';
+	import AlertDialog from '$lib/components/custom/Dialog/Alert.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import Search from '$lib/components/custom/TreeTable/Search.svelte';
 	import Create from '$lib/components/custom/ZFS/pools/Create.svelte';

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import AlertDialog from '$lib/components/custom/AlertDialog.svelte';
+	import AlertDialog from '$lib/components/custom/Dialog/Alert.svelte';
 
 	import { goto } from '$app/navigation';
 	import AreaChart from '$lib/components/custom/Charts/Area.svelte';
@@ -14,7 +14,7 @@
 		getVMs,
 		updateDescription
 	} from '$lib/api/vm/vm';
-	import LoadingDialog from '$lib/components/custom/LoadingDialog.svelte';
+	import LoadingDialog from '$lib/components/custom/Dialog/Loading.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import { Progress } from '$lib/components/ui/progress/index.js';
@@ -26,7 +26,7 @@
 	import { sleep } from '$lib/utils';
 	import { updateCache } from '$lib/utils/http';
 
-	import LineGraph from '$lib/components/custom/LineGraph.svelte';
+	import LineGraph from '$lib/components/custom/Charts/LineGraph.svelte';
 	import type { HistoricalData } from '$lib/types/common';
 	import { getTranslation } from '$lib/utils/i18n';
 	import { floatToNDecimals } from '$lib/utils/numbers';

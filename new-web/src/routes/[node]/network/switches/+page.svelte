@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getInterfaces } from '$lib/api/network/iface';
 	import { createSwitch, deleteSwitch, getSwitches, updateSwitch } from '$lib/api/network/switch';
-	import AlertDialog from '$lib/components/custom/AlertDialog.svelte';
+	import AlertDialog from '$lib/components/custom/Dialog/Alert.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import Search from '$lib/components/custom/TreeTable/Search.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';

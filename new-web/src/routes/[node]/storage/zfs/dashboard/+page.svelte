@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { getDatasets } from '$lib/api/zfs/datasets';
 	import { getPools, getPoolStats } from '$lib/api/zfs/pool';
-	import BarChart from '$lib/components/custom/BarChart.svelte';
-	import LineGraph from '$lib/components/custom/LineGraph.svelte';
-	import PieChart from '$lib/components/custom/PieChart.svelte';
+	import BarChart from '$lib/components/custom/Charts/Bar.svelte';
+	import LineGraph from '$lib/components/custom/Charts/LineGraph.svelte';
+	import PieChart from '$lib/components/custom/Charts/Pie.svelte';
 	import * as Card from '$lib/components/ui/card';
 	import CustomComboBox from '$lib/components/ui/custom-input/combobox.svelte';
 	import type { Dataset } from '$lib/types/zfs/dataset';

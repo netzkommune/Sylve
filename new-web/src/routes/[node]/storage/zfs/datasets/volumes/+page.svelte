@@ -10,7 +10,7 @@
 		getDatasets
 	} from '$lib/api/zfs/datasets';
 	import { getPools } from '$lib/api/zfs/pool';
-	import AlertDialogModal from '$lib/components/custom/AlertDialog.svelte';
+	import AlertDialogModal from '$lib/components/custom/Dialog/Alert.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import Search from '$lib/components/custom/TreeTable/Search.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';

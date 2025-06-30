@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { destroyDisk, destroyPartition, initializeGPT, listDisks } from '$lib/api/disk/disk';
 	import { getPools } from '$lib/api/zfs/pool';
-	import AlertDialog from '$lib/components/custom/AlertDialog.svelte';
+	import AlertDialog from '$lib/components/custom/Dialog/Alert.svelte';
 	import KvTableModal from '$lib/components/custom/KVTableModal.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import Search from '$lib/components/custom/TreeTable/Search.svelte';

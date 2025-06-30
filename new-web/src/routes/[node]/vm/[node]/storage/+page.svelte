@@ -1,12 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import AlertDialog from '$lib/components/custom/AlertDialog.svelte';
 
-	import { goto } from '$app/navigation';
-	import * as Card from '$lib/components/ui/card/index.js';
-
-	import { actionVm, deleteVM, getVMDomain, getVMs } from '$lib/api/vm/vm';
-	import LoadingDialog from '$lib/components/custom/LoadingDialog.svelte';
+	import { getVMDomain, getVMs } from '$lib/api/vm/vm';
+	import LoadingDialog from '$lib/components/custom/Dialog/Loading.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Progress } from '$lib/components/ui/progress/index.js';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';

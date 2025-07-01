@@ -601,9 +601,9 @@
 			properties = options;
 			open = false;
 		}}
-		class="fixed left-1/2 top-1/2 flex h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform flex-col gap-0 overflow-auto p-0 transition-all duration-300 ease-in-out lg:max-w-[70%]"
+		class="fixed left-1/2 top-1/2 flex h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform flex-col gap-4 overflow-auto p-5 transition-all duration-300 ease-in-out lg:max-w-[70%]"
 	>
-		<div class="flex items-center justify-between px-4 py-3">
+		<div class="flex items-center justify-between">
 			<Dialog.Header class="p-0">
 				<Dialog.Title class="flex items-center gap-2 text-left">
 					<Icon icon="bi:hdd-stack-fill" class="h-5 w-5 " />Create ZFS Pool
@@ -640,7 +640,7 @@
 			</div>
 		</div>
 
-		<Tabs.Root value="tab-devices" class="flex h-full flex-col overflow-y-auto px-4">
+		<Tabs.Root value="tab-devices" class="flex h-full flex-col overflow-y-auto ">
 			<Tabs.List class="grid w-full grid-cols-2 p-0 ">
 				<Tabs.Trigger value="tab-devices" class="border-b">Devices</Tabs.Trigger>
 				<Tabs.Trigger value="tab-options" class="border-b">Options</Tabs.Trigger>
@@ -904,11 +904,11 @@
 			</Tabs.Content>
 		</Tabs.Root>
 
-		<Dialog.Footer class="flex justify-between gap-2 border-t px-4 py-3">
+		<Dialog.Footer class="flex justify-between gap-2">
 			<div class="flex gap-2">
 				<Button
 					size="sm"
-					class="h-8 "
+					class="h-8 w-28"
 					onclick={() => {
 						makePool();
 					}}

@@ -240,58 +240,56 @@
 	</div>
 
 	<Dialog.Root bind:open={modalState.isOpen}>
-		<Dialog.Content class="w-[90%] gap-2 overflow-hidden p-5 lg:max-w-2xl">
-			<div class="flex items-center justify-between">
-				<Dialog.Header class="flex-1">
-					<Dialog.Title>
-						<div class="flex items-center gap-2">
-							<Icon icon={modalState.isEditMode ? 'mdi:note-edit' : 'mdi:note'} class="h-5 w-5" />
-							<span>
-								{#if modalState.isEditMode}
-									{#if selectedId}
-										Edit
-									{:else}
-										New
-									{/if}
+		<Dialog.Content class="w-[90%]  overflow-hidden p-5 lg:max-w-2xl">
+			<Dialog.Header class="">
+				<Dialog.Title class="flex items-center justify-between">
+					<div class="flex items-center gap-2">
+						<Icon icon={modalState.isEditMode ? 'mdi:note-edit' : 'mdi:note'} class="h-5 w-5" />
+						<span>
+							{#if modalState.isEditMode}
+								{#if selectedId}
+									Edit
 								{:else}
-									View
+									New
 								{/if}
+							{:else}
+								View
+							{/if}
 
-								{'Note'}
-							</span>
-						</div>
-					</Dialog.Title>
-				</Dialog.Header>
-				<div class="flex items-center gap-0.5">
-					<Button
-						size="sm"
-						variant="ghost"
-						class="h-8"
-						title={'Reset'}
-						onclick={() => {
-							modalState.title = '';
-							modalState.content = '';
-						}}
-					>
-						<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
-						<span class="sr-only">{'Reset'}</span>
-					</Button>
-					<Button
-						size="sm"
-						variant="ghost"
-						class="h-8"
-						title={'Close'}
-						onclick={() => {
-							modalState.isOpen = false;
-							modalState.title = '';
-							modalState.content = '';
-						}}
-					>
-						<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
-						<span class="sr-only">{'Close'}</span>
-					</Button>
-				</div>
-			</div>
+							{'Note'}
+						</span>
+					</div>
+					<div class="flex items-center gap-0.5">
+						<Button
+							size="sm"
+							variant="link"
+							title={'Reset'}
+							class="h-4 "
+							onclick={() => {
+								modalState.title = '';
+								modalState.content = '';
+							}}
+						>
+							<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
+							<span class="sr-only">{'Reset'}</span>
+						</Button>
+						<Button
+							size="sm"
+							variant="link"
+							class="h-4"
+							title={'Close'}
+							onclick={() => {
+								modalState.isOpen = false;
+								modalState.title = '';
+								modalState.content = '';
+							}}
+						>
+							<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
+							<span class="sr-only">{'Close'}</span>
+						</Button>
+					</div>
+				</Dialog.Title>
+			</Dialog.Header>
 
 			<CustomValueInput
 				label={'Name'}
@@ -328,9 +326,9 @@
 				</ScrollArea>
 			</div>
 			<Dialog.Footer class="flex justify-end">
-				<div class="flex w-full items-center justify-end gap-2 px-1 py-2">
+				<div class="flex w-full items-center justify-end gap-2">
 					{#if modalState.isEditMode}
-						<Button onclick={saveNote} type="submit" size="sm">{'Save'}</Button>
+						<Button onclick={saveNote} type="submit" size="sm" class="w-28">{'Save'}</Button>
 					{/if}
 				</div>
 			</Dialog.Footer>

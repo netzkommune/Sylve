@@ -118,8 +118,8 @@
 			<div class="flex items-center gap-0.5">
 				<Button
 					size="sm"
-					variant="ghost"
-					class="h-8"
+					variant="link"
+					class="h-4 cursor-pointer"
 					title={'Reset'}
 					onclick={() => {
 						newPartitions = [];
@@ -131,7 +131,13 @@
 					<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
 					<span class="sr-only">Reset</span>
 				</Button>
-				<Button size="sm" variant="ghost" class="h-8" title={'Close'} onclick={() => close()}>
+				<Button
+					size="sm"
+					variant="link"
+					class="h-4 cursor-pointer"
+					title={'Close'}
+					onclick={() => close()}
+				>
 					<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
 					<span class="sr-only">Close</span>
 				</Button>
@@ -188,7 +194,7 @@
 			</Table.Root>
 		</div>
 
-		<div class="space-y-2 border-t px-6 pt-4">
+		<div class="space-y-2 border-t pt-4">
 			<div class="flex items-center gap-6">
 				<div class="flex-1">
 					{#if remainingSpace > 0}

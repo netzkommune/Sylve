@@ -370,7 +370,7 @@
 			onInteractOutside={(e) => e.preventDefault()}
 			onEscapeKeydown={(e) => e.preventDefault()}
 		>
-			<div class="flex items-center justify-between px-1 py-1">
+			<div class="flex items-center justify-between">
 				<Dialog.Header>
 					<Dialog.Title>
 						<div class="flex items-center">
@@ -387,8 +387,8 @@
 				<div class="flex items-center gap-0.5">
 					<Button
 						size="sm"
-						variant="ghost"
-						class="h-8"
+						variant="link"
+						class="h-4"
 						title={'Reset'}
 						onclick={() => resetModal(false)}
 					>
@@ -397,8 +397,8 @@
 					</Button>
 					<Button
 						size="sm"
-						variant="ghost"
-						class="h-8"
+						variant="link"
+						class="h-4"
 						title={'Close'}
 						onclick={() => resetModal(true)}
 					>
@@ -506,12 +506,12 @@
 				></CustomCheckbox>
 			</div>
 
-			<Dialog.Footer class="flex justify-between gap-2 py-3">
+			<Dialog.Footer class="flex justify-between gap-2 ">
 				<div class="flex gap-2">
 					{#if confirmModals.active === 'editSwitch'}
-						<Button onclick={confirmAction} type="submit" size="sm">{'Save'}</Button>
+						<Button onclick={confirmAction} type="submit" size="sm" class="w-28">{'Save'}</Button>
 					{:else}
-						<Button onclick={confirmAction} type="submit" size="sm">{'Create'}</Button>
+						<Button onclick={confirmAction} type="submit" size="sm" class="w-28">{'Create'}</Button>
 					{/if}
 				</div>
 			</Dialog.Footer>

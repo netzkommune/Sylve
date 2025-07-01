@@ -18,7 +18,7 @@
 </script>
 
 <AlertDialog.Root bind:open>
-	<AlertDialog.Content onInteractOutside={(e) => e.preventDefault()}>
+	<AlertDialog.Content onInteractOutside={(e) => e.preventDefault()} class="p-5">
 		<AlertDialog.Header>
 			<AlertDialog.Title>Are you sure?</AlertDialog.Title>
 			<AlertDialog.Description>

@@ -87,157 +87,151 @@
 
 <Dialog.Root bind:open>
 	<Dialog.Content
-		class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-visible overflow-y-auto p-5 transition-all duration-300 ease-in-out lg:max-w-[70%]"
+		class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-visible overflow-y-auto p-5 transition-all duration-300 ease-in-out lg:max-w-2xl"
 		onInteractOutside={() => {
 			properties = options;
 			open = false;
 		}}
 	>
-		<div class="flex items-center justify-between px-4 py-3">
-			<Dialog.Header class="p-0">
-				<Dialog.Title class="flex items-center gap-2 text-left">
-					<div class="flex items-center gap-2">
-						<Icon icon="mdi:database-edit" class="h-5 w-5" />
-						<span>Edit ZFS Pool - {pool.name}</span>
-					</div>
-				</Dialog.Title>
-			</Dialog.Header>
+		<Dialog.Header class="p-0">
+			<Dialog.Title class="flex items-center justify-between gap-2 text-left">
+				<div class="flex items-center gap-2">
+					<Icon icon="mdi:database-edit" class="h-5 w-5" />
+					<span>Edit ZFS Pool - {pool.name}</span>
+				</div>
+				<div class="flex items-center gap-0.5">
+					<Button
+						size="sm"
+						variant="link"
+						class="h-4"
+						title={'Reset'}
+						onclick={() => {
+							properties = options;
+						}}
+					>
+						<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only">Reset</span>
+					</Button>
+					<Button
+						size="sm"
+						variant="link"
+						class="h-4"
+						title={'Close'}
+						onclick={() => {
+							open = false;
+							properties = options;
+						}}
+					>
+						<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only">Close</span>
+					</Button>
+				</div>
+			</Dialog.Title>
+		</Dialog.Header>
 
-			<div class="flex items-center gap-0.5">
-				<Button
-					size="sm"
-					variant="ghost"
-					class="h-8"
-					title={'Reset'}
-					onclick={() => {
-						properties = options;
-					}}
-				>
-					<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
-					<span class="sr-only">Reset</span>
-				</Button>
-				<Button
-					size="sm"
-					variant="ghost"
-					class="h-8"
-					title={'Close'}
-					onclick={() => {
-						open = false;
-						properties = options;
-					}}
-				>
-					<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
-					<span class="sr-only">Close</span>
-				</Button>
+		<div class="mt-4 grid grid-cols-1 gap-4">
+			<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+				<SimpleSelect
+					label="Auto Expand"
+					placeholder="Select Auto Expand"
+					options={[
+						{ value: 'on', label: 'Yes' },
+						{ value: 'off', label: 'No' }
+					]}
+					bind:value={properties.autoexpand}
+					onChange={(value) => (properties.autoexpand = value)}
+				/>
+
+				<SimpleSelect
+					label="Auto Trim"
+					placeholder="Select Auto Trim"
+					options={[
+						{ value: 'on', label: 'Yes' },
+						{ value: 'off', label: 'No' }
+					]}
+					bind:value={properties.autotrim}
+					onChange={(value) => (properties.autotrim = value)}
+				/>
+
+				<SimpleSelect
+					label="Delegation"
+					placeholder="Select Delegation"
+					options={[
+						{ value: 'on', label: 'Yes' },
+						{ value: 'off', label: 'No' }
+					]}
+					bind:value={properties.delegation}
+					onChange={(value) => (properties.delegation = value)}
+				/>
+
+				<SimpleSelect
+					label="Fail Mode"
+					placeholder="Select Fail Mode"
+					options={[
+						{ value: 'continue', label: 'Continue' },
+						{ value: 'wait', label: 'Wait' },
+						{ value: 'panic', label: 'Panic' }
+					]}
+					bind:value={properties.failmode}
+					onChange={(value) => (properties.failmode = value)}
+				/>
+
+				{#if properties.spares && isRaid}
+					<div class="h-full space-y-1">
+						<Label class="w-24 whitespace-nowrap text-sm">Spares</Label>
+						<Select.Root
+							type="multiple"
+							bind:value={properties.spares}
+							onValueChange={(value) => {
+								properties.spares = value as string[];
+							}}
+						>
+							<Select.Trigger class="w-full">
+								{#if properties.spares.length > 0}
+									<span>
+										{properties.spares.join(', ')}
+									</span>
+								{:else}
+									<span>Select spares</span>
+								{/if}
+							</Select.Trigger>
+							<Select.Content>
+								<Select.Group>
+									{#each spares as spare (spare)}
+										<Select.Item value={spare} label={spare}>
+											{spare}
+										</Select.Item>
+									{/each}
+								</Select.Group>
+							</Select.Content>
+						</Select.Root>
+					</div>
+
+					{#if properties.spares.length > 0}
+						<SimpleSelect
+							label="Auto Replace"
+							placeholder="Select Auto Replace"
+							options={[
+								{ value: 'on', label: 'Yes' },
+								{ value: 'off', label: 'No' }
+							]}
+							bind:value={properties.autoreplace}
+							onChange={(value) => (properties.autoreplace = value)}
+						/>
+					{/if}
+				{/if}
 			</div>
 		</div>
 
-		<Card.Root class="min-h-[20vh] border-none pb-6">
-			<Card.Content class="flex flex-col gap-4 p-4 !pb-0">
-				<div class="grid grid-cols-1 gap-4">
-					<div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-						<SimpleSelect
-							label="Auto Expand"
-							placeholder="Select Auto Expand"
-							options={[
-								{ value: 'on', label: 'Yes' },
-								{ value: 'off', label: 'No' }
-							]}
-							bind:value={properties.autoexpand}
-							onChange={(value) => (properties.autoexpand = value)}
-						/>
+		<div class="mt-4 flex-1 space-y-1">
+			<Label for="comment">Comment</Label>
+			<Textarea
+				id="comment"
+				placeholder="Comments about the pool"
+				bind:value={properties.comment}
+			/>
+		</div>
 
-						<SimpleSelect
-							label="Auto Trim"
-							placeholder="Select Auto Trim"
-							options={[
-								{ value: 'on', label: 'Yes' },
-								{ value: 'off', label: 'No' }
-							]}
-							bind:value={properties.autotrim}
-							onChange={(value) => (properties.autotrim = value)}
-						/>
-
-						<SimpleSelect
-							label="Delegation"
-							placeholder="Select Delegation"
-							options={[
-								{ value: 'on', label: 'Yes' },
-								{ value: 'off', label: 'No' }
-							]}
-							bind:value={properties.delegation}
-							onChange={(value) => (properties.delegation = value)}
-						/>
-
-						<SimpleSelect
-							label="Fail Mode"
-							placeholder="Select Fail Mode"
-							options={[
-								{ value: 'continue', label: 'Continue' },
-								{ value: 'wait', label: 'Wait' },
-								{ value: 'panic', label: 'Panic' }
-							]}
-							bind:value={properties.failmode}
-							onChange={(value) => (properties.failmode = value)}
-						/>
-
-						{#if properties.spares && isRaid}
-							<div class="h-full space-y-1">
-								<Label class="w-24 whitespace-nowrap text-sm">Spares</Label>
-								<Select.Root
-									type="multiple"
-									bind:value={properties.spares}
-									onValueChange={(value) => {
-										properties.spares = value as string[];
-									}}
-								>
-									<Select.Trigger class="w-full">
-										{#if properties.spares.length > 0}
-											<span>
-												{properties.spares.join(', ')}
-											</span>
-										{:else}
-											<span>Select spares</span>
-										{/if}
-									</Select.Trigger>
-									<Select.Content>
-										<Select.Group>
-											{#each spares as spare (spare)}
-												<Select.Item value={spare} label={spare}>
-													{spare}
-												</Select.Item>
-											{/each}
-										</Select.Group>
-									</Select.Content>
-								</Select.Root>
-							</div>
-
-							{#if properties.spares.length > 0}
-								<SimpleSelect
-									label="Auto Replace"
-									placeholder="Select Auto Replace"
-									options={[
-										{ value: 'on', label: 'Yes' },
-										{ value: 'off', label: 'No' }
-									]}
-									bind:value={properties.autoreplace}
-									onChange={(value) => (properties.autoreplace = value)}
-								/>
-							{/if}
-						{/if}
-					</div>
-				</div>
-
-				<div class="flex-1 space-y-1">
-					<Label for="comment">Comment</Label>
-					<Textarea
-						id="comment"
-						placeholder="Comments about the pool"
-						bind:value={properties.comment}
-					/>
-				</div>
-			</Card.Content>
-		</Card.Root>
 		<Dialog.Footer class="mt-4 flex justify-between gap-2">
 			<div class="flex gap-2">
 				<Button

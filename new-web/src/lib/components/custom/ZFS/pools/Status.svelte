@@ -126,7 +126,7 @@
 			onInteractOutside={() => {
 				open = false;
 			}}
-			class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-visible overflow-y-auto p-6 transition-all duration-300 ease-in-out lg:max-w-[45%]"
+			class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-visible overflow-y-auto p-5 transition-all duration-300 ease-in-out lg:max-w-[45%]"
 		>
 			<!-- Header -->
 			<div class="flex items-center justify-between pb-3">
@@ -140,7 +140,7 @@
 				</Dialog.Header>
 
 				<Dialog.Close
-					class="flex h-5 w-5 items-center justify-center rounded-sm opacity-70 transition-opacity hover:opacity-100"
+					class="flex h-5 w-5 cursor-pointer items-center justify-center rounded-sm opacity-70 transition-opacity hover:opacity-100"
 					onclick={() => {
 						open = false;
 					}}
@@ -149,7 +149,7 @@
 				</Dialog.Close>
 			</div>
 
-			<div class="space-y-4">
+			<div class="space-y-5">
 				<!-- Warning -->
 				{#if status.status && status.status.length > 0}
 					<div

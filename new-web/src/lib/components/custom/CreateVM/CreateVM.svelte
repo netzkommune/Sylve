@@ -234,7 +234,7 @@
 
 <Dialog.Root bind:open>
 	<Dialog.Content
-		class="fixed left-1/2 top-1/2 flex h-[85vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform flex-col gap-0  overflow-auto p-5 transition-all duration-300 ease-in-out lg:h-[72vh] lg:max-w-2xl"
+		class="fixed left-1/2 top-1/2 flex h-[85vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform flex-col gap-0  overflow-auto p-6 transition-all duration-300 ease-in-out lg:h-[72vh] lg:max-w-2xl"
 	>
 		<div class="flex items-center justify-between">
 			<Dialog.Header class="p-0">
@@ -277,7 +277,7 @@
 			</div>
 		</div>
 
-		<div class="mt-5 flex-1 overflow-y-auto">
+		<div class="mt-6 flex-1 overflow-y-auto">
 			<Tabs.Root value="basic" class="w-full overflow-hidden">
 				<Tabs.List class="grid w-full grid-cols-5 p-0 ">
 					{#each tabs as { value, label }}

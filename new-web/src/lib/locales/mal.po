@@ -124,6 +124,7 @@ msgstr ""
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 msgid "New"
 msgstr ""
 
@@ -166,6 +167,7 @@ msgstr ""
 #: src/lib/components/custom/Dialog/AlertDialog.svelte
 #: src/lib/components/custom/Dialog/Alert.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
 msgid "Cancel"
 msgstr ""
 
@@ -311,6 +313,7 @@ msgstr ""
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 #: src/lib/components/ui/sheet/sheet-content.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 msgid "Close"
 msgstr ""
 
@@ -347,6 +350,7 @@ msgstr ""
 #: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 msgid "Reset"
 msgstr ""
 
@@ -552,6 +556,7 @@ msgstr ""
 #: src/routes/[node]/notes/+page.svelte
 #: src/routes/[node]/network/interfaces/+page.svelte
 #: src/lib/components/custom/ZFS/SnapshotJobs.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
 msgid "ID"
 msgstr ""
 
@@ -668,6 +673,7 @@ msgstr ""
 
 #: src/routes/[node]/storage/zfs/dashboard/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 msgid "Select a pool"
 msgstr ""
 
@@ -747,6 +753,7 @@ msgstr ""
 #: src/lib/components/custom/ZFS/datasets/CreateSnapshot.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 msgid "Recursive"
 msgstr ""
 
@@ -761,6 +768,7 @@ msgstr ""
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 msgid "Create"
 msgstr ""
 
@@ -1085,6 +1093,7 @@ msgstr ""
 
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 msgid "Create Snapshot"
 msgstr ""
 
@@ -1130,6 +1139,7 @@ msgstr ""
 
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 #: src/lib/components/custom/ZFS/SnapshotJobs.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
 msgid "View Snapshot Jobs"
 msgstr ""
 
@@ -1139,24 +1149,31 @@ msgstr ""
 
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 msgid "Pool"
 msgstr ""
 
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 #: src/lib/components/custom/ZFS/SnapshotJobs.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
 msgid "Dataset"
 msgstr ""
 
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 msgid "Select a dataset"
 msgstr ""
 
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 #: src/lib/components/custom/ZFS/SnapshotJobs.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
 msgid "Interval"
 msgstr ""
 
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 msgid "Select an interval"
 msgstr ""
 
@@ -1165,22 +1182,27 @@ msgid "{0} <0/> ."
 msgstr ""
 
 #: src/lib/components/custom/ZFS/SnapshotJobs.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
 msgid "Prefix"
 msgstr ""
 
 #: src/lib/components/custom/ZFS/SnapshotJobs.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
 msgid "Last Run"
 msgstr ""
 
 #: src/lib/components/custom/ZFS/SnapshotJobs.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
 msgid "Deleted"
 msgstr ""
 
 #: src/lib/components/custom/ZFS/SnapshotJobs.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
 msgid "No snapshot jobs"
 msgstr ""
 
 #: src/lib/components/custom/ZFS/SnapshotJobs.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
 msgid "Save Snapshot Jobs"
 msgstr ""
 
@@ -1495,16 +1517,19 @@ msgstr ""
 
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 msgid "Deleted{0} datasets"
 msgstr ""
 
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 msgid "Failed to delete datasets"
 msgstr ""
 
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 msgid "Are you sure you want to delete{0}? This action cannot be undone."
 msgstr ""
 
@@ -1580,46 +1605,38 @@ msgstr ""
 msgid "<0/> Edit Volume - {0}"
 msgstr ""
 
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "df"
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+msgid "Updating datasets data"
 msgstr ""
 
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "<0/> wer <1>Drop disks here</1>"
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+msgid "No update needed for datasets data"
 msgstr ""
 
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "d"
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "Bulk Delete Snapshots"
 msgstr ""
 
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Hover"
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "Are you sure you want to delete{0} snapshot{1}? This action cannot be undone."
 msgstr ""
 
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Add to library"
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "Deleted{0} snapshot{1}"
 msgstr ""
 
-#: src/routes/[node]/summary/+page.svelte
-msgid "{0} sdfs"
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "Failed to delete snapshots"
 msgstr ""
 
-#: src/lib/components/custom/Terminal.svelte
-msgid "{0} f"
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "View Periodics"
 msgstr ""
 
-#: src/lib/components/custom/Terminal.svelte
-msgid "{0} fergre"
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Jan 01, 0001"
 msgstr ""
 
-#: src/lib/components/custom/Terminal.svelte
-msgid "ds <0><0>{0} fergre</0></0> <1/>"
-msgstr ""
-
-#: src/lib/components/custom/Terminal.svelte
-msgid "{0} dsf"
-msgstr ""
-
-#: src/lib/components/custom/Header.svelte
-msgid "<0/> Rootsf <1/> <2>Toggle user menu</2>"
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Never"
 msgstr ""

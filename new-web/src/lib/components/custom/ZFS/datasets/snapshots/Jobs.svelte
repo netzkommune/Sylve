@@ -5,9 +5,11 @@
 	import * as Table from '$lib/components/ui/table';
 	import type { Dataset, PeriodicSnapshot } from '$lib/types/zfs/dataset';
 	import type { Zpool } from '$lib/types/zfs/pool';
+	import { handleAPIError } from '$lib/utils/http';
 	import { dateToAgo } from '$lib/utils/time';
 	import { getDatasetByGUID } from '$lib/utils/zfs/dataset/dataset';
 	import Icon from '@iconify/svelte';
+	import { toast } from 'svelte-sonner';
 
 	interface Data {
 		open: boolean;
@@ -58,11 +60,20 @@
 			for (const id of shadowDeleted) {
 				const snapshot = periodicSnapshots.find((s) => s.id === id);
 				if (snapshot) {
-					console.log(await deletePeriodicSnapshot(snapshot.guid));
-					shadowDeleted = shadowDeleted.filter((s) => s !== id);
+					const response = await deletePeriodicSnapshot(snapshot.guid);
+					if (response.error) {
+						handleAPIError(response);
+						toast.error('Failed to delete periodic snapshot', {
+							position: 'bottom-center'
+						});
+					} else {
+						open = false;
+					}
 				}
 			}
-		} catch (e) {}
+		} catch (e) {
+			console.error('Error saving snapshot jobs:', e);
+		}
 	}
 </script>
 
@@ -111,9 +122,14 @@
 								<Table.Cell>{getDatasetName(snapshot.guid)}</Table.Cell>
 								<Table.Cell>{snapshot.prefix}</Table.Cell>
 								<Table.Cell>{intervalToString(snapshot.interval)}</Table.Cell>
-								<Table.Cell title={snapshot.lastRunAt.toLocaleString()}
-									>{dateToAgo(snapshot.lastRunAt)}</Table.Cell
-								>
+								<Table.Cell title={snapshot.lastRunAt.toLocaleString()}>
+									{@const lastRun = dateToAgo(snapshot.lastRunAt)}
+									{#if lastRun === 'Jan 01, 0001'}
+										<span>Never</span>
+									{:else}
+										{lastRun}
+									{/if}
+								</Table.Cell>
 
 								{#if !shadowDeleted.includes(snapshot.id)}
 									<Table.Cell>
@@ -145,9 +161,9 @@
 
 		<Dialog.Footer class="flex justify-between gap-2 border-t px-6 py-4">
 			<div class="flex gap-2">
-				<Button variant="outline" class="h-8" onclick={() => close()}>Cancel</Button>
+				<Button size="sm" onclick={() => close()}>Cancel</Button>
 				{#if shadowDeleted.length > 0}
-					<Button variant="outline" class="h-8" onclick={saveJobs}>Save Snapshot Jobs</Button>
+					<Button size="sm" onclick={saveJobs}>Save Snapshot Jobs</Button>
 				{/if}
 			</div>
 		</Dialog.Footer>

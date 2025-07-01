@@ -27,7 +27,7 @@ func (s *Service) GetDatasets() ([]zfsServiceInterfaces.Dataset, error) {
 	for _, dataset := range datasets {
 		props, err := dataset.GetAllProperties()
 		if err != nil {
-			return nil, err
+			continue
 		}
 
 		propMap := make(map[string]string, len(props))

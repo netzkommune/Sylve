@@ -294,6 +294,7 @@
 				placeholder="Post Upgrade Summary"
 				bind:value={modalState.title}
 				classes="flex-1 space-y-1"
+				disabled={!modalState.isEditMode}
 			/>
 
 			<div class="">

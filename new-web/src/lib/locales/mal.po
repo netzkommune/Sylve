@@ -1599,3 +1599,7 @@ msgstr ""
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Add to library"
 msgstr ""
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "{0} sdfs"
+msgstr ""

@@ -237,15 +237,15 @@
 <div class="flex h-full w-full flex-col">
 	<div class="min-h-0 flex-1">
 		<ScrollArea orientation="both" class="h-full w-full">
-			<div class="space-y-3 p-3">
-				<Card.Root class="w-full">
-					<Card.Header class="-mb-3 -mt-3 p-0">
-						<Card.Description class="text-md ml-3 font-normal text-blue-600 dark:text-blue-500">
+			<div class="space-y-4 p-4">
+				<Card.Root class="w-full gap-0 p-0">
+					<Card.Header class="p-4 pb-0">
+						<Card.Description class="text-md font-normal text-blue-600 dark:text-blue-500">
 							{basicInfo.hostname}
 						</Card.Description>
 					</Card.Header>
-					<Card.Content class="p-0">
-						<div class="ml-3 grid grid-cols-1 gap-4 md:grid-cols-2">
+					<Card.Content class="p-4 pt-2.5">
+						<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 							<div>
 								<div class="flex w-full justify-between pb-1">
 									<p class="inline-flex items-center">
@@ -349,7 +349,11 @@
 
 				<AreaChart title="CPU Usage" elements={[chartElements[1], chartElements[0]]} />
 				<AreaChart title="Memory Usage" elements={[chartElements[3], chartElements[2]]} />
-				<AreaChart title="Network Usage" elements={[chartElements[4], chartElements[5]]} formatSize={true} />
+				<AreaChart
+					title="Network Usage"
+					elements={[chartElements[4], chartElements[5]]}
+					formatSize={true}
+				/>
 			</div>
 		</ScrollArea>
 	</div>

@@ -80,7 +80,7 @@
 </script>
 
 <Card.Root>
-	<Card.Header class="flex items-center gap-2 space-y-0 border-b py-0 sm:flex-row">
+	<Card.Header class="flex items-center border-b px-4 sm:flex-row">
 		<div class="grid flex-1 gap-1 text-center sm:text-left">
 			<Card.Title>
 				<div class="flex items-center gap-2">
@@ -95,7 +95,7 @@
 	</Card.Header>
 
 	<Card.Content>
-		<Chart.Container {config} class="h-48 w-full">
+		<Chart.Container {config} class="h-48 w-full overflow-hidden ">
 			<AreaChart
 				legend
 				{data}

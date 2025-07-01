@@ -16,57 +16,56 @@ import { get } from 'svelte/store';
 import { getUsername } from './auth';
 
 interface Tab {
-	id: string;
-	title: string;
+    id: string;
+    title: string;
 }
 
 interface Terminal {
-	isOpen: boolean;
-	isMinimized: boolean;
-	title: string;
-	tabs: Tab[];
-	activeTabId: string;
+    isOpen: boolean;
+    isMinimized: boolean;
+    title: string;
+    tabs: Tab[];
+    activeTabId: string;
 }
 
 export const terminalStore = localStore<Terminal>('terminal', {
-	isOpen: false,
-	isMinimized: false,
-	title: '',
-	tabs: [],
-	activeTabId: ''
+    isOpen: false,
+    isMinimized: false,
+    title: '',
+    tabs: [],
+    activeTabId: ''
 });
 
 export function getDefaultTitle() {
-	// return `${getUsername()}@${get(hostname)}:~`;
-	return '';
+    return `${getUsername()}@${get(hostname)}:~`;
 }
 
 export function openTerminal() {
-	terminalStore.set({
-		...get(terminalStore),
-		isOpen: true,
-		isMinimized: false
-	});
+    terminalStore.set({
+        ...get(terminalStore),
+        isOpen: true,
+        isMinimized: false
+    });
 
-	let store = get(terminalStore);
-	if (store.tabs.length > 0) {
-		return;
-	}
+    let store = get(terminalStore);
+    if (store.tabs.length > 0) {
+        return;
+    }
 
-	const tabId = nanoid(9);
-	const newTerminal: Terminal = {
-		isOpen: true,
-		isMinimized: false,
-		title: 'Terminal',
-		tabs: [
-			{
-				id: tabId,
-				title: getDefaultTitle()
-			}
-		],
+    const tabId = nanoid(9);
+    const newTerminal: Terminal = {
+        isOpen: true,
+        isMinimized: false,
+        title: 'Terminal',
+        tabs: [
+            {
+                id: tabId,
+                title: getDefaultTitle()
+            }
+        ],
 
-		activeTabId: tabId
-	};
+        activeTabId: tabId
+    };
 
-	terminalStore.set(newTerminal);
+    terminalStore.set(newTerminal);
 }

@@ -12,7 +12,7 @@
 	import Icon from '@iconify/svelte';
 	import adze from 'adze';
 	import { nanoid } from 'nanoid';
-	import { onMount, untrack } from 'svelte';
+	import { untrack } from 'svelte';
 	import { fade, scale } from 'svelte/transition';
 
 	let terminal = $state<Terminal>();
@@ -174,6 +174,8 @@
 			});
 		}
 	});
+
+	$inspect('terminal store', $terminalStore);
 </script>
 
 <svelte:window bind:innerWidth />

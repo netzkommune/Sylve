@@ -259,21 +259,21 @@
 {/snippet}
 
 <div class="flex h-full w-full flex-col">
-	<div class="flex h-10 w-full items-center gap-2 border p-2">
+	<div class="flex h-10 w-full items-center gap-2 border p-4">
 		{@render button('start')}
 		{@render button('stop')}
 	</div>
 
 	<div class="min-h-0 flex-1">
 		<ScrollArea orientation="both" class="h-full">
-			<div class="grid grid-cols-1 gap-3 p-3 lg:grid-cols-2">
-				<Card.Root class="w-full">
-					<Card.Header class="p-2">
-						<Card.Description class="text-md font-normal text-blue-600 dark:text-blue-500"
+			<div class="grid grid-cols-1 gap-4 p-4 lg:grid-cols-2">
+				<Card.Root class="w-full gap-0 p-4">
+					<Card.Header class="p-0">
+						<Card.Description class="text-md  font-normal text-blue-600 dark:text-blue-500"
 							>{vm.name} {udTime ? `(${udTime})` : ''}</Card.Description
 						>
 					</Card.Header>
-					<Card.Content class="p-2">
+					<Card.Content class="mt-3 p-0">
 						<div class="flex items-start">
 							<div class="flex items-center">
 								<Icon icon="fluent:status-12-filled" class="mr-1 h-5 w-5" />
@@ -312,13 +312,13 @@
 					</Card.Content>
 				</Card.Root>
 
-				<Card.Root class="w-full">
-					<Card.Header class="p-2">
+				<Card.Root class="w-full gap-0 p-4">
+					<Card.Header class="p-0">
 						<Card.Description class="text-md font-normal text-blue-600 dark:text-blue-500">
 							Description
 						</Card.Description>
 					</Card.Header>
-					<Card.Content class="p-2">
+					<Card.Content class="mt-3 p-0">
 						<CustomValueInput
 							label={''}
 							placeholder="Notes about VM"

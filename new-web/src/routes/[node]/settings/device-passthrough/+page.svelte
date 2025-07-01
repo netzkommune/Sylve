@@ -93,7 +93,8 @@
 				onclick={() =>
 					activeRow && addDevice(activeRow[0].domain.toString(), activeRow[0].deviceId)}
 				size="sm"
-				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+				variant="outline"
+				class="h-6.5"
 			>
 				<Icon icon="wpf:disconnected" class="mr-1 h-4 w-4" />
 				Enable Passthrough
@@ -104,7 +105,8 @@
 			<Button
 				onclick={() => activeRow && removeDevice(activeRow[0].pptId)}
 				size="sm"
-				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+				variant="outline"
+				class="h-6.5"
 			>
 				<Icon icon="wpf:connected" class="mr-1 h-4 w-4" />
 				Disable Passthrough

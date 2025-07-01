@@ -204,11 +204,7 @@
 
 {#snippet button(type: string)}
 	{#if type == 'smart' && buttonAbilities.smart.ability}
-		<Button
-			onclick={() => diskAction('smart')}
-			size="sm"
-			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
-		>
+		<Button onclick={() => diskAction('smart')} size="sm" variant="outline" class="h-6.5">
 			<div class="flex items-center">
 				<Icon icon="icon-park-outline:hdd" class="mr-1 h-4 w-4" />
 				<span>S.M.A.R.T Values</span>
@@ -217,11 +213,7 @@
 	{/if}
 
 	{#if type == 'gpt' && buttonAbilities.gpt.ability}
-		<Button
-			onclick={() => diskAction('gpt')}
-			size="sm"
-			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
-		>
+		<Button onclick={() => diskAction('gpt')} size="sm" variant="outline" class="h-6.5">
 			<div class="flex items-center">
 				<Icon icon="carbon:logical-partition" class="mr-1 h-4 w-4" />
 				<span>Initialize GPT</span>
@@ -230,11 +222,7 @@
 	{/if}
 
 	{#if type == 'wipe-disk' && buttonAbilities.wipe.ability && activeDisk !== null}
-		<Button
-			onclick={() => diskAction('wipe')}
-			size="sm"
-			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
-		>
+		<Button onclick={() => diskAction('wipe')} size="sm" variant="outline" class="h-6.5">
 			<div class="flex items-center">
 				<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
 				<span>Wipe Disk</span>
@@ -243,11 +231,7 @@
 	{/if}
 
 	{#if type == 'wipe-partition' && buttonAbilities.wipe.ability && activePartition !== null}
-		<Button
-			onclick={() => diskAction('wipe')}
-			size="sm"
-			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
-		>
+		<Button onclick={() => diskAction('wipe')} size="sm" variant="outline" class="h-6.5">
 			<div class="flex items-center">
 				<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
 				<span>Delete Partition</span>
@@ -256,11 +240,7 @@
 	{/if}
 
 	{#if type == 'partition' && buttonAbilities.createPartition.ability}
-		<Button
-			onclick={() => diskAction('partition')}
-			size="sm"
-			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
-		>
+		<Button onclick={() => diskAction('partition')} size="sm" variant="outline" class="h-6.5">
 			<div class="flex items-center">
 				<Icon icon="ant-design:partition-outlined" class="mr-1 h-4 w-4" />
 				<span>Create Partition</span>

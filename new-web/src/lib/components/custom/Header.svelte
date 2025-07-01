@@ -87,10 +87,7 @@
 		</div>
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger>
-				<Button
-					variant="outline"
-					size="sm"
-					class="border-border h-6.5 flex  items-center gap-1 rounded-lg border"
+				<Button variant="outline" size="sm" class="h-6.5"
 					><Icon icon="mdi:user" class="h-4 w-4" /> Root <Icon
 						icon="famicons:chevron-down"
 						class="h-4 w-4"

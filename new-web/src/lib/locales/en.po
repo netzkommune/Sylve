@@ -1825,3 +1825,7 @@ msgstr "ds <0><0>{0} fergre</0></0> <1/>"
 #: src/lib/components/custom/Terminal.svelte
 msgid "{0} dsf"
 msgstr "{0} dsf"
+
+#: src/lib/components/custom/Header.svelte
+msgid "<0/> Rootsf <1/> <2>Toggle user menu</2>"
+msgstr "<0/> Rootsf <1/> <2>Toggle user menu</2>"

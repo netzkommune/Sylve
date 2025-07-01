@@ -160,7 +160,8 @@
 			<Button
 				onclick={() => activeRow && viewNote(activeRow[0]?.id)}
 				size="sm"
-				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+				variant="outline"
+				class="h-6.5"
 			>
 				<div class="flex items-center">
 					<Icon icon="mdi:eye" class="mr-1 h-4 w-4" />
@@ -173,7 +174,8 @@
 			<Button
 				onclick={() => activeRow && handleDelete(activeRow[0]?.id)}
 				size="sm"
-				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+				variant="outline"
+				class="h-6.5"
 			>
 				<div class="flex items-center">
 					<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
@@ -189,7 +191,8 @@
 					handleNote(note, true);
 				}}
 				size="sm"
-				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+				variant="outline"
+				class="h-6.5"
 			>
 				<div class="flex items-center">
 					<Icon icon="mdi:note-edit" class="mr-1 h-4 w-4" />
@@ -207,7 +210,8 @@
 					handleBulkDelete(ids as number[]);
 				}}
 				size="sm"
-				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+				variant="outline"
+				class="h-6.5"
 			>
 				<div class="flex items-center">
 					<Icon icon="material-symbols:delete-sweep" class="mr-1 h-4 w-4" />

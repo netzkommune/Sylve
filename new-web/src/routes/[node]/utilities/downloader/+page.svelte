@@ -164,11 +164,7 @@
 {#snippet button(type: string)}
 	{#if type === 'delete' && onlyParentsSelected}
 		{#if activeRows && activeRows.length >= 1}
-			<Button
-				onclick={handleDelete}
-				size="sm"
-				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
-			>
+			<Button onclick={handleDelete} size="sm" variant="outline" class="h-6.5">
 				<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
 				{#if activeRows.length > 1}
 					{capitalizeFirstLetter(getTranslation('common.bulk_delete', 'Bulk Delete'))}
@@ -181,11 +177,7 @@
 
 	{#if type === 'download' && onlyChildSelected && isDownloadCompleted}
 		{#if activeRows && activeRows.length == 1}
-			<Button
-				onclick={handleDownload}
-				size="sm"
-				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
-			>
+			<Button onclick={handleDownload} size="sm" variant="outline" class="h-6.5">
 				<Icon icon="mdi:download" class="mr-1 h-4 w-4" />
 				{capitalizeFirstLetter(getTranslation('common.download', 'Download'))}
 			</Button>
@@ -194,11 +186,7 @@
 
 	{#if type === 'download' && httpDownloadSelected && isDownloadCompleted}
 		{#if activeRows && activeRows.length == 1}
-			<Button
-				onclick={handleDownload}
-				size="sm"
-				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
-			>
+			<Button onclick={handleDownload} size="sm" variant="outline" class="h-6.5">
 				<Icon icon="mdi:download" class="mr-1 h-4 w-4" />
 				{capitalizeFirstLetter(getTranslation('common.download', 'Download'))}
 			</Button>

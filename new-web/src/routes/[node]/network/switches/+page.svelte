@@ -317,22 +317,14 @@
 {#snippet button(type: string)}
 	{#if activeRow && Object.keys(activeRow).length > 0}
 		{#if type === 'edit'}
-			<Button
-				onclick={handleEdit}
-				size="sm"
-				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
-			>
+			<Button onclick={handleEdit} size="sm" variant="outline" class="h-6.5">
 				<div class="flex items-center">
 					<Icon icon="mdi:pencil" class="mr-1 h-4 w-4" />
 					<span>Edit</span>
 				</div>
 			</Button>
 		{:else if type === 'delete'}
-			<Button
-				onclick={handleDelete}
-				size="sm"
-				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
-			>
+			<Button onclick={handleDelete} size="sm" variant="outline" class="h-6.5">
 				<div class="flex items-center">
 					<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
 					<span>Delete</span>

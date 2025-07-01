@@ -192,7 +192,8 @@
 					}
 				}}
 				size="sm"
-				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+				variant="outline"
+				class="h-6.5"
 			>
 				<div class="flex items-center">
 					<Icon icon="mdi:usb-flash-drive-outline" class="mr-1 h-4 w-4" />
@@ -209,7 +210,8 @@
 					}
 				}}
 				size="sm"
-				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+				variant="outline"
+				class="h-6.5"
 			>
 				<div class="flex items-center">
 					<Icon icon="carbon:ibm-cloud-vpc-block-storage-snapshots" class="mr-1 h-4 w-4" />
@@ -226,7 +228,8 @@
 					}
 				}}
 				size="sm"
-				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+				variant="outline"
+				class="h-6.5"
 			>
 				<div class="flex items-center">
 					<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
@@ -243,7 +246,8 @@
 					}
 				}}
 				size="sm"
-				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+				variant="outline"
+				class="h-6.5"
 			>
 				<div class="flex items-center">
 					<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
@@ -260,7 +264,8 @@
 					}
 				}}
 				size="sm"
-				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+				variant="outline"
+				class="h-6.5"
 			>
 				<div class="flex items-center">
 					<Icon icon="mdi:pencil" class="mr-1 h-4 w-4" />
@@ -295,7 +300,8 @@
 						modals.bulk.delete.title = title;
 					}}
 					size="sm"
-					class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+					variant="outline"
+					class="h-6.5"
 				>
 					<div class="flex items-center">
 						<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />

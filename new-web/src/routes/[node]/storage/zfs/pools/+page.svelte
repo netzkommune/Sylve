@@ -178,7 +178,8 @@
 						modals.status.open = true;
 					}}
 					size="sm"
-					class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+					variant="outline"
+					class="h-6.5"
 				>
 					<div class="flex items-center">
 						<Icon icon="mdi:eye" class="mr-1 h-4 w-4" />
@@ -203,7 +204,8 @@
 							}
 						}}
 						size="sm"
-						class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+						variant="outline"
+						class="h-6.5"
 						disabled={scrubbing}
 						title={scrubbing ? 'A scrub is already in progress' : ''}
 					>
@@ -221,7 +223,8 @@
 						modals.edit.open = true;
 					}}
 					size="sm"
-					class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+					variant="outline"
+					class="h-6.5"
 					disabled={replacing || scrubbing}
 					title={replacing || scrubbing
 						? 'Please wait for the scrub/replace operation to finish'
@@ -240,7 +243,8 @@
 						modals.delete.open = true;
 					}}
 					size="sm"
-					class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+					variant="outline"
+					class="h-6.5"
 					disabled={replacing}
 					title={replacing ? 'Please wait for the current replace operation to finish' : ''}
 				>

@@ -144,7 +144,8 @@
 		<Button
 			onclick={() => activeRow !== null && viewInterface(activeRow[0]?.name)}
 			size="sm"
-			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+			variant="outline"
+			class="h-6.5"
 		>
 			<Icon icon="mdi:eye" class="mr-1 h-4 w-4" />
 			{'View'}

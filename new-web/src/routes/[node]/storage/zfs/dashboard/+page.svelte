@@ -124,24 +124,28 @@
 		}
 	}
 
-	let comboBoxes = $derived({
-		poolUsage: {
-			open: false,
-			value: pools[0]?.name || '',
-			data: pools.map((pool) => ({
-				value: pool.name,
-				label: pool.name
-			}))
-		}
+	let poolState = $state({
+		poolUsageOpen: false,
+		poolUsageValue: pools[0]?.name || ''
+	});
+
+	let comboBoxData = $derived({
+		poolUsage: pools.map((pool) => ({
+			value: pool.name,
+			label: pool.name
+		}))
 	});
 
 	let pieCharts = $derived.by(() => {
 		return {
 			poolUsage: {
-				data: getPoolUsagePieData(pools, comboBoxes.poolUsage.value)
+				data: getPoolUsagePieData(pools, poolState.poolUsageValue)
 			}
 		};
 	});
+
+	$inspect('pool usage', comboBoxData);
+	$inspect('pie charts', pieCharts);
 </script>
 
 {#snippet card(type: string)}
@@ -169,5 +173,46 @@
 				{@render card(type)}
 			</div>
 		{/each}
+	</div>
+
+	<div class="flex flex-wrap gap-4">
+		{#if pools.length > 0}
+			<div
+				class="mt-3 flex h-[310px] min-h-[200px] w-[300px] min-w-[280px] resize flex-col overflow-auto"
+			>
+				<Card.Root class="flex flex-1 flex-col ">
+					<Card.Header>
+						<Card.Title class="mb-[-100px]">
+							<div class="flex w-full items-center justify-between">
+								<div class="flex items-center">
+									<Icon icon="mdi:data-usage" class="mr-2" />
+									<span class="text-sm font-bold md:text-lg xl:text-xl">Pool Usage</span>
+								</div>
+								<CustomComboBox
+									bind:open={poolState.poolUsageOpen}
+									label=""
+									bind:value={poolState.poolUsageValue}
+									data={comboBoxData.poolUsage}
+									classes=""
+									placeholder="Select a pool"
+									width="w-48"
+									disallowEmpty={true}
+								/>
+							</div>
+						</Card.Title>
+					</Card.Header>
+
+					<Card.Content class="flex-1 overflow-hidden">
+						<div class="mt-4 flex h-full items-center justify-center">
+							<PieChart
+								containerClass="h-full w-full rounded"
+								data={pieCharts.poolUsage.data}
+								formatter={'size-formatter'}
+							/>
+						</div>
+					</Card.Content>
+				</Card.Root>
+			</div>
+		{/if}
 	</div>
 </div>

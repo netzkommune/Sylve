@@ -96,8 +96,10 @@
 				variant="outline"
 				class="h-6.5"
 			>
-				<Icon icon="wpf:disconnected" class="mr-1 h-4 w-4" />
-				Enable Passthrough
+				<div class="flex items-center">
+					<Icon icon="wpf:disconnected" class="mr-1 h-4 w-4" />
+					<span>Enable Passthrough</span>
+				</div>
 			</Button>
 		{/if}
 
@@ -108,8 +110,10 @@
 				variant="outline"
 				class="h-6.5"
 			>
-				<Icon icon="wpf:connected" class="mr-1 h-4 w-4" />
-				Disable Passthrough
+				<div class="flex items-center">
+					<Icon icon="wpf:connected" class="mr-1 h-4 w-4" />
+					<span>Disable Passthrough</span>
+				</div>
 			</Button>
 		{/if}
 	{/if}

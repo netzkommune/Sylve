@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { revokeJWT } from '$lib/api/auth';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
@@ -7,8 +7,6 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
-	import { hostname, language as langStore } from '$lib/stores/basic';
-	import { getTranslation } from '$lib/utils/i18n';
 	import Icon from '@iconify/svelte';
 	import { mode } from 'mode-watcher';
 	import { onDestroy, onMount } from 'svelte';
@@ -33,7 +31,7 @@
 	let loading = $state(false);
 
 	$effect(() => {
-		if ($page.url.search.includes('loggedOut')) {
+		if (page.url.search.includes('loggedOut')) {
 			revokeJWT();
 		}
 	});
@@ -62,8 +60,10 @@
 		window.removeEventListener('keydown', handleKeydown);
 	});
 
-	const authTypeValue = $derived(getTranslation(`auth.${authType}`, authType));
-	const languageValue = $derived(getTranslation(`common.languages.${language}`, language));
+	let languageArr = [
+		{ value: 'en', label: 'English' },
+		{ value: 'mal', label: 'മലയാളം' }
+	];
 </script>
 
 <div class="fixed inset-0 flex items-center justify-center px-3">
@@ -105,7 +105,11 @@
 				<Label for="realm" class="w-44">Realm</Label>
 				<Select.Root type="single" bind:value={authType}>
 					<Select.Trigger class="h-8 w-full">
-						{authTypeValue}
+						{#if authType === 'pam'}
+							PAM
+						{:else if authType === 'sylve'}
+							Sylve
+						{/if}
 					</Select.Trigger>
 					<Select.Content>
 						<Select.Item value="pam">PAM</Select.Item>
@@ -114,11 +118,11 @@
 				</Select.Root>
 			</div>
 
-			<div class="flex items-center gap-2">
+			<div class="flex items-center gap-2" title="Language selection is disabled for now">
 				<Label for="language" class="w-44">Language</Label>
-				<Select.Root type="single" bind:value={language}>
+				<Select.Root type="single" bind:value={language} disabled>
 					<Select.Trigger class="h-8 w-full">
-						{languageValue}
+						{languageArr.find((lang) => lang.value === language)?.label || 'Select Language'}
 					</Select.Trigger>
 					<Select.Content>
 						<Select.Item value="en">English</Select.Item>

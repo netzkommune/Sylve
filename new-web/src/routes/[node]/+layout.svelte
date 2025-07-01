@@ -6,12 +6,9 @@
 	import * as Resizable from '$lib/components/ui/resizable';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 	import { hostname } from '$lib/stores/basic';
-	import { getTranslation } from '$lib/utils/i18n';
 	import { triggers } from '$lib/utils/keyboard-shortcuts';
-	import { capitalizeFirstLetter } from '$lib/utils/string';
 	import { shortcut, type ShortcutTrigger } from '@svelte-put/shortcut';
 	import CircleHelp from 'lucide-svelte/icons/circle-help';
-	import { onMount } from 'svelte';
 
 	let openCategories: { [key: string]: boolean } = $state({});
 
@@ -177,9 +174,15 @@
 <div class="flex h-full w-full flex-col">
 	<div class="flex h-10 w-full items-center justify-between border-b p-2">
 		<p>Datacenter</p>
-		<Button size="sm" class="h-6 ">
-			<CircleHelp class="mr-2 h-3 w-3" />
-			Help
+		<Button
+			size="sm"
+			class="h-6"
+			onclick={() => (window.location.href = 'https://github.com/AlchemillaHQ/Sylve')}
+		>
+			<div class="flex items-center">
+				<CircleHelp class="mr-2 h-5 w-5" />
+				<span>Help</span>
+			</div>
 		</Button>
 	</div>
 

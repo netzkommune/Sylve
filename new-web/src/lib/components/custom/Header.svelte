@@ -6,7 +6,7 @@
 	import { openTerminal, terminalStore } from '$lib/stores/terminal.svelte';
 	import Icon from '@iconify/svelte';
 	import { mode, toggleMode } from 'mode-watcher';
-	import CreateVM from './CreateVM/CreateVM.svelte';
+	import CreateVM from './VM/Create/CreateVM.svelte';
 
 	let menuData = $state({
 		createVM: {

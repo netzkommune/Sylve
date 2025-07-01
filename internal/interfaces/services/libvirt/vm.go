@@ -119,9 +119,19 @@ type Input struct {
 	Bus  string `xml:"bus,attr"`
 }
 
+type Address struct {
+	Type     string `xml:"type,attr,omitempty"`
+	Domain   string `xml:"domain,attr,omitempty"`
+	Bus      string `xml:"bus,attr,omitempty"`
+	Slot     string `xml:"slot,attr,omitempty"`
+	Function string `xml:"function,attr,omitempty"`
+}
+
 type Controller struct {
-	Type  string `xml:"type,attr"`
-	Model string `xml:"model,attr"`
+	Type    string   `xml:"type,attr"`
+	Index   *int     `xml:"index,attr,omitempty"`
+	Model   string   `xml:"model,attr,omitempty"`
+	Address *Address `xml:"address,omitempty"`
 }
 
 type Devices struct {

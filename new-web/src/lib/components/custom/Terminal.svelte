@@ -174,8 +174,6 @@
 			});
 		}
 	});
-
-	$inspect('terminal store', $terminalStore);
 </script>
 
 <svelte:window bind:innerWidth />

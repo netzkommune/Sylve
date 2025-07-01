@@ -167,7 +167,7 @@
 			{
 				field: 'cpuUsage',
 				label: 'CPU Usage',
-				color: 'var(--chart-1)',
+				color: 'chart-1',
 				data: cpuInfoHistorical
 					.map((data) => ({
 						date: new Date(data.createdAt),
@@ -178,7 +178,7 @@
 			{
 				field: 'ioDelay',
 				label: 'I/O Delay',
-				color: 'var(--chart-2)',
+				color: 'chart-2',
 				data: ioDelayHistorical
 					.map((data) => ({
 						date: new Date(data.createdAt),
@@ -189,7 +189,7 @@
 			{
 				field: 'ramUsage',
 				label: 'RAM Usage',
-				color: 'var(--chart-3)',
+				color: 'chart-3',
 				data: ramInfoHistorical
 					.map((data) => ({
 						date: new Date(data.createdAt),
@@ -200,7 +200,7 @@
 			{
 				field: 'swapUsage',
 				label: 'Swap Usage',
-				color: 'var(--chart-4)',
+				color: 'chart-4',
 				data: swapInfoHistorical
 					.map((data) => ({
 						date: new Date(data.createdAt),
@@ -211,7 +211,7 @@
 			{
 				field: 'networkUsageRx',
 				label: 'Network RX',
-				color: 'var(--chart-1)',
+				color: 'chart-1',
 				data: networkUsageHistorical
 					.map((data) => ({
 						date: new Date(data.createdAt),
@@ -222,7 +222,7 @@
 			{
 				field: 'networkUsageTx',
 				label: 'Network TX',
-				color: 'var(--chart-4)',
+				color: 'chart-4',
 				data: networkUsageHistorical
 					.map((data) => ({
 						date: new Date(data.createdAt),

@@ -1871,22 +1871,22 @@ msgstr "Enable Passthrough"
 msgid "Disable Passthrough"
 msgstr "Disable Passthrough"
 
-#: src/lib/components/custom/TreeTable/Search.svelte
-msgid "Search..."
-msgstr "Search..."
+#: src/lib/components/custom/Charts/Area.svelte
+msgid "Chart Demo"
+msgstr "Chart Demo"
 
-#: src/routes/[node]/notes/+page.svelte
-msgid "Failed to delete note"
-msgstr "Failed to delete note"
+#: src/lib/components/custom/Charts/Area.svelte
+msgid "Reset Zoom"
+msgstr "Reset Zoom"
 
-#: src/routes/[node]/notes/+page.svelte
-msgid "Failed to delete notes"
-msgstr "Failed to delete notes"
+#: src/lib/components/custom/Charts/Area.svelte
+msgid "sdf"
+msgstr "sdf"
 
-#: src/routes/[node]/utilities/downloader/+page.svelte
-msgid "Failed to delete download"
-msgstr "Failed to delete download"
+#: src/lib/components/custom/Charts/Area.svelte
+msgid "<0/> Reset"
+msgstr "<0/> Reset"
 
-#: src/routes/[node]/utilities/downloader/+page.svelte
-msgid "Failed to delete downloads"
-msgstr "Failed to delete downloads"
+#: src/lib/components/custom/Charts/Area.svelte
+msgid "<0/> Reset zoom"
+msgstr "<0/> Reset zoom"

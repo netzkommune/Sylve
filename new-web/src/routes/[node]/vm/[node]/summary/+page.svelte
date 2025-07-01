@@ -198,7 +198,7 @@
 		return {
 			field: 'cpuUsage',
 			label: 'CPU Usage',
-			color: 'var(--chart-1)',
+			color: 'chart-1',
 			data: stats
 				.map((data) => ({
 					date: new Date(data.createdAt),
@@ -212,7 +212,7 @@
 		return {
 			field: 'memoryUsage',
 			label: 'Memory Usage',
-			color: 'var(--chart-2)',
+			color: 'chart-2',
 			data: stats
 				.map((data) => ({
 					date: new Date(data.createdAt),

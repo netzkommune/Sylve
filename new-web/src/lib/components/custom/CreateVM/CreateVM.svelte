@@ -234,9 +234,9 @@
 
 <Dialog.Root bind:open>
 	<Dialog.Content
-		class="fixed left-1/2 top-1/2 flex h-[85vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform flex-col gap-0 overflow-auto p-0 transition-all duration-300 ease-in-out lg:h-[72vh] lg:max-w-2xl"
+		class="fixed left-1/2 top-1/2 flex h-[85vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform flex-col gap-0  overflow-auto p-5 transition-all duration-300 ease-in-out lg:h-[72vh] lg:max-w-2xl"
 	>
-		<div class="flex items-center justify-between px-4 py-3">
+		<div class="flex items-center justify-between">
 			<Dialog.Header class="p-0">
 				<Dialog.Title class="flex flex-col gap-1 text-left">
 					<div class="flex items-center gap-2">
@@ -276,7 +276,8 @@
 				</Button>
 			</div>
 		</div>
-		<div class="flex-1 overflow-y-auto px-4 py-3">
+
+		<div class="mt-5 flex-1 overflow-y-auto">
 			<Tabs.Root value="basic" class="w-full overflow-hidden">
 				<Tabs.List class="grid w-full grid-cols-5 p-0 ">
 					{#each tabs as { value, label }}
@@ -339,8 +340,8 @@
 			</Tabs.Root>
 		</div>
 
-		<Dialog.Footer class="px-4 py-3">
-			<div class="flex w-full justify-end px-1 py-3 md:flex-row">
+		<Dialog.Footer>
+			<div class="flex w-full justify-end md:flex-row">
 				<Button size="sm" type="button" class="h-8" onclick={() => create()}
 					>Create Virtual Machine</Button
 				>

@@ -12,6 +12,7 @@
 			label?: string;
 		};
 		onChange: (value: string) => void;
+		disabled?: boolean;
 	}
 
 	let {
@@ -20,7 +21,8 @@
 		options,
 		classes = { parent: 'flex-1 space-y-1', label: 'w-24 whitespace-nowrap text-sm' },
 		value = $bindable(),
-		onChange
+		onChange,
+		disabled = false
 	}: Props = $props();
 </script>
 
@@ -32,6 +34,7 @@
 		onValueChange={() => {
 			onChange(value);
 		}}
+		{disabled}
 	>
 		<Select.Trigger class="w-full">
 			{value ? options.find((o) => o.value === value)?.label : placeholder}

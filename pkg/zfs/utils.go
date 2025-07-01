@@ -76,6 +76,13 @@ func (d *Dataset) parseProps(out [][]string) error {
 	if err = setUint(&d.Volsize, d.props["volsize"]); err != nil {
 		return err
 	}
+
+	if d.props["volblock"] != "" && d.props["volblock"] != "-" {
+		if err = setUint(&d.VolBlockSize, d.props["volblock"]); err != nil {
+			return err
+		}
+	}
+
 	if err = setUint(&d.Quota, d.props["quota"]); err != nil {
 		return err
 	}

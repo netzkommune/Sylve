@@ -11,6 +11,7 @@ export const DatasetSchema = z.object({
 	type: z.string(),
 	written: z.number(),
 	volsize: z.number(),
+	volblocksize: z.number(),
 	logicalused: z.number(),
 	usedbydataset: z.number(),
 	quota: z.number(),

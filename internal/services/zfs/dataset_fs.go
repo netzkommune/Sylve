@@ -47,6 +47,29 @@ func (s *Service) CreateFilesystem(name string, props map[string]string) error {
 	return fmt.Errorf("failed to create filesystem %s", name)
 }
 
+func (s *Service) EditFilesystem(guid string, props map[string]string) error {
+	s.syncMutex.Lock()
+	defer s.syncMutex.Unlock()
+
+	datasets, err := zfs.Datasets("")
+	if err != nil {
+		return err
+	}
+
+	for _, dataset := range datasets {
+		property, err := dataset.GetProperty("guid")
+		if err != nil {
+			return err
+		}
+
+		if property == guid {
+			return zfs.EditFilesystem(dataset.Name, props)
+		}
+	}
+
+	return fmt.Errorf("filesystem with guid %s not found", guid)
+}
+
 func (s *Service) DeleteFilesystem(guid string) error {
 	s.syncMutex.Lock()
 	defer s.syncMutex.Unlock()

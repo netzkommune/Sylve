@@ -70,6 +70,16 @@ export async function createFileSystem(
 	});
 }
 
+export async function editFileSystem(
+	guid: string,
+	properties: Record<string, string>
+): Promise<APIResponse> {
+	return await apiRequest(`/zfs/datasets/filesystem`, APIResponseSchema, 'PATCH', {
+		guid: guid,
+		properties: properties
+	});
+}
+
 export async function deleteFileSystem(dataset: Dataset): Promise<APIResponse> {
 	return await apiRequest(
 		`/zfs/datasets/filesystem/${dataset.properties.guid}`,
@@ -94,6 +104,16 @@ export async function createVolume(
 		name: name,
 		parent: parent,
 		properties: props
+	});
+}
+
+export async function editVolume(
+	dataset: Dataset,
+	properties: Record<string, string>
+): Promise<APIResponse> {
+	return await apiRequest('/zfs/datasets/volume', APIResponseSchema, 'PATCH', {
+		name: dataset.name,
+		properties: properties
 	});
 }
 

@@ -257,7 +257,8 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 			size: 0,
 			referenced: '-',
 			guid: undefined,
-			children: []
+			children: [],
+			type: 'pool'
 		};
 
 		poolRow.size = group.pool?.size;
@@ -271,7 +272,8 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 					size: vol.volsize,
 					referenced: vol.referenced,
 					guid: vol.properties?.guid,
-					children: []
+					children: [],
+					type: 'volume'
 				};
 
 				const snapshots = group.snapshots.filter((snap) => snap.name.startsWith(vol.name + '@'));
@@ -282,7 +284,8 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 						size: snap.used,
 						referenced: snap.referenced,
 						guid: snap.properties?.guid,
-						children: []
+						children: [],
+						type: 'snapshot'
 					}))
 				);
 

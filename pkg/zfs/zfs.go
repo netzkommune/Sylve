@@ -44,8 +44,10 @@ type ZFS interface {
 	Datasets(filter string) ([]*Dataset, error)
 	GetDataset(name string) (*Dataset, error)
 	CreateFilesystem(name string, properties map[string]string) (*Dataset, error)
+	EditFilesystem(name string, props map[string]string) error
 	Filesystems(filter string) ([]*Dataset, error)
 	CreateVolume(name string, size uint64, properties map[string]string) (*Dataset, error)
+	EditVolume(name string, props map[string]string) error
 	Volumes(filter string) ([]*Dataset, error)
 	Snapshots(filter string) ([]*Dataset, error)
 	ReceiveSnapshot(input io.Reader, name string, force ...bool) (*Dataset, error)
@@ -152,6 +154,37 @@ func (z *zfs) CreateVolume(name string, size uint64, properties map[string]strin
 	return z.GetDataset(name)
 }
 
+func (z *zfs) EditVolume(name string, props map[string]string) error {
+	dataset, err := z.GetDataset(name)
+	if err != nil {
+		return fmt.Errorf("error_getting_dataset: %w", err)
+	}
+
+	if props == nil || len(props) == 0 {
+		return fmt.Errorf("no_properties_to_edit")
+	}
+
+	if _, ok := props["encryptionKey"]; ok {
+		delete(props, "encryptionKey")
+	}
+
+	if _, ok := props["quota"]; ok {
+		if props["quota"] == "" {
+			delete(props, "quota")
+		}
+	}
+
+	var keyValPairs []string
+	for k, v := range props {
+		keyValPairs = append(keyValPairs, k, v)
+	}
+	if err := dataset.SetProperties(keyValPairs...); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // https://openzfs.github.io/openzfs-docs/man/7/zfsprops.7.html.
 func (z *zfs) CreateFilesystem(name string, properties map[string]string) (*Dataset, error) {
 	args := make([]string, 1, 4)
@@ -196,4 +229,35 @@ func (z *zfs) CreateFilesystem(name string, properties map[string]string) (*Data
 		return nil, err
 	}
 	return z.GetDataset(name)
+}
+
+func (z *zfs) EditFilesystem(name string, props map[string]string) error {
+	dataset, err := z.GetDataset(name)
+	if err != nil {
+		return fmt.Errorf("error_getting_dataset: %w", err)
+	}
+
+	if props == nil || len(props) == 0 {
+		return fmt.Errorf("no_properties_to_edit")
+	}
+
+	if _, ok := props["encryptionKey"]; ok {
+		delete(props, "encryptionKey")
+	}
+
+	if _, ok := props["quota"]; ok {
+		if props["quota"] == "" {
+			delete(props, "quota")
+		}
+	}
+
+	var keyValPairs []string
+	for k, v := range props {
+		keyValPairs = append(keyValPairs, k, v)
+	}
+	if err := dataset.SetProperties(keyValPairs...); err != nil {
+		return err
+	}
+
+	return nil
 }

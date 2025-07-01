@@ -19,6 +19,7 @@ type Dataset struct {
 	Type          string `json:"type"`
 	Written       uint64 `json:"written"`
 	Volsize       uint64 `json:"volsize"`
+	VolBlockSize  uint64 `json:"volblocksize"`
 	Logicalused   uint64 `json:"logicalused"`
 	Usedbydataset uint64 `json:"usedbydataset"`
 	Quota         uint64 `json:"quota"`

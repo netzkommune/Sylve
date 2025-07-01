@@ -102,3 +102,19 @@ export function isValidPoolName(name: string): boolean {
 
 	return true;
 }
+
+export function isValidDatasetName(name: string): boolean {
+	if (!name || typeof name !== 'string') return false;
+	if (name.length > 255) return false;
+	if (/[^\x21-\x7E]/.test(name)) return false;
+	if (name.includes('%') || name.includes(' ')) return false;
+
+	const components = name.split('/');
+	for (const comp of components) {
+		if (!comp) return false;
+		if (!/^[a-zA-Z0-9_.-]+$/.test(comp)) return false;
+		if (comp.startsWith('.') || comp.startsWith('-')) return false;
+	}
+
+	return true;
+}

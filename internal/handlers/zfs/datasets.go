@@ -37,10 +37,20 @@ type CreateFilesystemRequest struct {
 	Properties map[string]string `json:"properties"`
 }
 
+type EditFilesystemRequest struct {
+	GUID       string            `json:"guid" binding:"required"`
+	Properties map[string]string `json:"properties" binding:"required"`
+}
+
 type CreateVolumeRequest struct {
 	Name       string            `json:"name" binding:"required"`
 	Parent     string            `json:"parent" binding:"required"`
 	Properties map[string]string `json:"properties"`
+}
+
+type EditVolumeRequest struct {
+	Name       string            `json:"name" binding:"required"`
+	Properties map[string]string `json:"properties" binding:"required"`
 }
 
 type RollbackSnapshotRequest struct {
@@ -378,6 +388,51 @@ func CreateFilesystem(zfsService *zfs.Service) gin.HandlerFunc {
 	}
 }
 
+// @Summary Edit a ZFS filesystem
+// @Description Edit a ZFS filesystem
+// @Tags ZFS
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body EditFilesystemRequest true "Edit Filesystem Request"
+// @Success 200 {object} internal.APIResponse[any] "OK"
+// @Failure 400 {object} internal.APIResponse[any] "Bad Request"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /zfs/datasets/filesystem [patch]
+func EditFilesystem(zfsService *zfs.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var request EditFilesystemRequest
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		err := zfsService.EditFilesystem(request.GUID, request.Properties)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "edited_filesystem",
+			Error:   "",
+			Data:    nil,
+		})
+	}
+}
+
 // @Summary Delete a ZFS filesystem
 // @Description Delete a ZFS filesystem
 // @Tags ZFS
@@ -451,6 +506,51 @@ func CreateVolume(zfsService *zfs.Service) gin.HandlerFunc {
 		c.JSON(http.StatusOK, internal.APIResponse[any]{
 			Status:  "success",
 			Message: "created_volume",
+			Error:   "",
+			Data:    nil,
+		})
+	}
+}
+
+// @Summary Edit a ZFS volume
+// @Description Edit a ZFS volume
+// @Tags ZFS
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body EditVolumeRequest true "Edit Volume Request"
+// @Success 200 {object} internal.APIResponse[any] "OK"
+// @Failure 400 {object} internal.APIResponse[any] "Bad Request"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /zfs/datasets/volume [patch]
+func EditVolume(zfsService *zfs.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var request EditVolumeRequest
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		err := zfsService.EditVolume(request.Name, request.Properties)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "edited_volume",
 			Error:   "",
 			Data:    nil,
 		})

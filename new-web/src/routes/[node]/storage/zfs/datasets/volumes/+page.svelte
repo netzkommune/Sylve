@@ -1,42 +1,26 @@
 <script lang="ts">
 	import { getDownloads } from '$lib/api/utilities/downloader';
-	import {
-		bulkDelete,
-		createSnapshot,
-		createVolume,
-		deleteSnapshot,
-		deleteVolume,
-		flashVolume,
-		getDatasets
-	} from '$lib/api/zfs/datasets';
+	import { bulkDelete, deleteVolume, getDatasets } from '$lib/api/zfs/datasets';
 	import { getPools } from '$lib/api/zfs/pool';
 	import AlertDialogModal from '$lib/components/custom/Dialog/Alert.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import Search from '$lib/components/custom/TreeTable/Search.svelte';
+	import CreateSnapshot from '$lib/components/custom/ZFS/datasets/snapshots/Create.svelte';
+	import DeleteSnapshot from '$lib/components/custom/ZFS/datasets/snapshots/Delete.svelte';
+	import CreateVolume from '$lib/components/custom/ZFS/datasets/volumes/Create.svelte';
+	import EditVolume from '$lib/components/custom/ZFS/datasets/volumes/Edit.svelte';
+	import FlashFile from '$lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import CustomComboBox from '$lib/components/ui/custom-input/combobox.svelte';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import Input from '$lib/components/ui/input/input.svelte';
-	import Label from '$lib/components/ui/label/label.svelte';
-	import * as Select from '$lib/components/ui/select/index.js';
 	import type { Column, Row } from '$lib/types/components/tree-table';
 	import type { Download } from '$lib/types/utilities/downloader';
 	import type { Dataset, GroupedByPool } from '$lib/types/zfs/dataset';
 	import type { Zpool } from '$lib/types/zfs/pool';
-	import { sleep } from '$lib/utils';
-	import { updateCache } from '$lib/utils/http';
-	import { getTranslation } from '$lib/utils/i18n';
-	import { isValidSize } from '$lib/utils/numbers';
-	import { capitalizeFirstLetter, generatePassword } from '$lib/utils/string';
-	import { getISOs } from '$lib/utils/utilities/downloader';
-	import { isValidPoolName } from '$lib/utils/zfs';
+	import { handleAPIError, updateCache } from '$lib/utils/http';
 	import { groupByPool } from '$lib/utils/zfs/dataset/dataset';
-	import { createVolProps, generateTableData, handleError } from '$lib/utils/zfs/dataset/volume';
+	import { generateTableData } from '$lib/utils/zfs/dataset/volume';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
-	import humanFormat from 'human-format';
-
-	import { toast, Toaster } from 'svelte-sonner';
+	import { toast } from 'svelte-sonner';
 
 	interface Data {
 		pools: Zpool[];
@@ -49,22 +33,28 @@
 
 	const results = useQueries([
 		{
-			queryKey: ['poolList'],
+			queryKey: ['pools'],
 			queryFn: async () => {
 				return await getPools();
 			},
 			refetchInterval: 1000,
 			keepPreviousData: false,
-			initialData: data.pools
+			initialData: data.pools,
+			onSuccess: (data: Zpool[]) => {
+				updateCache('pools', data);
+			}
 		},
 		{
-			queryKey: ['datasetList'],
+			queryKey: ['datasets'],
 			queryFn: async () => {
 				return await getDatasets();
 			},
 			refetchInterval: 1000,
 			keepPreviousData: false,
-			initialData: data.datasets
+			initialData: data.datasets,
+			onSuccess: (data: Dataset[]) => {
+				updateCache('datasets', data);
+			}
 		},
 		{
 			queryKey: ['downloads'],
@@ -80,18 +70,46 @@
 		}
 	]);
 
+	let pools: Zpool[] = $derived($results[0].data as Zpool[]);
 	let downloads = $derived($results[2].data as Download[]);
 	let grouped: GroupedByPool[] = $derived(groupByPool($results[0].data, $results[1].data));
 	let table: {
 		rows: Row[];
 		columns: Column[];
 	} = $derived(generateTableData(grouped));
-	let activeRows: Row[] | null = $state(null);
-	let activeRow: Row | null = $derived(activeRows ? (activeRows[0] as Row) : ({} as Row));
 
+	let activeRows = $state<Row[] | null>(null);
+	let activeRow: Row | null = $derived(activeRows ? (activeRows[0] as Row) : ({} as Row));
 	let activePool: Zpool | null = $derived.by(() => {
 		const pool = $results[0].data?.find((pool) => pool.name === activeRow?.name);
 		return pool ?? null;
+	});
+
+	let activeDatasets: Dataset[] = $derived.by(() => {
+		if (activeRows) {
+			let datasets: Dataset[] = [];
+			for (const row of activeRows) {
+				for (const dataset of grouped) {
+					const volumes = dataset.volumes;
+					const snapshots = dataset.snapshots;
+
+					for (const vol of volumes) {
+						if (vol.name === row.name) {
+							datasets.push(vol);
+						}
+					}
+
+					for (const snap of snapshots) {
+						if (snap.name === row.name) {
+							datasets.push(snap);
+						}
+					}
+				}
+			}
+			return datasets;
+		}
+
+		return [];
 	});
 
 	let activeVolume: Dataset | null = $derived.by(() => {
@@ -101,18 +119,6 @@
 		return volume ?? null;
 	});
 
-	let isPoolSelected: boolean = $derived.by(() => {
-		if (activeRows && activeRows.length > 0) {
-			for (const row of activeRows) {
-				if (row.guid === undefined) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	});
-
 	let activeVolumes: Dataset[] = $derived.by(() => {
 		if (activeRows && activeRows.length > 0) {
 			const volumes = $results[1].data?.filter((volume) => volume.type === 'volume');
@@ -120,7 +126,6 @@
 				volumes?.filter((volume) => activeRows?.some((row) => row.name.endsWith(volume.name))) ?? []
 			);
 		}
-
 		return [];
 	});
 
@@ -131,294 +136,50 @@
 		return snapshot ?? null;
 	});
 
-	type props = {
-		checksum: string;
-		compression: string;
-		dedup: string;
-		encryption: string;
-		volblocksize: string;
-		primarycache: string;
-		volmode: string;
-	};
+	let poolsSelected = $derived.by(() => {
+		if (activeRows && activeRows.length > 0) {
+			const filtered = activeRows.filter((row) => {
+				return row.type === 'pool';
+			});
 
-	let confirmModals = $state({
-		active: '' as
-			| 'createVolume'
-			| 'deleteVolume'
-			| 'deleteSnapshot'
-			| 'createSnapshot'
-			| 'deleteVolumes'
-			| 'flashFile',
-		parent: '',
-		createVolume: {
-			open: false,
-			data: {
-				name: '',
-				properties: {
-					parent: '',
-					checksum: 'on',
-					compression: 'on',
-					dedup: 'off',
-					encryption: 'off',
-					encryptionKey: '',
-					volblocksize: '16384',
-					size: '',
-					primarycache: 'all',
-					volmode: 'dev'
-				}
+			return filtered.length > 0;
+		}
+
+		return false;
+	});
+
+	let modals = $state({
+		volume: {
+			flash: {
+				open: false
 			},
-			title: ''
-		},
-		deleteVolume: {
-			open: false,
-			data: '',
-			title: ''
-		},
-		deleteSnapshot: {
-			open: false,
-			data: '',
-			title: ''
-		},
-		createSnapshot: {
-			open: false,
-			data: {
-				name: ''
+			delete: {
+				open: false
 			},
-			title: ''
-		},
-		deleteVolumes: {
-			open: false,
-			data: '',
-			title: ''
-		},
-		flashFile: {
-			open: false,
-			loading: false,
-			data: {
-				guid: '',
-				uuid: ''
+			create: {
+				open: false
 			},
-			title: '',
-			combobox: {
+			edit: {
+				open: false
+			}
+		},
+		snapshot: {
+			create: {
+				open: false
+			},
+			delete: {
+				open: false
+			}
+		},
+		bulk: {
+			delete: {
 				open: false,
-				value: '',
-				data: getISOs(downloads, true)
+				title: ''
 			}
 		}
 	});
 
-	let zfsProperties = $state(createVolProps);
-
-	async function closeCreateVolumeModal() {
-		confirmModals.createVolume.open = false;
-		confirmModals.createVolume.data = {
-			name: '',
-			properties: {
-				parent: '',
-				checksum: 'on',
-				compression: 'on',
-				dedup: 'off',
-				encryption: 'off',
-				encryptionKey: '',
-				volblocksize: '16384',
-				size: '',
-				primarycache: 'all',
-				volmode: 'dev'
-			}
-		};
-		confirmModals.createVolume.title = '';
-	}
-
-	async function confirmAction() {
-		if (confirmModals.active === 'createVolume') {
-			if (!isValidPoolName(confirmModals.createVolume.data.name)) {
-				toast.error(
-					capitalizeFirstLetter(
-						getTranslation('zfs.datasets.invalid_volume_name', 'invalid volume name')
-					),
-					{
-						position: 'bottom-center'
-					}
-				);
-				return;
-			}
-
-			if (!confirmModals.createVolume.data.properties.parent) {
-				toast.error(
-					capitalizeFirstLetter(
-						getTranslation('zfs.datasets.no_parent_selected', 'No parent selected')
-					),
-					{
-						position: 'bottom-center'
-					}
-				);
-				return;
-			}
-
-			if (confirmModals.createVolume.data.properties.encryption !== 'off') {
-				if (confirmModals.createVolume.data.properties.encryptionKey === '') {
-					toast.error(
-						capitalizeFirstLetter(
-							getTranslation('zfs.datasets.encryption_key_required', 'Encryption key is required')
-						),
-						{
-							position: 'bottom-center'
-						}
-					);
-					return;
-				}
-			}
-
-			if (!isValidSize(confirmModals.createVolume.data.properties.size)) {
-				toast.error(
-					capitalizeFirstLetter(
-						getTranslation('zfs.datasets.invalid_volume_size', 'Invalid volume size')
-					),
-					{
-						position: 'bottom-center'
-					}
-				);
-				return;
-			}
-
-			const parentSize = grouped.find(
-				(group) => group.pool.name === confirmModals.createVolume.data.properties.parent
-			)?.pool.free;
-
-			if (!parentSize) {
-				toast.error(
-					capitalizeFirstLetter(
-						getTranslation('zfs.datasets.parent_not_found', 'Parent not found')
-					),
-					{
-						position: 'bottom-center'
-					}
-				);
-				return;
-			}
-
-			if (humanFormat.parse(confirmModals.createVolume.data.properties.size) > parentSize) {
-				toast.error(
-					capitalizeFirstLetter(
-						getTranslation(
-							'zfs.datasets.vol_size_greater_than_available_space',
-							'volume size is greater than available space'
-						)
-					),
-					{
-						position: 'bottom-center'
-					}
-				);
-			}
-
-			const response = await createVolume(
-				confirmModals.createVolume.data.name,
-				confirmModals.createVolume.data.properties.parent,
-				confirmModals.createVolume.data.properties
-			);
-
-			if (response.error) {
-				handleError(response);
-				return;
-			}
-
-			let n = `${confirmModals.createVolume.data.properties.parent}/${confirmModals.createVolume.data.name}`;
-
-			toast.success(
-				`${capitalizeFirstLetter(getTranslation('common.volume', 'volume'))} ${n} ${capitalizeFirstLetter(getTranslation('common.created', 'created'))}`,
-				{
-					position: 'bottom-center'
-				}
-			);
-
-			confirmModals.createVolume.open = false;
-			confirmModals.createVolume.data.name = '';
-			confirmModals.createVolume.data.properties.parent = '';
-			confirmModals.createVolume.data.properties.size = '';
-			confirmModals.createVolume.data.properties.encryptionKey = '';
-			confirmModals.createVolume.data.properties.encryption = 'off';
-			confirmModals.createVolume.data.properties.dedup = 'off';
-			confirmModals.createVolume.data.properties.compression = 'on';
-			confirmModals.createVolume.data.properties.checksum = 'on';
-			confirmModals.createVolume.data.properties.volblocksize = '16384';
-			confirmModals.createVolume.data.properties.primarycache = 'all';
-			confirmModals.createVolume.data.properties.volmode = 'dev';
-		}
-
-		if (confirmModals.active === 'deleteVolume') {
-			if (activeVolume) {
-				const response = await deleteVolume(activeVolume);
-				if (response.error) {
-					confirmModals.deleteVolume.open = false;
-
-					handleError(response);
-					return;
-				}
-
-				toast.success(
-					`${capitalizeFirstLetter(getTranslation('common.volume', 'volume'))} ${activeVolume.name} ${capitalizeFirstLetter(getTranslation('common.deleted', 'deleted'))}`,
-					{
-						position: 'bottom-center'
-					}
-				);
-			}
-		}
-
-		if (confirmModals.active === 'createSnapshot') {
-			if (activeVolume) {
-				const response = await createSnapshot(
-					activeVolume,
-					confirmModals.createSnapshot.data.name,
-					false
-				);
-
-				if (response.error) {
-					handleError(response);
-					return;
-				}
-
-				activeRow = null;
-			}
-		}
-
-		if (confirmModals.active === 'deleteSnapshot') {
-			if (activeSnapshot) {
-				const response = await deleteSnapshot(activeSnapshot);
-				if (response.error) {
-					handleError(response);
-					return;
-				}
-
-				toast.success(
-					`${capitalizeFirstLetter(getTranslation('common.snapshot', 'snapshot'))} ${activeSnapshot.name} ${capitalizeFirstLetter(getTranslation('common.deleted', 'deleted'))}`,
-					{
-						position: 'bottom-center'
-					}
-				);
-			}
-		}
-
-		if (confirmModals.active === 'deleteVolumes') {
-			if (activeVolumes.length > 0) {
-				const response = await bulkDelete(activeVolumes);
-				if (response.error) {
-					handleError(response);
-					return;
-				}
-
-				toast.success(
-					`${capitalizeFirstLetter(getTranslation('common.volumes', 'volumes'))} ${activeVolumes
-						.map((volume) => volume.name)
-						.join(', ')} ${capitalizeFirstLetter(getTranslation('common.deleted', 'deleted'))}`,
-					{
-						position: 'bottom-center'
-					}
-				);
-			}
-		}
-	}
-
-	let query: string = $state('');
+	let query = $state('');
 </script>
 
 {#snippet button(type: string)}
@@ -427,14 +188,7 @@
 			<Button
 				onclick={async () => {
 					if (activeVolume) {
-						confirmModals.active = 'flashFile';
-						confirmModals.parent = 'volume';
-						confirmModals['flashFile'].open = true;
-						confirmModals['flashFile'].title = activeVolume.name;
-						confirmModals['flashFile'].data = {
-							guid: activeVolume.properties.guid || '',
-							uuid: ''
-						};
+						modals.volume.flash.open = true;
 					}
 				}}
 				size="sm"
@@ -451,10 +205,7 @@
 			<Button
 				onclick={async () => {
 					if (activeVolume) {
-						confirmModals.active = 'createSnapshot';
-						confirmModals.parent = 'volume';
-						confirmModals.createSnapshot.open = true;
-						confirmModals.createSnapshot.title = activeVolume.name;
+						modals.snapshot.create.open = true;
 					}
 				}}
 				size="sm"
@@ -469,12 +220,9 @@
 
 		{#if type === 'delete-snapshot' && activeSnapshot?.type === 'snapshot'}
 			<Button
-				onclick={async () => {
+				onclick={() => {
 					if (activeSnapshot) {
-						confirmModals.active = 'deleteSnapshot';
-						confirmModals.parent = 'snapshot';
-						confirmModals.deleteSnapshot.open = true;
-						confirmModals.deleteSnapshot.title = activeSnapshot.name;
+						modals.snapshot.delete.open = true;
 					}
 				}}
 				size="sm"
@@ -489,13 +237,9 @@
 
 		{#if type === 'delete-volume' && activeVolume?.type === 'volume'}
 			<Button
-				onclick={async () => {
-					if (activeRow) {
-						confirmModals.active = 'deleteVolume';
-						confirmModals.parent = 'volume';
-						confirmModals.deleteVolume.open = true;
-						confirmModals.deleteVolume.data = activeRow.name;
-						confirmModals.deleteVolume.title = activeRow.name;
+				onclick={() => {
+					if (activeVolume) {
+						modals.volume.delete.open = true;
 					}
 				}}
 				size="sm"
@@ -507,25 +251,58 @@
 				</div>
 			</Button>
 		{/if}
-	{:else if activeRows && activeRows.length > 1}
-		{#if activeVolumes.length > 0 && type === 'delete-volumes' && !isPoolSelected}
+
+		{#if type === 'edit-volume' && activeVolume?.type === 'volume'}
 			<Button
-				onclick={async () => {
-					if (activeRow) {
-						confirmModals.active = 'deleteVolumes';
-						confirmModals.parent = 'volume';
-						confirmModals.deleteVolumes.open = true;
-						confirmModals.deleteVolumes.title = `${activeVolumes.length} volumes`;
+				onclick={() => {
+					if (activeVolume) {
+						modals.volume.edit.open = true;
 					}
 				}}
 				size="sm"
 				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 			>
 				<div class="flex items-center">
-					<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
-					<span>Delete Volumes</span>
+					<Icon icon="mdi:pencil" class="mr-1 h-4 w-4" />
+					<span>Edit Volume</span>
 				</div>
 			</Button>
+		{/if}
+	{:else if activeRows && activeRows.length > 1}
+		{#if activeDatasets.length > 0 && !poolsSelected}
+			{#if type === 'bulk-delete'}
+				<Button
+					onclick={async () => {
+						let [snapLen, vLen] = [0, 0];
+						activeDatasets.forEach((dataset) => {
+							if (dataset.type === 'snapshot') {
+								snapLen++;
+							} else if (dataset.type === 'volume') {
+								vLen++;
+							}
+						});
+
+						let title = '';
+						if (snapLen > 0 && vLen > 0) {
+							title = `${snapLen} snapshot${snapLen > 1 ? 's' : ''} and ${vLen} volume${vLen > 1 ? 's' : ''}`;
+						} else if (snapLen > 0) {
+							title = `${snapLen} snapshot${snapLen > 1 ? 's' : ''}`;
+						} else if (vLen > 0) {
+							title = `${vLen} volume${vLen > 1 ? 's' : ''}`;
+						}
+
+						modals.bulk.delete.open = true;
+						modals.bulk.delete.title = title;
+					}}
+					size="sm"
+					class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+				>
+					<div class="flex items-center">
+						<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
+						<span>Delete Datasets</span>
+					</div>
+				</Button>
+			{/if}
 		{/if}
 	{/if}
 {/snippet}
@@ -535,21 +312,24 @@
 		<Search bind:query />
 		<Button
 			onclick={() => {
-				confirmModals.active = 'createVolume';
-				confirmModals.createVolume.open = true;
-				confirmModals.createVolume.title = '';
+				modals.volume.create.open = true;
 			}}
 			size="sm"
 			class="h-6"
 		>
-			<Icon icon="gg:add" class="mr-1 h-4 w-4" /> New
+			<div class="flex items-center">
+				<Icon icon="gg:add" class="mr-1 h-4 w-4" />
+				<span>New</span>
+			</div>
 		</Button>
 
 		{@render button('flash-file')}
 		{@render button('create-snapshot')}
 		{@render button('delete-snapshot')}
+		{@render button('edit-volume')}
 		{@render button('delete-volume')}
 		{@render button('delete-volumes')}
+		{@render button('bulk-delete')}
 	</div>
 
 	<TreeTable
@@ -561,421 +341,98 @@
 	/>
 </div>
 
-{#snippet simpleSelect(prop: keyof props, label: string, placeholder: string)}
-	<div class="space-y-1">
-		<Label class="whitespace-nowrap text-sm">{label}</Label>
-		<Select.Root type="single" bind:value={confirmModals.createVolume.data.properties[prop]}>
-			<Select.Trigger class="w-full">
-				{zfsProperties[prop].find(
-					(option) => option.value === confirmModals.createVolume.data.properties[prop]
-				)?.label || confirmModals.createVolume.data.properties[prop]}
-			</Select.Trigger>
-
-			<Select.Content class="max-h-36 overflow-y-auto">
-				<Select.Group>
-					{#each zfsProperties[prop] as option}
-						<Select.Item value={option.value} label={option.label}>{option.label}</Select.Item>
-					{/each}
-				</Select.Group>
-			</Select.Content>
-		</Select.Root>
-	</div>
-{/snippet}
-
-{#if confirmModals.active === 'createVolume'}
-	<Dialog.Root bind:open={confirmModals.createVolume.open}>
-		<Dialog.Content
-			class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-visible overflow-y-auto p-0 transition-all duration-300 ease-in-out lg:max-w-[70%]"
-		>
-			<div class="flex items-center justify-between">
-				<Dialog.Header class="flex justify-between p-4">
-					<Dialog.Title class="flex items-center text-left">
-						<Icon icon="carbon:volume-block-storage" class="mr-2 h-5 w-5" />Create Volume</Dialog.Title
-					>
-				</Dialog.Header>
-				<div class="flex items-center gap-0.5">
-					<Button
-						size="sm"
-						variant="ghost"
-						class="h-8"
-						title={capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}
-						onclick={() => {
-							confirmModals.createVolume.data = {
-								name: '',
-								properties: {
-									parent: '',
-									checksum: 'on',
-									compression: 'on',
-									dedup: 'off',
-									encryption: 'off',
-									encryptionKey: '',
-									volblocksize: '16384',
-									size: '',
-									primarycache: 'all',
-									volmode: 'dev'
-								}
-							};
-							confirmModals.createVolume.title = '';
-						}}
-					>
-						<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
-						<span class="sr-only"
-							>{capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}</span
-						>
-					</Button>
-					<Button
-						size="sm"
-						variant="ghost"
-						class="h-8"
-						title={capitalizeFirstLetter(getTranslation('common.close', 'Close'))}
-						onclick={() => closeCreateVolumeModal()}
-					>
-						<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
-						<span class="sr-only"
-							>{capitalizeFirstLetter(getTranslation('common.close', 'Close'))}</span
-						>
-					</Button>
-				</div>
-			</div>
-
-			<div class="w-full p-4">
-				<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
-					<div class="space-y-1">
-						<Label class="w-24 whitespace-nowrap text-sm">Name</Label>
-						<Input
-							type="text"
-							id="name"
-							placeholder="volume"
-							autocomplete="off"
-							bind:value={confirmModals.createVolume.data.name}
-						/>
-					</div>
-
-					<div class="space-y-1">
-						<Label class="w-24 whitespace-nowrap text-sm">Size</Label>
-						<Input
-							type="text"
-							class="w-full text-left"
-							min="0"
-							bind:value={confirmModals.createVolume.data.properties.size}
-							placeholder="128M"
-						/>
-					</div>
-
-					<div class="space-y-1">
-						<Label class="w-24 whitespace-nowrap text-sm">Parent</Label>
-						<Select.Root
-							type="single"
-							bind:value={confirmModals.createVolume.data.properties.parent}
-						>
-							<Select.Trigger class="w-full">
-								{confirmModals.createVolume.data.properties.parent ||
-									activePool?.name ||
-									'Select Parent'}
-							</Select.Trigger>
-							<Select.Content class="max-h-36 overflow-y-auto">
-								<Select.Group>
-									{#each grouped as group}
-										<Select.Item value={group.pool.name} label={group.pool.name}>
-											{group.pool.name}
-										</Select.Item>
-									{/each}
-								</Select.Group>
-							</Select.Content>
-						</Select.Root>
-					</div>
-
-					{@render simpleSelect('volblocksize', 'Block Size', 'Select block size')}
-					{@render simpleSelect('checksum', 'Checksum', 'Select checksum algorithm')}
-					{@render simpleSelect('compression', 'Compression', 'Select compression type')}
-					{@render simpleSelect('dedup', 'Deduplication', 'Select deduplication mode')}
-					{@render simpleSelect('encryption', 'Encryption', 'Select encryption')}
-
-					{#if confirmModals.createVolume.data.properties.encryption !== 'off'}
-						<div class="space-y-1">
-							<Label class="w-24 whitespace-nowrap text-sm">Passphrase</Label>
-							<div class="flex w-full max-w-sm items-center space-x-2">
-								<Input
-									type="password"
-									id="d-passphrase"
-									placeholder="Enter or generate passphrase"
-									class="w-full"
-									autocomplete="off"
-									bind:value={confirmModals.createVolume.data.properties.encryptionKey}
-									showPasswordOnFocus={true}
-								/>
-
-								<Button
-									onclick={() => {
-										confirmModals.createVolume.data.properties.encryptionKey = generatePassword();
-									}}
-								>
-									<Icon
-										icon="fad:random-2dice"
-										class="h-6 w-6"
-										onclick={() => {
-											confirmModals.createVolume.data.properties.encryptionKey = generatePassword();
-										}}
-									/>
-								</Button>
-							</div>
-						</div>
-					{/if}
-
-					{@render simpleSelect('primarycache', 'Primary Cache', 'Select primary cache mode')}
-					{@render simpleSelect('volmode', 'Volume Mode', 'Select volume mode')}
-				</div>
-			</div>
-
-			<Dialog.Footer>
-				<div class="flex items-center justify-end space-x-4 p-4">
-					<Button
-						size="sm"
-						type="button"
-						class="h-8 w-full "
-						onclick={() => {
-							confirmAction();
-						}}
-					>
-						Create
-					</Button>
-				</div>
-			</Dialog.Footer>
-		</Dialog.Content>
-	</Dialog.Root>
+<!-- Flash File to Volume -->
+{#if modals.volume.flash.open && activeVolume && activeVolume.type === 'volume'}
+	<FlashFile bind:open={modals.volume.flash.open} dataset={activeVolume} {downloads} />
 {/if}
 
-{#if confirmModals.active == 'deleteVolume'}
+<!-- Create Snapshot -->
+{#if modals.snapshot.create.open && activeVolume && activeVolume.type === 'volume'}
+	<CreateSnapshot bind:open={modals.snapshot.create.open} dataset={activeVolume} recursion={true} />
+{/if}
+
+<!-- Delete Snapshot -->
+{#if modals.snapshot.delete.open && activeSnapshot && activeSnapshot.type === 'snapshot'}
+	<DeleteSnapshot
+		bind:open={modals.snapshot.delete.open}
+		dataset={activeSnapshot}
+		askRecursive={false}
+	/>
+{/if}
+
+<!-- Delete Volume -->
+{#if modals.volume.delete.open && activeVolume && activeVolume.type === 'volume'}
 	<AlertDialogModal
-		open={confirmModals.active && confirmModals[confirmModals.active].open}
+		bind:open={modals.volume.delete.open}
 		names={{
 			parent: 'volume',
-			element: confirmModals.active ? confirmModals[confirmModals.active].title || '' : ''
+			element: activeVolume.name
 		}}
 		actions={{
-			onConfirm: () => {
-				if (confirmModals.active) {
-					confirmAction();
+			onConfirm: async () => {
+				if (activeVolume.properties.guid) {
+					const response = await deleteVolume(activeVolume);
+
+					if (response.status === 'success') {
+						toast.success(`Deleted volume ${activeVolume.name}`, {
+							position: 'bottom-center'
+						});
+					} else {
+						handleAPIError(response);
+						toast.error(`Failed to delete volume ${activeVolume.name}`, {
+							position: 'bottom-center'
+						});
+					}
+				} else {
+					toast.error('Volume GUID not found', {
+						position: 'bottom-center'
+					});
 				}
+
+				modals.volume.delete.open = false;
 			},
 			onCancel: () => {
-				if (confirmModals.active) {
-					confirmModals[confirmModals.active].open = false;
-				}
+				modals.volume.delete.open = false;
 			}
 		}}
-	></AlertDialogModal>
+	/>
 {/if}
 
-{#if confirmModals.active == 'deleteVolumes'}
+<!-- Bulk Delete -->
+{#if modals.bulk.delete.open && activeDatasets.length > 0}
 	<AlertDialogModal
-		open={confirmModals.active && confirmModals[confirmModals.active].open}
-		names={{
-			parent: '',
-			element: confirmModals[confirmModals.active].title
-		}}
+		bind:open={modals.bulk.delete.open}
+		customTitle={`This will delete ${modals.bulk.delete.title}. This action cannot be undone.`}
 		actions={{
-			onConfirm: () => {
-				if (confirmModals.active) {
-					confirmAction();
+			onConfirm: async () => {
+				const activeSnapshot = $state.snapshot(activeDatasets);
+				const response = await bulkDelete(activeDatasets);
+				if (response.status === 'success') {
+					toast.success(`Deleted ${activeSnapshot.length} datasets`, {
+						position: 'bottom-center'
+					});
+				} else {
+					handleAPIError(response);
+					toast.error('Failed to delete datasets', {
+						position: 'bottom-center'
+					});
 				}
+
+				modals.bulk.delete.open = false;
 			},
 			onCancel: () => {
-				if (confirmModals.active) {
-					console.log(confirmModals[confirmModals.active]);
-					confirmModals[confirmModals.active].open = false;
-				}
+				modals.bulk.delete.open = false;
 			}
 		}}
-	></AlertDialogModal>
+	/>
 {/if}
 
-{#if confirmModals.active === 'createSnapshot'}
-	<Dialog.Root bind:open={confirmModals.createSnapshot.open}>
-		<Dialog.Content class="p-5">
-			<div class="flex items-center justify-between">
-				<Dialog.Header class="flex-1">
-					<Dialog.Title>
-						<div class="flex items-center">
-							<Icon icon="carbon:ibm-cloud-vpc-block-storage-snapshots" class="mr-2 h-6 w-6" />
-							Snapshot -
-							{confirmModals.createSnapshot.data.name !== ''
-								? `${confirmModals.createSnapshot.title}@${confirmModals.createSnapshot.data.name}`
-								: `${confirmModals.createSnapshot.title}`}
-						</div>
-					</Dialog.Title>
-				</Dialog.Header>
-				<div class="flex items-center gap-0.5">
-					<Button
-						size="sm"
-						variant="ghost"
-						class="h-8"
-						title={capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}
-						onclick={() => {
-							confirmModals.createSnapshot.data.name = '';
-							confirmModals.createSnapshot.title = '';
-						}}
-					>
-						<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
-						<span class="sr-only"
-							>{capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}</span
-						>
-					</Button>
-					<Button
-						size="sm"
-						variant="ghost"
-						class="h-8"
-						title={capitalizeFirstLetter(getTranslation('common.close', 'Close'))}
-						onclick={() => {
-							confirmModals.createSnapshot = {
-								open: false,
-								data: {
-									name: ''
-								},
-								title: ''
-							};
-						}}
-					>
-						<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
-						<span class="sr-only"
-							>{capitalizeFirstLetter(getTranslation('common.close', 'Close'))}</span
-						>
-					</Button>
-				</div>
-			</div>
-
-			<div class="flex-1 space-y-1">
-				<Label for="name">Name</Label>
-				<Input
-					type="text"
-					id="name"
-					placeholder="before-upgrade"
-					autocomplete="off"
-					bind:value={confirmModals.createSnapshot.data.name}
-				/>
-			</div>
-
-			<Dialog.Footer>
-				<Button
-					size="sm"
-					onclick={() => {
-						confirmAction();
-					}}>Create</Button
-				>
-			</Dialog.Footer>
-		</Dialog.Content>
-	</Dialog.Root>
+<!-- Create Volume -->
+{#if modals.volume.create.open}
+	<CreateVolume bind:open={modals.volume.create.open} {pools} {grouped} />
 {/if}
 
-{#if confirmModals.active == 'deleteSnapshot'}
-	<AlertDialogModal
-		open={confirmModals.active && confirmModals[confirmModals.active].open}
-		names={{
-			parent: confirmModals.parent,
-			element: confirmModals.active ? confirmModals[confirmModals.active].title || '' : ''
-		}}
-		actions={{
-			onConfirm: () => {
-				if (confirmModals.active) {
-					confirmAction();
-				}
-			},
-			onCancel: () => {
-				if (confirmModals.active) {
-					confirmModals[confirmModals.active].open = false;
-				}
-			}
-		}}
-	></AlertDialogModal>
-{/if}
-
-{#if confirmModals.active === 'flashFile'}
-	<Dialog.Root bind:open={confirmModals.flashFile.open}>
-		<Dialog.Content
-			class="p-5"
-			onInteractOutside={(e) => e.preventDefault()}
-			onEscapeKeydown={(e) => e.preventDefault()}
-		>
-			<div class="flex items-center justify-between">
-				<Dialog.Header class="flex-1">
-					<Dialog.Title>
-						<div class="flex items-center">
-							<Icon icon="mdi:usb-flash-drive-outline" class="mr-2 h-6 w-6" />
-							Flash File to {confirmModals.flashFile.title}
-						</div>
-					</Dialog.Title>
-				</Dialog.Header>
-				<Dialog.Close>
-					<Button
-						size="sm"
-						variant="ghost"
-						class="h-8"
-						title={'Close'}
-						onclick={() => {
-							confirmModals.flashFile.open = false;
-							confirmModals.flashFile.data = {
-								guid: '',
-								uuid: ''
-							};
-							confirmModals.flashFile.title = '';
-						}}
-					>
-						<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
-						<span class="sr-only">{'Close'}</span>
-					</Button>
-				</Dialog.Close>
-			</div>
-
-			<div class="flex-1 space-y-1">
-				<CustomComboBox
-					bind:open={confirmModals.flashFile.combobox.open}
-					label="Select File"
-					bind:value={confirmModals.flashFile.data.uuid}
-					data={confirmModals.flashFile.combobox.data}
-					classes="flex-1 space-y-1.5"
-					placeholder="File"
-					triggerWidth="w-full"
-					width="w-full"
-				></CustomComboBox>
-			</div>
-
-			<Dialog.Footer class="flex justify-end">
-				<div class="flex w-full items-center justify-end gap-2 px-1 py-2">
-					<Button
-						onclick={async () => {
-							confirmModals.flashFile.loading = true;
-							await sleep(1000);
-
-							const response = await flashVolume(
-								confirmModals.flashFile.data.guid,
-								confirmModals.flashFile.data.uuid
-							);
-
-							if (response.status === 'error') {
-								handleError(response);
-							} else {
-								toast.success(`${'Volume ' + confirmModals.flashFile.title + ' flashed'}`);
-							}
-
-							confirmModals.flashFile.open = false;
-							confirmModals.flashFile.loading = false;
-							confirmModals.flashFile.data = {
-								guid: '',
-								uuid: ''
-							};
-						}}
-						type="submit"
-						size="sm"
-						disabled={!confirmModals.flashFile.data.uuid || confirmModals.flashFile.loading}
-					>
-						{#if confirmModals.flashFile.loading}
-							<Icon icon="mdi:loading" class="h-4 w-4 animate-spin" />
-						{:else}
-							<span>Flash</span>
-						{/if}
-					</Button>
-				</div>
-			</Dialog.Footer>
-		</Dialog.Content>
-	</Dialog.Root>
+<!-- Edit Volume -->
+{#if modals.volume.edit.open && activeVolume && activeVolume.type === 'volume'}
+	<EditVolume bind:open={modals.volume.edit.open} dataset={activeVolume} />
 {/if}

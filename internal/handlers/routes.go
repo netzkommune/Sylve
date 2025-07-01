@@ -134,9 +134,11 @@ func RegisterRoutes(r *gin.Engine,
 			datasets.DELETE("/snapshot/periodic/:guid", zfsHandlers.DeletePeriodicSnapshot(zfsService))
 
 			datasets.POST("/filesystem", zfsHandlers.CreateFilesystem(zfsService))
+			datasets.PATCH("/filesystem", zfsHandlers.EditFilesystem(zfsService))
 			datasets.DELETE("/filesystem/:guid", zfsHandlers.DeleteFilesystem(zfsService))
 
 			datasets.POST("/volume", zfsHandlers.CreateVolume(zfsService))
+			datasets.PATCH("/volume", zfsHandlers.EditVolume(zfsService))
 			datasets.POST("/volume/flash", zfsHandlers.FlashVolume(zfsService))
 			datasets.DELETE("/volume/:guid", zfsHandlers.DeleteVolume(zfsService))
 

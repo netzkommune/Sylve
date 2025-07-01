@@ -11,21 +11,21 @@ import { toast } from 'svelte-sonner';
 export const createFSProps = {
 	atime: [
 		{
-			label: 'on',
+			label: 'On',
 			value: 'on'
 		},
 		{
-			label: 'off',
+			label: 'Off',
 			value: 'off'
 		}
 	],
 	checksum: [
 		{
-			label: 'on',
+			label: 'On',
 			value: 'on'
 		},
 		{
-			label: 'off',
+			label: 'Off',
 			value: 'off'
 		},
 		{
@@ -47,11 +47,11 @@ export const createFSProps = {
 	],
 	compression: [
 		{
-			label: 'on',
+			label: 'On',
 			value: 'on'
 		},
 		{
-			label: 'off',
+			label: 'Off',
 			value: 'off'
 		},
 		{
@@ -81,11 +81,11 @@ export const createFSProps = {
 	],
 	dedup: [
 		{
-			label: 'No',
+			label: 'Off',
 			value: 'off'
 		},
 		{
-			label: 'Yes',
+			label: 'On',
 			value: 'on'
 		},
 		{
@@ -95,11 +95,11 @@ export const createFSProps = {
 	],
 	encryption: [
 		{
-			label: 'No',
+			label: 'Off',
 			value: 'off'
 		},
 		{
-			label: 'Yes',
+			label: 'On',
 			value: 'on'
 		},
 		{

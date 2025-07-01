@@ -20,6 +20,23 @@ export function bytesToHumanReadable(value: number | undefined): string {
 	return humanFormat(value, { unit: 'B' });
 }
 
+export function parseQuotaToZFSBytes(input: string): string {
+	if (!input || input.trim() === '') return '0B';
+
+	try {
+		const parsed = humanFormat.parse(input);
+
+		if (parsed === null || isNaN(parsed)) {
+			throw new Error('Invalid quota format');
+		}
+
+		return `${parsed}B`;
+	} catch (e) {
+		console.error(`Failed to parse quota "${input}":`, e);
+		return '0B';
+	}
+}
+
 export function generateNumberFromString(str: string): number {
 	let hash = 0x811c9dc5;
 	for (let i = 0; i < str.length; i++) {

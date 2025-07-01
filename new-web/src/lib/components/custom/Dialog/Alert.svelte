@@ -3,7 +3,7 @@
 
 	interface Props {
 		open: boolean;
-		names: {
+		names?: {
 			parent: string;
 			element: string;
 		};
@@ -14,7 +14,7 @@
 		customTitle?: string;
 	}
 
-	let { open, names, actions, customTitle }: Props = $props();
+	let { open = $bindable(), names, actions, customTitle }: Props = $props();
 </script>
 
 <AlertDialog.Root bind:open>
@@ -24,7 +24,7 @@
 			<AlertDialog.Description>
 				{#if customTitle}
 					{@html customTitle}
-				{:else}
+				{:else if names && names.parent && names.element}
 					{'This action cannot be undone. This will permanently delete '}
 					<span>{names.parent}</span>
 					<span class="font-semibold">{names.element}</span>.

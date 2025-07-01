@@ -37,6 +37,25 @@ func (s *Service) CreateVolume(name string, parent string, props map[string]stri
 	return err
 }
 
+func (s *Service) EditVolume(name string, props map[string]string) error {
+	s.syncMutex.Lock()
+	defer s.syncMutex.Unlock()
+	defer s.Libvirt.RescanStoragePools()
+
+	datasets, err := zfs.Datasets(name)
+	if err != nil {
+		return err
+	}
+
+	for _, dataset := range datasets {
+		if dataset.Name == name && dataset.Type == "volume" {
+			return zfs.EditVolume(name, props)
+		}
+	}
+
+	return fmt.Errorf("volume with name %s not found", name)
+}
+
 func (s *Service) DeleteVolume(guid string) error {
 	s.syncMutex.Lock()
 	defer s.syncMutex.Unlock()

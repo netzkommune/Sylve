@@ -19,13 +19,13 @@
 	import { slide } from 'svelte/transition';
 
 	import { createPool } from '$lib/api/zfs/pool';
+	import { buttonVariants } from '$lib/components/ui/button/index.js';
 	import type { APIResponse } from '$lib/types/common';
 	import { isValidPoolName } from '$lib/utils/zfs';
 	import Icon from '@iconify/svelte';
 	import humanFormat from 'human-format';
 	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
-
 	interface Props {
 		open: boolean;
 		disks: Disk[];
@@ -459,14 +459,21 @@
 {#snippet vdevErrors(id: number)}
 	{#if getVdevErrors(id) !== ''}
 		<div class="absolute right-1 top-1 z-50 cursor-pointer text-yellow-700 hover:text-yellow-600">
-			<Tooltip.Root>
-				<Tooltip.Trigger><Icon icon="carbon:warning-filled" class="h-5 w-5" /></Tooltip.Trigger>
-				<Tooltip.Content>
-					<p>
-						{@html getVdevErrors(id)}
-					</p>
-				</Tooltip.Content>
-			</Tooltip.Root>
+			<Tooltip.Provider>
+				<Tooltip.Root>
+					<Tooltip.Trigger class="cursor-pointer"
+						><Icon
+							icon="carbon:warning-filled"
+							class="pointer-events-none h-5 w-5 cursor-pointer"
+						/></Tooltip.Trigger
+					>
+					<Tooltip.Content>
+						<p>
+							{@html getVdevErrors(id)}
+						</p>
+					</Tooltip.Content>
+				</Tooltip.Root>
+			</Tooltip.Provider>
 		</div>
 	{/if}
 {/snippet}

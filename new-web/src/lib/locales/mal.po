@@ -1579,3 +1579,23 @@ msgstr ""
 #: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
 msgid "<0/> Edit Volume - {0}"
 msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "df"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "<0/> wer <1>Drop disks here</1>"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "d"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Hover"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Add to library"
+msgstr ""

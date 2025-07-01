@@ -12,7 +12,7 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import type { Disk, Partition } from '$lib/types/disk/disk';
-	import type { Zpool, ZpoolRaidType } from '$lib/types/zfs/pool';
+	import type { ZpoolRaidType } from '$lib/types/zfs/pool';
 	import { draggable, dropzone } from '$lib/utils/dnd';
 	import { raidTypeArr } from '$lib/utils/zfs/pool';
 	import { flip } from 'svelte/animate';
@@ -23,7 +23,6 @@
 	import { isValidPoolName } from '$lib/utils/zfs';
 	import Icon from '@iconify/svelte';
 	import humanFormat from 'human-format';
-	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
 
 	interface Props {

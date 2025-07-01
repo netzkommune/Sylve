@@ -142,13 +142,10 @@ func (s *Service) DeletePeriodicSnapshot(guid string) error {
 
 func (s *Service) StartSnapshotScheduler(ctx context.Context) {
 	ticker := time.NewTicker(30 * time.Second)
-
 	go func() {
 		for {
 			select {
 			case <-ticker.C:
-				s.syncMutex.Lock()
-
 				var snapshotJobs []zfsModels.PeriodicSnapshot
 				if err := s.DB.Find(&snapshotJobs).Error; err != nil {
 					logger.L.Debug().Err(err).Msg("Failed to load snapshotJobs")
@@ -162,7 +159,6 @@ func (s *Service) StartSnapshotScheduler(ctx context.Context) {
 						allSets, err := zfs.Snapshots("")
 						if err != nil {
 							logger.L.Debug().Err(err).Msgf("Failed to get snapshots for %s", job.GUID)
-							s.syncMutex.Unlock()
 							continue
 						}
 
@@ -193,8 +189,6 @@ func (s *Service) StartSnapshotScheduler(ctx context.Context) {
 						logger.L.Debug().Msgf("Snapshot %s created successfully", name)
 					}
 				}
-
-				s.syncMutex.Unlock()
 			case <-ctx.Done():
 				ticker.Stop()
 				return

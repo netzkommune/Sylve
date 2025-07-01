@@ -70,7 +70,8 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 			avail: snapshot.avail,
 			referenced: snapshot.referenced,
 			mountpoint: snapshot.mountpoint || '',
-			children: []
+			children: [],
+			type: 'snapshot'
 		}));
 
 		rows.push({
@@ -80,6 +81,7 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 			avail: poolLevelFilesystem.avail,
 			referenced: poolLevelFilesystem.referenced,
 			mountpoint: poolLevelFilesystem.mountpoint || '',
+			type: 'pool',
 			children
 		});
 	}

@@ -61,6 +61,7 @@
 					class="w-full"
 					autocomplete="off"
 					bind:value={vncPassword}
+					showPasswordOnFocus={true}
 				/>
 
 				<Button

@@ -1705,7 +1705,7 @@ body.tabulator-print-fullscreen-hide > *:not(.tabulator-print-fullscreen) {
 }
 
 .tabulator-table .tabulator-selected {
-	@apply bg-muted;
+	@apply bg-accent hover:!bg-accent;
 }
 
 .tabulator-table .tabulator-tree-level-0 .tabulator-cell:first-of-type {

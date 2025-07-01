@@ -299,36 +299,36 @@
 				disabled={!modalState.isEditMode}
 			/>
 
-			<div class="">
-				<ScrollArea orientation="vertical" class="h-full">
-					{#if modalState.isEditMode}
-						<div>
-							<CustomValueInput
-								label={'Content'}
-								placeholder="This is a note"
-								bind:value={modalState.content}
-								classes="flex-1 space-y-1 "
-								type="textarea"
-							/>
-						</div>
-					{:else}
-						<div class="mt-2">
-							<p
-								class="mb-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-							>
-								Content
-							</p>
-							<article class="prose lg:prose-xl rounded-md border p-3">
-								{@html markdownToTailwindHTML(modalState.content)}
-							</article>
-						</div>
-					{/if}
-				</ScrollArea>
-			</div>
+			<ScrollArea orientation="vertical" class="h-full">
+				{#if modalState.isEditMode}
+					<div>
+						<CustomValueInput
+							label={'Content'}
+							placeholder="This is a note"
+							bind:value={modalState.content}
+							classes="flex-1 space-y-1 "
+							type="textarea"
+						/>
+					</div>
+				{:else}
+					<div class="mt-2">
+						<p
+							class="mb-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+						>
+							Content
+						</p>
+						<article class="prose lg:prose-xl rounded-md border p-3">
+							{@html markdownToTailwindHTML(modalState.content)}
+						</article>
+					</div>
+				{/if}
+			</ScrollArea>
 			<Dialog.Footer class="flex justify-end">
 				<div class="flex w-full items-center justify-end gap-2">
 					{#if modalState.isEditMode}
-						<Button onclick={saveNote} type="submit" size="sm" class="w-28">{'Save'}</Button>
+						<Button onclick={saveNote} type="submit" size="sm" class="w-full lg:w-28"
+							>{'Save'}</Button
+						>
 					{/if}
 				</div>
 			</Dialog.Footer>

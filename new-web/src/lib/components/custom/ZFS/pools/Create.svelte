@@ -602,42 +602,41 @@
 		}}
 		class="fixed left-1/2 top-1/2 flex h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform flex-col gap-4 overflow-auto p-5 transition-all duration-300 ease-in-out lg:max-w-[70%]"
 	>
-		<div class="flex items-center justify-between">
-			<Dialog.Header class="p-0">
-				<Dialog.Title class="flex items-center gap-2 text-left">
+		<Dialog.Header class="p-0">
+			<Dialog.Title class="flex  justify-between  text-left">
+				<div class="flex items-center gap-2">
 					<Icon icon="bi:hdd-stack-fill" class="h-5 w-5 " />Create ZFS Pool
-				</Dialog.Title>
-			</Dialog.Header>
+				</div>
+				<div class="flex items-center gap-0.5">
+					<Button
+						size="sm"
+						variant="link"
+						class="h-4"
+						title={'Reset'}
+						onclick={() => {
+							properties = options;
+						}}
+					>
+						<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only">Reset</span>
+					</Button>
 
-			<div class="flex items-center gap-0.5">
-				<Button
-					size="sm"
-					variant="ghost"
-					class="h-8"
-					title={'Reset'}
-					onclick={() => {
-						properties = options;
-					}}
-				>
-					<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
-					<span class="sr-only">Reset</span>
-				</Button>
-
-				<Button
-					size="sm"
-					variant="ghost"
-					class="h-8"
-					title={'Close'}
-					onclick={() => {
-						properties = options;
-						open = false;
-					}}
-				>
-					<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
-					<span class="sr-only">Close</span>
-				</Button>
-			</div>
-		</div>
+					<Button
+						size="sm"
+						variant="link"
+						class="h-4"
+						title={'Close'}
+						onclick={() => {
+							properties = options;
+							open = false;
+						}}
+					>
+						<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only">Close</span>
+					</Button>
+				</div>
+			</Dialog.Title>
+		</Dialog.Header>
 
 		<Tabs.Root value="tab-devices" class="flex h-full flex-col overflow-y-auto ">
 			<Tabs.List class="grid w-full grid-cols-2 p-0 ">
@@ -645,9 +644,9 @@
 				<Tabs.Trigger value="tab-options" class="border-b">Options</Tabs.Trigger>
 			</Tabs.List>
 
-			<Tabs.Content class="mt-0" value="tab-devices">
-				<Card.Root class="border-none pb-4">
-					<Card.Content class="grid grid-cols-1 gap-4 p-4 !pb-0 lg:grid-cols-3">
+			<Tabs.Content class="mt-4" value="tab-devices">
+				<Card.Root class="border-none ">
+					<Card.Content class="grid grid-cols-1 gap-4 lg:grid-cols-3">
 						<CustomValueInput
 							label={'Name'}
 							placeholder="tank"
@@ -696,7 +695,7 @@
 						</div>
 					</Card.Content>
 
-					<Card.Content class="flex flex-col gap-4 p-4 !pb-0">
+					<Card.Content class="flex flex-col gap-4 ">
 						<div id="vdev-containers">
 							<Label>VDEVs</Label>
 							<ScrollArea class="w-full whitespace-nowrap rounded-md" orientation="horizontal">
@@ -734,7 +733,7 @@
 						</div>
 					</Card.Content>
 
-					<Card.Content class="flex flex-col gap-4 p-4 !pb-0">
+					<Card.Content class="flex flex-col gap-4 ">
 						<div id="disk-containers">
 							<Label>Disks</Label>
 							<div
@@ -750,11 +749,11 @@
 				</Card.Root>
 			</Tabs.Content>
 
-			<Tabs.Content class="mt-0" value="tab-options">
+			<Tabs.Content class="mt-3" value="tab-options">
 				<Card.Root class="min-h-[20vh] border-none pb-6">
 					<Card.Content class="flex flex-col gap-4 p-4 !pb-0">
 						<div transition:slide class="grid grid-cols-1 gap-4">
-							<div class="flex-1 space-y-1">
+							<div class="flex-1 space-y-1.5">
 								<Label for="comment">Comment</Label>
 								<Textarea
 									id="comment"
@@ -907,7 +906,7 @@
 			<div class="flex gap-2">
 				<Button
 					size="sm"
-					class="h-8 w-28"
+					class="h-8 w-full lg:w-28"
 					onclick={() => {
 						makePool();
 					}}

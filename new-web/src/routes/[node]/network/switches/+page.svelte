@@ -509,9 +509,13 @@
 			<Dialog.Footer class="flex justify-between gap-2 ">
 				<div class="flex gap-2">
 					{#if confirmModals.active === 'editSwitch'}
-						<Button onclick={confirmAction} type="submit" size="sm" class="w-28">{'Save'}</Button>
+						<Button onclick={confirmAction} type="submit" size="sm" class="w-full lg:w-28"
+							>{'Save'}</Button
+						>
 					{:else}
-						<Button onclick={confirmAction} type="submit" size="sm" class="w-28">{'Create'}</Button>
+						<Button onclick={confirmAction} type="submit" size="sm" class="w-full lg:w-28"
+							>{'Create'}</Button
+						>
 					{/if}
 				</div>
 			</Dialog.Footer>

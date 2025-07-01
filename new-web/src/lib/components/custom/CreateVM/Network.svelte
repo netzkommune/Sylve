@@ -49,8 +49,8 @@
 	{@const i = `radio-${id}`}
 	<div class="mb-2 flex items-center space-x-3 rounded-lg border p-4">
 		<RadioGroup.Item value={id.toString()} id={i} />
-		<Label for={i} class="flex flex-col gap-2">
-			<p>{name}</p>
+		<Label for={i} class="flex flex-col items-start gap-2">
+			<p class="">{name}</p>
 			<p class="text-muted-foreground text-sm">
 				{name === 'None'
 					? 'No network switch will be allocated now, you can add it later'

@@ -234,48 +234,42 @@
 
 <Dialog.Root bind:open>
 	<Dialog.Content
-		class="fixed left-1/2 top-1/2 flex h-[85vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform flex-col gap-0  overflow-auto p-6 transition-all duration-300 ease-in-out lg:h-[72vh] lg:max-w-2xl"
+		class="fixed left-1/2 top-1/2 flex h-[85vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform flex-col gap-0  overflow-auto p-5 transition-all duration-300 ease-in-out lg:h-[72vh] lg:max-w-2xl"
 	>
-		<div class="flex items-center justify-between">
-			<Dialog.Header class="p-0">
-				<Dialog.Title class="flex flex-col gap-1 text-left">
-					<div class="flex items-center gap-2">
-						<Icon icon="material-symbols:monitor-outline-rounded" class="h-5 w-5 " />
-						Create Virtual Machine
-					</div>
-					<p class="text-muted-foreground text-sm">
-						Configure your virtual machine with custom hardware and network settings
-					</p>
-				</Dialog.Title>
-			</Dialog.Header>
-
-			<div class="flex items-center gap-0.5">
-				<Button
-					size="sm"
-					variant="ghost"
-					class="h-8"
-					onclick={() => resetModal()}
-					title={capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}
-				>
-					<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
-					<span class="sr-only"
-						>{capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}</span
+		<Dialog.Header class="p-0">
+			<Dialog.Title class="flex  justify-between gap-1 text-left">
+				<div class="flex items-center gap-2">
+					<Icon icon="material-symbols:monitor-outline-rounded" class="h-5 w-5 " />
+					Create Virtual Machine
+				</div>
+				<div class="flex items-center gap-0.5">
+					<Button
+						size="sm"
+						variant="link"
+						class="h-4"
+						onclick={() => resetModal()}
+						title={capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}
 					>
-				</Button>
-				<Button
-					size="sm"
-					variant="ghost"
-					class="h-8"
-					onclick={() => (open = false)}
-					title={capitalizeFirstLetter(getTranslation('common.close', 'Close'))}
-				>
-					<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
-					<span class="sr-only"
-						>{capitalizeFirstLetter(getTranslation('common.close', 'Close'))}</span
+						<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only"
+							>{capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}</span
+						>
+					</Button>
+					<Button
+						size="sm"
+						variant="link"
+						class="h-4"
+						onclick={() => (open = false)}
+						title={capitalizeFirstLetter(getTranslation('common.close', 'Close'))}
 					>
-				</Button>
-			</div>
-		</div>
+						<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only"
+							>{capitalizeFirstLetter(getTranslation('common.close', 'Close'))}</span
+						>
+					</Button>
+				</div>
+			</Dialog.Title>
+		</Dialog.Header>
 
 		<div class="mt-6 flex-1 overflow-y-auto">
 			<Tabs.Root value="basic" class="w-full overflow-hidden">

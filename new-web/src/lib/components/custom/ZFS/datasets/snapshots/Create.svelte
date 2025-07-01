@@ -67,54 +67,51 @@
 
 <Dialog.Root bind:open>
 	<Dialog.Content
-		class="flex flex-col"
+		class="flex flex-col p-5"
 		onInteractOutside={() => {
 			properties = options;
 			open = false;
 		}}
 	>
-		<div class="flex w-full items-center justify-between">
-			<Dialog.Header>
-				<Dialog.Title>
-					<div class="flex items-center gap-2">
-						<Icon icon="carbon:ibm-cloud-vpc-block-storage-snapshots" class="h-6 w-6" />
-						<span>
-							Snapshot - {properties.name !== ''
-								? `${dataset.name}@${properties.name}`
-								: `${dataset.name}`}
-						</span>
-					</div>
-				</Dialog.Title>
-			</Dialog.Header>
-
-			<div class="flex items-center gap-0.5">
-				<Button
-					size="sm"
-					variant="ghost"
-					class="h-8"
-					title={'Reset'}
-					onclick={() => {
-						properties = options;
-					}}
-				>
-					<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
-					<span class="sr-only">Reset</span>
-				</Button>
-				<Button
-					size="sm"
-					variant="ghost"
-					class="h-8"
-					title={'Close'}
-					onclick={() => {
-						open = false;
-						properties = options;
-					}}
-				>
-					<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
-					<span class="sr-only">Close</span>
-				</Button>
-			</div>
-		</div>
+		<Dialog.Header class="p-0">
+			<Dialog.Title class="flex  justify-between gap-1 text-left">
+				<div class="flex items-center gap-2">
+					<Icon icon="carbon:ibm-cloud-vpc-block-storage-snapshots" class="h-6 w-6" />
+					<span>
+						Snapshot - {properties.name !== ''
+							? `${dataset.name}@${properties.name}`
+							: `${dataset.name}`}
+					</span>
+				</div>
+				<div class="flex items-center gap-0.5">
+					<Button
+						size="sm"
+						variant="link"
+						class="h-4"
+						title={'Reset'}
+						onclick={() => {
+							properties = options;
+						}}
+					>
+						<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only">Reset</span>
+					</Button>
+					<Button
+						size="sm"
+						variant="link"
+						class="h-4"
+						title={'Close'}
+						onclick={() => {
+							open = false;
+							properties = options;
+						}}
+					>
+						<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only">Close</span>
+					</Button>
+				</div>
+			</Dialog.Title>
+		</Dialog.Header>
 
 		<CustomValueInput
 			label={`${'Name'} | ${'Prefix'}`}
@@ -134,6 +131,7 @@
 		<Dialog.Footer>
 			<Button
 				size="sm"
+				class="w-full lg:w-28"
 				onclick={() => {
 					create();
 				}}>Create</Button

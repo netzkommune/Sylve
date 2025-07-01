@@ -36,44 +36,41 @@
 		onInteractOutside={(e) => e.preventDefault()}
 		onEscapeKeydown={(e) => e.preventDefault()}
 	>
-		<div class="flex items-center justify-between">
-			<Dialog.Header class="flex-1">
-				<Dialog.Title>
-					<div class="flex items-center">
-						<Icon icon="mdi:usb-flash-drive-outline" class="mr-2 h-6 w-6" />
-						Flash File to {dataset.name}
-					</div>
-				</Dialog.Title>
-			</Dialog.Header>
-
-			<div class="flex items-center gap-0.5">
-				<Button
-					size="sm"
-					variant="ghost"
-					class="h-8"
-					title={'Reset'}
-					onclick={() => {
-						properties = options;
-					}}
-				>
-					<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
-					<span class="sr-only">Reset</span>
-				</Button>
-				<Button
-					size="sm"
-					variant="ghost"
-					class="h-8"
-					title={'Close'}
-					onclick={() => {
-						properties = options;
-						open = false;
-					}}
-				>
-					<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
-					<span class="sr-only">Close</span>
-				</Button>
-			</div>
-		</div>
+		<Dialog.Header class="p-0">
+			<Dialog.Title class="flex justify-between">
+				<div class="flex items-center">
+					<Icon icon="mdi:usb-flash-drive-outline" class="mr-2 h-6 w-6" />
+					Flash File to {dataset.name}
+				</div>
+				<div class="flex items-center gap-0.5">
+					<Button
+						size="sm"
+						variant="link"
+						class="h-4"
+						title={'Reset'}
+						onclick={() => {
+							properties = options;
+						}}
+					>
+						<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only">Reset</span>
+					</Button>
+					<Button
+						size="sm"
+						variant="link"
+						class="h-4"
+						title={'Close'}
+						onclick={() => {
+							properties = options;
+							open = false;
+						}}
+					>
+						<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only">Close</span>
+					</Button>
+				</div>
+			</Dialog.Title>
+		</Dialog.Header>
 
 		<div class="flex-1 space-y-1">
 			<CustomComboBox
@@ -89,7 +86,7 @@
 		</div>
 
 		<Dialog.Footer class="flex justify-end">
-			<div class="flex w-full items-center justify-end gap-2 px-1 py-2">
+			<div class="flex w-full items-center justify-end gap-2 py-2">
 				<Button
 					onclick={async () => {
 						properties.loading = true;
@@ -116,6 +113,7 @@
 					}}
 					type="submit"
 					size="sm"
+					class="w-full lg:w-28"
 					disabled={!properties.select.uuid || properties.loading}
 				>
 					{#if properties.loading}

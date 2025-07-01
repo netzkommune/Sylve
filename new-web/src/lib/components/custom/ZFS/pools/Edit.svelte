@@ -236,7 +236,7 @@
 			<div class="flex gap-2">
 				<Button
 					size="sm"
-					class="h-8 "
+					class="h-8 w-full lg:w-28"
 					onclick={() => {
 						edit();
 					}}

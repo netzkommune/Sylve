@@ -76,45 +76,44 @@
 
 <Dialog.Root bind:open>
 	<Dialog.Content
-		class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-visible overflow-y-auto p-5 transition-all duration-300 ease-in-out lg:max-w-[70%]"
+		class="fixed left-1/2 top-1/2 max-h-[90vh] w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-0 overflow-visible overflow-y-auto p-5 transition-all duration-300 ease-in-out lg:max-w-2xl"
 	>
-		<div class="flex items-center justify-between pb-3">
-			<Dialog.Header class="flex justify-between">
-				<Dialog.Title class="flex items-center text-left">
-					<Icon icon="material-symbols:files" class="mr-2 h-5 w-5" />Edit Filesystem - {dataset.name}</Dialog.Title
-				>
-			</Dialog.Header>
+		<Dialog.Header class="p-0">
+			<Dialog.Title class="flex items-center justify-between text-left">
+				<div class="flex items-center gap-2">
+					<Icon icon="material-symbols:files" class="h-5 w-5" />Edit Filesystem - {dataset.name}
+				</div>
+				<div class="flex items-center gap-0.5">
+					<Button
+						size="sm"
+						variant="link"
+						class="h-4"
+						title={'Reset'}
+						onclick={() => {
+							properties = options;
+						}}
+					>
+						<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only">Reset</span>
+					</Button>
+					<Button
+						size="sm"
+						variant="link"
+						class="h-4"
+						title={'Close'}
+						onclick={() => {
+							properties = options;
+							open = false;
+						}}
+					>
+						<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only">Close</span>
+					</Button>
+				</div>
+			</Dialog.Title>
+		</Dialog.Header>
 
-			<div class="flex items-center gap-0.5">
-				<Button
-					size="sm"
-					variant="ghost"
-					class="h-8"
-					title={'Reset'}
-					onclick={() => {
-						properties = options;
-					}}
-				>
-					<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
-					<span class="sr-only">Reset</span>
-				</Button>
-				<Button
-					size="sm"
-					variant="ghost"
-					class="h-8"
-					title={'Close'}
-					onclick={() => {
-						properties = options;
-						open = false;
-					}}
-				>
-					<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
-					<span class="sr-only">Close</span>
-				</Button>
-			</div>
-		</div>
-
-		<div class="w-full">
+		<div class="mt-4 w-full">
 			<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
 				<SimpleSelect
 					label="ATime"
@@ -166,7 +165,7 @@
 				<Button
 					size="sm"
 					type="button"
-					class="h-8 w-full"
+					class="h-8 w-28"
 					onclick={() => {
 						edit();
 					}}

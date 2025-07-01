@@ -106,45 +106,42 @@
 </script>
 
 <Dialog.Root bind:open>
-	<Dialog.Content>
-		<div class="flex items-center justify-between">
-			<Dialog.Header class="flex-1">
-				<Dialog.Title>
-					<div class="flex items-center">
-						<Icon icon="carbon:ibm-cloud-vpc-block-storage-snapshots" class="mr-2 h-6 w-6" />
-						<span>Create Snapshot</span>
-					</div>
-				</Dialog.Title>
-			</Dialog.Header>
-
-			<div class="flex items-center gap-0.5">
-				<Button
-					size="sm"
-					variant="ghost"
-					class="h-8"
-					title={'Reset'}
-					onclick={() => {
-						properties = options;
-					}}
-				>
-					<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
-					<span class="sr-only">{'Reset'}</span>
-				</Button>
-				<Button
-					size="sm"
-					variant="ghost"
-					class="h-8"
-					title={'Close'}
-					onclick={() => {
-						properties = options;
-						open = false;
-					}}
-				>
-					<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
-					<span class="sr-only">{'Close'}</span>
-				</Button>
-			</div>
-		</div>
+	<Dialog.Content class="p-5">
+		<Dialog.Header class="p-0">
+			<Dialog.Title class="flex justify-between">
+				<div class="flex items-center">
+					<Icon icon="carbon:ibm-cloud-vpc-block-storage-snapshots" class="mr-2 h-6 w-6" />
+					<span>Create Snapshot</span>
+				</div>
+				<div class="flex items-center gap-0.5">
+					<Button
+						size="sm"
+						variant="link"
+						class="h-4"
+						title={'Reset'}
+						onclick={() => {
+							properties = options;
+						}}
+					>
+						<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only">{'Reset'}</span>
+					</Button>
+					<Button
+						size="sm"
+						variant="link"
+						class="h-4"
+						title={'Close'}
+						onclick={() => {
+							properties = options;
+							open = false;
+						}}
+					>
+						<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only">{'Close'}</span>
+					</Button>
+				</div>
+			</Dialog.Title>
+		</Dialog.Header>
 
 		<CustomValueInput
 			label={`${'Name'} | ${'Prefix'}`}
@@ -194,6 +191,7 @@
 		<Dialog.Footer>
 			<Button
 				size="sm"
+				class="w-full lg:w-28"
 				onclick={() => {
 					create();
 				}}>Create</Button

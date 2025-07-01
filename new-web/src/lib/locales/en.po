@@ -1891,18 +1891,6 @@ msgstr "<0/> Reset"
 msgid "<0/> Reset zoom"
 msgstr "<0/> Reset zoom"
 
-#: src/routes/[node]/utilities/downloader/+page.svelte
-msgid "Failed to delete download"
-msgstr "Failed to delete download"
-
-#: src/routes/[node]/utilities/downloader/+page.svelte
-msgid "Failed to delete downloads"
-msgstr "Failed to delete downloads"
-
-#: src/lib/components/custom/TreeTable/Search.svelte
-msgid "Search..."
-msgstr "Search..."
-
 #: src/routes/[node]/notes/+page.svelte
 msgid "Failed to delete note"
 msgstr "Failed to delete note"

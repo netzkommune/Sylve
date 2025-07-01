@@ -145,16 +145,16 @@
 </script>
 
 {#snippet card(type: string)}
-	<Card.Root>
-		<Card.Header>
-			<Card.Title class="mb-[-10px]">
+	<Card.Root class="gap-2 p-5">
+		<Card.Header class="p-0">
+			<Card.Title class="p-0">
 				<div class="flex items-center">
 					<Icon icon={getCardDetails(type).icon} class="mr-2" />
 					<span class="font-normal">{getCardDetails(type).title}</span>
 				</div>
 			</Card.Title>
 		</Card.Header>
-		<Card.Content class="mb-[-10px]">
+		<Card.Content class="p-0 pl-1">
 			<p class="text-xl font-semibold">
 				{counts[type as CardType]}
 			</p>
@@ -163,7 +163,7 @@
 {/snippet}
 
 <div class="p-4">
-	<div class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4">
+	<div class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-5">
 		{#each ['pools', 'datasets', 'file_systems', 'volumes', 'snapshots'] as type}
 			<div>
 				{@render card(type)}

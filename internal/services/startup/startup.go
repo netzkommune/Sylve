@@ -12,7 +12,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"sylve/internal/config"
 	serviceInterfaces "sylve/internal/interfaces/services"
 	infoServiceInterfaces "sylve/internal/interfaces/services/info"
 	libvirtServiceInterfaces "sylve/internal/interfaces/services/libvirt"
@@ -21,8 +20,10 @@ import (
 	utilitiesServiceInterfaces "sylve/internal/interfaces/services/utilities"
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
 	"sylve/internal/logger"
+	"sync"
 	"time"
 
+	"sylve/pkg/pkg"
 	sysctl "sylve/pkg/utils/sysctl"
 
 	"gorm.io/gorm"
@@ -78,7 +79,13 @@ func (s *Service) SysctlSync() error {
 	}
 
 	for k, v := range intVals {
-		err := sysctl.SetInt32(k, v)
+		_, err := sysctl.GetInt64(k)
+		if err != nil {
+			logger.L.Error().Msgf("Error getting sysctl %s: %v, skipping!", k, err)
+			continue
+		}
+
+		err = sysctl.SetInt32(k, v)
 		if err != nil {
 			logger.L.Error().Msgf("Error setting sysctl %s: %v", k, err)
 		}
@@ -88,14 +95,52 @@ func (s *Service) SysctlSync() error {
 }
 
 func (s *Service) InitFirewall() error {
-	if len(config.ParsedConfig.WANInterfaces) == 0 {
-		return fmt.Errorf("no WAN interfaces found in config")
+	// if len(config.ParsedConfig.WANInterfaces) == 0 {
+	// 	return fmt.Errorf("no WAN interfaces found in config")
+	// }
+
+	return nil
+}
+
+func (s *Service) CheckPackageDepdencies() error {
+	requiredPackages := []string{
+		"libvirt",
+		"bhyve-firmware",
+		"smartmontools",
+		"tmux",
+	}
+
+	var wg sync.WaitGroup
+	errCh := make(chan error, len(requiredPackages))
+
+	for _, p := range requiredPackages {
+		p := p
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			if !pkg.IsPackageInstalled(p) {
+				errCh <- fmt.Errorf("Required package %s is not installed", p)
+			}
+		}()
+	}
+
+	wg.Wait()
+	close(errCh)
+
+	for err := range errCh {
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
 }
 
 func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface) error {
+	if err := s.CheckPackageDepdencies(); err != nil {
+		return err
+	}
+
 	if err := s.InitKeys(authService); err != nil {
 		return err
 	}

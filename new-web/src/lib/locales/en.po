@@ -1847,6 +1847,18 @@ msgstr "Jan 01, 0001"
 msgid "Never"
 msgstr "Never"
 
-#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
-msgid "W-28"
-msgstr "W-28"
+#: src/lib/components/custom/Login.svelte
+msgid "Language selection is disabled for now"
+msgstr "Language selection is disabled for now"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Help"
+msgstr "Help"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Enable Passthrough"
+msgstr "Enable Passthrough"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Disable Passthrough"
+msgstr "Disable Passthrough"

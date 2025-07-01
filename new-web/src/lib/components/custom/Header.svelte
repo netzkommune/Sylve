@@ -65,7 +65,7 @@
 				<Icon icon="garden:terminal-cli-stroke-16" class="h-6 w-6" />
 				{#if $terminalStore.tabs.length > 0}
 					<span
-						class="absolute -right-1 -top-1 flex h-4 min-w-[8px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white"
+						class="absolute -right-1 top-0.5 flex h-4 min-w-[8px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white"
 					>
 						{$terminalStore.tabs.length}
 					</span>

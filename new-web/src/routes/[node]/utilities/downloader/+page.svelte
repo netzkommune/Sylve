@@ -16,8 +16,7 @@
 	import type { Row } from '$lib/types/components/tree-table';
 	import type { Download } from '$lib/types/utilities/downloader';
 	import { handleValidationErrors, isAPIResponse, updateCache } from '$lib/utils/http';
-	import { getTranslation } from '$lib/utils/i18n';
-	import { capitalizeFirstLetter, isDownloadURL } from '$lib/utils/string';
+	import { isDownloadURL } from '$lib/utils/string';
 	import { generateTableData } from '$lib/utils/utilities/downloader';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
@@ -139,7 +138,7 @@
 				}
 			}
 			modalState.isBulkDelete = true;
-			modalState.title = `${activeRows.length} ${capitalizeFirstLetter(getTranslation('common.downloads', 'Downloads'))}`;
+			modalState.title = `${activeRows.length} Downloads`;
 		}
 	}
 
@@ -165,12 +164,10 @@
 	{#if type === 'delete' && onlyParentsSelected}
 		{#if activeRows && activeRows.length >= 1}
 			<Button onclick={handleDelete} size="sm" variant="outline" class="h-6.5">
-				<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
-				{#if activeRows.length > 1}
-					{capitalizeFirstLetter(getTranslation('common.bulk_delete', 'Bulk Delete'))}
-				{:else}
-					{capitalizeFirstLetter(getTranslation('common.delete', 'Delete'))}
-				{/if}
+				<div class="flex items-center">
+					<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
+					<span>{activeRows.length > 1 ? 'Bulk Delete' : 'Delete'}</span>
+				</div>
 			</Button>
 		{/if}
 	{/if}
@@ -178,8 +175,10 @@
 	{#if type === 'download' && onlyChildSelected && isDownloadCompleted}
 		{#if activeRows && activeRows.length == 1}
 			<Button onclick={handleDownload} size="sm" variant="outline" class="h-6.5">
-				<Icon icon="mdi:download" class="mr-1 h-4 w-4" />
-				{capitalizeFirstLetter(getTranslation('common.download', 'Download'))}
+				<div class="flex items-center">
+					<Icon icon="mdi:download" class="mr-1 h-4 w-4" />
+					<span>Download</span>
+				</div>
 			</Button>
 		{/if}
 	{/if}
@@ -187,8 +186,10 @@
 	{#if type === 'download' && httpDownloadSelected && isDownloadCompleted}
 		{#if activeRows && activeRows.length == 1}
 			<Button onclick={handleDownload} size="sm" variant="outline" class="h-6.5">
-				<Icon icon="mdi:download" class="mr-1 h-4 w-4" />
-				{capitalizeFirstLetter(getTranslation('common.download', 'Download'))}
+				<div class="flex items-center">
+					<Icon icon="mdi:download" class="mr-1 h-4 w-4" />
+					<span>Download</span>
+				</div>
 			</Button>
 		{/if}
 	{/if}
@@ -199,8 +200,10 @@
 		<Search bind:query />
 
 		<Button onclick={() => (modalState.isOpen = true)} size="sm" class="h-6  ">
-			<Icon icon="gg:add" class="mr-1 h-4 w-4" />
-			{capitalizeFirstLetter(getTranslation('common.new', 'New'))}
+			<div class="flex items-center">
+				<Icon icon="gg:add" class="mr-1 h-4 w-4" />
+				<span>New</span>
+			</div>
 		</Button>
 
 		{@render button('delete')}
@@ -214,7 +217,7 @@
 					<Dialog.Title>
 						<div class="flex items-center gap-2">
 							<Icon icon="mdi:download" class="text-primary h-5 w-5" />
-							{capitalizeFirstLetter(getTranslation('common.download', 'Download'))}
+							<span>Download</span>
 						</div>
 					</Dialog.Title>
 				</Dialog.Header>
@@ -224,41 +227,33 @@
 						size="sm"
 						variant="ghost"
 						class="h-8"
-						title={capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}
+						title={'Reset'}
 						onclick={() => {
 							modalState.isOpen = true;
 							modalState.url = '';
 						}}
 					>
 						<Icon icon="radix-icons:reset" class="h-4 w-4" />
-						<span class="sr-only"
-							>{capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}</span
-						>
+						<span class="sr-only">Reset</span>
 					</Button>
 					<Button
 						size="sm"
 						variant="ghost"
 						class="h-8"
-						title={capitalizeFirstLetter(getTranslation('common.close', 'Close'))}
+						title={'Close'}
 						onclick={() => {
 							modalState.isOpen = false;
 							modalState.url = '';
 						}}
 					>
 						<Icon icon="material-symbols:close-rounded" class="h-4 w-4" />
-						<span class="sr-only"
-							>{capitalizeFirstLetter(getTranslation('common.close', 'Close'))}</span
-						>
+						<span class="sr-only">Close</span>
 					</Button>
 				</div>
 			</div>
 
 			<CustomValueInput
-				label={capitalizeFirstLetter(getTranslation('common.magnet', 'Magnet')) +
-					' / ' +
-					capitalizeFirstLetter(getTranslation('common.http', 'HTTP')) +
-					' ' +
-					capitalizeFirstLetter(getTranslation('common.url', 'URL'))}
+				label={'Magnet' + ' / ' + 'HTTP' + ' ' + 'URL'}
 				placeholder="magnet:?xt=urn:btih:7d5210a711291d7181d6e074ce5ebd56f3fedd60&dn=debian-12.10.0-amd64-netinst.iso&xl=663748608&tr=http%3A%2F%2Fbttracker.debian.org%3A6969%2Fannounce"
 				bind:value={modalState.url}
 				classes="flex-1 space-y-1"
@@ -266,9 +261,7 @@
 
 			<Dialog.Footer class="flex justify-end">
 				<div class="flex w-full items-center justify-end gap-2 px-1 py-2">
-					<Button onclick={newDownload} type="submit" size="sm"
-						>{capitalizeFirstLetter(getTranslation('common.download', 'Download'))}</Button
-					>
+					<Button onclick={newDownload} type="submit" size="sm">Download</Button>
 				</div>
 			</Dialog.Footer>
 		</Dialog.Content>

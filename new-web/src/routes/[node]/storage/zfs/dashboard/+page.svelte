@@ -54,7 +54,7 @@
 		{
 			queryKey: ['poolStats'],
 			queryFn: async () => {
-				return await getPoolStats(Number(comboBoxes.poolStats.interval.value), 128);
+				return await getPoolStats(1, 128);
 			},
 			refetchInterval: 1000,
 			keepPreviousData: false,
@@ -132,31 +132,6 @@
 				value: pool.name,
 				label: pool.name
 			}))
-		},
-		datasetCompression: {
-			open: false,
-			value: pools[0]?.name || '',
-			data: pools.map((pool) => ({
-				value: pool.name,
-				label: pool.name
-			}))
-		},
-		poolStats: {
-			interval: {
-				open: false,
-				value: '1',
-				data: poolStats?.intervalMap
-			},
-			statType: {
-				open: false,
-				value: 'allocated',
-				data: [
-					{ value: 'allocated', label: 'Allocated' },
-					{ value: 'free', label: 'Free' },
-					{ value: 'size', label: 'Size' },
-					{ value: 'dedupRatio', label: 'Dedup Ratio' }
-				]
-			}
 		}
 	});
 
@@ -166,21 +141,6 @@
 				data: getPoolUsagePieData(pools, comboBoxes.poolUsage.value)
 			}
 		};
-	});
-
-	let histograms = $derived.by(() => {
-		return {
-			compression: {
-				data: getDatasetCompressionHist(comboBoxes.datasetCompression.value, datasets)
-			}
-		};
-	});
-
-	type StatType = 'allocated' | 'free' | 'size' | 'dedupRatio';
-
-	let { poolStatsData, poolStatsKeys } = $derived.by(() => {
-		const statType = comboBoxes.poolStats.statType.value as StatType;
-		return getPoolStatsCombined(poolStats.poolStatPoint, statType);
 	});
 </script>
 
@@ -209,146 +169,5 @@
 				{@render card(type)}
 			</div>
 		{/each}
-	</div>
-
-	<div class="flex flex-wrap gap-4">
-		{#if pools.length > 0}
-			<div
-				class="mt-3 flex h-[310px] min-h-[200px] w-[300px] min-w-[280px] resize flex-col overflow-auto"
-			>
-				<Card.Root class="flex flex-1 flex-col ">
-					<Card.Header>
-						<Card.Title class="mb-[-100px]">
-							<div class="flex w-full items-center justify-between">
-								<div class="flex items-center">
-									<Icon icon="mdi:data-usage" class="mr-2" />
-									<span class="text-sm font-bold md:text-lg xl:text-xl">Pool Usage</span>
-								</div>
-								<CustomComboBox
-									bind:open={comboBoxes.poolUsage.open}
-									label=""
-									bind:value={comboBoxes.poolUsage.value}
-									data={comboBoxes.poolUsage.data}
-									classes=""
-									placeholder="Select a pool"
-									width="w-48"
-									disallowEmpty={true}
-								/>
-							</div>
-						</Card.Title>
-					</Card.Header>
-
-					<Card.Content class="flex-1 overflow-hidden">
-						<div class="mt-4 flex h-full items-center justify-center">
-							<PieChart
-								containerClass="h-full w-full rounded"
-								data={pieCharts.poolUsage.data}
-								formatter={'size-formatter'}
-							/>
-						</div>
-					</Card.Content>
-				</Card.Root>
-			</div>
-
-			<div
-				class="mt-3 flex h-[310px] min-h-[270px] w-[722px] min-w-[425px] resize flex-col overflow-auto"
-			>
-				<Card.Root class="flex flex-1 flex-col ">
-					<Card.Header>
-						<Card.Title class="mb-[-100px]">
-							<div class="flex w-full items-center justify-between">
-								<div class="flex items-center">
-									<Icon icon="mdi:data-usage" class="mr-2" />
-									<span class="text-sm font-bold md:text-lg xl:text-xl">Dataset Compression</span>
-								</div>
-								<CustomComboBox
-									bind:open={comboBoxes.datasetCompression.open}
-									label=""
-									bind:value={comboBoxes.datasetCompression.value}
-									data={comboBoxes.datasetCompression.data}
-									classes=""
-									placeholder="Select a pool"
-									width="w-48"
-									disallowEmpty={true}
-								/>
-							</div>
-						</Card.Title>
-					</Card.Header>
-
-					<Card.Content class="flex-1 overflow-hidden">
-						<div class="mt-4 flex h-full items-center justify-center">
-							{#if histograms.compression.data.length === 0}
-								<p class="text-sm font-semibold text-gray-500">No data available</p>
-							{:else}
-								<BarChart
-									containerClass="h-full w-full rounded"
-									data={histograms.compression.data}
-									colors={{
-										baseline: 'hsla(60, 50%, 50%, 0.5)',
-										value: 'hsla(120, 50%, 50%, 0.5)'
-									}}
-								/>
-							{/if}
-						</div>
-					</Card.Content>
-				</Card.Root>
-			</div>
-
-			<div
-				class="mt-3 flex h-[310px] min-h-[270px] w-[722px] min-w-[425px] resize flex-col overflow-auto"
-			>
-				<Card.Root class="flex flex-1 flex-col ">
-					<Card.Header>
-						<Card.Title class="mb-[-100px]">
-							<div class="flex w-full items-center justify-between">
-								<div class="flex items-center">
-									<Icon icon="mdi:data-usage" class="mr-2" />
-									<span class="text-sm font-bold md:text-lg xl:text-xl">PoolStats</span>
-								</div>
-
-								<div class="flex items-center gap-2">
-									<CustomComboBox
-										bind:open={comboBoxes.poolStats.statType.open}
-										label=""
-										bind:value={comboBoxes.poolStats.statType.value}
-										data={comboBoxes.poolStats.statType.data}
-										classes=""
-										placeholder="Select a stat type"
-										width="w-48"
-										disallowEmpty={true}
-									/>
-									<CustomComboBox
-										bind:open={comboBoxes.poolStats.interval.open}
-										label=""
-										bind:value={comboBoxes.poolStats.interval.value}
-										data={comboBoxes.poolStats.interval.data}
-										classes=""
-										placeholder="Select a interval"
-										width="w-48"
-										disallowEmpty={true}
-									/>
-								</div>
-							</div>
-						</Card.Title>
-					</Card.Header>
-
-					<Card.Content class="flex-1 overflow-hidden">
-						<div class="mt-4 flex h-full items-center justify-center">
-							{#if poolStatsData.length === 0}
-								<p class="text-sm font-semibold text-gray-500">No data available</p>
-							{:else}
-								<LineGraph
-									data={poolStatsData}
-									keys={poolStatsKeys}
-									unformattedKeys={[comboBoxes.poolStats.statType.value]}
-									valueType="fileSize"
-									interval={comboBoxes.poolStats.interval.value}
-								/>
-							{/if}
-						</div>
-					</Card.Content>
-				</Card.Root>
-			</div>
-		{/if}
 	</div>
 </div>

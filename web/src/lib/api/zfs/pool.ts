@@ -42,17 +42,17 @@ export async function createPool(data: CreateZpool) {
 }
 
 export async function replaceDevice(data: ReplaceDevice) {
-	return await apiRequest(`/zfs/pools/${data.name}/replace-device`, APIResponseSchema, 'POST', {
+	return await apiRequest(`/zfs/pools/${data.guid}/replace-device`, APIResponseSchema, 'POST', {
 		...data
 	});
 }
 
-export async function deletePool(name: string) {
-	return await apiRequest(`/zfs/pools/${name}`, APIResponseSchema, 'DELETE');
+export async function deletePool(guid: string) {
+	return await apiRequest(`/zfs/pools/${guid}`, APIResponseSchema, 'DELETE');
 }
 
-export async function scrubPool(name: string) {
-	return await apiRequest(`/zfs/pools/${name}/scrub`, APIResponseSchema, 'POST');
+export async function scrubPool(guid: string) {
+	return await apiRequest(`/zfs/pools/${guid}/scrub`, APIResponseSchema, 'POST');
 }
 
 export async function getPoolStats(
@@ -68,10 +68,12 @@ export async function getPoolStats(
 
 export async function editPool(
 	name: string,
-	properties: Record<string, string>
+	properties: Record<string, string>,
+	spares: string[] = []
 ): Promise<APIResponse> {
 	return await apiRequest(`/zfs/pools`, APIResponseSchema, 'PATCH', {
 		name,
-		properties
+		properties,
+		spares
 	});
 }

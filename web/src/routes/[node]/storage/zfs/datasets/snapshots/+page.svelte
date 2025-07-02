@@ -1,34 +1,23 @@
 <script lang="ts">
-	import {
-		createPeriodicSnapshot,
-		createSnapshot,
-		deleteSnapshot,
-		getDatasets,
-		getPeriodicSnapshots
-	} from '$lib/api/zfs/datasets';
+	import { bulkDelete, getDatasets, getPeriodicSnapshots } from '$lib/api/zfs/datasets';
 	import { getPools } from '$lib/api/zfs/pool';
+	import AlertDialogModal from '$lib/components/custom/Dialog/Alert.svelte';
+
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import Search from '$lib/components/custom/TreeTable/Search.svelte';
-	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import CreateDetailed from '$lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte';
+	import DeleteSnapshot from '$lib/components/custom/ZFS/datasets/snapshots/Delete.svelte';
+	import Jobs from '$lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
-	import CustomCheckbox from '$lib/components/ui/custom-input/checkbox.svelte';
-	import CustomComboBox from '$lib/components/ui/custom-input/combobox.svelte';
-	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import Label from '$lib/components/ui/label/label.svelte';
-	import ViewSnapshotJobs from '$lib/components/zfs/ViewSnapshotJobs.svelte';
 	import type { Row } from '$lib/types/components/tree-table';
 	import type { Dataset, GroupedByPool, PeriodicSnapshot } from '$lib/types/zfs/dataset';
 	import type { Zpool } from '$lib/types/zfs/pool';
-	import { getTranslation } from '$lib/utils/i18n';
-	import { capitalizeFirstLetter } from '$lib/utils/string';
+	import { handleAPIError } from '$lib/utils/http';
 	import { groupByPool } from '$lib/utils/zfs/dataset/dataset';
-	import { handleError } from '$lib/utils/zfs/dataset/fs';
 	import { generateTableData } from '$lib/utils/zfs/dataset/snapshot';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
-	import toast from 'svelte-french-toast';
+	import { toast } from 'svelte-sonner';
 
 	interface Data {
 		pools: Zpool[];
@@ -85,19 +74,30 @@
 		return null;
 	});
 
-	let activeDataset: Dataset | null = $derived.by(() => {
-		if (activeRow) {
-			for (const poolGroup of grouped) {
-				const snapshots = poolGroup.snapshots.filter(
-					(snapshot) => snapshot.name === activeRow?.name
-				);
-				if (snapshots) {
-					return snapshots.find((dataset) => dataset.name === activeRow?.name) || null;
+	let activeDatasets: Dataset[] | null = $derived.by(() => {
+		let snapshots: Dataset[] = [];
+
+		if (activeRows) {
+			for (const row of activeRows) {
+				for (const group of grouped) {
+					if (group.snapshots.length > 0) {
+						const snapshot = group.snapshots.find((snapshot) => snapshot.name === row.name);
+						if (snapshot) {
+							snapshots.push(snapshot);
+						}
+					}
 				}
 			}
 		}
 
-		return null;
+		return snapshots;
+	});
+
+	let isPoolSelected: boolean = $derived.by(() => {
+		if (activeRows) {
+			return activeRows.some((row) => row.type === 'pool');
+		}
+		return false;
 	});
 
 	let activePeriodics: PeriodicSnapshot[] = $derived.by(() => {
@@ -127,221 +127,78 @@
 	});
 
 	let query = $state('');
-	let confirmModals = $state({
-		active: '' as 'createSnapshot' | 'deleteSnapshot' | 'viewSnapshotJobs',
-		parent: 'filesystem' as 'filesystem' | 'snapshot',
-		deleteSnapshot: {
-			open: false,
-			recursive: false,
-			data: '',
-			title: ''
-		},
-		createSnapshot: {
-			open: false,
-			recursive: false,
-			interval: 0,
-			name: '',
-			title: '',
-			extraTitle: ''
-		},
-		viewSnapshotJobs: {
-			open: false
-		}
-	});
-
-	async function closeModal() {
-		confirmModals.createSnapshot = {
-			open: false,
-			recursive: false,
-			interval: 0,
-			name: '',
-			title: '',
-			extraTitle: ''
-		};
-		comboBoxes.pool.value = '';
-		comboBoxes.datasets.value = '';
-		comboBoxes.interval.value = '0';
-	}
-
-	let comboBoxes = $state({
-		pool: {
-			open: false,
-			value: '',
-			data: pools.map((pool) => ({
-				value: pool.name,
-				label: pool.name
-			}))
-		},
-		datasets: {
-			open: false,
-			value: '',
-			data: [] as { value: string; label: string }[]
-		},
-		interval: {
-			open: false,
-			value: '0',
-			data: [
-				{ value: '0', label: 'None' },
-				{ value: '60', label: 'Every Minute' },
-				{ value: '3600', label: 'Every Hour' },
-				{ value: '86400', label: 'Every Day' },
-				{ value: '604800', label: 'Every Week' },
-				{ value: '2419200', label: 'Every Month' },
-				{ value: '29030400', label: 'Every Year' }
-			]
-		}
-	});
-
-	$effect(() => {
-		const currentSelectedPool = comboBoxes.pool.value;
-		if (currentSelectedPool) {
-			comboBoxes.datasets.data = datasets
-				.filter((dataset) => dataset.name.startsWith(currentSelectedPool))
-				.map((dataset) => ({
-					value: dataset.name,
-					label: dataset.name
-				}));
-		} else {
-			comboBoxes.datasets.data = [];
-		}
-	});
-
-	$effect(() => {
-		if (confirmModals.active === 'createSnapshot' && confirmModals.createSnapshot.open) {
-			if (comboBoxes.pool.value && !comboBoxes.datasets.value) {
-				confirmModals.createSnapshot.extraTitle = ` - ${comboBoxes.pool.value}`;
-			} else if (comboBoxes.pool.value && comboBoxes.datasets.value) {
-				confirmModals.createSnapshot.extraTitle = ` - ${comboBoxes.datasets.value}`;
-			} else {
-				confirmModals.createSnapshot.extraTitle = '';
+	let modals = $state({
+		snapshot: {
+			create: {
+				open: false
+			},
+			delete: {
+				open: false
+			},
+			bulkDelete: {
+				open: false
+			},
+			periodics: {
+				open: false
 			}
 		}
 	});
-
-	async function confirmAction() {
-		if (confirmModals.active === 'deleteSnapshot') {
-			if (activeDataset) {
-				const response = await deleteSnapshot(
-					activeDataset,
-					confirmModals.deleteSnapshot.recursive
-				);
-
-				if (response.error) {
-					handleError(response);
-					return;
-				}
-
-				toast.success(
-					`${capitalizeFirstLetter(getTranslation('common.snapshot', 'snapshot'))} ${activeDataset.name} ${getTranslation('common.deleted', 'deleted')}`,
-					{
-						position: 'bottom-center'
-					}
-				);
-
-				activeDataset = null;
-				activeRow = null;
-			}
-		}
-
-		if (confirmModals.active === 'createSnapshot') {
-			if (comboBoxes.datasets.value) {
-				const dataset = datasets.find((dataset) => dataset.name === comboBoxes.datasets.value);
-				if (dataset) {
-					const interval = parseInt(comboBoxes.interval.value) || 0;
-
-					if (interval === 0) {
-						const response = await createSnapshot(
-							dataset,
-							confirmModals.createSnapshot.name,
-							confirmModals.createSnapshot.recursive
-						);
-
-						if (response.error) {
-							handleError(response);
-							return;
-						}
-					} else if (interval > 0) {
-						const response = await createPeriodicSnapshot(
-							dataset,
-							confirmModals.createSnapshot.name,
-							confirmModals.createSnapshot.recursive,
-							interval
-						);
-
-						console.log(response);
-					}
-				}
-			} else {
-				toast.error('Please select a dataset', {
-					position: 'bottom-center'
-				});
-			}
-
-			confirmModals.createSnapshot.open = false;
-		}
-	}
 </script>
 
 {#snippet button(type: string)}
-	{#if type === 'delete-snapshot' && activeDataset !== null}
+	{#if type === 'delete-snapshot' && activeRows && activeRows.length >= 1 && !isPoolSelected}
 		<Button
-			on:click={async () => {
-				confirmModals.active = 'deleteSnapshot';
-				confirmModals.parent = 'snapshot';
-				confirmModals.deleteSnapshot.open = true;
-				confirmModals.deleteSnapshot.data = activeDataset?.name || '';
-				confirmModals.deleteSnapshot.title = activeDataset?.name || '';
+			onclick={() => {
+				if (activeRows?.length === 1) {
+					modals.snapshot.delete.open = true;
+					modals.snapshot.bulkDelete.open = false;
+				} else {
+					modals.snapshot.bulkDelete.open = true;
+					modals.snapshot.delete.open = false;
+				}
 			}}
 			size="sm"
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
-			<Icon icon="mdi:delete" class="mr-1 h-4 w-4" /> Delete Snapshot
+			<div class="flex items-center">
+				<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
+				<span>{activeRows?.length === 1 ? 'Delete Snapshot' : 'Delete Snapshots'}</span>
+			</div>
 		</Button>
 	{/if}
 
-	{#if type === 'view-periodics' && activePeriodics.length > 0}
+	{#if type === 'view-periodics' && activePool && activePeriodics && activePeriodics.length > 0}
 		<Button
-			on:click={async () => {
-				confirmModals.active = 'viewSnapshotJobs';
-				confirmModals.parent = 'snapshot';
-				// confirmModals.deleteSnapshot.open = true;
-				// confirmModals.deleteSnapshot.data = activeDataset?.name || '';
-				// confirmModals.deleteSnapshot.title = activeDataset?.name || '';
-				confirmModals.viewSnapshotJobs.open = true;
+			onclick={() => {
+				modals.snapshot.periodics.open = true;
 			}}
 			size="sm"
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
-			<Icon icon="material-symbols:save-clock" class="mr-1 h-4 w-4" /> View Snapshot Jobs
+			<div class="flex items-center">
+				<Icon icon="mdi:clock-time-four" class="mr-1 h-4 w-4" />
+				<span>View Periodics</span>
+			</div>
 		</Button>
 	{/if}
 {/snippet}
 
 <div class="flex h-full w-full flex-col">
-	<div class="flex h-10 w-full items-center gap-2 border p-2">
+	<div class="flex h-10 w-full items-center gap-2 border-b p-2">
 		<Search bind:query />
 
 		<Button
-			on:click={() => {
-				confirmModals.active = 'createSnapshot';
-				confirmModals.parent = 'snapshot';
-				confirmModals.createSnapshot.open = true;
-				confirmModals.createSnapshot.recursive = false;
-				confirmModals.createSnapshot.interval = 0;
-				confirmModals.createSnapshot.name = '';
-				confirmModals.createSnapshot.title = '';
+			onclick={() => {
+				modals.snapshot.create.open = true;
 			}}
 			size="sm"
 			class="h-6"
 		>
-			<Icon icon="gg:add" class="mr-1 h-4 w-4" /> New
+			<div class="flex items-center">
+				<Icon icon="gg:add" class="mr-1 h-4 w-4" />
+				<span>New</span>
+			</div>
 		</Button>
-
-		<!-- {@render button('create-snapshot')}
-		{@render button('rollback-snapshot')}
-		{@render button('delete-snapshot')}
-		{@render button('delete-filesystem')} -->
-		<!-- {@render button('create-snapshot')} -->
 
 		{@render button('delete-snapshot')}
 		{@render button('view-periodics')}
@@ -352,187 +209,56 @@
 		name={tableName}
 		bind:parentActiveRow={activeRows}
 		bind:query
-		multipleSelect={false}
+		multipleSelect={true}
 	/>
 </div>
 
-{#if confirmModals.active === 'createSnapshot'}
-	<Dialog.Root
-		bind:open={confirmModals[confirmModals.active].open}
-		closeOnOutsideClick={false}
-		closeOnEscape={false}
-	>
-		<Dialog.Content>
-			<div class="flex items-center justify-between">
-				<Dialog.Header class="flex-1">
-					<Dialog.Title>
-						<div class="flex items-center">
-							<Icon icon="carbon:ibm-cloud-vpc-block-storage-snapshots" class="mr-2 h-6 w-6" />
-							Snapshot {confirmModals.createSnapshot.extraTitle}
-						</div>
-					</Dialog.Title>
-				</Dialog.Header>
-				<div class="flex items-center gap-0.5">
-					<Button
-						size="sm"
-						variant="ghost"
-						class="h-8"
-						title={capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}
-						onclick={() => {
-							confirmModals.createSnapshot = {
-								open: true,
-								recursive: false,
-								interval: 0,
-								name: '',
-								title: '',
-								extraTitle: ''
-							};
-							comboBoxes.pool.value = '';
-							comboBoxes.datasets.value = '';
-							comboBoxes.interval.value = '0';
-						}}
-					>
-						<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
-						<span class="sr-only"
-							>{capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}</span
-						>
-					</Button>
-					<Button
-						size="sm"
-						variant="ghost"
-						class="h-8"
-						title={capitalizeFirstLetter(getTranslation('common.close', 'Close'))}
-						onclick={() => {
-							closeModal();
-						}}
-					>
-						<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
-						<span class="sr-only"
-							>{capitalizeFirstLetter(getTranslation('common.close', 'Close'))}</span
-						>
-					</Button>
-				</div>
-			</div>
-			<CustomValueInput
-				label={capitalizeFirstLetter(getTranslation('common.name', 'Name')) +
-					' | ' +
-					capitalizeFirstLetter(getTranslation('common.prefix', 'Prefix'))}
-				placeholder="after-upgrade"
-				bind:value={confirmModals.createSnapshot.name}
-				classes="flex-1 space-y-1"
-			/>
-
-			<div class="flex gap-4">
-				<CustomComboBox
-					bind:open={comboBoxes.pool.open}
-					label="Pool"
-					bind:value={comboBoxes.pool.value}
-					data={comboBoxes.pool.data}
-					classes="flex-1 space-y-1"
-					placeholder="Select a pool"
-				></CustomComboBox>
-
-				<CustomComboBox
-					bind:open={comboBoxes.datasets.open}
-					label="Dataset"
-					bind:value={comboBoxes.datasets.value}
-					data={comboBoxes.datasets.data}
-					classes="flex-1 space-y-1"
-					placeholder="Select a dataset"
-				></CustomComboBox>
-			</div>
-
-			<div class="flex-1 space-y-1">
-				<CustomComboBox
-					bind:open={comboBoxes.interval.open}
-					label="Interval"
-					bind:value={comboBoxes.interval.value}
-					data={comboBoxes.interval.data}
-					classes="flex-1 space-y-1"
-					placeholder="Select an interval"
-				></CustomComboBox>
-			</div>
-
-			<CustomCheckbox
-				label="Recursive"
-				bind:checked={confirmModals.createSnapshot.recursive}
-				classes="flex items-center gap-2"
-			></CustomCheckbox>
-
-			<Dialog.Footer>
-				<Button
-					size="sm"
-					onclick={() => {
-						confirmAction();
-					}}>Create</Button
-				>
-			</Dialog.Footer>
-		</Dialog.Content>
-	</Dialog.Root>
+<!-- Create Snapshot -->
+{#if modals.snapshot.create.open}
+	<CreateDetailed bind:open={modals.snapshot.create.open} {pools} {datasets} />
 {/if}
 
-{#if confirmModals.active === 'deleteSnapshot'}
-	<AlertDialog.Root
-		bind:open={confirmModals[confirmModals.active].open}
-		closeOnOutsideClick={false}
-		closeOnEscape={false}
-	>
-		<AlertDialog.Content>
-			<AlertDialog.Header>
-				<AlertDialog.Title>{getTranslation('are_you_sure', 'Are you sure?')}</AlertDialog.Title>
-			</AlertDialog.Header>
-
-			<div class="text-muted-foreground mb-2 text-sm">
-				{getTranslation(
-					'common.permanent_delete_msg',
-					'This action cannot be undone. This will permanently delete'
-				)}
-				{confirmModals.parent}
-				<span class="font-semibold">{confirmModals[confirmModals.active].title}</span>.
-			</div>
-
-			<div class="flex items-center gap-2">
-				<Checkbox
-					id="deleteRecursive"
-					bind:checked={confirmModals[confirmModals.active].recursive}
-					aria-labelledby="deleteRecursive-label"
-				/>
-				<Label
-					id="deleteRecursive-label"
-					for="deleteRecursive"
-					class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-					onclick={() => {
-						confirmModals[confirmModals.active].recursive =
-							!confirmModals[confirmModals.active].recursive;
-					}}
-				>
-					Recursive
-				</Label>
-			</div>
-
-			<AlertDialog.Footer>
-				<AlertDialog.Cancel
-					on:click={() => {
-						confirmModals[confirmModals.active].open = false;
-					}}
-				>
-					Cancel
-				</AlertDialog.Cancel>
-				<AlertDialog.Action
-					on:click={() => {
-						confirmAction();
-					}}
-				>
-					Delete
-				</AlertDialog.Action>
-			</AlertDialog.Footer>
-		</AlertDialog.Content>
-	</AlertDialog.Root>
+<!-- Delete Snapshot -->
+{#if modals.snapshot.delete.open && activeDatasets && activeDatasets.length === 1}
+	<DeleteSnapshot bind:open={modals.snapshot.delete.open} dataset={activeDatasets[0]} />
 {/if}
 
-<ViewSnapshotJobs
-	bind:open={confirmModals.viewSnapshotJobs.open}
-	{pools}
-	{datasets}
-	periodicSnapshots={activePeriodics}
-></ViewSnapshotJobs>
+<!-- Bulk delete -->
+{#if modals.snapshot.bulkDelete.open && activeDatasets && activeDatasets.length > 0}
+	<AlertDialogModal
+		bind:open={modals.snapshot.bulkDelete.open}
+		customTitle={`Are you sure you want to delete ${activeDatasets.length} snapshot${activeDatasets.length > 1 ? 's' : ''}? This action cannot be undone.`}
+		actions={{
+			onConfirm: async () => {
+				const response = await bulkDelete(activeDatasets);
+				if (response.status === 'success') {
+					toast.success(
+						`Deleted ${activeDatasets.length} snapshot${activeDatasets.length > 1 ? 's' : ''}`,
+						{
+							position: 'bottom-center'
+						}
+					);
+				} else {
+					handleAPIError(response);
+					toast.error('Failed to delete snapshots', {
+						position: 'bottom-center'
+					});
+				}
+
+				modals.snapshot.bulkDelete.open = false;
+			},
+			onCancel: () => {
+				modals.snapshot.bulkDelete.open = false;
+			}
+		}}
+	/>
+{/if}
+
+{#if modals.snapshot.periodics.open && activePeriodics && activePeriodics.length > 0}
+	<Jobs
+		bind:open={modals.snapshot.periodics.open}
+		{pools}
+		{datasets}
+		periodicSnapshots={activePeriodics}
+	/>
+{/if}

@@ -10,9 +10,10 @@ package handlers
 
 import (
 	"log"
+	"net/http"
 
+	static "github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
-	static "github.com/soulteary/gin-static"
 
 	"sylve/internal/assets"
 	diskHandlers "sylve/internal/handlers/disk"
@@ -217,19 +218,20 @@ func RegisterRoutes(r *gin.Engine,
 			ReverseProxy(c, "http://127.0.0.1:5173")
 		})
 	} else {
-		staticFiles, err := static.EmbedFolder(assets.SvelteKitFiles, "web-files")
+		files, err := static.EmbedFolder(assets.SvelteKitFiles, "web-files")
 		if err != nil {
 			log.Fatalln("Initialization of embed folder failed:", err)
 		}
 
-		r.Use(static.Serve("/", staticFiles))
-
+		r.Use(static.Serve("/", files))
 		r.NoRoute(func(c *gin.Context) {
-			c.FileFromFS("index.html", staticFiles)
-		})
+			indexFile, err := assets.SvelteKitFiles.ReadFile("web-files/index.html")
+			if err != nil {
+				c.String(http.StatusInternalServerError, "Internal Server Error")
+				return
+			}
 
-		r.GET("/", func(c *gin.Context) {
-			c.FileFromFS("index.html", staticFiles)
+			c.Data(http.StatusOK, "text/html", indexFile)
 		})
 	}
 }

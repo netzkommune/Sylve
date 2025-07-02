@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { revokeJWT } from '$lib/api/auth';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
@@ -7,12 +7,9 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
-	import { hostname, language as langStore } from '$lib/stores/basic';
-	import { getTranslation } from '$lib/utils/i18n';
 	import Icon from '@iconify/svelte';
 	import { mode } from 'mode-watcher';
 	import { onDestroy, onMount } from 'svelte';
-	import { _ } from 'svelte-i18n';
 
 	interface Props {
 		onLogin: (
@@ -34,7 +31,7 @@
 	let loading = $state(false);
 
 	$effect(() => {
-		if ($page.url.search.includes('loggedOut')) {
+		if (page.url.search.includes('loggedOut')) {
 			revokeJWT();
 		}
 	});
@@ -46,7 +43,7 @@
 			loading = true;
 
 			try {
-				await onLogin(username, password, authType, language, remember);
+				onLogin(username, password, authType, language, remember);
 			} catch (error) {
 				console.error('Login error:', error);
 			} finally {
@@ -62,12 +59,17 @@
 	onDestroy(() => {
 		window.removeEventListener('keydown', handleKeydown);
 	});
+
+	let languageArr = [
+		{ value: 'en', label: 'English' },
+		{ value: 'mal', label: 'മലയാളം' }
+	];
 </script>
 
 <div class="fixed inset-0 flex items-center justify-center px-3">
 	<Card.Root class="w-full max-w-lg rounded-lg shadow-lg">
 		<Card.Header class="flex flex-row items-center justify-center gap-2">
-			{#if $mode === 'dark'}
+			{#if mode.current === 'dark'}
 				<img src="/logo/white.svg" alt="Sylve Logo" class="mt-2 h-8 w-auto" />
 			{:else}
 				<img src="/logo/black.svg" alt="Sylve Logo" class="h-8 w-auto" />
@@ -77,18 +79,18 @@
 
 		<Card.Content class="space-y-4 p-6">
 			<div class="flex items-center gap-2">
-				<Label for="username" class="w-44">{$_('auth.username')}</Label>
+				<Label for="username" class="w-44">Username</Label>
 				<Input
 					id="username"
 					class="h-8 w-full"
 					type="text"
-					placeholder={$_('common.example')}
+					placeholder="Enter your username"
 					bind:value={username}
 					required
 				/>
 			</div>
 			<div class="flex items-center gap-2">
-				<Label for="password" class="w-44">{$_('auth.password')}</Label>
+				<Label for="password" class="w-44">Password</Label>
 				<Input
 					id="password"
 					type="password"
@@ -100,37 +102,27 @@
 			</div>
 
 			<div class="flex items-center gap-2">
-				<Label for="realm" class="w-44">{$_('auth.realm')}</Label>
-				<Select.Root
-					onSelectedChange={(v) => {
-						authType = v?.value as string;
-					}}
-					selected={{
-						label: getTranslation(`auth.${authType}`, authType),
-						value: authType
-					}}
-				>
+				<Label for="realm" class="w-44">Realm</Label>
+				<Select.Root type="single" bind:value={authType}>
 					<Select.Trigger class="h-8 w-full">
-						<Select.Value placeholder={$_('auth.select_authentication')} />
+						{#if authType === 'pam'}
+							PAM
+						{:else if authType === 'sylve'}
+							Sylve
+						{/if}
 					</Select.Trigger>
 					<Select.Content>
-						<Select.Item value="pam">{$_('auth.pam')}</Select.Item>
-						<Select.Item value="sylve">{$_('auth.sylve')}</Select.Item>
+						<Select.Item value="pam">PAM</Select.Item>
+						<Select.Item value="sylve">Sylve</Select.Item>
 					</Select.Content>
 				</Select.Root>
 			</div>
 
-			<div class="flex items-center gap-2">
-				<Label for="language" class="w-44">{$_('auth.language')}</Label>
-				<Select.Root
-					onSelectedChange={(v) => (language = v?.value as string)}
-					selected={{
-						label: getTranslation(`common.languages.${language}`, language),
-						value: language
-					}}
-				>
+			<div class="flex items-center gap-2" title="Language selection is disabled for now">
+				<Label for="language" class="w-44">Language</Label>
+				<Select.Root type="single" bind:value={language} disabled>
 					<Select.Trigger class="h-8 w-full">
-						<Select.Value placeholder={$_('auth.select_language')} />
+						{languageArr.find((lang) => lang.value === language)?.label || 'Select Language'}
 					</Select.Trigger>
 					<Select.Content>
 						<Select.Item value="en">English</Select.Item>

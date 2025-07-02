@@ -12,9 +12,7 @@ import { api } from '$lib/api/common';
 import { APIResponseSchema, type APIResponse } from '$lib/types/common';
 import type { QueryFunctionContext } from '@sveltestack/svelte-query';
 import adze from 'adze';
-import toast from 'svelte-french-toast';
 import { z } from 'zod/v4';
-import { getValidationError } from './i18n';
 
 export async function apiRequest<T extends z.ZodType>(
 	endpoint: string,
@@ -47,7 +45,6 @@ export async function apiRequest<T extends z.ZodType>(
 			if (parsedResult.success) {
 				return parsedResult.data;
 			} else {
-				// console.log('Validation Error', parsedResult.error);
 				adze.withEmoji.warn('Zod Validation Error', parsedResult.error);
 				return getDefaultValue(schema, apiResponse.data);
 			}
@@ -55,6 +52,7 @@ export async function apiRequest<T extends z.ZodType>(
 
 		return getDefaultValue(schema, apiResponse.data);
 	} catch (error) {
+		adze.withEmoji.error('API Request Error', error);
 		return getDefaultValue(schema, { status: 'error' });
 	}
 }
@@ -101,6 +99,19 @@ export async function cachedFetch<T>(
 	return data;
 }
 
+export function getCache<T>(key: string): T | null {
+	const storedEntry = localStorage.getItem(key);
+	if (storedEntry) {
+		try {
+			const entry: CacheEntry<T> = JSON.parse(storedEntry);
+			return entry.data;
+		} catch (error) {
+			console.error(`Failed to parse cached data for key "${key}"`, error);
+		}
+	}
+	return null;
+}
+
 export async function updateCache<T>(key: string, obj: T): Promise<void> {
 	const now = Date.now();
 	const storedEntry = localStorage.getItem(key);
@@ -123,19 +134,6 @@ export function isAPIResponse(obj: any): obj is APIResponse {
 		typeof obj.status === 'string' &&
 		(typeof obj.message === 'string' || typeof obj.error === 'string')
 	);
-}
-
-export function handleValidationErrors(result: APIResponse, section: string): void {
-	adze.withEmoji.error('Validation Error', result);
-	if (result.error === 'validation_error') {
-		if (Array.isArray(result.data)) {
-			if (result.data.length > 0) {
-				toast.error(getValidationError(result.data[0], section), {
-					position: 'bottom-center'
-				});
-			}
-		}
-	}
 }
 
 export function handleAPIError(result: APIResponse): void {

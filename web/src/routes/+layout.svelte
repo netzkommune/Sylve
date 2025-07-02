@@ -8,16 +8,39 @@
 	import Login from '$lib/components/custom/Login.svelte';
 	import Throbber from '$lib/components/custom/Throbber.svelte';
 	import Shell from '$lib/components/skeleton/Shell.svelte';
+	import { Toaster } from '$lib/components/ui/sonner/index.js';
 	import { store as token } from '$lib/stores/auth';
-	import { hostname } from '$lib/stores/basic';
+	import { hostname, language } from '$lib/stores/basic';
 	import '$lib/utils/i18n';
 	import { preloadIcons } from '$lib/utils/icons';
 	import { addTabulatorFilters } from '$lib/utils/table';
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
 	import { ModeWatcher } from 'mode-watcher';
 	import { onMount, tick } from 'svelte';
-	import toast, { Toaster } from 'svelte-french-toast';
-	import '../app.scss';
+	import { setTranslations } from 'wuchale/runtime.svelte.js';
+
+	import type { Locales } from '$lib/types/common';
+	import { toast } from 'svelte-sonner';
+	import '../app.css';
+
+	const locales = {
+		en: () => import('$lib/locales/en.js'),
+		mal: () => import('$lib/locales/mal.js')
+	};
+
+	function setLocale(locale: Locales) {
+		if (locales[locale]) {
+			locales[locale]().then((mod) => {
+				setTranslations(mod.default);
+			});
+		} else {
+			console.error('Unknown locale:', locale);
+		}
+	}
+
+	$effect.pre(() => {
+		setLocale($language as Locales);
+	});
 
 	const queryClient = new QueryClient();
 	let { children } = $props();
@@ -85,6 +108,7 @@
 		let isError = false;
 
 		try {
+			setLocale(language as Locales);
 			if (await login(username, password, type, remember, language)) {
 				isLoading = true;
 				isLoggedIn = true;

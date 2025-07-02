@@ -118,7 +118,7 @@ export const CreateZpoolSchema = z.object({
 });
 
 export const ReplaceDeviceSchema = z.object({
-	name: z.string(),
+	guid: z.string(),
 	old: z.string(),
 	new: z.string()
 });

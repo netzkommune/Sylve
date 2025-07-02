@@ -15,6 +15,7 @@
 		placeholder?: string;
 		disabled?: boolean;
 		classes?: string;
+		triggerWidth?: string;
 		width?: string;
 		disallowEmpty?: boolean;
 		multiple?: boolean;
@@ -28,6 +29,7 @@
 		placeholder = '',
 		disabled = false,
 		classes = 'space-y-1',
+		triggerWidth = 'w-full',
 		width = 'w-1/2',
 		disallowEmpty = false,
 		multiple = false,
@@ -78,37 +80,40 @@
 </script>
 
 <div class={classes}>
-	<Label class="w-24 whitespace-nowrap text-sm" for={label.toLowerCase()}>
+	<Label class="w-full whitespace-nowrap text-sm" for={label.toLowerCase()}>
 		{label}
 	</Label>
 	<Popover.Root bind:open>
-		<Popover.Trigger asChild let:builder>
+		<Popover.Trigger class={triggerWidth}>
 			<Button
-				builders={[builder]}
 				variant="outline"
 				role="combobox"
 				aria-expanded={open}
-				class="w-full flex-wrap justify-between gap-1"
+				class="w-full flex-nowrap justify-between gap-1 overflow-hidden"
 				{disabled}
 			>
-				{#if selectedLabels.length > 0}
-					{#each selectedLabels as lbl, i}
-						<span
-							class={multiple
-								? 'bg-secondary/100 rounded px-2 py-0.5 text-sm'
-								: 'rounded px-2 text-sm'}
-						>
-							{lbl}
-						</span>
-					{/each}
-				{:else}
-					<span class="opacity-50">{placeholder}</span>
-				{/if}
+				<div class="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
+					{#if selectedLabels.length > 0}
+						{#each selectedLabels as lbl, i}
+							<span
+								class={multiple
+									? 'bg-secondary/100 truncate rounded px-2 py-0.5 text-sm'
+									: 'truncate rounded px-2 text-sm'}
+								title={lbl}
+							>
+								{lbl}
+							</span>
+						{/each}
+					{:else}
+						<span class="truncate opacity-50">{placeholder}</span>
+					{/if}
+				</div>
+
 				<Icon icon="lucide:chevrons-up-down" class="ml-auto h-4 w-4 shrink-0 opacity-50" />
 			</Button>
 		</Popover.Trigger>
 
-		<Popover.Content class="{width} p-0">
+		<Popover.Content class="{width} mx-auto p-0">
 			<Command.Root shouldFilter={false}>
 				<Command.Input bind:value={search} placeholder={placeholder || 'Search...'} />
 				<Command.Empty>No data</Command.Empty>
@@ -118,7 +123,7 @@
 							<Command.Item
 								value={element.value}
 								onSelect={() => selectItem(element.value)}
-								on:keydown={(e) => {
+								onkeydown={(e) => {
 									if (e.key === 'Enter') selectItem(element.value);
 								}}
 							>

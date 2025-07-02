@@ -1,8 +1,6 @@
 import type { Column, Row } from '$lib/types/components/tree-table';
 import type { SwitchList } from '$lib/types/network/switch';
 import type { CellComponent } from 'tabulator-tables';
-import { getTranslation } from '../i18n';
-import { capitalizeFirstLetter } from '../string';
 import { renderWithIcon } from '../table';
 
 export function generateTableData(
@@ -16,11 +14,11 @@ export function generateTableData(
 		{
 			field: 'id',
 			visible: false,
-			title: getTranslation('common.ID', 'ID')
+			title: 'ID'
 		},
 		{
 			field: 'name',
-			title: capitalizeFirstLetter(getTranslation('common.name', 'Name')),
+			title: 'Name',
 			formatter(cell: CellComponent) {
 				const value = cell.getValue();
 				const row = cell.getRow();
@@ -48,15 +46,15 @@ export function generateTableData(
 		},
 		{
 			field: 'mtu',
-			title: getTranslation('network.MTU', 'MTU')
+			title: 'MTU'
 		},
 		{
 			field: 'vlan',
-			title: getTranslation('network.VLAN', 'VLAN')
+			title: 'VLAN'
 		},
 		{
 			field: 'ipv4',
-			title: getTranslation('network.ipv4', 'IPv4'),
+			title: 'IPv4',
 			formatter: (cell: CellComponent) => {
 				const row = cell.getRow();
 				const data = row.getData();
@@ -70,26 +68,26 @@ export function generateTableData(
 		},
 		{
 			field: 'ipv6',
-			title: getTranslation('network.ipv6', 'IPv6')
+			title: 'IPv6'
 		},
 		{
 			field: 'private',
-			title: getTranslation('common.private', 'Private'),
+			title: 'Private',
 			visible: false
 		},
 		{
 			field: 'dhcp',
-			title: getTranslation('network.DHCP', 'DHCP'),
+			title: 'DHCP',
 			visible: false
 		},
 		{
 			field: 'disableIPv6',
-			title: getTranslation('network.disableIPv6', 'Disable IPv6'),
+			title: 'Disable IPv6',
 			visible: false
 		},
 		{
 			field: 'slaac',
-			title: getTranslation('network.slaac', 'SLAAC'),
+			title: 'SLAAC',
 			visible: false
 		}
 	];

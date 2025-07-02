@@ -18,7 +18,7 @@ export async function getVMs(): Promise<VM[]> {
 export async function newVM(data: CreateData): Promise<APIResponse> {
 	return await apiRequest('/vm', APIResponseSchema, 'POST', {
 		name: data.name,
-		vmId: data.id,
+		vmId: parseInt(data.id.toString(), 10),
 		iso: data.storage.iso,
 		storageType: data.storage.type,
 		storageDataset: data.storage.guid,
@@ -27,16 +27,17 @@ export async function newVM(data: CreateData): Promise<APIResponse> {
 		switchId: data.network.switch,
 		switchEmulationType: data.network.emulation,
 		macAddress: data.network.mac,
-		cpuSockets: data.hardware.sockets,
-		cpuCores: data.hardware.cores,
-		cpuThreads: data.hardware.threads,
-		ram: data.hardware.memory,
+		cpuSockets: parseInt(data.hardware.sockets.toString(), 10),
+		cpuCores: parseInt(data.hardware.cores.toString(), 10),
+		cpuThreads: parseInt(data.hardware.threads.toString(), 10),
+		ram: parseInt(data.hardware.memory.toString(), 10),
+		cpuPinning: data.hardware.pinnedCPUs,
 		vncPort: data.advanced.vncPort,
 		vncPassword: data.advanced.vncPassword,
 		vncWait: data.advanced.vncWait,
 		vncResolution: data.advanced.vncResolution,
 		startAtBoot: data.advanced.startAtBoot,
-		bootOrder: data.advanced.bootOrder,
+		bootOrder: parseInt(data.advanced.bootOrder.toString(), 10),
 		pciDevices: data.hardware.passthroughIds,
 		description: data.description
 	});

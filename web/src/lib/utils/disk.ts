@@ -13,9 +13,7 @@ import type { Disk, Partition, SmartAttribute, SmartCtl, SmartNVME } from '$lib/
 import type { Zpool } from '$lib/types/zfs/pool';
 import humanFormat from 'human-format';
 import type { CellComponent } from 'tabulator-tables';
-import { getTranslation } from './i18n';
 import { generateNumberFromString } from './numbers';
-import { capitalizeFirstLetter } from './string';
 import { renderWithIcon } from './table';
 
 export function parseSMART(disk: Disk): SmartAttribute | SmartAttribute[] {
@@ -57,14 +55,13 @@ export function parseSMART(disk: Disk): SmartAttribute | SmartAttribute[] {
 		if (data?.ata_smart_attributes?.table?.length) {
 			for (const element of data.ata_smart_attributes.table) {
 				attributes.push({
-					[getTranslation('common.ID', 'ID')]: element.id,
-					[capitalizeFirstLetter(getTranslation('common.name', 'Name'))]: element.name,
-					[capitalizeFirstLetter(getTranslation('common.value', 'Value'))]: element.value,
-					[capitalizeFirstLetter(getTranslation('common.worst', 'Worst'))]: element.worst,
-					[capitalizeFirstLetter(getTranslation('common.threshold', 'Threshold'))]: element.thresh,
-					[capitalizeFirstLetter(getTranslation('common.flags', 'Flags'))]: element.flags.string,
-					[capitalizeFirstLetter(getTranslation('common.failing', 'Failing'))]:
-						element.when_failed || '-'
+					['ID']: element.id,
+					['Name']: element.name,
+					['Value']: element.value,
+					['Worst']: element.worst,
+					['Threshold']: element.thresh,
+					['Flags']: element.flags.string,
+					['Failing']: element.when_failed || '-'
 				});
 			}
 		}
@@ -124,18 +121,22 @@ export function isPartitionInDisk(disks: Disk[], partition: Partition): Disk | n
 }
 
 export function zpoolUseableDisks(disks: Disk[], pools: Zpool[]): Disk[] {
-	const useableDisks: Disk[] = [];
+	const useable: Disk[] = [];
 	for (const disk of disks) {
+		if (disk.device === 'da0' || disk.device === 'cd0') {
+			continue;
+		}
+
 		if (disk.usage === 'Partitions') {
 			continue;
 		}
 
 		if (disk.usage === 'Unused' && disk.gpt === false) {
-			useableDisks.push(disk);
+			useable.push(disk);
 		}
 	}
 
-	return useableDisks;
+	return useable;
 }
 
 export function zpoolUseablePartitions(disks: Disk[], pools: Zpool[]): Partition[] {
@@ -186,7 +187,7 @@ export function generateTableData(disks: Disk[]): { rows: Row[]; columns: Column
 	const columns: Column[] = [
 		{
 			field: 'device',
-			title: getTranslation('disk.device', 'Device'),
+			title: 'Device',
 			formatter: (cell: CellComponent) => {
 				const value = cell.getValue();
 				const row = cell.getRow();
@@ -215,39 +216,39 @@ export function generateTableData(disks: Disk[]): { rows: Row[]; columns: Column
 		},
 		{
 			field: 'type',
-			title: getTranslation('disk.type', 'Type')
+			title: 'Type'
 		},
 		{
 			field: 'usage',
-			title: getTranslation('disk.usage', 'Usage')
+			title: 'Usage'
 		},
 		{
 			field: 'size',
-			title: getTranslation('disk.size', 'Size'),
+			title: 'Size',
 			formatter: (cell: CellComponent) => {
 				return humanFormat(cell.getValue());
 			}
 		},
 		{
 			field: 'gpt',
-			title: getTranslation('disk.gpt', 'GPT')
+			title: 'GPT'
 		},
 		{
 			field: 'model',
-			title: getTranslation('disk.model', 'Model')
+			title: 'Model'
 		},
 		{
 			field: 'serial',
-			title: getTranslation('disk.serial', 'Serial')
+			title: 'Serial'
 		},
 		{
 			field: 'smartStatus',
-			title: getTranslation('disk.smart', 'S.M.A.R.T.'),
+			title: 'S.M.A.R.T.',
 			visible: false
 		},
 		{
 			field: 'wearOut',
-			title: getTranslation('disk.wearout', 'Wearout'),
+			title: 'Wearout',
 			formatter: (cell: CellComponent) => {
 				const value = cell.getValue();
 				if (!isNaN(value)) {

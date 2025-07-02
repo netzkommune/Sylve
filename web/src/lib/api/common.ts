@@ -11,9 +11,10 @@
 import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
 import { store as token } from '$lib/stores/auth';
+import type { APIResponse } from '$lib/types/common';
 import adze from 'adze';
 import axios, { AxiosError, type AxiosInstance, type InternalAxiosRequestConfig } from 'axios';
-import toast from 'svelte-french-toast';
+import { toast } from 'svelte-sonner';
 import { get } from 'svelte/store';
 
 export let ENDPOINT: string;
@@ -75,16 +76,38 @@ export function handleAxiosError(error: unknown): void {
 	if (axiosError.response) {
 		const errorMessage =
 			axiosError.response.data?.message || axiosError.message || 'An error occurred';
-		// adze.withEmoji.error('Status:', axiosError.response.status);
-		// adze.withEmoji.error('Data:', axiosError.response.data);
-		// adze.withEmoji.error('Error message:', errorMessage);
-		// showToast({ text: errorMessage, type: 'error', timeout: 5000 });
+		adze.withEmoji.error(
+			JSON.stringify({
+				status: axiosError.response.status,
+				data: axiosError.response.data,
+				message: errorMessage
+			})
+		);
 	} else if (axiosError.request) {
-		// adze.withEmoji.error('No response:', axiosError.request);
-		// showToast({
-		// 	text: 'No response from server',
-		// 	type: 'error',
-		// 	timeout: 5000
-		// });
+		adze.withEmoji.error('No response:', axiosError.request);
+	}
+}
+
+export function handleAPIResponse(
+	response: APIResponse,
+	messages: {
+		success?: string;
+		error?: string;
+		info?: string;
+		warn?: string;
+	}
+): void {
+	// console.log('API Response:', response);
+	if (response.status === 'error') {
+		adze.withEmoji.error(response);
+		toast.error(messages.error || 'Operation failed', {
+			position: 'bottom-center'
+		});
+	}
+
+	if (response.status === 'success') {
+		toast.success(messages.success || 'Operation successful', {
+			position: 'bottom-center'
+		});
 	}
 }

@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
-	import { getTranslation } from '$lib/utils/i18n';
+	import { page } from '$app/state';
 	import Icon from '@iconify/svelte';
-	import { _ } from 'svelte-i18n';
 	import { slide } from 'svelte/transition';
 	import SidebarElement from './TreeView.svelte';
 
@@ -36,7 +34,7 @@
 		}
 	};
 
-	const sidebarActive = 'rounded-md bg-primary/10 dark:bg-muted font-inter font-medium';
+	const sidebarActive = 'rounded-md bg-muted dark:bg-muted font-inter font-medium';
 
 	function isItemActive(menuItem: SidebarProps, currentUrl: string): boolean {
 		if (menuItem.href && currentUrl.startsWith(menuItem.href)) {
@@ -48,7 +46,7 @@
 		return false;
 	}
 
-	let activeUrl = $derived($page.url.pathname);
+	let activeUrl = $derived(page.url.pathname);
 	let isActive = $derived(isItemActive(item, activeUrl));
 	let lastActiveUrl = $derived.by(() => {
 		const segments = activeUrl.split('/');
@@ -72,14 +70,14 @@
 
 <li class={`w-full`}>
 	<a
-		class={`my-0.5 flex w-full items-center justify-between px-1.5 py-0.5 ${isActive ? sidebarActive : 'hover:bg-primary/10 dark:hover:bg-muted rounded-md'}${lastActiveUrl === item.label ? '!text-primary' : ' '}`}
+		class={`my-0.5 flex w-full items-center justify-between px-1.5 py-0.5 ${isActive ? sidebarActive : 'hover:bg-muted dark:hover:bg-muted rounded-md'}${lastActiveUrl === item.label ? '!text-primary' : ' '}`}
 		href={item.href}
 		onclick={toggle}
 	>
 		<div class="flex items-center space-x-1 text-sm">
 			<Icon icon={item.icon} width="18" />
 			<p class="font-inter cursor-pointer whitespace-nowrap">
-				{getTranslation(`node.${item.label}`, item.label)}
+				{item.label}
 			</p>
 		</div>
 		{#if item.children}

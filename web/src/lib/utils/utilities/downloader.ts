@@ -2,7 +2,6 @@ import type { Column, Row } from '$lib/types/components/tree-table';
 import type { Download } from '$lib/types/utilities/downloader';
 import humanFormat from 'human-format';
 import type { CellComponent } from 'tabulator-tables';
-import { getTranslation } from '../i18n';
 import { generateNumberFromString } from '../numbers';
 import { renderWithIcon } from '../table';
 
@@ -40,7 +39,7 @@ export function generateTableData(data: Download[]): { rows: Row[]; columns: Col
 		},
 		{
 			field: 'size',
-			title: getTranslation('disk.size', 'Size'),
+			title: 'Size',
 			formatter: (cell: CellComponent) => {
 				const value = cell.getValue();
 
@@ -117,4 +116,31 @@ export function generateTableData(data: Download[]): { rows: Row[]; columns: Col
 		rows: rows,
 		columns: columns
 	};
+}
+
+export function getISOs(
+	downloads: Download[],
+	includeImg: boolean = false
+): { label: string; value: string }[] {
+	const options: { label: string; value: string }[] = [];
+
+	for (const download of downloads || []) {
+		if (download.progress !== 100) continue;
+
+		const addIfMatch = (name: string) => {
+			if (name.endsWith('.iso') || (includeImg && name.endsWith('.img'))) {
+				options.push({ label: name, value: download.uuid });
+			}
+		};
+
+		if (download.type === 'http') {
+			addIfMatch(download.name);
+		} else if (download.type === 'torrent' && Array.isArray(download.files)) {
+			for (const file of download.files) {
+				addIfMatch(file.name);
+			}
+		}
+	}
+
+	return options;
 }

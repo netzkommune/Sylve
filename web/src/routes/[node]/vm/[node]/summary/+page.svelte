@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import AlertDialog from '$lib/components/custom/AlertDialog.svelte';
+	import AlertDialog from '$lib/components/custom/Dialog/Alert.svelte';
 
 	import { goto } from '$app/navigation';
+	import AreaChart from '$lib/components/custom/Charts/Area.svelte';
 	import * as Card from '$lib/components/ui/card/index.js';
 
 	import {
@@ -13,7 +14,7 @@
 		getVMs,
 		updateDescription
 	} from '$lib/api/vm/vm';
-	import LoadingDialog from '$lib/components/custom/LoadingDialog.svelte';
+	import LoadingDialog from '$lib/components/custom/Dialog/Loading.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import { Progress } from '$lib/components/ui/progress/index.js';
@@ -25,16 +26,15 @@
 	import { sleep } from '$lib/utils';
 	import { updateCache } from '$lib/utils/http';
 
-	import LineGraph from '$lib/components/custom/LineGraph.svelte';
+	import LineGraph from '$lib/components/custom/Charts/LineGraph.svelte';
 	import type { HistoricalData } from '$lib/types/common';
-	import { getTranslation } from '$lib/utils/i18n';
 	import { floatToNDecimals } from '$lib/utils/numbers';
 	import { capitalizeFirstLetter } from '$lib/utils/string';
 	import { dateToAgo } from '$lib/utils/time';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
 	import humanFormat from 'human-format';
-	import toast from 'svelte-french-toast';
+	import { toast } from 'svelte-sonner';
 
 	interface Data {
 		vms: VM[];
@@ -109,11 +109,9 @@
 	async function handleDelete() {
 		modalState.isDeleteOpen = false;
 		modalState.loading.open = true;
-		modalState.loading.title = capitalizeFirstLetter(
-			getTranslation('vm.deleting_vm_full', 'Deleting Virtual Machine')
-		);
-
+		modalState.loading.title = 'Deleting Virtual Machine';
 		modalState.loading.description = `Please wait while VM <b>${vm.name} (${vm.vmId})</b> is being deleted.`;
+
 		await sleep(1000);
 		const result = await deleteVM(vm.id);
 		modalState.loading.open = false;
@@ -134,9 +132,7 @@
 
 	async function handleStart() {
 		modalState.loading.open = true;
-		modalState.loading.title = capitalizeFirstLetter(
-			getTranslation('vm.starting_vm_full', 'Starting Virtual Machine')
-		);
+		modalState.loading.title = 'Starting Virtual Machine';
 		modalState.loading.description = `Please wait while VM <b>${vm.name} (${vm.vmId})</b> is being started.`;
 		modalState.loading.iconColor = 'text-green-500';
 
@@ -161,9 +157,7 @@
 
 	async function handleStop() {
 		modalState.loading.open = true;
-		modalState.loading.title = capitalizeFirstLetter(
-			getTranslation('vm.stopping_vm_full', 'Stopping Virtual Machine')
-		);
+		modalState.loading.title = 'Stopping Virtual Machine';
 		modalState.loading.description = `Please wait while VM <b>${vm.name} (${vm.vmId})</b> is being stopped.`;
 		modalState.loading.iconColor = 'text-red-500';
 
@@ -185,31 +179,47 @@
 		}
 	}
 
-	let udTime = $derived.by(() => {
-		if (domain.status === 'Running') {
-			if (vm.startedAt) {
-				return `Started ${dateToAgo(vm.startedAt)}`;
+	let udTime = $derived.by(
+		/* @wc-ignore */ () => {
+			if (domain.status === 'Running') {
+				if (vm.startedAt) {
+					return `Started ${dateToAgo(vm.startedAt)}`;
+				}
+			} else if (domain.status === 'Stopped' || domain.status === 'Shutoff') {
+				if (vm.stoppedAt) {
+					return `Stopped ${dateToAgo(vm.stoppedAt)}`;
+				}
 			}
-		} else if (domain.status === 'Stopped' || domain.status === 'Shutoff') {
-			if (vm.stoppedAt) {
-				return `Stopped ${dateToAgo(vm.stoppedAt)}`;
-			}
+			return '';
 		}
-		return '';
+	);
+
+	let cpuHistoricalData = $derived.by(() => {
+		return {
+			field: 'cpuUsage',
+			label: 'CPU Usage',
+			color: 'chart-1',
+			data: stats
+				.map((data) => ({
+					date: new Date(data.createdAt),
+					value: Math.floor(data.cpuUsage)
+				}))
+				.slice(-12)
+		};
 	});
 
-	let cpuHistoricalData: HistoricalData[] = $derived.by(() => {
-		return stats.map((data) => ({
-			date: new Date(data.createdAt),
-			cpuUsage: Math.floor(data.cpuUsage)
-		}));
-	});
-
-	let memoryUsageData: HistoricalData[] = $derived.by(() => {
-		return stats.map((data) => ({
-			date: new Date(data.createdAt),
-			memoryUsage: Math.floor(data.memoryUsage)
-		}));
+	let memoryUsageData = $derived.by(() => {
+		return {
+			field: 'memoryUsage',
+			label: 'Memory Usage',
+			color: 'chart-2',
+			data: stats
+				.map((data) => ({
+					date: new Date(data.createdAt),
+					value: Math.floor(data.memoryUsage)
+				}))
+				.slice(-12)
+		};
 	});
 
 	$effect(() => {
@@ -222,16 +232,16 @@
 {#snippet button(type: string)}
 	{#if type === 'start' && domain.id == -1 && domain.status !== 'Running'}
 		<Button
-			on:click={() => handleStart()}
+			onclick={() => handleStart()}
 			size="sm"
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
 			<Icon icon="mdi:play" class="mr-1 h-4 w-4" />
-			{capitalizeFirstLetter(getTranslation('common.start', 'Start'))}
+			{'Start'}
 		</Button>
 
 		<Button
-			on:click={() => {
+			onclick={() => {
 				modalState.isDeleteOpen = true;
 				modalState.title = `${vm.name} (${vm.vmId})`;
 			}}
@@ -239,40 +249,40 @@
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
 			<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
-			{capitalizeFirstLetter(getTranslation('common.delete', 'Delete'))}
+			{'Delete'}
 		</Button>
 	{:else if type === 'stop' && domain.id !== -1 && domain.status === 'Running'}
 		<Button
-			on:click={() => handleStop()}
+			onclick={() => handleStop()}
 			size="sm"
 			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 		>
 			<Icon icon="mdi:stop" class="mr-1 h-4 w-4" />
-			{capitalizeFirstLetter(getTranslation('common.stop', 'Stop'))}
+			{'Stop'}
 		</Button>
 	{/if}
 {/snippet}
 
 <div class="flex h-full w-full flex-col">
-	<div class="flex h-10 w-full items-center gap-2 border p-2">
+	<div class="flex h-10 w-full items-center gap-2 border p-4">
 		{@render button('start')}
 		{@render button('stop')}
 	</div>
 
 	<div class="min-h-0 flex-1">
 		<ScrollArea orientation="both" class="h-full">
-			<div class="grid grid-cols-1 gap-3 p-3 lg:grid-cols-2">
-				<Card.Root class="w-full">
-					<Card.Header class="p-2">
-						<Card.Description class="text-md font-normal text-blue-600 dark:text-blue-500"
-							>{vm.name} {udTime ? `(${udTime})` : ''}</Card.Description
-						>
+			<div class="grid grid-cols-1 gap-4 p-4 lg:grid-cols-2">
+				<Card.Root class="w-full gap-0 p-4">
+					<Card.Header class="p-0">
+						<Card.Description class="text-md  font-normal text-blue-600 dark:text-blue-500">
+							{`${vm.name} ${udTime ? `(${udTime})` : ''}`}
+						</Card.Description>
 					</Card.Header>
-					<Card.Content class="p-2">
+					<Card.Content class="mt-3 p-0">
 						<div class="flex items-start">
 							<div class="flex items-center">
 								<Icon icon="fluent:status-12-filled" class="mr-1 h-5 w-5" />
-								{getTranslation('vm.stats', 'Status')}
+								{'Status'}
 							</div>
 							<div class="ml-auto">
 								{domain.status}
@@ -283,40 +293,55 @@
 							<div class="flex w-full justify-between pb-1">
 								<p class="inline-flex items-center">
 									<Icon icon="solar:cpu-bold" class="mr-1 h-5 w-5" />
-									{getTranslation('summary.cpu_usage', 'CPU Usage')}
+									{'CPU Usage'}
 								</p>
 								<p class="ml-auto">
-									{floatToNDecimals(recentStat.cpuUsage, 2)}% {getTranslation('common.of', 'of')}
-									{vm.cpuCores * vm.cpuThreads * vm.cpuSockets}
-									vCPU(s)
+									{#if domain.status === 'Running'}
+										{`${floatToNDecimals(recentStat.cpuUsage, 2)}% of ${vm.cpuCores * vm.cpuThreads * vm.cpuSockets} vCPU(s)`}
+									{:else}
+										{`0% of ${vm.cpuCores * vm.cpuThreads * vm.cpuSockets} vCPU(s)`}
+									{/if}
 								</p>
 							</div>
-							<Progress value={recentStat.cpuUsage || 0} max={100} class="ml-auto h-2" />
+
+							{#if domain.status === 'Running'}
+								<Progress value={recentStat.cpuUsage || 0} max={100} class="ml-auto h-2" />
+							{:else}
+								<Progress value={0} max={100} class="ml-auto h-2" />
+							{/if}
 						</div>
 
 						<div class="mt-2">
 							<div class="flex w-full justify-between pb-1">
 								<p class="inline-flex items-center">
 									<Icon icon="ph:memory" class="mr-1 h-5 w-5" />
-									{getTranslation('summary.ram_usage', 'RAM Usage')}
+									{'RAM Usage'}
 								</p>
 								<p class="ml-auto">
-									{floatToNDecimals(recentStat.memoryUsage, 2)}% {getTranslation('common.of', 'of')}
-									{humanFormat(vm.ram)}
+									{#if domain.status === 'Running'}
+										{`${floatToNDecimals(recentStat.memoryUsage, 2)}% of ${humanFormat(vm.ram)}`}
+									{:else}
+										{`0% of ${humanFormat(vm.ram)}`}
+									{/if}
 								</p>
 							</div>
-							<Progress value={recentStat.memoryUsage || 0} max={100} class="ml-auto h-2" />
+
+							{#if domain.status === 'Running'}
+								<Progress value={recentStat.memoryUsage || 0} max={100} class="ml-auto h-2" />
+							{:else}
+								<Progress value={0} max={100} class="ml-auto h-2" />
+							{/if}
 						</div>
 					</Card.Content>
 				</Card.Root>
 
-				<Card.Root class="w-full">
-					<Card.Header class="p-2">
+				<Card.Root class="w-full gap-0 p-4">
+					<Card.Header class="p-0">
 						<Card.Description class="text-md font-normal text-blue-600 dark:text-blue-500">
 							Description
 						</Card.Description>
 					</Card.Header>
-					<Card.Content class="p-2">
+					<Card.Content class="mt-3 p-0">
 						<CustomValueInput
 							label={''}
 							placeholder="Notes about VM"
@@ -329,56 +354,9 @@
 				</Card.Root>
 			</div>
 
-			<div class="p-3">
-				<Card.Root class="w-full">
-					<Card.Header>
-						<Card.Title>
-							<div class="flex items-center space-x-2">
-								<Icon icon="solar:cpu-bold" class="h-5 w-5" />
-								<p>{getTranslation('summary.cpu_usage', 'CPU Usage')}</p>
-							</div>
-						</Card.Title>
-					</Card.Header>
-					<Card.Content class="h-[300px]">
-						<LineGraph
-							data={[cpuHistoricalData]}
-							valueType="percentage"
-							keys={[
-								{
-									key: 'cpuUsage',
-									title: getTranslation('summary.cpu_usage', 'CPU Usage'),
-									color: 'hsl(0, 50%, 50%)'
-								}
-							]}
-						/>
-					</Card.Content>
-				</Card.Root>
-			</div>
-
-			<div class="p-3">
-				<Card.Root class="w-full">
-					<Card.Header>
-						<Card.Title>
-							<div class="flex items-center space-x-2">
-								<Icon icon="ph:memory" class="h-5 w-5" />
-								<p>{getTranslation('summary.memory_usage', 'Memory Usage')}</p>
-							</div>
-						</Card.Title>
-					</Card.Header>
-					<Card.Content class="h-[300px]">
-						<LineGraph
-							data={[memoryUsageData]}
-							valueType="percentage"
-							keys={[
-								{
-									key: 'memoryUsage',
-									title: getTranslation('summary.memory_usage', 'Memory Usage'),
-									color: 'hsl(50, 50%, 50%)'
-								}
-							]}
-						/>
-					</Card.Content>
-				</Card.Root>
+			<div class="space-y-4 p-3">
+				<AreaChart title="CPU Usage" elements={[cpuHistoricalData]} />
+				<AreaChart title="Memory Usage" elements={[memoryUsageData]} />
 			</div>
 		</ScrollArea>
 	</div>

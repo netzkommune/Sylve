@@ -27,13 +27,13 @@
 						id="child-left-pane-auto"
 						autoSaveId="child-left-pane-auto-save"
 					>
-						<Resizable.Pane defaultSize={12}>
+						<Resizable.Pane defaultSize={12} class="border-l">
 							<LeftPanel />
 						</Resizable.Pane>
 
 						<Resizable.Handle withHandle />
 
-						<Resizable.Pane>
+						<Resizable.Pane class="border-r">
 							{@render children?.()}
 						</Resizable.Pane>
 					</Resizable.PaneGroup>

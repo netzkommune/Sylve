@@ -1,7 +1,7 @@
 @use './tabulator.scss';
 
 .tabulator {
-	@apply border-none bg-primary;
+	@apply bg-primary border-none;
 
 	.tabulator-header {
 		@apply border-border bg-background;
@@ -15,10 +15,10 @@
 		}
 
 		.tabulator-calcs-holder {
-			@apply border border-border bg-background !important;
+			@apply !border-border !bg-background !border;
 
 			.tabulator-row {
-				@apply bg-background !important;
+				@apply !bg-background;
 			}
 		}
 
@@ -29,7 +29,7 @@
 				@media (hover: hover) and (pointer: fine) {
 					@apply border-border;
 					&.tabulator-col-sorter-element:hover {
-						@apply cursor-pointer bg-background;
+						@apply bg-background cursor-pointer;
 					}
 				}
 			}
@@ -44,12 +44,12 @@
 		}
 
 		.tabulator-col-title input {
-			@apply border border-border;
+			@apply border-border border;
 		}
 	}
 
 	.tabulator-row {
-		@apply border-b border-border bg-background text-black dark:text-white;
+		@apply border-border bg-background border-b text-black dark:text-white;
 
 		@media (hover: hover) and (pointer: fine) {
 			&.tabulator-selectable:hover {
@@ -99,7 +99,7 @@
 		.tabulator-frozen input {
 			@apply opacity-40;
 			background-color: rgb(63 63 70) !important;
-			@apply border border-border;
+			@apply border-border border;
 		}
 	}
 
@@ -137,10 +137,10 @@
 				}
 
 				.tabulator-page {
-					@apply border-border bg-primary-foreground text-black hover:border-primary/10 hover:bg-primary/10 dark:bg-muted dark:text-white hover:dark:border-muted hover:dark:bg-muted/10;
+					@apply border-border bg-primary-foreground hover:border-primary/10 hover:bg-primary/10 dark:bg-muted hover:dark:border-muted hover:dark:bg-muted/10 text-black dark:text-white;
 
 					&.active {
-						@apply bg-primary text-secondary !important;
+						@apply !bg-primary !text-secondary;
 					}
 
 					&:disabled {
@@ -152,7 +152,7 @@
 
 		.tabulator-calcs-holder {
 			.tabulator-row {
-				@apply bg-primary !important;
+				@apply !bg-primary;
 			}
 		}
 
@@ -170,7 +170,7 @@
 }
 
 .tabulator-table .tabulator-row-odd {
-	@apply border-b border-none border-border bg-background text-black dark:text-white;
+	@apply border-border bg-background border-b border-none text-black dark:text-white;
 
 	.tabulator-frozen {
 		@apply bg-secondary;
@@ -185,14 +185,14 @@
 }
 
 .tabulator-table .tabulator-row-even {
-	@apply border-b border-none border-border bg-background text-black dark:text-white;
+	@apply border-border bg-background border-b border-none text-black dark:text-white;
 
 	.tabulator-frozen {
 		@apply bg-secondary;
 	}
 
 	.tabulator-frozen input {
-		@apply border border-border;
+		@apply border-border border;
 	}
 
 	@media (hover: hover) and (pointer: fine) {
@@ -204,7 +204,7 @@
 }
 
 .tabulator-table .tabulator-selected {
-	@apply bg-muted !important;
+	@apply !bg-muted;
 }
 
 .tabulator-table .tabulator-tree-level-0 .tabulator-cell:first-of-type {

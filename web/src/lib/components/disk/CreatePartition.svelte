@@ -6,13 +6,10 @@
 	import { Slider } from '$lib/components/ui/slider/index.js';
 	import * as Table from '$lib/components/ui/table';
 	import type { Disk } from '$lib/types/disk/disk';
-	import { handleAPIError } from '$lib/utils/http';
-	import { getTranslation } from '$lib/utils/i18n';
-	import { capitalizeFirstLetter } from '$lib/utils/string';
 	import Icon from '@iconify/svelte';
 	import humanFormat from 'human-format';
 	import { tick } from 'svelte';
-	import toast from 'svelte-french-toast';
+	import { toast } from 'svelte-sonner';
 	import { slide } from 'svelte/transition';
 
 	interface Data {
@@ -24,20 +21,13 @@
 	let { open, disk, onCancel }: Data = $props();
 
 	let newPartitions: { name: string; size: number }[] = $state([]);
-	let remainingSpace = $state(0);
-	let currentPartitionInput = $state('');
+	let currentPartitionInput = $state('0 B');
 	let currentPartition = $derived.by(() => {
 		try {
 			const parsed = humanFormat.parse.raw(currentPartitionInput);
 			return parsed.factor * parsed.value;
 		} catch (e) {
 			return 0;
-		}
-	});
-
-	$effect(() => {
-		if (disk) {
-			remainingSpace = calculateRemainingSpace(disk);
 		}
 	});
 
@@ -50,29 +40,17 @@
 		if (disk) {
 			const sizes = newPartitions.map((partition) => Math.floor(partition.size));
 			const result = await createPartitions(`/dev/${disk.device}`, sizes);
+			let message = '';
+
 			if (result.status === 'success') {
-				let successMessage = '';
-				if (sizes.length === 1) {
-					successMessage = `${capitalizeFirstLetter(getTranslation('disk.partition', 'Partition'))}`;
-				} else {
-					successMessage = `${capitalizeFirstLetter(getTranslation('disk.partitions', 'Partitions'))}`;
-				}
-
-				successMessage += ` ${getTranslation('common.created', 'created')}`;
-
-				toast.success(successMessage);
+				message = `Partition${sizes.length > 1 ? 's' : ''} created`;
 			} else {
-				handleAPIError(result);
-				let errorMessage =
-					capitalizeFirstLetter(getTranslation('common.error', 'Error')) +
-					getTranslation('common.creating', 'creating');
-
-				if (sizes.length === 1) {
-					errorMessage = `${capitalizeFirstLetter(getTranslation('disk.partition', 'Partition'))}`;
-				} else {
-					errorMessage = `${capitalizeFirstLetter(getTranslation('disk.partitions', 'Partitions'))}`;
-				}
+				message = `Error creating ${sizes.length > 1 ? 'partitions' : 'partition'}`;
 			}
+
+			toast.success(message, {
+				position: 'bottom-center'
+			});
 
 			newPartitions = [];
 		}
@@ -123,9 +101,11 @@
 
 		return actual;
 	}
+
+	let remainingSpace = $derived.by(() => (disk ? calculateRemainingSpace(disk) : 0));
 </script>
 
-<Dialog.Root bind:open onOutsideClick={(e) => close()}>
+<Dialog.Root bind:open>
 	<Dialog.Content
 		class="fixed left-1/2 top-1/2 w-[80%] -translate-x-1/2 -translate-y-1/2 transform gap-4 overflow-hidden p-5 lg:max-w-3xl"
 	>
@@ -138,10 +118,10 @@
 			<div class="flex items-center gap-0.5">
 				<Button
 					size="sm"
-					variant="ghost"
-					class="h-8"
-					title={capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}
-					on:click={() => {
+					variant="link"
+					class="h-4 cursor-pointer"
+					title={'Reset'}
+					onclick={() => {
 						newPartitions = [];
 						remainingSpace = disk ? calculateRemainingSpace(disk) : 0;
 						currentPartition = 0;
@@ -149,21 +129,17 @@
 					}}
 				>
 					<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
-					<span class="sr-only"
-						>{capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}</span
-					>
+					<span class="sr-only">Reset</span>
 				</Button>
 				<Button
 					size="sm"
-					variant="ghost"
-					class="h-8"
-					title={capitalizeFirstLetter(getTranslation('common.close', 'Close'))}
+					variant="link"
+					class="h-4 cursor-pointer"
+					title={'Close'}
 					onclick={() => close()}
 				>
 					<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
-					<span class="sr-only"
-						>{capitalizeFirstLetter(getTranslation('common.close', 'Close'))}</span
-					>
+					<span class="sr-only">Close</span>
 				</Button>
 			</div>
 		</div>
@@ -218,19 +194,23 @@
 			</Table.Root>
 		</div>
 
-		<div class="space-y-2 border-t px-6 pt-4">
+		<div class="space-y-2 border-t pt-4">
 			<div class="flex items-center gap-6">
 				<div class="flex-1">
-					<Slider
-						value={[currentPartition]}
-						max={remainingSpace}
-						step={0.1}
-						onValueChange={(e) => {
-							const value = Math.floor(e[0]);
-							currentPartition = value <= 0 ? 0 : value;
-							currentPartitionInput = humanFormat(currentPartition);
-						}}
-					/>
+					{#if remainingSpace > 0}
+						<!-- <Slider
+							type="single"
+							bind:value={currentPartition}
+							max={remainingSpace}
+							step={0.1}
+							onValueCommit={(value: number) => {
+								currentPartition = value <= 0 ? 0 : value;
+								currentPartitionInput = humanFormat(currentPartition);
+
+								console.log('Slider value committed:', value);
+							}}
+						/> -->
+					{/if}
 				</div>
 
 				<Input

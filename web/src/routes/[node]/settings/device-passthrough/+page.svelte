@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { addPPTDevice, getPCIDevices, getPPTDevices, removePPTDevice } from '$lib/api/system/pci';
-	import AlertDialog from '$lib/components/custom/AlertDialog.svelte';
+	import AlertDialog from '$lib/components/custom/Dialog/Alert.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import Search from '$lib/components/custom/TreeTable/Search.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -10,7 +10,7 @@
 	import { generateTableData } from '$lib/utils/system/pci';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
-	import toast from 'svelte-french-toast';
+	import { toast } from 'svelte-sonner';
 
 	interface Data {
 		pciDevices: PCIDevice[];
@@ -90,31 +90,37 @@
 	{#if activeRow !== null && activeRow.length === 1}
 		{#if type === 'enable-passthrough' && !activeRow[0].name.startsWith('ppt')}
 			<Button
-				on:click={() =>
+				onclick={() =>
 					activeRow && addDevice(activeRow[0].domain.toString(), activeRow[0].deviceId)}
 				size="sm"
-				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+				variant="outline"
+				class="h-6.5"
 			>
-				<Icon icon="wpf:disconnected" class="mr-1 h-4 w-4" />
-				Enable Passthrough
+				<div class="flex items-center">
+					<Icon icon="wpf:disconnected" class="mr-1 h-4 w-4" />
+					<span>Enable Passthrough</span>
+				</div>
 			</Button>
 		{/if}
 
 		{#if type === 'disable-passthrough' && activeRow[0].name.startsWith('ppt')}
 			<Button
-				on:click={() => activeRow && removeDevice(activeRow[0].pptId)}
+				onclick={() => activeRow && removeDevice(activeRow[0].pptId)}
 				size="sm"
-				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+				variant="outline"
+				class="h-6.5"
 			>
-				<Icon icon="wpf:connected" class="mr-1 h-4 w-4" />
-				Disable Passthrough
+				<div class="flex items-center">
+					<Icon icon="wpf:connected" class="mr-1 h-4 w-4" />
+					<span>Disable Passthrough</span>
+				</div>
 			</Button>
 		{/if}
 	{/if}
 {/snippet}
 
 <div class="flex h-full w-full flex-col">
-	<div class="flex h-10 w-full items-center gap-2 border p-2">
+	<div class="flex h-10 w-full items-center gap-2 border-b p-2">
 		<Search bind:query />
 
 		{@render button('enable-passthrough')}

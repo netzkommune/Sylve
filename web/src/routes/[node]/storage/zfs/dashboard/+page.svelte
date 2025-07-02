@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { getDatasets } from '$lib/api/zfs/datasets';
 	import { getPools, getPoolStats } from '$lib/api/zfs/pool';
-	import BarChart from '$lib/components/custom/BarChart.svelte';
-	import LineGraph from '$lib/components/custom/LineGraph.svelte';
-	import PieChart from '$lib/components/custom/PieChart.svelte';
+	import BarChart from '$lib/components/custom/Charts/Bar.svelte';
+	import LineGraph from '$lib/components/custom/Charts/LineGraph.svelte';
+	import PieChart from '$lib/components/custom/Charts/Pie.svelte';
 	import * as Card from '$lib/components/ui/card';
 	import CustomComboBox from '$lib/components/ui/custom-input/combobox.svelte';
 	import type { Dataset } from '$lib/types/zfs/dataset';
@@ -54,7 +54,7 @@
 		{
 			queryKey: ['poolStats'],
 			queryFn: async () => {
-				return await getPoolStats(Number(comboBoxes.poolStats.interval.value), 128);
+				return await getPoolStats(1, 128);
 			},
 			refetchInterval: 1000,
 			keepPreviousData: false,
@@ -124,77 +124,41 @@
 		}
 	}
 
-	let comboBoxes = $state({
-		poolUsage: {
-			open: false,
-			value: pools[0]?.name || '',
-			data: pools.map((pool) => ({
-				value: pool.name,
-				label: pool.name
-			}))
-		},
-		datasetCompression: {
-			open: false,
-			value: pools[0]?.name || '',
-			data: pools.map((pool) => ({
-				value: pool.name,
-				label: pool.name
-			}))
-		},
-		poolStats: {
-			interval: {
-				open: false,
-				value: poolStats?.intervalMap[0]?.value || '1',
-				data: poolStats?.intervalMap
-			},
-			statType: {
-				open: false,
-				value: 'allocated',
-				data: [
-					{ value: 'allocated', label: 'Allocated' },
-					{ value: 'free', label: 'Free' },
-					{ value: 'size', label: 'Size' },
-					{ value: 'dedupRatio', label: 'Dedup Ratio' }
-				]
-			}
-		}
+	let poolState = $state({
+		poolUsageOpen: false,
+		poolUsageValue: pools[0]?.name || ''
+	});
+
+	let comboBoxData = $derived({
+		poolUsage: pools.map((pool) => ({
+			value: pool.name,
+			label: pool.name
+		}))
 	});
 
 	let pieCharts = $derived.by(() => {
 		return {
 			poolUsage: {
-				data: getPoolUsagePieData(pools, comboBoxes.poolUsage.value)
+				data: getPoolUsagePieData(pools, poolState.poolUsageValue)
 			}
 		};
 	});
 
-	let histograms = $derived.by(() => {
-		return {
-			compression: {
-				data: getDatasetCompressionHist(comboBoxes.datasetCompression.value, datasets)
-			}
-		};
-	});
-
-	type StatType = 'allocated' | 'free' | 'size' | 'dedupRatio';
-
-	let { poolStatsData, poolStatsKeys } = $derived.by(() => {
-		const statType = comboBoxes.poolStats.statType.value as StatType;
-		return getPoolStatsCombined(poolStats.poolStatPoint, statType);
-	});
+	$inspect('pool usage', comboBoxData);
+	$inspect('pie charts', pieCharts);
 </script>
 
 {#snippet card(type: string)}
-	<Card.Root>
-		<Card.Header>
-			<Card.Title class="mb-[-10px]">
+	<Card.Root class="gap-2 p-5">
+		<Card.Header class="p-0">
+			<Card.Title class="p-0">
 				<div class="flex items-center">
 					<Icon icon={getCardDetails(type).icon} class="mr-2" />
 					<span class="font-normal">{getCardDetails(type).title}</span>
 				</div>
 			</Card.Title>
 		</Card.Header>
-		<Card.Content class="mb-[-10px]">
+		<Card.Content class="p-0 pl-1">
 			<p class="text-xl font-semibold">
 				{counts[type as CardType]}
 			</p>
@@ -203,7 +167,7 @@
 {/snippet}
 
 <div class="p-4">
-	<div class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4">
+	<div class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-5">
 		{#each ['pools', 'datasets', 'file_systems', 'volumes', 'snapshots'] as type}
 			<div>
 				{@render card(type)}
@@ -225,10 +189,10 @@
 									<span class="text-sm font-bold md:text-lg xl:text-xl">Pool Usage</span>
 								</div>
 								<CustomComboBox
-									bind:open={comboBoxes.poolUsage.open}
+									bind:open={poolState.poolUsageOpen}
 									label=""
-									bind:value={comboBoxes.poolUsage.value}
-									data={comboBoxes.poolUsage.data}
+									bind:value={poolState.poolUsageValue}
+									data={comboBoxData.poolUsage}
 									classes=""
 									placeholder="Select a pool"
 									width="w-48"
@@ -245,106 +209,6 @@
 								data={pieCharts.poolUsage.data}
 								formatter={'size-formatter'}
 							/>
-						</div>
-					</Card.Content>
-				</Card.Root>
-			</div>
-
-			<div
-				class="mt-3 flex h-[310px] min-h-[270px] w-[722px] min-w-[425px] resize flex-col overflow-auto"
-			>
-				<Card.Root class="flex flex-1 flex-col ">
-					<Card.Header>
-						<Card.Title class="mb-[-100px]">
-							<div class="flex w-full items-center justify-between">
-								<div class="flex items-center">
-									<Icon icon="mdi:data-usage" class="mr-2" />
-									<span class="text-sm font-bold md:text-lg xl:text-xl">Dataset Compression</span>
-								</div>
-								<CustomComboBox
-									bind:open={comboBoxes.datasetCompression.open}
-									label=""
-									bind:value={comboBoxes.datasetCompression.value}
-									data={comboBoxes.datasetCompression.data}
-									classes=""
-									placeholder="Select a pool"
-									width="w-48"
-									disallowEmpty={true}
-								/>
-							</div>
-						</Card.Title>
-					</Card.Header>
-
-					<Card.Content class="flex-1 overflow-hidden">
-						<div class="mt-4 flex h-full items-center justify-center">
-							{#if histograms.compression.data.length === 0}
-								<p class="text-sm font-semibold text-gray-500">No data available</p>
-							{:else}
-								<BarChart
-									containerClass="h-full w-full rounded"
-									data={histograms.compression.data}
-									colors={{
-										baseline: 'hsla(60, 50%, 50%, 0.5)',
-										value: 'hsla(120, 50%, 50%, 0.5)'
-									}}
-								/>
-							{/if}
-						</div>
-					</Card.Content>
-				</Card.Root>
-			</div>
-
-			<div
-				class="mt-3 flex h-[310px] min-h-[270px] w-[722px] min-w-[425px] resize flex-col overflow-auto"
-			>
-				<Card.Root class="flex flex-1 flex-col ">
-					<Card.Header>
-						<Card.Title class="mb-[-100px]">
-							<div class="flex w-full items-center justify-between">
-								<div class="flex items-center">
-									<Icon icon="mdi:data-usage" class="mr-2" />
-									<span class="text-sm font-bold md:text-lg xl:text-xl">PoolStats</span>
-								</div>
-
-								<div class="flex items-center gap-2">
-									<CustomComboBox
-										bind:open={comboBoxes.poolStats.statType.open}
-										label=""
-										bind:value={comboBoxes.poolStats.statType.value}
-										data={comboBoxes.poolStats.statType.data}
-										classes=""
-										placeholder="Select a stat type"
-										width="w-48"
-										disallowEmpty={true}
-									/>
-									<CustomComboBox
-										bind:open={comboBoxes.poolStats.interval.open}
-										label=""
-										bind:value={comboBoxes.poolStats.interval.value}
-										data={comboBoxes.poolStats.interval.data}
-										classes=""
-										placeholder="Select a interval"
-										width="w-48"
-										disallowEmpty={true}
-									/>
-								</div>
-							</div>
-						</Card.Title>
-					</Card.Header>
-
-					<Card.Content class="flex-1 overflow-hidden">
-						<div class="mt-4 flex h-full items-center justify-center">
-							{#if poolStatsData.length === 0}
-								<p class="text-sm font-semibold text-gray-500">No data available</p>
-							{:else}
-								<LineGraph
-									data={poolStatsData}
-									keys={poolStatsKeys}
-									unformattedKeys={[comboBoxes.poolStats.statType.value]}
-									valueType="fileSize"
-									interval={comboBoxes.poolStats.interval.value}
-								/>
-							{/if}
 						</div>
 					</Card.Content>
 				</Card.Root>

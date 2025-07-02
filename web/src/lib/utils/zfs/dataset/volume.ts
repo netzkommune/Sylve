@@ -1,31 +1,29 @@
 import type { APIResponse } from '$lib/types/common';
 import type { Column, Row } from '$lib/types/components/tree-table';
 import type { GroupedByPool } from '$lib/types/zfs/dataset';
-import { getTranslation } from '$lib/utils/i18n';
 import { generateNumberFromString } from '$lib/utils/numbers';
-import { capitalizeFirstLetter } from '$lib/utils/string';
 import { renderWithIcon, sizeFormatter } from '$lib/utils/table';
 import { cleanChildren } from '$lib/utils/tree-table';
-import toast from 'svelte-french-toast';
+import { toast } from 'svelte-sonner';
 
 export const createVolProps = {
 	atime: [
 		{
-			label: 'on',
+			label: 'Yes',
 			value: 'on'
 		},
 		{
-			label: 'off',
+			label: 'No',
 			value: 'off'
 		}
 	],
 	checksum: [
 		{
-			label: 'on',
+			label: 'Yes',
 			value: 'on'
 		},
 		{
-			label: 'off',
+			label: 'No',
 			value: 'off'
 		},
 		{
@@ -47,11 +45,11 @@ export const createVolProps = {
 	],
 	compression: [
 		{
-			label: 'on',
+			label: 'Yes',
 			value: 'on'
 		},
 		{
-			label: 'off',
+			label: 'No',
 			value: 'off'
 		},
 		{
@@ -81,11 +79,11 @@ export const createVolProps = {
 	],
 	dedup: [
 		{
-			label: 'off',
+			label: 'No',
 			value: 'off'
 		},
 		{
-			label: 'on',
+			label: 'Yes',
 			value: 'on'
 		},
 		{
@@ -95,11 +93,11 @@ export const createVolProps = {
 	],
 	encryption: [
 		{
-			label: 'off',
+			label: 'No',
 			value: 'off'
 		},
 		{
-			label: 'on',
+			label: 'Yes',
 			value: 'on'
 		},
 		{
@@ -257,7 +255,8 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 			size: 0,
 			referenced: '-',
 			guid: undefined,
-			children: []
+			children: [],
+			type: 'pool'
 		};
 
 		poolRow.size = group.pool?.size;
@@ -271,7 +270,8 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 					size: vol.volsize,
 					referenced: vol.referenced,
 					guid: vol.properties?.guid,
-					children: []
+					children: [],
+					type: 'volume'
 				};
 
 				const snapshots = group.snapshots.filter((snap) => snap.name.startsWith(vol.name + '@'));
@@ -282,7 +282,8 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 						size: snap.used,
 						referenced: snap.referenced,
 						guid: snap.properties?.guid,
-						children: []
+						children: [],
+						type: 'snapshot'
 					}))
 				);
 
@@ -301,27 +302,16 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 
 export function handleError(error: APIResponse): void {
 	if (error.error?.includes('dataset_in_use_by_vm')) {
-		toast.error(
-			capitalizeFirstLetter(
-				getTranslation('zfs.datasets.dataset_in_use_by_vm', 'dataset is in use by a VM'),
-				true
-			),
-			{
-				position: 'bottom-center'
-			}
-		);
+		toast.error('Dataset is in use by a VM', {
+			position: 'bottom-center'
+		});
 
 		return;
 	}
 
 	if (error.error?.includes('dataset already exists')) {
-		toast.error(
-			capitalizeFirstLetter(
-				getTranslation('zfs.datasets.dataset_already_exists', 'dataset already exists')
-			),
-			{
-				position: 'bottom-center'
-			}
-		);
+		toast.error('Dataset already exists', {
+			position: 'bottom-center'
+		});
 	}
 }

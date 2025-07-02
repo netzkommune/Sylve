@@ -6,7 +6,7 @@
 	import { openTerminal, terminalStore } from '$lib/stores/terminal.svelte';
 	import Icon from '@iconify/svelte';
 	import { mode, toggleMode } from 'mode-watcher';
-	import CreateVM from './CreateVM/CreateVM.svelte';
+	import CreateVM from './VM/Create/CreateVM.svelte';
 
 	let menuData = $state({
 		createVM: {
@@ -22,32 +22,22 @@
 	});
 </script>
 
-<header class="sticky top-0 flex h-[5vh] items-center gap-4 border-b px-2 md:h-[4vh]">
+<header class="sticky top-0 flex h-[5vh] items-center gap-4 border-x border-b px-2 md:h-[4vh]">
 	<nav
 		class="hidden flex-col gap-2 text-lg font-medium md:items-center md:gap-2 md:text-sm lg:flex lg:flex-row lg:gap-4"
 	>
 		<div class="flex items-center space-x-2">
-			{#if $mode === 'dark'}
+			{#if mode.current === 'dark'}
 				<img src="/logo/white.svg" alt="Sylve Logo" class="h-6 w-auto max-w-[100px]" />
 			{:else}
 				<img src="/logo/black.svg" alt="Sylve Logo" class="h-6 w-auto max-w-[100px]" />
 			{/if}
 			<p class="font-normal tracking-[.45em]">SYLVE</p>
 		</div>
-		<!-- <form class="ml-auto flex-1 sm:flex-initial">
-			<div class="relative">
-				<Icon icon="ic:sharp-search" class="absolute left-2.5 top-1.5 h-4 w-4" />
-				<Input
-					type="search"
-					placeholder="Search products..."
-					class="h-7 pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
-				/>
-			</div>
-		</form> -->
 	</nav>
 	<Sheet.Root>
-		<Sheet.Trigger asChild let:builder>
-			<Button variant="outline" size="icon" class="h-7 shrink-0 lg:hidden" builders={[builder]}>
+		<Sheet.Trigger>
+			<Button variant="outline" size="icon" class="h-7 shrink-0 lg:hidden">
 				<Icon icon="material-symbols:menu-rounded" class="h-5 w-5" />
 				<span class="sr-only">Toggle navigation menu</span>
 			</Button>
@@ -60,59 +50,22 @@
 					<p class="font-normal tracking-[.45em]">SYLVE</p>
 				</div>
 				<p class="mt-4 whitespace-nowrap">Virtual Environment 0.0.1</p>
-				<!-- <Button size="sm" class="mt-4 h-8 bg-neutral-600 text-white hover:bg-neutral-700">
-					<Icon icon="material-symbols-light:mail-outline-sharp" class="mr-2 h-4 w-4" />
-					Documentation
-				</Button> -->
-
-				<!-- <Button
-					size="sm"
-					class="h-6"
-					onclick={() => (menuData.createVM.open = !menuData.createVM.open)}
-				>
-					<Icon
-						icon="material-symbols:monitor-outline-rounded pointer-events-none"
-						class="mr-1.5 h-5 w-5"
-					/>
-					Create VM
-				</Button>
-				<CreateVM open={menuData.createVM.open} /> -->
-
-				<!-- <CreateDialog
-					title="Create: Jail"
-					tabs={ctTabs}
-					icon="ph:cube-fill"
-					buttonText="Create Jail"
-					buttonClass="h-8 mt-4"
-				/> -->
 			</nav>
 		</Sheet.Content>
 	</Sheet.Root>
 	<div class="flex w-full items-center justify-end gap-2 md:ml-auto">
-		<!-- <div class="relative lg:hidden">
-			<Icon
-				icon="ic:sharp-search"
-				class="text-muted-foreground absolute left-2.5 top-1.5 h-4 w-4"
-			/>
-			<Input
-				type="search"
-				placeholder="Search products..."
-				class="h-7 pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
-			/>
-		</div> -->
-
 		<!-- desktop view -->
-		<div class="hidden items-center gap-2 lg:inline-flex">
+		<div class="mr-2 hidden items-center gap-4 lg:inline-flex">
 			<Button
-				size="sm"
-				variant="ghost"
-				class="relative z-[9999] flex h-6 items-center justify-center px-0"
+				size="icon"
+				variant="link"
+				class="relative z-[9999] flex  w-auto items-center justify-center "
 				onclick={() => openTerminal()}
 			>
-				<Icon icon="garden:terminal-cli-stroke-16" class="h-5 w-5" />
+				<Icon icon="garden:terminal-cli-stroke-16" class="h-6 w-6" />
 				{#if $terminalStore.tabs.length > 0}
 					<span
-						class="absolute -right-1 -top-1 flex h-4 min-w-[8px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white"
+						class="absolute -right-1 top-0.5 flex h-4 min-w-[8px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white"
 					>
 						{$terminalStore.tabs.length}
 					</span>
@@ -120,8 +73,8 @@
 			</Button>
 
 			<Button
-				size="sm"
 				class="h-6"
+				size="sm"
 				onclick={() => (menuData.createVM.open = !menuData.createVM.open)}
 			>
 				<Icon icon="material-symbols:monitor-outline-rounded" class="mr-1.5 h-5 w-5" />
@@ -131,22 +84,10 @@
 			{#if menuData.createVM.open}
 				<CreateVM bind:open={menuData.createVM.open} />
 			{/if}
-
-			<!--
-			<CreateDialog
-				title="Create: Jail"
-				tabs={ctTabs}
-				icon="tabler:prison"
-				buttonText="Create Jail"
-				buttonClass="h-6"
-			/> -->
 		</div>
 		<DropdownMenu.Root>
-			<DropdownMenu.Trigger asChild let:builder>
-				<Button
-					builders={[builder]}
-					variant="outline"
-					class="border-border flex h-7 items-center gap-1 rounded-md border"
+			<DropdownMenu.Trigger>
+				<Button variant="outline" size="sm" class="h-6.5"
 					><Icon icon="mdi:user" class="h-4 w-4" /> Root <Icon
 						icon="famicons:chevron-down"
 						class="h-4 w-4"

@@ -70,6 +70,16 @@ export async function createFileSystem(
 	});
 }
 
+export async function editFileSystem(
+	guid: string,
+	properties: Record<string, string>
+): Promise<APIResponse> {
+	return await apiRequest(`/zfs/datasets/filesystem`, APIResponseSchema, 'PATCH', {
+		guid: guid,
+		properties: properties
+	});
+}
+
 export async function deleteFileSystem(dataset: Dataset): Promise<APIResponse> {
 	return await apiRequest(
 		`/zfs/datasets/filesystem/${dataset.properties.guid}`,
@@ -97,6 +107,16 @@ export async function createVolume(
 	});
 }
 
+export async function editVolume(
+	dataset: Dataset,
+	properties: Record<string, string>
+): Promise<APIResponse> {
+	return await apiRequest('/zfs/datasets/volume', APIResponseSchema, 'PATCH', {
+		name: dataset.name,
+		properties: properties
+	});
+}
+
 export async function deleteVolume(dataset: Dataset): Promise<APIResponse> {
 	return await apiRequest(
 		`/zfs/datasets/volume/${dataset.properties.guid}`,
@@ -109,5 +129,12 @@ export async function bulkDelete(datasets: Dataset[]): Promise<APIResponse> {
 	const guids = datasets.map((dataset) => dataset.properties.guid);
 	return await apiRequest('/zfs/datasets/bulk-delete', APIResponseSchema, 'POST', {
 		guids: guids
+	});
+}
+
+export async function flashVolume(guid: string, uuid: string): Promise<APIResponse> {
+	return await apiRequest('/zfs/datasets/volume/flash', APIResponseSchema, 'POST', {
+		guid: guid,
+		uuid: uuid
 	});
 }

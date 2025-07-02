@@ -15,7 +15,7 @@
 	import { type APIResponse } from '$lib/types/common';
 	import type { Row } from '$lib/types/components/tree-table';
 	import type { Download } from '$lib/types/utilities/downloader';
-	import { handleValidationErrors, isAPIResponse, updateCache } from '$lib/utils/http';
+	import { handleAPIError, isAPIResponse, updateCache } from '$lib/utils/http';
 	import { isDownloadURL } from '$lib/utils/string';
 	import { generateTableData } from '$lib/utils/utilities/downloader';
 	import Icon from '@iconify/svelte';
@@ -154,7 +154,8 @@
 				document.body.appendChild(link);
 				link.click();
 			} else {
-				handleValidationErrors(result as APIResponse, 'downloads');
+				handleAPIError(result as APIResponse);
+				toast.error('Failed to get download link', { position: 'bottom-center' });
 			}
 		}
 	}
@@ -287,7 +288,8 @@
 					modalState.title = '';
 					activeRows = null;
 				} else {
-					handleValidationErrors(result as APIResponse, 'downloads');
+					handleAPIError(result as APIResponse);
+					toast.error('Failed to delete download', { position: 'bottom-center' });
 				}
 			},
 			onCancel: () => {
@@ -309,7 +311,8 @@
 					modalState.title = '';
 					activeRows = null;
 				} else {
-					handleValidationErrors(result as APIResponse, 'downloads');
+					handleAPIError(result as APIResponse);
+					toast.error('Failed to delete downloads', { position: 'bottom-center' });
 				}
 			},
 			onCancel: () => {

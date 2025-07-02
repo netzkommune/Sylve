@@ -28,6 +28,14 @@ func (s *Service) CreateVmXML(vm vmModels.VM, vmPath string) (string, error) {
 	}
 
 	var devices libvirtServiceInterfaces.Devices
+
+	devices.Controllers = []libvirtServiceInterfaces.Controller{
+		{
+			Type:  "usb",
+			Model: "nec-xhci",
+		},
+	}
+
 	devices.Inputs = []libvirtServiceInterfaces.Input{
 		{
 			Type: "tablet",

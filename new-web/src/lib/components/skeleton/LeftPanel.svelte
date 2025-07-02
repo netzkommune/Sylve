@@ -4,8 +4,6 @@
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 	import { hostname } from '$lib/stores/basic';
 	import type { VM } from '$lib/types/vm/vm';
-	import { getTranslation } from '$lib/utils/i18n';
-	import { capitalizeFirstLetter } from '$lib/utils/string';
 	import { useQueries } from '@sveltestack/svelte-query';
 
 	let openCategories: { [key: string]: boolean } = $state({});
@@ -31,7 +29,7 @@
 	const vms = $derived($results[0].data || []);
 	const tree = $derived([
 		{
-			label: capitalizeFirstLetter(getTranslation('common.datacenter', 'Data Center')),
+			label: 'Data Center',
 			icon: 'fa-solid:server',
 			children: [
 				{

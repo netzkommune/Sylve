@@ -119,10 +119,16 @@ type Input struct {
 	Bus  string `xml:"bus,attr"`
 }
 
+type Controller struct {
+	Type  string `xml:"type,attr"`
+	Model string `xml:"model,attr"`
+}
+
 type Devices struct {
-	Disks      []Disk      `xml:"disk,omitempty"`
-	Interfaces []Interface `xml:"interface,omitempty"`
-	Inputs     []Input     `xml:"input,omitempty"`
+	Disks       []Disk       `xml:"disk,omitempty"`
+	Interfaces  []Interface  `xml:"interface,omitempty"`
+	Controllers []Controller `xml:"controller,omitempty"`
+	Inputs      []Input      `xml:"input,omitempty"`
 }
 
 type BhyveArg struct {

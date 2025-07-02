@@ -93,7 +93,9 @@
 
 		if (totalPinned === cpuInfo?.logicalCores) {
 			pinnedCPUs = pinnedCPUs.slice(0, -1);
-			toast.info('At least one CPU must be left unpinned');
+			toast.info('At least one CPU must be left unpinned', {
+				position: 'bottom-center'
+			});
 		}
 	});
 </script>
@@ -132,8 +134,7 @@
 	<div>
 		{#if cpuInfo}
 			<Label class="mb-4 flex justify-center">CPU Pinning</Label>
-
-			<ScrollArea orientation="vertical" class="h-32 w-full max-w-full">
+			<ScrollArea orientation="vertical" class="h-full w-full max-w-full">
 				<div
 					class="grid grid-cols-6 justify-items-center gap-1 text-xs sm:grid-cols-8 md:grid-cols-10"
 				>
@@ -157,7 +158,7 @@
 	{#if pptDevices && pptDevices.length > 0}
 		<p class="font-medium">PCI Passthrough</p>
 		<div class="border p-4">
-			<ScrollArea orientation="vertical" class="h-60 w-full">
+			<ScrollArea orientation="vertical" class="h-full w-full">
 				{#each checkboxItems as item (item.pptId)}
 					<div class="mb-3 border p-4">
 						<div class="flex items-start space-x-3">
@@ -171,11 +172,13 @@
 							/>
 							<div class="grid gap-1.5 leading-none">
 								<Label for={item.pptId} class="text-sm font-medium">
-									{item.device.names.device} — {item.device.names.vendor}
+									<!-- {item.device.names.device} — {item.device.names.vendor} -->
+									{`${item.device.names.device} — ${item.device.names.vendor}`}
 								</Label>
 								<p class="text-muted-foreground text-sm">
-									pci{item.device.domain}:{item.device.bus}:{item.device.device}:{item.device
-										.function}
+									<!-- pci{item.device.domain}:{item.device.bus}:{item.device.device}:{item.device
+										.function} -->
+									{`pci${item.device.domain}:${item.device.bus}:${item.device.device}:${item.device.function}`}
 								</p>
 							</div>
 						</div>

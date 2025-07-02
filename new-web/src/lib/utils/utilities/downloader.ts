@@ -2,7 +2,6 @@ import type { Column, Row } from '$lib/types/components/tree-table';
 import type { Download } from '$lib/types/utilities/downloader';
 import humanFormat from 'human-format';
 import type { CellComponent } from 'tabulator-tables';
-import { getTranslation } from '../i18n';
 import { generateNumberFromString } from '../numbers';
 import { renderWithIcon } from '../table';
 
@@ -40,7 +39,7 @@ export function generateTableData(data: Download[]): { rows: Row[]; columns: Col
 		},
 		{
 			field: 'size',
-			title: getTranslation('disk.size', 'Size'),
+			title: 'Size',
 			formatter: (cell: CellComponent) => {
 				const value = cell.getValue();
 

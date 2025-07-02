@@ -4,34 +4,33 @@ import type { Disk } from '$lib/types/disk/disk';
 import type { Dataset } from '$lib/types/zfs/dataset';
 import type { Zpool } from '$lib/types/zfs/pool';
 import humanFormat from 'human-format';
-import { getTranslation } from '../i18n';
 import { generateNumberFromString } from '../numbers';
 import { renderWithIcon, sizeFormatter } from '../table';
 
 export const raidTypeArr = [
 	{
 		value: 'stripe',
-		label: getTranslation('zfs.pool.redundancy.stripe', 'Stripe'),
+		label: 'Stripe',
 		available: true
 	},
 	{
 		value: 'mirror',
-		label: getTranslation('zfs.pool.redundancy.mirror', 'Mirror'),
+		label: 'Mirror',
 		available: false
 	},
 	{
 		value: 'raidz',
-		label: getTranslation('zfs.pool.redundancy.raidz', 'RAIDZ'),
+		label: 'RAIDZ',
 		available: false
 	},
 	{
 		value: 'raidz2',
-		label: getTranslation('zfs.pool.redundancy.raidz2', 'RAIDZ2'),
+		label: 'RAIDZ2',
 		available: false
 	},
 	{
 		value: 'raidz3',
-		label: getTranslation('zfs.pool.redundancy.raidz3', 'RAIDZ3'),
+		label: 'RAIDZ3',
 		available: false
 	}
 ];
@@ -289,15 +288,9 @@ export function parsePoolActionError(error: APIResponse): string {
 	if (error.message && error.message === 'pool_create_failed') {
 		if (error.error) {
 			if (error.error.includes('mirror contains devices of different sizes')) {
-				return getTranslation(
-					'zfs.pool.errors.pool_create_failed_mirror_different_sizes',
-					'Pool contains a mirror with devices of different sizes'
-				);
+				return 'Pool contains a mirror with devices of different sizes';
 			} else if (error.error.includes('raidz contains devices of different sizes')) {
-				return getTranslation(
-					'zfs.pool.errors.pool_create_failed_raidz_different_sizes',
-					'Pool contains a raidz vdev with devices of different sizes'
-				);
+				return 'Pool contains a RAIDZ vdev with devices of different sizes';
 			}
 		}
 	}
@@ -305,13 +298,13 @@ export function parsePoolActionError(error: APIResponse): string {
 	if (error.message && error.message === 'pool_delete_failed') {
 		if (error.error) {
 			if (error.error.includes('pool or dataset is busy')) {
-				return getTranslation('zfs.pool.errors.pool_delete_failed_busy', 'Pool is busy');
+				return 'Pool is busy';
 			}
 		}
 	}
 
 	if (error.message && error.message === 'pool_edit_failed') {
-		return getTranslation('zfs.pool.errors.pool_edit_failed', 'Pool edit failed');
+		return 'Pool edit failed';
 	}
 
 	return '';

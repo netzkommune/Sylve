@@ -1,7 +1,6 @@
 import type { APIResponse } from '$lib/types/common';
 import type { Column, Row } from '$lib/types/components/tree-table';
 import type { Dataset, GroupedByPool } from '$lib/types/zfs/dataset';
-import { getTranslation } from '$lib/utils/i18n';
 import { generateNumberFromString } from '$lib/utils/numbers';
 import { capitalizeFirstLetter } from '$lib/utils/string';
 import { renderWithIcon, sizeFormatter } from '$lib/utils/table';
@@ -286,54 +285,34 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 
 export function handleError(error: APIResponse): void {
 	if (error.error?.includes('dataset already exists')) {
-		let [key, value] = ['', ''];
+		let value = '';
 
 		if (error.error?.includes('snapshot')) {
-			key = 'zfs.datasets.snapshot_already_exists';
-			value = 'snapshot already exists';
+			value = 'Snapshot already exists';
 		} else {
-			key = 'zfs.datasets.filesystem_already_exists';
-			value = 'filesystem already exists';
+			value = 'Filesystem already exists';
 		}
 
-		toast.error(capitalizeFirstLetter(getTranslation(key, value)), {
+		toast.error(value, {
 			position: 'bottom-center'
 		});
 	}
 
 	if (error.error?.includes('numeric value is too large')) {
-		toast.error(
-			capitalizeFirstLetter(
-				getTranslation('zfs.datasets.numeric_value_too_large', 'Numeric value is too large')
-			),
-			{
-				position: 'bottom-center'
-			}
-		);
+		toast.error('Numeric value is too large', {
+			position: 'bottom-center'
+		});
 	}
 
 	if (error.error?.includes('invalid_encryption_key_length')) {
-		toast.error(
-			capitalizeFirstLetter(
-				getTranslation(
-					'zfs.datasets.invalid_encryption_key_length',
-					'Invalid encryption key length'
-				)
-			),
-			{
-				position: 'bottom-center'
-			}
-		);
+		toast.error('Invalid encryption key length', {
+			position: 'bottom-center'
+		});
 	}
 
 	if (error.error?.includes('pool or dataset is busy')) {
-		toast.error(
-			capitalizeFirstLetter(
-				getTranslation('zfs.datasets.pool_or_dataset_is_busy', 'Pool or dataset is busy')
-			),
-			{
-				position: 'bottom-center'
-			}
-		);
+		toast.error('Pool or dataset is busy', {
+			position: 'bottom-center'
+		});
 	}
 }

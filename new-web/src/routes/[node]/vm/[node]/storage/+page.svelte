@@ -1,34 +1,21 @@
 <script lang="ts">
 	import { page } from '$app/state';
-
-	import { getVMDomain, getVMs } from '$lib/api/vm/vm';
-	import LoadingDialog from '$lib/components/custom/Dialog/Loading.svelte';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Progress } from '$lib/components/ui/progress/index.js';
-	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
-
-	import { hostname } from '$lib/stores/basic';
-	import type { VM, VMDomain } from '$lib/types/vm/vm';
-	import { sleep } from '$lib/utils';
-	import { updateCache } from '$lib/utils/http';
-
 	import { getDownloads } from '$lib/api/utilities/downloader';
 	import { storageDetach } from '$lib/api/vm/storage';
+	import { getVMDomain, getVMs } from '$lib/api/vm/vm';
 	import { getDatasets } from '$lib/api/zfs/datasets';
 	import { getPools } from '$lib/api/zfs/pool';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
+	import { Button } from '$lib/components/ui/button/index.js';
 	import type { Row } from '$lib/types/components/tree-table';
 	import type { Download } from '$lib/types/utilities/downloader';
+	import type { VM, VMDomain } from '$lib/types/vm/vm';
 	import type { Dataset } from '$lib/types/zfs/dataset';
 	import type { Zpool } from '$lib/types/zfs/pool';
-	import { getTranslation } from '$lib/utils/i18n';
-	import { floatToNDecimals } from '$lib/utils/numbers';
-	import { capitalizeFirstLetter } from '$lib/utils/string';
-	import { dateToAgo } from '$lib/utils/time';
+	import { updateCache } from '$lib/utils/http';
 	import { generateTableData } from '$lib/utils/vm/storage';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
-	import { t } from 'svelte-i18n';
 	import { toast } from 'svelte-sonner';
 
 	interface Data {
@@ -130,8 +117,10 @@
 	{#if domain && domain.status === 'Shutoff' && activeRows && activeRows.length === 1}
 		{#if type === 'detach'}
 			<Button onclick={() => handleDetach()} size="sm" class="h-6">
-				<Icon icon="gg:remove" class="mr-1 h-4 w-4" />
-				{capitalizeFirstLetter(getTranslation('common.detach', 'Detach'))}
+				<div class="flex items-center">
+					<Icon icon="gg:remove" class="mr-1 h-4 w-4" />
+					<span>Detach</span>
+				</div>
 			</Button>
 		{/if}
 	{/if}
@@ -140,8 +129,10 @@
 <div class="flex h-full w-full flex-col">
 	<div class="flex h-10 w-full items-center gap-2 border p-2">
 		<Button onclick={() => handleCreate()} size="sm" class="h-6  ">
-			<Icon icon="gg:add" class="mr-1 h-4 w-4" />
-			{capitalizeFirstLetter(getTranslation('common.new', 'New'))}
+			<div class="flex items-center">
+				<Icon icon="gg:add" class="mr-1 h-4 w-4" />
+				<span>New</span>
+			</div>
 		</Button>
 
 		{@render button('detach')}

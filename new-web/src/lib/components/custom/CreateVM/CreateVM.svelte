@@ -13,7 +13,6 @@
 	import type { PCIDevice, PPTDevice } from '$lib/types/system/pci';
 	import type { Download } from '$lib/types/utilities/downloader';
 	import type { Dataset } from '$lib/types/zfs/dataset';
-	import { getTranslation } from '$lib/utils/i18n';
 	import { capitalizeFirstLetter, generatePassword } from '$lib/utils/string';
 	import { isValidCreateData } from '$lib/utils/vm/vm';
 	import Icon from '@iconify/svelte';
@@ -243,29 +242,19 @@
 					Create Virtual Machine
 				</div>
 				<div class="flex items-center gap-0.5">
-					<Button
-						size="sm"
-						variant="link"
-						class="h-4"
-						onclick={() => resetModal()}
-						title={capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}
-					>
+					<Button size="sm" variant="link" class="h-4" onclick={() => resetModal()} title={'Reset'}>
 						<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
-						<span class="sr-only"
-							>{capitalizeFirstLetter(getTranslation('common.reset', 'Reset'))}</span
-						>
+						<span class="sr-only">{'Reset'}</span>
 					</Button>
 					<Button
 						size="sm"
 						variant="link"
 						class="h-4"
 						onclick={() => (open = false)}
-						title={capitalizeFirstLetter(getTranslation('common.close', 'Close'))}
+						title={'Close'}
 					>
 						<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
-						<span class="sr-only"
-							>{capitalizeFirstLetter(getTranslation('common.close', 'Close'))}</span
-						>
+						<span class="sr-only">{'Close'}</span>
 					</Button>
 				</div>
 			</Dialog.Title>

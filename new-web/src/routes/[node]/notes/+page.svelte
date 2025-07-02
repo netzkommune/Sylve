@@ -10,7 +10,7 @@
 	import type { APIResponse } from '$lib/types/common';
 	import type { Column, Row } from '$lib/types/components/tree-table';
 	import type { Note } from '$lib/types/info/notes';
-	import { handleValidationErrors, isAPIResponse, updateCache } from '$lib/utils/http';
+	import { handleAPIError, isAPIResponse, updateCache } from '$lib/utils/http';
 	import { generateTableData, markdownToTailwindHTML } from '$lib/utils/info/notes';
 	import { convertDbTime } from '$lib/utils/time';
 	import Icon from '@iconify/svelte';
@@ -77,7 +77,10 @@
 				toast.success('Note updated', { position: 'bottom-center' });
 				handleNote(undefined, false, true);
 			} else {
-				handleValidationErrors(response, 'notes');
+				handleAPIError(response);
+				toast.error('Failed to update note', {
+					position: 'bottom-center'
+				});
 			}
 		} else {
 			const response = await createNote(modalState.title, modalState.content);
@@ -86,8 +89,11 @@
 				handleNote(undefined, false, true);
 			}
 
-			if ((response as APIResponse).status) {
-				handleValidationErrors(response as APIResponse, 'notes');
+			if ((response as APIResponse).error) {
+				handleAPIError(response as APIResponse);
+				toast.error('Failed to create note', {
+					position: 'bottom-center'
+				});
 			}
 		}
 	}
@@ -349,7 +355,10 @@
 				if (isAPIResponse(result) && result.status === 'success') {
 					handleNote(undefined, false, true);
 				} else {
-					handleValidationErrors(result as APIResponse, 'notes');
+					handleAPIError(result as APIResponse);
+					toast.error('Failed to delete note', {
+						position: 'bottom-center'
+					});
 				}
 			},
 			onCancel: () => {
@@ -370,7 +379,10 @@
 				if (isAPIResponse(result) && result.status === 'success') {
 					handleNote(undefined, false, true);
 				} else {
-					handleValidationErrors(result as APIResponse, 'notes');
+					handleAPIError(result as APIResponse);
+					toast.error('Failed to delete notes', {
+						position: 'bottom-center'
+					});
 				}
 			},
 			onCancel: () => {

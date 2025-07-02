@@ -1855,6 +1855,14 @@ msgstr "Language selection is disabled for now"
 msgid "Help"
 msgstr "Help"
 
+#: src/routes/[node]/vm/[node]/console/+page.svelte
+msgid "Send Control + Alt + Delete"
+msgstr "Send Control + Alt + Delete"
+
+#: src/routes/[node]/vm/[node]/console/+page.svelte
+msgid "// control alt delete icons in one line <0/> <1/> <2/>"
+msgstr "// control alt delete icons in one line <0/> <1/> <2/>"
+
 #: src/routes/[node]/settings/device-passthrough/+page.svelte
 msgid "Enable Passthrough"
 msgstr "Enable Passthrough"
@@ -1862,3 +1870,23 @@ msgstr "Enable Passthrough"
 #: src/routes/[node]/settings/device-passthrough/+page.svelte
 msgid "Disable Passthrough"
 msgstr "Disable Passthrough"
+
+#: src/lib/components/custom/TreeTable/Search.svelte
+msgid "Search..."
+msgstr "Search..."
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Failed to delete note"
+msgstr "Failed to delete note"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Failed to delete notes"
+msgstr "Failed to delete notes"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Failed to delete download"
+msgstr "Failed to delete download"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Failed to delete downloads"
+msgstr "Failed to delete downloads"

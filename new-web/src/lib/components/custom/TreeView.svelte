@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
-	import { getTranslation } from '$lib/utils/i18n';
+	import { page } from '$app/state';
 	import Icon from '@iconify/svelte';
-	import { _ } from 'svelte-i18n';
 	import { slide } from 'svelte/transition';
 	import SidebarElement from './TreeView.svelte';
 
@@ -48,7 +46,7 @@
 		return false;
 	}
 
-	let activeUrl = $derived($page.url.pathname);
+	let activeUrl = $derived(page.url.pathname);
 	let isActive = $derived(isItemActive(item, activeUrl));
 	let lastActiveUrl = $derived.by(() => {
 		const segments = activeUrl.split('/');

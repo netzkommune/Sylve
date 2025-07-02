@@ -1,9 +1,5 @@
 import type { Column, Row } from '$lib/types/components/tree-table';
 import type { Note } from '$lib/types/info/notes';
-import type { CellComponent } from 'tabulator-tables';
-import { getTranslation } from '../i18n';
-import { capitalizeFirstLetter } from '../string';
-import { convertDbTime } from '../time';
 
 export function generateTableData(
 	columns: Column[],

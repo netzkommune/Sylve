@@ -2,15 +2,23 @@ msgid ""
 msgstr ""
 
 #: src/routes/[node]/network/interfaces/+page.svelte
+#: src/routes/[node]/notes/+page.svelte
 msgid "View"
 msgstr ""
 
 #: src/routes/[node]/network/interfaces/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+#: src/routes/[node]/notes/+page.svelte
 msgid "ID"
 msgstr ""
 
 #: src/routes/[node]/network/interfaces/+page.svelte
 #: src/routes/[node]/network/switches/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/disk/CreatePartition.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/routes/[node]/notes/+page.svelte
 msgid "Name"
 msgstr ""
 
@@ -19,10 +27,13 @@ msgid "Model"
 msgstr ""
 
 #: src/routes/[node]/network/interfaces/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/lib/components/custom/CreateVM/Basic.svelte
 msgid "Description"
 msgstr ""
 
 #: src/routes/[node]/network/interfaces/+page.svelte
+#: src/lib/components/custom/CreateVM/Network.svelte
 msgid "MAC Address"
 msgstr ""
 
@@ -37,6 +48,8 @@ msgstr ""
 
 #: src/routes/[node]/network/interfaces/+page.svelte
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
 msgid "Status"
 msgstr ""
 
@@ -46,12 +59,18 @@ msgstr ""
 
 #: src/routes/[node]/network/switches/+page.svelte
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/routes/[node]/notes/+page.svelte
 msgid "Edit"
 msgstr ""
 
 #: src/routes/[node]/network/switches/+page.svelte
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/notes/+page.svelte
 msgid "Delete"
 msgstr ""
 
@@ -60,6 +79,9 @@ msgstr ""
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+#: src/routes/[node]/notes/+page.svelte
 msgid "New"
 msgstr ""
 
@@ -73,11 +95,37 @@ msgstr ""
 
 #: src/routes/[node]/network/switches/+page.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/CreateVM/CreateVM.svelte
+#: src/lib/components/disk/CreatePartition.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/routes/[node]/notes/+page.svelte
 msgid "Reset"
 msgstr ""
 
 #: src/routes/[node]/network/switches/+page.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/Terminal.svelte
+#: src/lib/components/custom/CreateVM/CreateVM.svelte
+#: src/lib/components/ui/dialog/dialog-content.svelte
+#: src/lib/components/disk/CreatePartition.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/routes/[node]/notes/+page.svelte
 msgid "Close"
 msgstr ""
 
@@ -118,10 +166,16 @@ msgid "Disable IPV6"
 msgstr ""
 
 #: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/notes/+page.svelte
 msgid "Save"
 msgstr ""
 
 #: src/routes/[node]/network/switches/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Create"
 msgstr ""
 
@@ -143,6 +197,7 @@ msgstr ""
 
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 msgid "Create Snapshot"
 msgstr ""
 
@@ -255,10 +310,12 @@ msgid "Pool{0} deleted"
 msgstr ""
 
 #: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "CPU Usage"
 msgstr ""
 
 #: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "RAM Usage"
 msgstr ""
 
@@ -303,6 +360,7 @@ msgid "Sylve Version"
 msgstr ""
 
 #: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Memory Usage"
 msgstr ""
 
@@ -319,6 +377,7 @@ msgid "Network TX"
 msgstr ""
 
 #: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/routes/[node]/notes/+page.svelte
 msgid "Bulk Delete"
 msgstr ""
 
@@ -345,6 +404,7 @@ msgstr ""
 
 #: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/Header.svelte
+#: src/lib/components/custom/Throbber.svelte
 msgid "SYLVE"
 msgstr ""
 
@@ -405,6 +465,7 @@ msgid "Help"
 msgstr ""
 
 #: src/routes/[node]/+layout.svelte
+#: src/lib/components/skeleton/LeftPanel.svelte
 msgid "Difuse-sidebar"
 msgstr ""
 
@@ -437,10 +498,12 @@ msgid "Switches"
 msgstr ""
 
 #: src/routes/[node]/+layout.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Disks"
 msgstr ""
 
 #: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/storage/disks/+page.svelte
 msgid "ZFS"
 msgstr ""
 
@@ -481,6 +544,7 @@ msgid "Settings"
 msgstr ""
 
 #: src/routes/[node]/+layout.svelte
+#: src/lib/components/custom/CreateVM/Hardware.svelte
 msgid "PCI Passthrough"
 msgstr ""
 
@@ -508,6 +572,785 @@ msgstr ""
 msgid "⌘⇧Q"
 msgstr ""
 
+#: src/lib/components/custom/CreateVM/Network.svelte
+#: src/lib/components/custom/CreateVM/Storage.svelte
+msgid "Emulation Type"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Network.svelte
+#: src/lib/components/custom/CreateVM/Storage.svelte
+msgid "Select emulation type"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Hardware.svelte
+msgid "CPU Sockets"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Hardware.svelte
+msgid "CPU Cores"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Hardware.svelte
+msgid "CPU Threads"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Hardware.svelte
+msgid "Memory Size"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Hardware.svelte
+msgid "CPU Pinning"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Hardware.svelte
+msgid "{0} — {1}"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Hardware.svelte
+msgid "pci {0} : {1} : {2} : {3}"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Hardware.svelte
+msgid "At least one CPU must be left unpinned"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+msgid "Snapshot - {0}"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
+msgid "Recursive"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "<0/> Create Volume"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Size"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+msgid "Pool"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Select Pool"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Passphrase"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/CreateVM/Advanced.svelte
+msgid "Enter or generate passphrase"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+msgid "<0/> Edit Volume - {0}"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+msgid "<0/> Flash File to {0}"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+msgid "Select File"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+msgid "File"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+msgid "Error flashing volume"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+msgid "Flash"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "Select a pool"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Dataset"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+msgid "Select a dataset"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Interval"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+msgid "Select an interval"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "<0/> Create Filesystem"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Parent"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Select parent"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "ATime"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "Select ATime"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "Checksum"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "Select Checksum"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "Compression"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "Select Compression"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "Deduplication"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "Select Deduplication"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Encryption"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Select Encryption"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "Quota"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "<0/> Edit Filesystem - {0}"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Start"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Stop"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Notes about VM"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "VM"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Running"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Started{0}"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Stopped{0}"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/console/+page.svelte
+msgid "Reconnect"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+msgid "Detach"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/console/+page.svelte
+msgid "Send Control + Alt + Delete"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/console/+page.svelte
+msgid "// control alt delete icons in one line <0/> <1/> <2/>"
+msgstr ""
+
+#: src/routes/+layout.svelte
+msgid "Logged out"
+msgstr ""
+
+#: src/lib/components/custom/Terminal.svelte
+msgid "Minimize"
+msgstr ""
+
+#: src/lib/components/custom/Terminal.svelte
+msgid "Add new tab"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Start Time"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "End Time"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Node"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "User"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Action"
+msgstr ""
+
+#: src/lib/components/skeleton/LeftPanel.svelte
+msgid "Data Center"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/CreateVM.svelte
+msgid "<0/> Create Virtual Machine"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/CreateVM.svelte
+msgid "Create Virtual Machine"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Advanced.svelte
+msgid "VNC Port"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Advanced.svelte
+msgid "VNC Password"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Advanced.svelte
+msgid "VNC Resolution"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Advanced.svelte
+msgid "Select VNC resolution"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Advanced.svelte
+msgid "Startup/Shutdown Order"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Advanced.svelte
+msgid "VNC Wait"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Advanced.svelte
+msgid "Start On Boot"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Basic.svelte
+msgid "VM Name"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Basic.svelte
+msgid "VM ID"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Basic.svelte
+msgid "Optional description for this virtual machine"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Storage.svelte
+msgid "ZFS Volume"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Storage.svelte
+msgid "Select ZFS volume"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Storage.svelte
+msgid "Disk Size"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Storage.svelte
+msgid "Filesystem Dataset"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Storage.svelte
+msgid "Select filesystem"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Storage.svelte
+msgid "Installation Media"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Storage.svelte
+msgid "Select installation media"
+msgstr ""
+
+#: src/lib/components/custom/CreateVM/Storage.svelte
+msgid "None"
+msgstr ""
+
+#: src/lib/components/ui/custom-input/combobox.svelte
+msgid "No data"
+msgstr ""
+
+#: src/lib/components/ui/custom-input/combobox.svelte
+msgid "Enter"
+msgstr ""
+
+#: src/lib/components/custom/Dialog/Alert.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
+msgid "Are you sure?"
+msgstr ""
+
+#: src/lib/components/custom/Dialog/Alert.svelte
+msgid "This action cannot be undone. This will permanently delete"
+msgstr ""
+
+#: src/lib/components/custom/Dialog/Alert.svelte
+msgid "."
+msgstr ""
+
+#: src/lib/components/custom/Dialog/Alert.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Cancel"
+msgstr ""
+
+#: src/lib/components/custom/Dialog/Alert.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
+msgid "Continue"
+msgstr ""
+
+#: src/lib/components/custom/KVTableModal.svelte
+msgid "Object ( {0} properties)"
+msgstr ""
+
+#: src/lib/components/custom/TreeTable/Search.svelte
+msgid "Escape"
+msgstr ""
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "S.M.A.R.T Values"
+msgstr ""
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Initialize GPT"
+msgstr ""
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Wipe Disk"
+msgstr ""
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Delete Partition"
+msgstr ""
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Create Partition"
+msgstr ""
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Attribute"
+msgstr ""
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Value"
+msgstr ""
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Unable to wipe busy disk"
+msgstr ""
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Unable to delete busy partition"
+msgstr ""
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Error{0}: {1}"
+msgstr ""
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Create Partitions"
+msgstr ""
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Usage"
+msgstr ""
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Actions"
+msgstr ""
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Existing"
+msgstr ""
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "-"
+msgstr ""
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "No partitions created yet"
+msgstr ""
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Add Partition"
+msgstr ""
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "No space left"
+msgstr ""
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Size: {0}"
+msgstr ""
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Remaining space: {0}"
+msgstr ""
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Save Partitions"
+msgstr ""
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "Pool Usage"
+msgstr ""
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "Dataset Compression"
+msgstr ""
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "No data available"
+msgstr ""
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "PoolStats"
+msgstr ""
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "Select a stat type"
+msgstr ""
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "Select a interval"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+msgid "Edit ZFS Pool - {0}"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Auto Expand"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Select Auto Expand"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Yes"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "No"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Auto Trim"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Select Auto Trim"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Delegation"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Select Delegation"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Fail Mode"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Select Fail Mode"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Wait"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Panic"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Spares"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Select spares"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Auto Replace"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Select Auto Replace"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Comment"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Comments about the pool"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Replace.svelte
+msgid "Replace{0} in {1}"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Replace.svelte
+msgid "Replace"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "Resilvering"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "READ: {0}"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "WRITE: {0}"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "CKSUM: {0}"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "Pool Status"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "•"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "Scan Activity"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "No recent scan activity"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "Device Topology"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "No devices found"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "Error Status"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "HDD"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "SSD"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "NVMe"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "No available disks"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Partitions"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "No available partitions"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "<0/> Create ZFS Pool"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Devices"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Options"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Virtual Devices"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Redundancy <0/>"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "VDEVs"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Drop disks here"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Mount Point"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Force Create"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Advanced"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "AShift"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Select ASHIFT"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
+msgid "This will delete the snapshot <0/>"
+msgstr ""
+
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "View Periodics"
+msgstr ""
+
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "Are you sure you want to delete{0} snapshot{1}? This action cannot be undone."
+msgstr ""
+
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "Deleted{0} snapshot{1}"
+msgstr ""
+
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "Failed to delete snapshots"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "View Snapshot Jobs"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Prefix"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Last Run"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Jan 01, 0001"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Never"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Deleted"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "No snapshot jobs"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Save Snapshot Jobs"
+msgstr ""
+
 #: src/routes/[node]/settings/device-passthrough/+page.svelte
 msgid "Enable Passthrough"
 msgstr ""
@@ -530,4 +1373,48 @@ msgstr ""
 
 #: src/routes/[node]/settings/device-passthrough/+page.svelte
 msgid "Failed to remove device from passthrough"
+msgstr ""
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Note"
+msgstr ""
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Post Upgrade Summary"
+msgstr ""
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Content"
+msgstr ""
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "This is a note"
+msgstr ""
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Created"
+msgstr ""
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Updated"
+msgstr ""
+
+#: src/lib/components/custom/TreeTable/Search.svelte
+msgid "Search..."
+msgstr ""
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Failed to delete note"
+msgstr ""
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Failed to delete notes"
+msgstr ""
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Failed to delete download"
+msgstr ""
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Failed to delete downloads"
 msgstr ""

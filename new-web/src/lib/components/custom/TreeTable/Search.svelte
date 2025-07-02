@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { getTranslation } from '$lib/utils/i18n';
-	import { capitalizeFirstLetter } from '$lib/utils/string';
 	import Icon from '@iconify/svelte';
 	import { onMount } from 'svelte';
 	import { cubicOut } from 'svelte/easing';
@@ -48,7 +46,7 @@
 				id="search-input"
 				bind:value={query}
 				type="text"
-				placeholder={`${capitalizeFirstLetter(getTranslation('common.search', 'Search'))}...`}
+				placeholder={'Search...'}
 				class="bg-primary ml-1 w-full text-sm leading-4 focus:outline-none"
 				in:slide={{ duration: 250, easing: cubicOut, axis: 'x' }}
 				out:fade={{ duration: 150 }}

@@ -1,9 +1,7 @@
 import type { APIResponse } from '$lib/types/common';
 import type { Column, Row } from '$lib/types/components/tree-table';
 import type { GroupedByPool } from '$lib/types/zfs/dataset';
-import { getTranslation } from '$lib/utils/i18n';
 import { generateNumberFromString } from '$lib/utils/numbers';
-import { capitalizeFirstLetter } from '$lib/utils/string';
 import { renderWithIcon, sizeFormatter } from '$lib/utils/table';
 import { cleanChildren } from '$lib/utils/tree-table';
 import { toast } from 'svelte-sonner';
@@ -304,27 +302,16 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 
 export function handleError(error: APIResponse): void {
 	if (error.error?.includes('dataset_in_use_by_vm')) {
-		toast.error(
-			capitalizeFirstLetter(
-				getTranslation('zfs.datasets.dataset_in_use_by_vm', 'dataset is in use by a VM'),
-				true
-			),
-			{
-				position: 'bottom-center'
-			}
-		);
+		toast.error('Dataset is in use by a VM', {
+			position: 'bottom-center'
+		});
 
 		return;
 	}
 
 	if (error.error?.includes('dataset already exists')) {
-		toast.error(
-			capitalizeFirstLetter(
-				getTranslation('zfs.datasets.dataset_already_exists', 'dataset already exists')
-			),
-			{
-				position: 'bottom-center'
-			}
-		);
+		toast.error('Dataset already exists', {
+			position: 'bottom-center'
+		});
 	}
 }

@@ -12,9 +12,7 @@ import { api } from '$lib/api/common';
 import { APIResponseSchema, type APIResponse } from '$lib/types/common';
 import type { QueryFunctionContext } from '@sveltestack/svelte-query';
 import adze from 'adze';
-import { toast } from 'svelte-sonner';
 import { z } from 'zod/v4';
-import { getValidationError } from './i18n';
 
 export async function apiRequest<T extends z.ZodType>(
 	endpoint: string,
@@ -136,19 +134,6 @@ export function isAPIResponse(obj: any): obj is APIResponse {
 		typeof obj.status === 'string' &&
 		(typeof obj.message === 'string' || typeof obj.error === 'string')
 	);
-}
-
-export function handleValidationErrors(result: APIResponse, section: string): void {
-	adze.withEmoji.error('Validation Error', result);
-	if (result.error === 'validation_error') {
-		if (Array.isArray(result.data)) {
-			if (result.data.length > 0) {
-				toast.error(getValidationError(result.data[0], section), {
-					position: 'bottom-center'
-				});
-			}
-		}
-	}
 }
 
 export function handleAPIError(result: APIResponse): void {

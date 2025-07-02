@@ -28,7 +28,6 @@
 
 	import LineGraph from '$lib/components/custom/Charts/LineGraph.svelte';
 	import type { HistoricalData } from '$lib/types/common';
-	import { getTranslation } from '$lib/utils/i18n';
 	import { floatToNDecimals } from '$lib/utils/numbers';
 	import { capitalizeFirstLetter } from '$lib/utils/string';
 	import { dateToAgo } from '$lib/utils/time';
@@ -180,28 +179,32 @@
 		}
 	}
 
-	let udTime = $derived.by(() => {
-		if (domain.status === 'Running') {
-			if (vm.startedAt) {
-				return `Started ${dateToAgo(vm.startedAt)}`;
+	let udTime = $derived.by(
+		/* @wc-ignore */ () => {
+			if (domain.status === 'Running') {
+				if (vm.startedAt) {
+					return `Started ${dateToAgo(vm.startedAt)}`;
+				}
+			} else if (domain.status === 'Stopped' || domain.status === 'Shutoff') {
+				if (vm.stoppedAt) {
+					return `Stopped ${dateToAgo(vm.stoppedAt)}`;
+				}
 			}
-		} else if (domain.status === 'Stopped' || domain.status === 'Shutoff') {
-			if (vm.stoppedAt) {
-				return `Stopped ${dateToAgo(vm.stoppedAt)}`;
-			}
+			return '';
 		}
-		return '';
-	});
+	);
 
 	let cpuHistoricalData = $derived.by(() => {
 		return {
 			field: 'cpuUsage',
 			label: 'CPU Usage',
 			color: 'var(--chart-1)',
-			data: stats.map((data) => ({
-				date: new Date(data.createdAt),
-				value: Math.floor(data.cpuUsage)
-			}))
+			data: stats
+				.map((data) => ({
+					date: new Date(data.createdAt),
+					value: Math.floor(data.cpuUsage)
+				}))
+				.slice(-12)
 		};
 	});
 
@@ -210,10 +213,12 @@
 			field: 'memoryUsage',
 			label: 'Memory Usage',
 			color: 'var(--chart-2)',
-			data: stats.map((data) => ({
-				date: new Date(data.createdAt),
-				value: Math.floor(data.memoryUsage)
-			}))
+			data: stats
+				.map((data) => ({
+					date: new Date(data.createdAt),
+					value: Math.floor(data.memoryUsage)
+				}))
+				.slice(-12)
 		};
 	});
 
@@ -269,9 +274,10 @@
 			<div class="grid grid-cols-1 gap-4 p-4 lg:grid-cols-2">
 				<Card.Root class="w-full gap-0 p-4">
 					<Card.Header class="p-0">
-						<Card.Description class="text-md  font-normal text-blue-600 dark:text-blue-500"
-							>{vm.name} {udTime ? `(${udTime})` : ''}</Card.Description
-						>
+						<Card.Description class="text-md  font-normal text-blue-600 dark:text-blue-500">
+							<!-- {vm.name} {udTime ? `(${udTime})` : ''} -->
+							{`${vm.name} ${udTime ? `(${udTime})` : ''}`}
+						</Card.Description>
 					</Card.Header>
 					<Card.Content class="mt-3 p-0">
 						<div class="flex items-start">

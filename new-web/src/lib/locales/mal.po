@@ -8,6 +8,8 @@ msgstr ""
 #: src/lib/components/disk/CreatePartition.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/Terminal.svelte
+#: src/lib/components/ui/sheet/sheet-content.svelte
 msgid "Close"
 msgstr ""
 
@@ -99,6 +101,7 @@ msgid "CPU Pinning"
 msgstr ""
 
 #: src/lib/components/custom/CreateVM/Hardware.svelte
+#: src/routes/[node]/+layout.svelte
 msgid "PCI Passthrough"
 msgstr ""
 
@@ -327,6 +330,7 @@ msgstr ""
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/network/interfaces/+page.svelte
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
 msgid "Status"
 msgstr ""
 
@@ -461,6 +465,7 @@ msgid "Error{0}: {1}"
 msgstr ""
 
 #: src/routes/[node]/storage/disks/+page.svelte
+#: src/routes/[node]/+layout.svelte
 msgid "ZFS"
 msgstr ""
 
@@ -617,6 +622,7 @@ msgid "Drop disks here"
 msgstr ""
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/routes/[node]/+layout.svelte
 msgid "Disks"
 msgstr ""
 
@@ -790,4 +796,145 @@ msgstr ""
 
 #: src/lib/components/custom/ZFS/pools/Status.svelte
 msgid "Error Status"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Datacenter"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Help"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+#: src/lib/components/skeleton/LeftPanel.svelte
+msgid "Difuse-sidebar"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Summary"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Console"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Storage"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Notes"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Network"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Interfaces"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Switches"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Dashboard"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Pools"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Datasets"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "File Systems"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Volumes"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Snapshots"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Utilities"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Downloader"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Settings"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "Sylve Logo"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "SYLVE"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "Toggle navigation menu"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "Virtual Environment 0.0.1"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "<0/> Create VM"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "<0/> Root <1/> <2>Toggle user menu</2>"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "Log out"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "⌘⇧Q"
+msgstr ""
+
+#: src/lib/components/custom/Terminal.svelte
+msgid "Minimize"
+msgstr ""
+
+#: src/lib/components/custom/Terminal.svelte
+msgid "Add new tab"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Start Time"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "End Time"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Node"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "User"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Action"
+msgstr ""
+
+#: src/lib/components/skeleton/LeftPanel.svelte
+msgid "Data Center"
 msgstr ""

@@ -124,7 +124,7 @@
 		}
 	}
 
-	let comboBoxes = $state({
+	let comboBoxes = $derived({
 		poolUsage: {
 			open: false,
 			value: pools[0]?.name || '',

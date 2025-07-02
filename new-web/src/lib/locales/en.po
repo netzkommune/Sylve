@@ -103,6 +103,8 @@ msgstr "Settings"
 
 #: src/routes/[node]/+layout.svelte
 #: src/lib/components/custom/CreateVM/Hardware.svelte
+#: src/lib/components/custom/VM/CreateVM/Hardware.svelte
+#: src/lib/components/custom/VM/Create/Hardware.svelte
 msgid "PCI Passthrough"
 msgstr "PCI Passthrough"
 
@@ -230,6 +232,9 @@ msgstr "Minimize"
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/VM/CreateVM/CreateVM.svelte
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
 msgid "Close"
 msgstr "Close"
 
@@ -268,6 +273,9 @@ msgstr "Create Partitions"
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/VM/CreateVM/CreateVM.svelte
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
 msgid "Reset"
 msgstr "Reset"
 
@@ -282,6 +290,7 @@ msgstr "Reset"
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
 msgid "Name"
 msgstr "Name"
 
@@ -427,6 +436,7 @@ msgstr "Save Snapshot Jobs"
 
 #: src/routes/[node]/notes/+page.svelte
 #: src/routes/[node]/network/interfaces/+page.svelte
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
 msgid "View"
 msgstr "View"
 
@@ -469,6 +479,7 @@ msgid "Note"
 msgstr "Note"
 
 #: src/routes/[node]/notes/+page.svelte
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
 msgid "Post Upgrade Summary"
 msgstr "Post Upgrade Summary"
 
@@ -482,6 +493,7 @@ msgstr "This is a note"
 
 #: src/routes/[node]/notes/+page.svelte
 #: src/routes/[node]/network/switches/+page.svelte
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
 msgid "Save"
 msgstr "Save"
 
@@ -549,10 +561,14 @@ msgid "Memory Usage"
 msgstr "Memory Usage"
 
 #: src/lib/components/custom/CreateVM/Advanced.svelte
+#: src/lib/components/custom/VM/CreateVM/Advanced.svelte
+#: src/lib/components/custom/VM/Create/Advanced.svelte
 msgid "VNC Port"
 msgstr "VNC Port"
 
 #: src/lib/components/custom/CreateVM/Advanced.svelte
+#: src/lib/components/custom/VM/CreateVM/Advanced.svelte
+#: src/lib/components/custom/VM/Create/Advanced.svelte
 msgid "VNC Password"
 msgstr "VNC Password"
 
@@ -562,50 +578,72 @@ msgstr "VNC Password"
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/VM/CreateVM/Advanced.svelte
+#: src/lib/components/custom/VM/Create/Advanced.svelte
 msgid "Enter or generate passphrase"
 msgstr "Enter or generate passphrase"
 
 #: src/lib/components/custom/CreateVM/Advanced.svelte
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+#: src/lib/components/custom/VM/CreateVM/Advanced.svelte
+#: src/lib/components/custom/VM/Create/Advanced.svelte
 msgid "VNC Resolution"
 msgstr "VNC Resolution"
 
 #: src/lib/components/custom/CreateVM/Advanced.svelte
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+#: src/lib/components/custom/VM/CreateVM/Advanced.svelte
+#: src/lib/components/custom/VM/Create/Advanced.svelte
 msgid "Select VNC resolution"
 msgstr "Select VNC resolution"
 
 #: src/lib/components/custom/CreateVM/Advanced.svelte
+#: src/lib/components/custom/VM/CreateVM/Advanced.svelte
+#: src/lib/components/custom/VM/Create/Advanced.svelte
 msgid "Startup/Shutdown Order"
 msgstr "Startup/Shutdown Order"
 
 #: src/lib/components/custom/CreateVM/Advanced.svelte
+#: src/lib/components/custom/VM/CreateVM/Advanced.svelte
+#: src/lib/components/custom/VM/Create/Advanced.svelte
 msgid "VNC Wait"
 msgstr "VNC Wait"
 
 #: src/lib/components/custom/CreateVM/Advanced.svelte
+#: src/lib/components/custom/VM/CreateVM/Advanced.svelte
+#: src/lib/components/custom/VM/Create/Advanced.svelte
 msgid "Start On Boot"
 msgstr "Start On Boot"
 
 #: src/lib/components/custom/CreateVM/Basic.svelte
+#: src/lib/components/custom/VM/CreateVM/Basic.svelte
+#: src/lib/components/custom/VM/Create/Basic.svelte
 msgid "VM Name"
 msgstr "VM Name"
 
 #: src/lib/components/custom/CreateVM/Basic.svelte
+#: src/lib/components/custom/VM/CreateVM/Basic.svelte
+#: src/lib/components/custom/VM/Create/Basic.svelte
 msgid "VM ID"
 msgstr "VM ID"
 
 #: src/lib/components/custom/CreateVM/Basic.svelte
 #: src/routes/[node]/network/interfaces/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/lib/components/custom/VM/CreateVM/Basic.svelte
+#: src/lib/components/custom/VM/Create/Basic.svelte
 msgid "Description"
 msgstr "Description"
 
 #: src/lib/components/custom/CreateVM/Basic.svelte
+#: src/lib/components/custom/VM/CreateVM/Basic.svelte
+#: src/lib/components/custom/VM/Create/Basic.svelte
 msgid "Optional description for this virtual machine"
 msgstr "Optional description for this virtual machine"
 
 #: src/lib/components/custom/CreateVM/CreateVM.svelte
+#: src/lib/components/custom/VM/CreateVM/CreateVM.svelte
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
 msgid "<0/> Create Virtual Machine"
 msgstr "<0/> Create Virtual Machine"
 
@@ -614,22 +652,32 @@ msgid "Configure your virtual machine with custom hardware and network settings"
 msgstr "Configure your virtual machine with custom hardware and network settings"
 
 #: src/lib/components/custom/CreateVM/CreateVM.svelte
+#: src/lib/components/custom/VM/CreateVM/CreateVM.svelte
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
 msgid "Create Virtual Machine"
 msgstr "Create Virtual Machine"
 
 #: src/lib/components/custom/CreateVM/Hardware.svelte
+#: src/lib/components/custom/VM/CreateVM/Hardware.svelte
+#: src/lib/components/custom/VM/Create/Hardware.svelte
 msgid "CPU Sockets"
 msgstr "CPU Sockets"
 
 #: src/lib/components/custom/CreateVM/Hardware.svelte
+#: src/lib/components/custom/VM/CreateVM/Hardware.svelte
+#: src/lib/components/custom/VM/Create/Hardware.svelte
 msgid "CPU Cores"
 msgstr "CPU Cores"
 
 #: src/lib/components/custom/CreateVM/Hardware.svelte
+#: src/lib/components/custom/VM/CreateVM/Hardware.svelte
+#: src/lib/components/custom/VM/Create/Hardware.svelte
 msgid "CPU Threads"
 msgstr "CPU Threads"
 
 #: src/lib/components/custom/CreateVM/Hardware.svelte
+#: src/lib/components/custom/VM/CreateVM/Hardware.svelte
+#: src/lib/components/custom/VM/Create/Hardware.svelte
 msgid "Memory Size"
 msgstr "Memory Size"
 
@@ -643,48 +691,74 @@ msgstr "pci {0} : {1} : {2} : {3}"
 
 #: src/lib/components/custom/CreateVM/Network.svelte
 #: src/lib/components/custom/CreateVM/Storage.svelte
+#: src/lib/components/custom/VM/CreateVM/Network.svelte
+#: src/lib/components/custom/VM/CreateVM/Storage.svelte
+#: src/lib/components/custom/VM/Create/Network.svelte
+#: src/lib/components/custom/VM/Create/Storage.svelte
 msgid "Emulation Type"
 msgstr "Emulation Type"
 
 #: src/lib/components/custom/CreateVM/Network.svelte
 #: src/lib/components/custom/CreateVM/Storage.svelte
+#: src/lib/components/custom/VM/CreateVM/Network.svelte
+#: src/lib/components/custom/VM/CreateVM/Storage.svelte
+#: src/lib/components/custom/VM/Create/Network.svelte
+#: src/lib/components/custom/VM/Create/Storage.svelte
 msgid "Select emulation type"
 msgstr "Select emulation type"
 
 #: src/lib/components/custom/CreateVM/Network.svelte
 #: src/routes/[node]/network/interfaces/+page.svelte
+#: src/lib/components/custom/VM/CreateVM/Network.svelte
+#: src/lib/components/custom/VM/Create/Network.svelte
 msgid "MAC Address"
 msgstr "MAC Address"
 
 #: src/lib/components/custom/CreateVM/Storage.svelte
+#: src/lib/components/custom/VM/CreateVM/Storage.svelte
+#: src/lib/components/custom/VM/Create/Storage.svelte
 msgid "ZFS Volume"
 msgstr "ZFS Volume"
 
 #: src/lib/components/custom/CreateVM/Storage.svelte
+#: src/lib/components/custom/VM/CreateVM/Storage.svelte
+#: src/lib/components/custom/VM/Create/Storage.svelte
 msgid "Select ZFS volume"
 msgstr "Select ZFS volume"
 
 #: src/lib/components/custom/CreateVM/Storage.svelte
+#: src/lib/components/custom/VM/CreateVM/Storage.svelte
+#: src/lib/components/custom/VM/Create/Storage.svelte
 msgid "Disk Size"
 msgstr "Disk Size"
 
 #: src/lib/components/custom/CreateVM/Storage.svelte
+#: src/lib/components/custom/VM/CreateVM/Storage.svelte
+#: src/lib/components/custom/VM/Create/Storage.svelte
 msgid "Filesystem Dataset"
 msgstr "Filesystem Dataset"
 
 #: src/lib/components/custom/CreateVM/Storage.svelte
+#: src/lib/components/custom/VM/CreateVM/Storage.svelte
+#: src/lib/components/custom/VM/Create/Storage.svelte
 msgid "Select filesystem"
 msgstr "Select filesystem"
 
 #: src/lib/components/custom/CreateVM/Storage.svelte
+#: src/lib/components/custom/VM/CreateVM/Storage.svelte
+#: src/lib/components/custom/VM/Create/Storage.svelte
 msgid "Installation Media"
 msgstr "Installation Media"
 
 #: src/lib/components/custom/CreateVM/Storage.svelte
+#: src/lib/components/custom/VM/CreateVM/Storage.svelte
+#: src/lib/components/custom/VM/Create/Storage.svelte
 msgid "Select installation media"
 msgstr "Select installation media"
 
 #: src/lib/components/custom/CreateVM/Storage.svelte
+#: src/lib/components/custom/VM/CreateVM/Storage.svelte
+#: src/lib/components/custom/VM/Create/Storage.svelte
 msgid "None"
 msgstr "None"
 
@@ -830,6 +904,7 @@ msgid "Attribute"
 msgstr "Attribute"
 
 #: src/routes/[node]/storage/disks/+page.svelte
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
 msgid "Value"
 msgstr "Value"
 
@@ -1328,6 +1403,8 @@ msgid "{0} <0>{0}</0> ."
 msgstr "{0} <0>{0}</0> ."
 
 #: src/lib/components/custom/CreateVM/Hardware.svelte
+#: src/lib/components/custom/VM/CreateVM/Hardware.svelte
+#: src/lib/components/custom/VM/Create/Hardware.svelte
 msgid "CPU Pinning"
 msgstr "CPU Pinning"
 
@@ -1352,6 +1429,8 @@ msgid "Pinned CPUs have been limited to{0} vCPU{1}"
 msgstr "Pinned CPUs have been limited to{0} vCPU{1}"
 
 #: src/lib/components/custom/CreateVM/Hardware.svelte
+#: src/lib/components/custom/VM/CreateVM/Hardware.svelte
+#: src/lib/components/custom/VM/Create/Hardware.svelte
 msgid "At least one CPU must be left unpinned"
 msgstr "At least one CPU must be left unpinned"
 
@@ -1910,3 +1989,36 @@ msgstr "Failed to delete note"
 #: src/routes/[node]/notes/+page.svelte
 msgid "Failed to delete notes"
 msgstr "Failed to delete notes"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Hardware"
+msgstr "Hardware"
+
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+msgid "Change RAM"
+msgstr "Change RAM"
+
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+msgid "Edit RAM"
+msgstr "Edit RAM"
+
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+msgid "RAM"
+msgstr "RAM"
+
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "B"
+msgstr "B"
+
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "Current: {0} ( {1} MB) | Max: {2} ( {3} MB)"
+msgstr "Current: {0} ( {1} MB) | Max: {2} ( {3} MB)"
+
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+msgid "Property"
+msgstr "Property"
+
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+msgid "Shutoff"
+msgstr "Shutoff"

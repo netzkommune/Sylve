@@ -275,7 +275,6 @@
 				<Card.Root class="w-full gap-0 p-4">
 					<Card.Header class="p-0">
 						<Card.Description class="text-md  font-normal text-blue-600 dark:text-blue-500">
-							<!-- {vm.name} {udTime ? `(${udTime})` : ''} -->
 							{`${vm.name} ${udTime ? `(${udTime})` : ''}`}
 						</Card.Description>
 					</Card.Header>
@@ -297,10 +296,19 @@
 									{'CPU Usage'}
 								</p>
 								<p class="ml-auto">
-									{`${floatToNDecimals(recentStat.cpuUsage, 2)}% of ${vm.cpuCores * vm.cpuThreads * vm.cpuSockets} vCPU(s)`}
+									{#if domain.status === 'Running'}
+										{`${floatToNDecimals(recentStat.cpuUsage, 2)}% of ${vm.cpuCores * vm.cpuThreads * vm.cpuSockets} vCPU(s)`}
+									{:else}
+										{`0% of ${vm.cpuCores * vm.cpuThreads * vm.cpuSockets} vCPU(s)`}
+									{/if}
 								</p>
 							</div>
-							<Progress value={recentStat.cpuUsage || 0} max={100} class="ml-auto h-2" />
+
+							{#if domain.status === 'Running'}
+								<Progress value={recentStat.cpuUsage || 0} max={100} class="ml-auto h-2" />
+							{:else}
+								<Progress value={0} max={100} class="ml-auto h-2" />
+							{/if}
 						</div>
 
 						<div class="mt-2">
@@ -310,10 +318,19 @@
 									{'RAM Usage'}
 								</p>
 								<p class="ml-auto">
-									{`${floatToNDecimals(recentStat.memoryUsage, 2)}% of ${humanFormat(vm.ram)}`}
+									{#if domain.status === 'Running'}
+										{`${floatToNDecimals(recentStat.memoryUsage, 2)}% of ${humanFormat(vm.ram)}`}
+									{:else}
+										{`0% of ${humanFormat(vm.ram)}`}
+									{/if}
 								</p>
 							</div>
-							<Progress value={recentStat.memoryUsage || 0} max={100} class="ml-auto h-2" />
+
+							{#if domain.status === 'Running'}
+								<Progress value={recentStat.memoryUsage || 0} max={100} class="ml-auto h-2" />
+							{:else}
+								<Progress value={0} max={100} class="ml-auto h-2" />
+							{/if}
 						</div>
 					</Card.Content>
 				</Card.Root>

@@ -14,6 +14,7 @@
 		type?: string;
 		textAreaCLasses?: string;
 		disabled?: boolean;
+		onChange?: (value: string | number) => void;
 	}
 
 	let {
@@ -24,7 +25,8 @@
 		classes = 'space-y-1.5',
 		type = 'text',
 		textAreaCLasses = 'min-h-56',
-		disabled = false
+		disabled = false,
+		onChange
 	}: Props = $props();
 
 	let nanoId = $state(generateNanoId(label));
@@ -42,8 +44,23 @@
 			{autocomplete}
 			bind:value
 			{disabled}
+			oninput={(e) => {
+				value = e.target?.value;
+				if (onChange) onChange(value);
+			}}
 		/>
 	{:else}
-		<Input {type} id={nanoId} {placeholder} {autocomplete} bind:value {disabled} />
+		<Input
+			{type}
+			id={nanoId}
+			{placeholder}
+			{autocomplete}
+			bind:value
+			{disabled}
+			oninput={(e) => {
+				value = e.target?.value;
+				if (onChange) onChange(value);
+			}}
+		/>
 	{/if}
 </div>

@@ -43,6 +43,11 @@
 					label: 'Storage',
 					icon: 'mdi:storage',
 					href: `/${node}/vm/${vmName}/storage`
+				},
+				{
+					label: 'Hardware',
+					icon: 'ix:hardware-cabinet',
+					href: `/${node}/vm/${vmName}/hardware`
 				}
 			];
 		} else {

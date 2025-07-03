@@ -54,28 +54,34 @@
 			return;
 		}
 
-		const cpuPinning = vm.cpuPinning ? vm.cpuPinning : [];
-		const response = await modifyHardware(
-			vm.vmId,
-			vm.cpuSockets,
-			vm.cpuCores,
-			vm.cpuThreads,
-			bytes,
-			cpuPinning
-		);
+		if (vm) {
+			const cpuPinning = vm.cpuPinning ? vm.cpuPinning : [];
+			const response = await modifyHardware(
+				vm.vmId,
+				vm.cpuSockets,
+				vm.cpuCores,
+				vm.cpuThreads,
+				bytes,
+				cpuPinning
+			);
 
-		console.log(response);
+			console.log(response);
 
-		if (response.error) {
-			handleAPIError(response);
-			toast.error('Failed to modify RAM', {
-				position: 'bottom-center'
-			});
+			if (response.error) {
+				handleAPIError(response);
+				toast.error('Failed to modify RAM', {
+					position: 'bottom-center'
+				});
+			} else {
+				toast.success('RAM modified', {
+					position: 'bottom-center'
+				});
+				open = false;
+			}
 		} else {
-			toast.success('RAM modified', {
+			toast.error('VM not found', {
 				position: 'bottom-center'
 			});
-			open = false;
 		}
 	}
 </script>

@@ -2,16 +2,105 @@ package libvirt
 
 import (
 	"fmt"
-	"regexp"
 	"strconv"
 	vmModels "sylve/internal/db/models/vm"
+
+	"github.com/beevik/etree"
 )
 
 func updateMemory(xml string, ram int) (string, error) {
-	re := regexp.MustCompile(`<memory unit='[^']*'>[^<]*</memory>`)
-	replacement := fmt.Sprintf("<memory unit='B'>%d</memory>", ram)
-	updatedXML := re.ReplaceAllString(xml, replacement)
-	return updatedXML, nil
+	doc := etree.NewDocument()
+	if err := doc.ReadFromString(xml); err != nil {
+		return "", fmt.Errorf("failed to parse XML: %w", err)
+	}
+
+	memory := doc.FindElement("//memory")
+	if memory == nil {
+		return "", fmt.Errorf("<memory> tag not found")
+	}
+
+	memory.SetText(fmt.Sprintf("%d", ram))
+	memory.RemoveAttr("unit")
+	memory.CreateAttr("unit", "B")
+
+	out, err := doc.WriteToString()
+	if err != nil {
+		return "", fmt.Errorf("failed to serialize XML: %w", err)
+	}
+
+	return out, nil
+}
+
+func updateCPU(xml string, cpuSockets, cpuCores, cpuThreads int, cpuPinning []int) (string, error) {
+	doc := etree.NewDocument()
+	if err := doc.ReadFromString(xml); err != nil {
+		return "", fmt.Errorf("failed to parse XML: %w", err)
+	}
+
+	vcpu := doc.FindElement("//vcpu")
+	if vcpu == nil {
+		return "", fmt.Errorf("<vcpu> tag not found")
+	}
+
+	vcpu.SetText(strconv.Itoa(cpuSockets * cpuCores * cpuThreads))
+
+	cpu := doc.FindElement("//cpu")
+	if cpu == nil {
+		cpu = doc.CreateElement("cpu")
+	}
+
+	topology := cpu.FindElement("topology")
+	if topology == nil {
+		topology = cpu.CreateElement("topology")
+	}
+
+	topology.CreateAttr("sockets", strconv.Itoa(cpuSockets))
+	topology.CreateAttr("cores", strconv.Itoa(cpuCores))
+	topology.CreateAttr("threads", strconv.Itoa(cpuThreads))
+
+	if len(cpuPinning) > 0 {
+		bhyveCommandline := doc.FindElement("//bhyve:commandline")
+		if bhyveCommandline == nil {
+			bhyveCommandline = doc.CreateElement("bhyve:commandline")
+		}
+
+		for _, arg := range bhyveCommandline.SelectElements("bhyve:arg") {
+			if arg.Text() != "" && arg.Text()[0:2] == "-p" {
+				bhyveCommandline.RemoveChild(arg)
+			}
+		}
+
+		pinStr := ""
+
+		for i, cpu := range cpuPinning {
+			if i > 0 {
+				pinStr += " "
+			}
+
+			pinStr += fmt.Sprintf("-p %d:%d", i, cpu)
+		}
+
+		if pinStr != "" {
+			arg := bhyveCommandline.CreateElement("bhyve:arg")
+			arg.CreateAttr("value", pinStr)
+		}
+	} else {
+		bhyveCommandline := doc.FindElement("//bhyve:commandline")
+		if bhyveCommandline != nil {
+			for _, arg := range bhyveCommandline.SelectElements("bhyve:arg") {
+				if arg.Text() != "" && arg.Text()[0:2] == "-p" {
+					bhyveCommandline.RemoveChild(arg)
+				}
+			}
+		}
+	}
+
+	out, err := doc.WriteToString()
+	if err != nil {
+		return "", fmt.Errorf("failed to serialize XML: %w", err)
+	}
+
+	return out, nil
 }
 
 func (s *Service) ModifyHardware(vmId int,
@@ -52,6 +141,7 @@ func (s *Service) ModifyHardware(vmId int,
 	}
 
 	vCPUs := cpuSockets * cpuCores * cpuThreads
+
 	if vCPUs <= 0 {
 		return fmt.Errorf("invalid_cpu_configuration: sockets=%d, cores=%d, threads=%d", cpuSockets, cpuCores, cpuThreads)
 	}
@@ -105,6 +195,26 @@ func (s *Service) ModifyHardware(vmId int,
 		updatedXML, err = updateMemory(xml, ram)
 		if err != nil {
 			return fmt.Errorf("failed_to_update_memory_in_xml: %w", err)
+		}
+	}
+
+	if vm.CPUCores != cpuCores ||
+		vm.CPUSockets != cpuSockets ||
+		vm.CPUsThreads != cpuThreads ||
+		len(vm.CPUPinning) != len(cpuPinning) {
+		vm.CPUCores = cpuCores
+		vm.CPUSockets = cpuSockets
+		vm.CPUsThreads = cpuThreads
+		vm.CPUPinning = cpuPinning
+
+		if err := s.DB.Save(&vm).Error; err != nil {
+			return fmt.Errorf("failed_to_update_vm_cpu_in_db: %w", err)
+		}
+
+		updatedXML, err = updateCPU(xml, cpuSockets, cpuCores, cpuThreads, cpuPinning)
+
+		if err != nil {
+			return fmt.Errorf("failed_to_update_cpu_in_xml: %w", err)
 		}
 	}
 

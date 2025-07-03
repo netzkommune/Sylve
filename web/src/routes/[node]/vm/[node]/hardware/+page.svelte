@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getVMs } from '$lib/api/vm/vm';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
+	import CPU from '$lib/components/custom/VM/Hardware/CPU.svelte';
 	import RAM from '$lib/components/custom/VM/Hardware/RAM.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import type { Row } from '$lib/components/ui/table';
@@ -35,9 +36,8 @@
 		}
 	]);
 
-	let vm: VM | null = $derived(
-		$results[0].data ? ($results[0].data.find((v: VM) => v.vmId === data.vm.vmId) ?? null) : null
-	);
+	let vms: VM[] = $derived($results[0].data ? $results[0].data : data.vms);
+	let vm: VM | null = $derived(vms ? (vms.find((v: VM) => v.vmId === data.vm.vmId) ?? null) : null);
 
 	let options = {
 		cpu: {
@@ -45,7 +45,8 @@
 			cores: data.vm.cpuCores,
 			threads: data.vm.cpuThreads,
 			pinning: data.vm.cpuPinning,
-			vCPUs: data.vm.cpuSockets * data.vm.cpuCores * data.vm.cpuThreads
+			vCPUs: data.vm.cpuSockets * data.vm.cpuCores * data.vm.cpuThreads,
+			open: false
 		},
 		ram: {
 			value: data.vm.ram,
@@ -89,19 +90,6 @@
 	});
 </script>
 
-{#snippet button(type: string)}
-	{#if activeRows && activeRows.length === 1}
-		{#if type === 'ram'}
-			<Button onclick={() => {}} size="sm" variant="outline" class="h-6.5">
-				<div class="flex items-center">
-					<Icon icon="mdi:eye" class="mr-1 h-4 w-4" />
-					<span>View</span>
-				</div>
-			</Button>
-		{/if}
-	{/if}
-{/snippet}
-
 <div class="flex h-full w-full flex-col">
 	{#if activeRows && activeRows?.length !== 0}
 		<div class="flex h-10 w-full items-center gap-2 border-b p-2">
@@ -124,6 +112,26 @@
 					</div>
 				</Button>
 			{/if}
+
+			{#if activeRow && activeRow.property === 'vCPUs'}
+				<Button
+					onclick={() => {
+						properties.cpu.open = true;
+					}}
+					size="sm"
+					variant="outline"
+					class="h-6.5"
+					title={data.domain.status === 'Shutoff'
+						? ''
+						: 'CPU can only be edited when the VM is shut off'}
+					disabled={data.domain.status !== 'Shutoff'}
+				>
+					<div class="flex items-center">
+						<Icon icon="mdi:pencil" class="mr-1 h-4 w-4" />
+						<span>Edit CPU</span>
+					</div>
+				</Button>
+			{/if}
 		</div>
 	{/if}
 
@@ -140,4 +148,8 @@
 
 {#if properties.ram.open}
 	<RAM bind:open={properties.ram.open} ram={data.ram} {vm} />
+{/if}
+
+{#if properties.cpu.open}
+	<CPU bind:open={properties.cpu.open} {vm} {vms} />
 {/if}

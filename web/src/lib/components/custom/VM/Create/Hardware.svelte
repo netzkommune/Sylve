@@ -77,7 +77,9 @@
 			pinnedCPUs = pinnedCPUs.filter((cpu) => cpu !== index);
 		} else {
 			if (pinnedCPUs.length >= vCPUs) {
-				toast.info(`You can only pin up to ${vCPUs} vCPU${vCPUs > 1 ? 's' : ''}`);
+				toast.info(`You can only pin up to ${vCPUs} vCPU${vCPUs > 1 ? 's' : ''}`, {
+					position: 'bottom-center'
+				});
 				return;
 			}
 			pinnedCPUs = [...pinnedCPUs, index];

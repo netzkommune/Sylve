@@ -318,10 +318,12 @@
 									{'RAM Usage'}
 								</p>
 								<p class="ml-auto">
-									{#if domain.status === 'Running'}
-										{`${floatToNDecimals(recentStat.memoryUsage, 2)}% of ${humanFormat(vm.ram)}`}
-									{:else}
-										{`0% of ${humanFormat(vm.ram || 0)}`}
+									{#if vm}
+										{#if domain.status === 'Running'}
+											{`${floatToNDecimals(recentStat.memoryUsage, 2)}% of ${humanFormat(vm.ram || 0)}`}
+										{:else}
+											{`0% of ${humanFormat(vm.ram || 0)}`}
+										{/if}
 									{/if}
 								</p>
 							</div>

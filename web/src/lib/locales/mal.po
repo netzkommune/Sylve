@@ -21,6 +21,7 @@ msgstr ""
 #: src/lib/components/custom/VM/CreateVM/CreateVM.svelte
 #: src/lib/components/custom/VM/Create/CreateVM.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
 msgid "Close"
 msgstr ""
 
@@ -47,6 +48,7 @@ msgstr ""
 #: src/lib/components/custom/VM/CreateVM/CreateVM.svelte
 #: src/lib/components/custom/VM/Create/CreateVM.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
 msgid "Reset"
 msgstr ""
 
@@ -159,6 +161,7 @@ msgstr ""
 #: src/lib/components/custom/CreateVM/Hardware.svelte
 #: src/lib/components/custom/VM/CreateVM/Hardware.svelte
 #: src/lib/components/custom/VM/Create/Hardware.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
 msgid "CPU Pinning"
 msgstr ""
 
@@ -172,6 +175,7 @@ msgstr ""
 #: src/lib/components/custom/CreateVM/Hardware.svelte
 #: src/lib/components/custom/VM/CreateVM/Hardware.svelte
 #: src/lib/components/custom/VM/Create/Hardware.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
 msgid "At least one CPU must be left unpinned"
 msgstr ""
 
@@ -328,6 +332,7 @@ msgstr ""
 #: src/routes/[node]/notes/+page.svelte
 #: src/routes/[node]/network/switches/+page.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
 msgid "Save"
 msgstr ""
 
@@ -1508,4 +1513,28 @@ msgstr ""
 
 #: src/routes/[node]/settings/device-passthrough/+page.svelte
 msgid "Device is in use by a VM, failed to remove"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+msgid "Edit CPU"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "CPU"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "Sockets"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "Cores"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "Threads per Core"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "Threads"
 msgstr ""

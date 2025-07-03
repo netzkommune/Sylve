@@ -235,6 +235,7 @@ msgstr "Minimize"
 #: src/lib/components/custom/VM/CreateVM/CreateVM.svelte
 #: src/lib/components/custom/VM/Create/CreateVM.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
 msgid "Close"
 msgstr "Close"
 
@@ -276,6 +277,7 @@ msgstr "Create Partitions"
 #: src/lib/components/custom/VM/CreateVM/CreateVM.svelte
 #: src/lib/components/custom/VM/Create/CreateVM.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
 msgid "Reset"
 msgstr "Reset"
 
@@ -2026,3 +2028,27 @@ msgstr "Shutoff"
 #: src/routes/[node]/settings/device-passthrough/+page.svelte
 msgid "Device is in use by a VM, failed to remove"
 msgstr "Device is in use by a VM, failed to remove"
+
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+msgid "Edit CPU"
+msgstr "Edit CPU"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "CPU"
+msgstr "CPU"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "Sockets"
+msgstr "Sockets"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "Cores"
+msgstr "Cores"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "Threads per Core"
+msgstr "Threads per Core"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "Threads"
+msgstr "Threads"

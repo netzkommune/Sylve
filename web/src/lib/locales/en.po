@@ -2078,3 +2078,7 @@ msgstr "This will detach the storage <b>{0}</b> from the VM <b>{1}</b>"
 #: src/routes/[node]/vm/[node]/storage/+page.svelte
 msgid "This will detach the storage{0} from the VM {1}"
 msgstr "This will detach the storage{0} from the VM {1}"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Drop disks here1"
+msgstr "Drop disks here1"

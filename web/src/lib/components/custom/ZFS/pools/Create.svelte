@@ -24,6 +24,7 @@
 	import { isValidPoolName } from '$lib/utils/zfs';
 	import Icon from '@iconify/svelte';
 	import humanFormat from 'human-format';
+	import { untrack } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	interface Props {
 		open: boolean;
@@ -73,9 +74,14 @@
 	});
 
 	$effect(() => {
-		if (properties.vdev.count < 1) {
-			properties.vdev.count = 1;
-		}
+		let int = parseInt(properties.vdev.count.toString(), 10);
+		untrack(() => {
+			if (isNaN(int) || int < 1) {
+				properties.vdev.count = 1;
+			} else {
+				properties.vdev.count = int;
+			}
+		});
 	});
 
 	let spares: string[] = $derived.by(() => {

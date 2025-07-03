@@ -33,11 +33,70 @@ func (s *Service) StoreStats(interval int) {
 			newStat := infoModels.ZPoolHistorical{
 				Pools: infoModels.ZpoolJSON(*pool),
 			}
-
 			if err := s.DB.Create(&newStat).Error; err != nil {
 				logger.L.Debug().Err(err).Msg("zfs_cron: Failed to insert zpool data")
 			}
 		}
+
+		if time.Now().Minute()%10 == 0 {
+			s.trimZPoolHistoricalData()
+		}
+	}
+}
+
+func (s *Service) trimZPoolHistoricalData() {
+	now := time.Now()
+	cutoff24h := now.Add(-24 * time.Hour).UnixMilli()
+
+	var oldRecords []infoModels.ZPoolHistorical
+	err := s.DB.Where("created_at < ?", cutoff24h).
+		Order("created_at ASC").
+		Find(&oldRecords).Error
+	if err != nil {
+		logger.L.Debug().Err(err).Msg("zfs_cron: Failed to fetch old zpool records")
+		return
+	}
+
+	if len(oldRecords) == 0 {
+		return
+	}
+
+	hourlyRecords := make(map[int64]infoModels.ZPoolHistorical)
+	recordsToDelete := make([]int64, 0)
+
+	for _, record := range oldRecords {
+		recordTime := time.UnixMilli(record.CreatedAt)
+		hourKey := recordTime.Truncate(time.Hour).UnixMilli()
+
+		if _, exists := hourlyRecords[hourKey]; !exists {
+			hourlyRecords[hourKey] = record
+		} else {
+			recordsToDelete = append(recordsToDelete, record.ID)
+		}
+	}
+
+	if len(recordsToDelete) > 0 {
+		err = s.DB.Where("id IN ?", recordsToDelete).Delete(&infoModels.ZPoolHistorical{}).Error
+		if err != nil {
+			logger.L.Debug().Err(err).Msg("ZFS Cron: Failed to delete old zpool records")
+		} else {
+			logger.L.Debug().
+				Int("deleted_count", len(recordsToDelete)).
+				Msg("ZFS Cron: Trimmed old zpool historical data")
+		}
+	}
+
+	maxAge := now.Add(-365 * 24 * time.Hour).UnixMilli()
+	result := s.DB.Where("created_at < ?", maxAge).Delete(&infoModels.ZPoolHistorical{})
+	deletedCount := result.RowsAffected
+	if result.Error == nil && deletedCount > 0 {
+		logger.L.Debug().
+			Int64("deleted_count", deletedCount).
+			Msg("ZFS Cron: Deleted very old zpool records (>1 year)")
+	}
+
+	if err := s.DB.Exec("VACUUM").Error; err != nil {
+		logger.L.Warn().Msgf("ZFS Cron: VACUUM failed: %v", err)
 	}
 }
 

@@ -167,7 +167,14 @@
 						position: 'bottom-center'
 					});
 				} else {
-					toast.error('Failed to remove device from passthrough', {
+					let message = '';
+					if (result.error?.endsWith('in_use_by_vm')) {
+						message = 'Device is in use by a VM, failed to remove';
+					} else {
+						message = 'Failed to remove device from passthrough';
+					}
+
+					toast.error(message, {
 						position: 'bottom-center'
 					});
 				}

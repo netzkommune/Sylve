@@ -2022,3 +2022,7 @@ msgstr "Property"
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 msgid "Shutoff"
 msgstr "Shutoff"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Device is in use by a VM, failed to remove"
+msgstr "Device is in use by a VM, failed to remove"

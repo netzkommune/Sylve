@@ -1505,3 +1505,7 @@ msgstr ""
 #: src/lib/components/custom/TreeTable/Search.svelte
 msgid "Escape"
 msgstr ""
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Device is in use by a VM, failed to remove"
+msgstr ""

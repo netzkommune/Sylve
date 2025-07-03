@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"sylve/internal/db/models"
+	vmModels "sylve/internal/db/models/vm"
 	"sylve/pkg/system/pciconf"
 	"sylve/pkg/utils"
 
@@ -211,6 +212,23 @@ func (s *Service) RemovePPTDevice(id string) error {
 			return fmt.Errorf("device ID %s not found", id)
 		}
 		return fmt.Errorf("checking PassedThroughIDs: %w", err)
+	}
+
+	var vms []vmModels.VM
+	_ = s.DB.Find(&vms)
+
+	var result []vmModels.VM
+	for _, vm := range vms {
+		for _, id := range vm.PCIDevices {
+			if id == existing.ID {
+				result = append(result, vm)
+				break
+			}
+		}
+	}
+
+	if len(result) > 0 {
+		return fmt.Errorf("device_%d_in_use_by_vm", existing.ID)
 	}
 
 	parts := strings.Split(existing.DeviceID, "/")

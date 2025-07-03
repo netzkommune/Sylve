@@ -321,7 +321,7 @@
 									{#if domain.status === 'Running'}
 										{`${floatToNDecimals(recentStat.memoryUsage, 2)}% of ${humanFormat(vm.ram)}`}
 									{:else}
-										{`0% of ${humanFormat(vm.ram)}`}
+										{`0% of ${humanFormat(vm.ram || 0)}`}
 									{/if}
 								</p>
 							</div>

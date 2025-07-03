@@ -3,6 +3,7 @@ package libvirt
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	vmModels "sylve/internal/db/models/vm"
 
 	"github.com/beevik/etree"
@@ -342,4 +343,45 @@ func (s *Service) ModifyHardware(vmId int,
 	// }
 
 	return nil
+}
+
+func findLowestIndex(xml string) (int, error) {
+	doc := etree.NewDocument()
+	if err := doc.ReadFromString(xml); err != nil {
+		return -1, fmt.Errorf("failed to parse XML: %w", err)
+	}
+	bhyveCommandline := doc.FindElement("//commandline")
+	if bhyveCommandline == nil || bhyveCommandline.Space != "bhyve" {
+		return 10, nil
+	}
+
+	usedIndices := make(map[int]bool)
+	for _, arg := range bhyveCommandline.ChildElements() {
+		valueAttr := arg.SelectAttr("value")
+		if valueAttr == nil {
+			continue
+		}
+		value := valueAttr.Value
+		if len(value) >= 2 && value[0:2] == "-s" {
+			parts := strings.Fields(value)
+			if len(parts) >= 2 {
+				indexPart := parts[1]
+				colonIndex := strings.Index(indexPart, ":")
+				if colonIndex > 0 {
+					indexStr := indexPart[0:colonIndex] // "10"
+					if index, err := strconv.Atoi(indexStr); err == nil {
+						usedIndices[index] = true
+					}
+				}
+			}
+		}
+	}
+
+	for i := 10; i < 30; i++ {
+		if !usedIndices[i] {
+			return i, nil
+		}
+	}
+
+	return -1, fmt.Errorf("all indices 10-29 are in use")
 }

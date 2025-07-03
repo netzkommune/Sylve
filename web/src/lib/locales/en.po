@@ -35,6 +35,7 @@ msgid "Console"
 msgstr "Console"
 
 #: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
 msgid "Storage"
 msgstr "Storage"
 
@@ -496,6 +497,7 @@ msgstr "This is a note"
 #: src/routes/[node]/notes/+page.svelte
 #: src/routes/[node]/network/switches/+page.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
 msgid "Save"
 msgstr "Save"
 
@@ -1407,6 +1409,7 @@ msgstr "{0} <0>{0}</0> ."
 #: src/lib/components/custom/CreateVM/Hardware.svelte
 #: src/lib/components/custom/VM/CreateVM/Hardware.svelte
 #: src/lib/components/custom/VM/Create/Hardware.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
 msgid "CPU Pinning"
 msgstr "CPU Pinning"
 
@@ -1433,6 +1436,7 @@ msgstr "Pinned CPUs have been limited to{0} vCPU{1}"
 #: src/lib/components/custom/CreateVM/Hardware.svelte
 #: src/lib/components/custom/VM/CreateVM/Hardware.svelte
 #: src/lib/components/custom/VM/Create/Hardware.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
 msgid "At least one CPU must be left unpinned"
 msgstr "At least one CPU must be left unpinned"
 
@@ -1604,6 +1608,7 @@ msgid "Language"
 msgstr "Language"
 
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
 msgid "ZFS Pool"
 msgstr "ZFS Pool"
 
@@ -1616,6 +1621,7 @@ msgid "This action cannot be undone. This will permanently delete the ZFS Pool{0
 msgstr "This action cannot be undone. This will permanently delete the ZFS Pool{0} and all its data. Are you sure you want to continue?"
 
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
 msgid "Pool{0} deleted"
 msgstr "Pool{0} deleted"
 
@@ -2052,3 +2058,23 @@ msgstr "Threads per Core"
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 msgid "Threads"
 msgstr "Threads"
+
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+msgid "Failed to detach storage"
+msgstr "Failed to detach storage"
+
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+msgid "Storage detached"
+msgstr "Storage detached"
+
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+msgid "This will detach the storage{0} from the VM {1}. Are you sure?"
+msgstr "This will detach the storage{0} from the VM {1}. Are you sure?"
+
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+msgid "This will detach the storage <b>{0}</b> from the VM <b>{1}</b>"
+msgstr "This will detach the storage <b>{0}</b> from the VM <b>{1}</b>"
+
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+msgid "This will detach the storage{0} from the VM {1}"
+msgstr "This will detach the storage{0} from the VM {1}"

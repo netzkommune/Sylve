@@ -7,11 +7,11 @@ import (
 
 type Storage struct {
 	ID        uint   `gorm:"primaryKey" json:"id"`
+	Name      string `json:"name" gorm:"default:''"`
 	Type      string `json:"type"`
 	Dataset   string `json:"dataset"`
 	Size      int64  `json:"size"`
 	Emulation string `json:"emulation"`
-	Detached  bool   `json:"detached"`
 
 	VMID uint `json:"vmId" gorm:"index"`
 }

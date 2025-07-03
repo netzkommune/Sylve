@@ -1,4 +1,3 @@
-import type { Cell } from '$lib/components/ui/table';
 import type { Column, Row } from '$lib/types/components/tree-table';
 import type { Download } from '$lib/types/utilities/downloader';
 import type { VM } from '$lib/types/vm/vm';
@@ -42,6 +41,8 @@ export function generateTableData(
 						'text-blue-500',
 						'ZFS Volume'
 					);
+				} else if (row.type === 'raw') {
+					return renderWithIcon('carbon:volume-block-storage', value, 'text-blue-500', 'Raw Disk');
 				}
 				return value;
 			}

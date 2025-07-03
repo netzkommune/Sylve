@@ -1,17 +1,16 @@
 package libvirt
 
 import (
-	"encoding/xml"
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strconv"
 	"strings"
 	vmModels "sylve/internal/db/models/vm"
-	libvirtServiceInterfaces "sylve/internal/interfaces/services/libvirt"
 	"sylve/pkg/utils"
 	"sylve/pkg/zfs"
+
+	"github.com/beevik/etree"
 )
 
 func (s *Service) CreateDiskImage(vmId int, guid string, size int64) error {
@@ -81,10 +80,6 @@ func (s *Service) StorageDetach(vmId int, storageId int) error {
 		return fmt.Errorf("failed_to_find_storage: %w", err)
 	}
 
-	if storage.Detached {
-		return fmt.Errorf("storage_already_detached: %d", storageId)
-	}
-
 	domain, err := s.Conn.DomainLookupByName(strconv.Itoa(vmId))
 	if err != nil {
 		return fmt.Errorf("failed_to_lookup_domain_by_name: %w", err)
@@ -100,51 +95,285 @@ func (s *Service) StorageDetach(vmId int, storageId int) error {
 		return fmt.Errorf("domain_state_not_shutoff: %d", vmId)
 	}
 
-	var parsed libvirtServiceInterfaces.Domain
-
-	domainXML, err := s.Conn.DomainGetXMLDesc(domain, 0)
+	xml, err := s.Conn.DomainGetXMLDesc(domain, 0)
 	if err != nil {
 		return fmt.Errorf("failed_to_get_domain_xml_desc: %w", err)
 	}
 
-	err = xml.Unmarshal([]byte(domainXML), &parsed)
-
-	if err != nil {
-		return fmt.Errorf("failed_to_parse_domain_xml: %w", err)
+	doc := etree.NewDocument()
+	if err := doc.ReadFromString(xml); err != nil {
+		return fmt.Errorf("failed to parse XML: %w", err)
 	}
 
+	bhyveCommandline := doc.FindElement("//commandline")
+	if bhyveCommandline == nil || bhyveCommandline.Space != "bhyve" {
+		root := doc.Root()
+		if root.SelectAttr("xmlns:bhyve") == nil {
+			root.CreateAttr("xmlns:bhyve", "http://libvirt.org/schemas/domain/bhyve/1.0")
+		}
+		bhyveCommandline = root.CreateElement("bhyve:commandline")
+	}
+
+	filePath := ""
+
 	if storage.Type == "iso" {
-		filePath, err := s.FindISOByUUID(storage.Dataset, false)
+		filePath, err = s.FindISOByUUID(storage.Dataset, false)
+		if err != nil {
+			return fmt.Errorf("failed_to_find_iso_by_uuid: %w", err)
+		}
+	}
+
+	for _, arg := range bhyveCommandline.ChildElements() {
+		valueAttr := arg.SelectAttr("value")
+		if valueAttr != nil {
+			value := valueAttr.Value
+			if value != "" {
+				/* Takes care of CD removals */
+				if strings.Contains(value, "ahci-cd") &&
+					strings.Contains(value, filePath) &&
+					storage.Type == "iso" {
+					bhyveCommandline.RemoveChild(arg)
+				}
+
+				var dataset *zfs.Dataset
+
+				if storage.Type == "zvol" || storage.Type == "raw" {
+					datasets, err := zfs.Datasets("")
+					if err != nil {
+						return fmt.Errorf("failed_to_get_datasets: %w", err)
+					}
+
+					for _, d := range datasets {
+						guid, err := d.GetProperty("guid")
+						if err != nil {
+							return fmt.Errorf("failed_to_get_dataset_property: %w", err)
+						}
+
+						if guid == storage.Dataset {
+							dataset = d
+							break
+						}
+					}
+
+					if dataset == nil {
+						return fmt.Errorf("dataset_not_found: %s", storage.Dataset)
+					}
+				}
+
+				/* Takes care of ZVOL removals */
+				if storage.Type == "zvol" {
+					if dataset.Type != "volume" {
+						return fmt.Errorf("invalid_dataset_type: %s", dataset.Type)
+					}
+
+					if strings.Contains(value, fmt.Sprintf("/dev/zvol/%s", dataset.Name)) {
+						bhyveCommandline.RemoveChild(arg)
+					}
+				}
+
+				/* Takes care of RAW Disk removals */
+				if storage.Type == "raw" {
+					if strings.Contains(value, fmt.Sprintf(dataset.Name)) &&
+						strings.Contains(value, storage.Name) {
+						bhyveCommandline.RemoveChild(arg)
+					}
+				}
+			}
+		}
+	}
+
+	out, err := doc.WriteToString()
+	if err != nil {
+		return fmt.Errorf("failed to serialize XML: %w", err)
+	}
+
+	if err := s.Conn.DomainUndefineFlags(domain, 0); err != nil {
+		return fmt.Errorf("failed_to_undefine_domain: %w", err)
+	}
+
+	if _, err := s.Conn.DomainDefineXML(out); err != nil {
+		return fmt.Errorf("failed_to_define_domain_with_modified_xml: %w", err)
+	}
+
+	if err := s.DB.Delete(&storage).Error; err != nil {
+		return fmt.Errorf("failed_to_delete_storage: %w", err)
+	}
+
+	return nil
+}
+
+func (s *Service) StorageAttach(vmId int, sType string, dataset string, emulation string, size int64) error {
+	domain, err := s.Conn.DomainLookupByName(strconv.Itoa(vmId))
+	if err != nil {
+		return fmt.Errorf("failed_to_lookup_domain_by_name: %w", err)
+	}
+
+	state, _, err := s.Conn.DomainGetState(domain, 0)
+	if err != nil {
+		return fmt.Errorf("failed_to_get_domain_state: %w", err)
+	}
+
+	if state != 5 {
+		return fmt.Errorf("domain_state_not_shutoff: %d", vmId)
+	}
+
+	if sType != "zvol" && sType != "raw" && sType != "iso" {
+		return fmt.Errorf("invalid_storage_type: %s", sType)
+	}
+
+	if emulation == "" {
+		return fmt.Errorf("emulation_type_required: %s", sType)
+	}
+
+	if emulation != "virtio-blk" && emulation != "ahci-cd" && emulation != "ahci-hd" && emulation != "nvme" {
+		return fmt.Errorf("invalid_emulation_type: %s", emulation)
+	}
+
+	var vm vmModels.VM
+
+	if err := s.DB.Preload("Storages").Where("vm_id = ?", vmId).First(&vm).Error; err != nil {
+		return fmt.Errorf("failed_to_find_vm: %w", err)
+	}
+
+	if vm.ID == 0 {
+		return fmt.Errorf("vm_not_found: %d", vmId)
+	}
+
+	xml, err := s.Conn.DomainGetXMLDesc(domain, 0)
+	if err != nil {
+		return fmt.Errorf("failed_to_get_domain_xml_desc: %w", err)
+	}
+
+	doc := etree.NewDocument()
+	if err := doc.ReadFromString(xml); err != nil {
+		return fmt.Errorf("failed to parse XML: %w", err)
+	}
+
+	bhyveCommandline := doc.FindElement("//commandline")
+	if bhyveCommandline == nil || bhyveCommandline.Space != "bhyve" {
+		root := doc.Root()
+		if root.SelectAttr("xmlns:bhyve") == nil {
+			root.CreateAttr("xmlns:bhyve", "http://libvirt.org/schemas/domain/bhyve/1.0")
+		}
+		bhyveCommandline = root.CreateElement("bhyve:commandline")
+	}
+
+	if sType == "iso" {
+		filePath, err := s.FindISOByUUID(dataset, false)
 		if err != nil {
 			return fmt.Errorf("failed_to_find_iso_by_uuid: %w", err)
 		}
 
-		pattern := fmt.Sprintf(`\s*-s\s+\d+:0,ahci-cd,%s\s*`, regexp.QuoteMeta(filePath))
-		re := regexp.MustCompile(pattern)
+		if filePath == "" {
+			return fmt.Errorf("iso_file_not_found: %s", dataset)
+		}
 
-		var filteredLines []string
-		for _, line := range strings.Split(domainXML, "\n") {
-			if re.MatchString(line) {
-				continue
+		for _, storage := range vm.Storages {
+			if storage.Type == "iso" && storage.Dataset == dataset {
+				return fmt.Errorf("iso_already_attached: %s", dataset)
 			}
-			filteredLines = append(filteredLines, line)
 		}
 
-		newXML := strings.Join(filteredLines, "\n")
-
-		if err := s.Conn.DomainUndefineFlags(domain, 0); err != nil {
-			return fmt.Errorf("failed_to_undefine_domain: %w", err)
+		var existingStorage vmModels.Storage
+		err = s.DB.First(&existingStorage, "dataset = ? AND type = ?", dataset, sType).Error
+		if err != nil {
+			if err.Error() != "record not found" {
+				return fmt.Errorf("failed_to_find_existing_storage: %w", err)
+			}
 		}
 
-		if _, err := s.Conn.DomainDefineXML(newXML); err != nil {
-			return fmt.Errorf("failed_to_define_domain_with_modified_xml: %w", err)
+		newStorage := vmModels.Storage{
+			Type:      sType,
+			Dataset:   dataset,
+			Size:      0,
+			Emulation: "ahci-cd",
+			VMID:      uint(vm.ID),
 		}
 
-		storage.Detached = true
-
-		if err := s.DB.Save(&storage).Error; err != nil {
-			return fmt.Errorf("failed_to_save_storage: %w", err)
+		if err := s.DB.Create(&newStorage).Error; err != nil {
+			return fmt.Errorf("failed_to_create_storage: %w", err)
 		}
+
+		index, err := findLowestIndex(xml)
+		if err != nil {
+			return fmt.Errorf("failed_to_find_lowest_index: %w", err)
+		}
+
+		argValue := fmt.Sprintf("-s %d:0,ahci-cd,%s", index, filePath)
+		bhyveCommandline.CreateElement("bhyve:arg").CreateAttr("value", argValue)
+	} else if sType == "zvol" {
+		datasets, err := zfs.Datasets("")
+		if err != nil {
+			return fmt.Errorf("failed_to_get_datasets: %w", err)
+		}
+
+		var targetDataset *zfs.Dataset
+		for _, d := range datasets {
+			guid, err := d.GetProperty("guid")
+			if err != nil {
+				return fmt.Errorf("failed_to_get_dataset_property: %w", err)
+			}
+
+			if guid == dataset {
+				targetDataset = d
+				break
+			}
+		}
+
+		if targetDataset == nil {
+			return fmt.Errorf("dataset_not_found: %s", dataset)
+		}
+
+		if targetDataset.Type != "volume" {
+			return fmt.Errorf("invalid_dataset_type: %s", targetDataset.Type)
+		}
+
+		for _, storage := range vm.Storages {
+			if storage.Type == "zvol" && storage.Dataset == dataset {
+				return fmt.Errorf("zvol_already_attached: %s", dataset)
+			}
+		}
+
+		var existingStorage vmModels.Storage
+		err = s.DB.First(&existingStorage, "dataset = ? AND type = ?", dataset, sType).Error
+		if err != nil {
+			if err.Error() != "record not found" {
+				return fmt.Errorf("failed_to_find_existing_storage: %w", err)
+			}
+		}
+
+		newStorage := vmModels.Storage{
+			Type:      sType,
+			Dataset:   dataset,
+			Size:      size,
+			Emulation: emulation,
+			VMID:      uint(vm.ID),
+		}
+
+		if err := s.DB.Create(&newStorage).Error; err != nil {
+			return fmt.Errorf("failed_to_create_storage: %w", err)
+		}
+
+		index, err := findLowestIndex(xml)
+		if err != nil {
+			return fmt.Errorf("failed_to_find_lowest_index: %w", err)
+		}
+
+		argValue := fmt.Sprintf("-s %d:0,%s,%s", index, emulation, fmt.Sprintf("/dev/zvol/%s", targetDataset.Name))
+		bhyveCommandline.CreateElement("bhyve:arg").CreateAttr("value", argValue)
+	}
+
+	out, err := doc.WriteToString()
+	if err != nil {
+		return fmt.Errorf("failed to serialize XML: %w", err)
+	}
+
+	if err := s.Conn.DomainUndefineFlags(domain, 0); err != nil {
+		return fmt.Errorf("failed_to_undefine_domain: %w", err)
+	}
+
+	if _, err := s.Conn.DomainDefineXML(out); err != nil {
+		return fmt.Errorf("failed_to_define_domain_with_modified_xml: %w", err)
 	}
 
 	return nil

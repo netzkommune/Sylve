@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { getDownloads } from '$lib/api/utilities/downloader';
-	import { storageDetach } from '$lib/api/vm/storage';
+	import { storageAttach, storageDetach } from '$lib/api/vm/storage';
 	import { getVMDomain, getVMs } from '$lib/api/vm/vm';
 	import { getDatasets } from '$lib/api/zfs/datasets';
 	import { getPools } from '$lib/api/zfs/pool';
+	import AlertDialog from '$lib/components/custom/Dialog/Alert.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import type { Row } from '$lib/types/components/tree-table';
@@ -12,7 +13,7 @@
 	import type { VM, VMDomain } from '$lib/types/vm/vm';
 	import type { Dataset } from '$lib/types/zfs/dataset';
 	import type { Zpool } from '$lib/types/zfs/pool';
-	import { updateCache } from '$lib/utils/http';
+	import { handleAPIError, updateCache } from '$lib/utils/http';
 	import { generateTableData } from '$lib/utils/vm/storage';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
@@ -102,21 +103,46 @@
 	let downloads: Download[] = $derived($results[4].data as Download[]);
 	let tableData = $derived(generateTableData(vm, datasets, downloads));
 
-	function handleCreate() {
-		toast.error('Not implemented yet', {
-			position: 'bottom-center'
-		});
+	async function handleCreate() {
+		// For CD Disk
+		// await storageAttach(
+		// 	Number(vmId),
+		// 	'iso',
+		// 	'54fded81-fc06-5592-9526-51e6c0920479',
+		// 	'ahci-cd',
+		// 	1024
+		// );
+		// For ZVols
+		// await storageAttach(Number(vmId), 'zvol', '10237231054568828850', 'virtio-blk', 1024);
 	}
 
-	async function handleDetach() {
-		await storageDetach(Number(vmId), Number(activeRows[0].id));
-	}
+	let options = {
+		attach: {
+			open: false
+		},
+		detach: {
+			open: false,
+			id: null as number | null,
+			name: ''
+		}
+	};
+
+	let properties = $state(options);
 </script>
 
 {#snippet button(type: string)}
 	{#if domain && domain.status === 'Shutoff' && activeRows && activeRows.length === 1}
 		{#if type === 'detach'}
-			<Button onclick={() => handleDetach()} size="sm" class="h-6">
+			<Button
+				onclick={() => {
+					properties.detach.open = true;
+					properties.detach.id = activeRows[0].id as number;
+					properties.detach.name = activeRows[0].name as string;
+				}}
+				size="sm"
+				variant="outline"
+				class="h-6.5"
+			>
 				<div class="flex items-center">
 					<Icon icon="gg:remove" class="mr-1 h-4 w-4" />
 					<span>Detach</span>
@@ -146,3 +172,29 @@
 		bind:query
 	/>
 </div>
+
+<AlertDialog
+	open={properties.detach.open}
+	customTitle={`This will detach the storage ${properties.detach.name} from the VM ${vm.name}`}
+	actions={{
+		onConfirm: async () => {
+			let response = await storageDetach(Number(vmId), properties.detach.id as number);
+			if (response.status === 'error') {
+				handleAPIError(response);
+				toast.error('Failed to detach storage', {
+					position: 'bottom-center'
+				});
+			} else {
+				toast.success('Storage detached', {
+					position: 'bottom-center'
+				});
+			}
+
+			properties.detach.open = false;
+		},
+		onCancel: () => {
+			properties = options;
+			properties.detach.open = false;
+		}
+	}}
+/>

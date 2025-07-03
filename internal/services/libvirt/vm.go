@@ -306,7 +306,14 @@ func (s *Service) CreateVM(data libvirtServiceInterfaces.CreateVMRequest) error 
 			*data.StorageSize = 0
 		}
 
+		var name string
+
+		if data.StorageType == "raw" {
+			name = fmt.Sprintf("%d.img", *data.VMID)
+		}
+
 		storages = append(storages, vmModels.Storage{
+			Name:      name,
 			Type:      data.StorageType,
 			Dataset:   data.StorageDataset,
 			Size:      int64(*data.StorageSize),
@@ -323,7 +330,7 @@ func (s *Service) CreateVM(data libvirtServiceInterfaces.CreateVMRequest) error 
 			Type:      "iso",
 			Dataset:   data.ISO,
 			Size:      0,
-			Emulation: "sata",
+			Emulation: "ahci-cd",
 		})
 	}
 

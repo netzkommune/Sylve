@@ -680,10 +680,12 @@ msgid "Replace Device"
 msgstr ""
 
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
 msgid "ZFS Pool"
 msgstr ""
 
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
 msgid "Pool{0} deleted"
 msgstr ""
 
@@ -940,6 +942,7 @@ msgid "Console"
 msgstr ""
 
 #: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
 msgid "Storage"
 msgstr ""
 
@@ -1537,4 +1540,24 @@ msgstr ""
 
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 msgid "Threads"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+msgid "Failed to detach storage"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+msgid "Storage detached"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+msgid "This will detach the storage{0} from the VM {1}. Are you sure?"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+msgid "This will detach the storage <b>{0}</b> from the VM <b>{1}</b>"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+msgid "This will detach the storage{0} from the VM {1}"
 msgstr ""

@@ -144,8 +144,11 @@ func (s *Service) AddPPTDevice(domain string, id string) error {
 		intParts[i] = n
 	}
 
+	var driver string
+
 	for _, device := range pciDevices {
 		if device.Domain == intDomain && device.Bus == intParts[0] && device.Device == intParts[1] && device.Function == intParts[2] {
+			driver = device.Name
 			found = true
 			break
 		}
@@ -163,7 +166,9 @@ func (s *Service) AddPPTDevice(domain string, id string) error {
 	)
 
 	if err != nil && detach != "" {
-		return fmt.Errorf("detaching device %s on root bus %s failed %s: %w", id, domain, detach, err)
+		if !strings.HasSuffix(strings.TrimSpace(detach), "Device not configured") {
+			return fmt.Errorf("detaching device %s on root bus %s failed %s: %w", id, domain, detach, err)
+		}
 	}
 
 	clearDriver, err := utils.RunCommand(
@@ -190,7 +195,7 @@ func (s *Service) AddPPTDevice(domain string, id string) error {
 		return fmt.Errorf("setting driver for device %s on root bus %s failed %s: %w", id, domain, setDriver, err)
 	}
 
-	newID := models.PassedThroughIDs{DeviceID: id}
+	newID := models.PassedThroughIDs{DeviceID: id, OldDriver: driver}
 	if err := s.DB.Create(&newID).Error; err != nil {
 		return fmt.Errorf("adding PassedThroughIDs: %w", err)
 	}
@@ -257,6 +262,18 @@ func (s *Service) RemovePPTDevice(id string) error {
 
 	if err != nil && clearDriver != "" {
 		return fmt.Errorf("clearing driver for device %s failed %s: %w", existing.DeviceID, clearDriver, err)
+	}
+
+	setDriver, err := utils.RunCommand(
+		"devctl",
+		"set",
+		"driver",
+		fmt.Sprintf("pci%d:%s:%s:%s", existing.Domain, parts[0], parts[1], parts[2]),
+		existing.OldDriver,
+	)
+
+	if err != nil && setDriver != "" {
+		return fmt.Errorf("setting driver for device %s failed %s: %w", existing.DeviceID, setDriver, err)
 	}
 
 	if err := s.DB.Delete(&existing).Error; err != nil {

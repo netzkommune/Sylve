@@ -22,7 +22,8 @@ type System struct {
 }
 
 type PassedThroughIDs struct {
-	ID       int    `json:"id" gorm:"primaryKey"`
-	Domain   int    `json:"domain"`
-	DeviceID string `json:"deviceID" gorm:"uniqueIndex"`
+	ID        int    `json:"id" gorm:"primaryKey"`
+	Domain    int    `json:"domain"`
+	OldDriver string `json:"oldDriver"`
+	DeviceID  string `json:"deviceID" gorm:"uniqueIndex"`
 }

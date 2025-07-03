@@ -59,14 +59,22 @@ func updateCPU(xml string, cpuSockets, cpuCores, cpuThreads int, cpuPinning []in
 	topology.CreateAttr("threads", strconv.Itoa(cpuThreads))
 
 	if len(cpuPinning) > 0 {
-		bhyveCommandline := doc.FindElement("//bhyve:commandline")
-		if bhyveCommandline == nil {
-			bhyveCommandline = doc.CreateElement("bhyve:commandline")
+		bhyveCommandline := doc.FindElement("//commandline")
+		if bhyveCommandline == nil || bhyveCommandline.Space != "bhyve" {
+			root := doc.Root()
+			if root.SelectAttr("xmlns:bhyve") == nil {
+				root.CreateAttr("xmlns:bhyve", "http://libvirt.org/schemas/domain/bhyve/1.0")
+			}
+			bhyveCommandline = root.CreateElement("bhyve:commandline")
 		}
 
-		for _, arg := range bhyveCommandline.SelectElements("bhyve:arg") {
-			if arg.Text() != "" && arg.Text()[0:2] == "-p" {
-				bhyveCommandline.RemoveChild(arg)
+		for _, arg := range bhyveCommandline.ChildElements() {
+			valueAttr := arg.SelectAttr("value")
+			if valueAttr != nil {
+				value := valueAttr.Value
+				if value != "" && len(value) >= 2 && value[0:2] == "-p" {
+					bhyveCommandline.RemoveChild(arg)
+				}
 			}
 		}
 

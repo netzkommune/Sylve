@@ -134,6 +134,13 @@ func (s *Service) DeletePool(guid string) error {
 		return err
 	}
 
+	result := s.DB.Where("json_extract(pools, '$.guid') = ?", guid).
+		Delete(&infoModels.ZPoolHistorical{})
+
+	if result.Error != nil {
+		return fmt.Errorf("failed_to_delete_historical_data: %v", result.Error)
+	}
+
 	if err := s.Libvirt.DeleteStoragePool(pool.Name); err != nil {
 		if !strings.Contains(err.Error(), "failed to lookup storage pool") &&
 			!strings.Contains(err.Error(), "Storage pool not found") {

@@ -99,6 +99,7 @@ export const PeriodicSnapshotSchema = z.object({
 	prefix: z.string(),
 	recursive: z.boolean(),
 	interval: z.number(),
+	cronExpr: z.string(),
 	createdAt: z.coerce.date().optional(),
 	lastRunAt: z.coerce.date()
 });

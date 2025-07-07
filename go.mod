@@ -76,6 +76,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/powerman/rpc-codec v1.2.2 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
+	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/sv-tools/openapi v0.2.1 // indirect
 	github.com/tklauser/go-sysconf v0.3.14 // indirect

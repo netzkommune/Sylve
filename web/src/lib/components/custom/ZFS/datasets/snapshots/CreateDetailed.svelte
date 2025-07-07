@@ -9,7 +9,9 @@
 	import type { Dataset } from '$lib/types/zfs/dataset';
 	import type { Zpool } from '$lib/types/zfs/pool';
 	import { handleAPIError } from '$lib/utils/http';
+	import { cronToHuman } from '$lib/utils/time';
 	import Icon from '@iconify/svelte';
+	import { interval } from 'date-fns';
 	import { toast } from 'svelte-sonner';
 
 	interface Props {
@@ -36,17 +38,29 @@
 			data: [] as { label: string; value: string }[]
 		},
 		interval: {
+			type: 'none' as 'none' | 'minutes' | 'cronExpr',
 			open: false,
-			value: '0',
+			value: 'none',
 			data: [
-				{ value: '0', label: 'None' },
-				{ value: '60', label: 'Every Minute' },
-				{ value: '3600', label: 'Every Hour' },
-				{ value: '86400', label: 'Every Day' },
-				{ value: '604800', label: 'Every Week' },
-				{ value: '2419200', label: 'Every Month' },
-				{ value: '29030400', label: 'Every Year' }
-			]
+				{ value: 'none', label: 'None' },
+				{ value: 'minutes', label: 'Simple' },
+				{ value: 'cronExpr', label: 'Cron Expression' }
+			],
+			values: {
+				cron: '',
+				interval: {
+					open: false,
+					data: [
+						{ value: '60', label: 'Every Minute' },
+						{ value: '3600', label: 'Every Hour' },
+						{ value: '86400', label: 'Every Day' },
+						{ value: '604800', label: 'Every Week' },
+						{ value: '2419200', label: 'Every Month' },
+						{ value: '29030400', label: 'Every Year' }
+					],
+					value: ''
+				}
+			}
 		},
 		recursive: false
 	};
@@ -73,17 +87,27 @@
 		const pool = pools.find((pool) => pool.name === properties.pool.value);
 
 		if (dataset) {
-			const interval = parseInt(properties.interval.value) || 0;
+			const intervalType = properties.interval.value;
 			let response: APIResponse | null = null;
 
-			if (interval === 0) {
+			if (intervalType === 'none') {
 				response = await createSnapshot(dataset, properties.name, properties.recursive);
-			} else if (interval > 0) {
+			} else if (intervalType === 'minutes') {
+				const intervalValue = parseInt(properties.interval.values.interval.value) || 0;
 				response = await createPeriodicSnapshot(
 					dataset,
 					properties.name,
 					properties.recursive,
-					interval
+					intervalValue,
+					''
+				);
+			} else if (intervalType === 'cronExpr') {
+				response = await createPeriodicSnapshot(
+					dataset,
+					properties.name,
+					properties.recursive,
+					0,
+					properties.interval.values.cron
 				);
 			}
 
@@ -106,7 +130,7 @@
 </script>
 
 <Dialog.Root bind:open>
-	<Dialog.Content class="p-5">
+	<Dialog.Content class="w-3/4 p-5">
 		<Dialog.Header class="p-0">
 			<Dialog.Title class="flex justify-between">
 				<div class="flex items-center">
@@ -170,16 +194,46 @@
 			></CustomComboBox>
 		</div>
 
-		<div class="flex-1 space-y-1">
+		<div class="w-full space-y-4">
 			<CustomComboBox
 				bind:open={properties.interval.open}
 				label="Interval"
 				bind:value={properties.interval.value}
 				data={properties.interval.data}
-				classes="flex-1 space-y-1"
+				classes="w-full space-y-1"
 				placeholder="Select an interval"
-				width="w-3/4"
-			></CustomComboBox>
+				width="w-full"
+			/>
+
+			{#if properties.interval.value === 'cronExpr'}
+				<CustomValueInput
+					label={`
+  <span class="text-sm font-medium text-gray-200">
+    Cron Expression${
+			cronToHuman(properties.interval.values.cron)
+				? `&nbsp;<span class="text-green-300 font-semibold">(${cronToHuman(properties.interval.values.cron)})</span>`
+				: ''
+		}
+  </span>
+`}
+					labelHTML={true}
+					placeholder="0 0 * * *"
+					bind:value={properties.interval.values.cron}
+					classes="w-full space-y-1"
+				/>
+			{/if}
+
+			{#if properties.interval.value === 'minutes'}
+				<CustomComboBox
+					bind:open={properties.interval.values.interval.open}
+					label="Interval"
+					bind:value={properties.interval.values.interval.value}
+					data={properties.interval.values.interval.data}
+					classes="w-full space-y-1"
+					placeholder="Select an interval"
+					width="w-full"
+				/>
+			{/if}
 		</div>
 
 		<CustomCheckbox

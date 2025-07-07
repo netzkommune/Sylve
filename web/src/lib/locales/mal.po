@@ -1,5 +1,23 @@
 msgid ""
 msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language: Malayalam\n"
+"Language-Team: \n"
+"Content-Type: \n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=n == 1 ? 0 : 1;\n"
+
+#: src/routes/+layout.svelte
+msgid "Failed to load locale:"
+msgstr ""
+
+#: src/routes/+layout.svelte
+msgid "Logged out"
+msgstr ""
 
 #: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/Header.svelte
@@ -60,6 +78,158 @@ msgstr ""
 msgid "Login"
 msgstr ""
 
+#: src/lib/components/custom/Login.svelte
+#: src/lib/components/ui/custom-input/combobox.svelte
+msgid "Enter"
+msgstr ""
+
+#: src/lib/components/custom/Dialog/Alert.svelte
+msgid "Are you sure?"
+msgstr ""
+
+#: src/lib/components/custom/Dialog/Alert.svelte
+msgid "This action cannot be undone. This will permanently delete "
+msgstr ""
+
+#: src/lib/components/custom/Dialog/Alert.svelte
+msgid "."
+msgstr ""
+
+#: src/lib/components/custom/Dialog/Alert.svelte
+#: src/lib/components/custom/VM/Hardware/BootOrder.svelte
+msgid "Cancel"
+msgstr ""
+
+#: src/lib/components/custom/Dialog/Alert.svelte
+msgid "Continue"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/BootOrder.svelte
+msgid "Reorder Boot Devices"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/BootOrder.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/Terminal.svelte
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+#: src/lib/components/ui/sheet/sheet-content.svelte
+msgid "Close"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/BootOrder.svelte
+msgid "Name"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/BootOrder.svelte
+msgid "Actions"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/BootOrder.svelte
+msgid "Move up"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/BootOrder.svelte
+msgid "Move down"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/BootOrder.svelte
+msgid "Save Order"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "New Storage"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+msgid "Reset"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Type"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Select Type"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "CD-ROM"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Disk"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/VM/Create/Storage.svelte
+msgid "ZFS Volume"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "ISO"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Select ISO"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Select ZFS Volume"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Emulation"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Select Emulation"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "AHCI HD"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "VirtIO Block"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "NVMe"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Attach"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Please select a type and dataset"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Failed to attach CD-ROM"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "CD-ROM attached"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Please select an emulation type"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Please select a ZFS Volume"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Failed to attach ZFS Volume"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "ZFS Volume attached"
+msgstr ""
+
 #: src/lib/components/custom/Header.svelte
 msgid "Toggle navigation menu"
 msgstr ""
@@ -82,20 +252,6 @@ msgstr ""
 
 #: src/lib/components/custom/Header.svelte
 msgid "⌘⇧Q"
-msgstr ""
-
-#: src/lib/components/custom/Terminal.svelte
-msgid "Minimize"
-msgstr ""
-
-#: src/lib/components/custom/Terminal.svelte
-#: src/lib/components/custom/VM/Create/CreateVM.svelte
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Close"
-msgstr ""
-
-#: src/lib/components/custom/Terminal.svelte
-msgid "Add new tab"
 msgstr ""
 
 #: src/lib/components/skeleton/BottomPanel.svelte
@@ -122,6 +278,14 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
+#: src/lib/components/custom/Terminal.svelte
+msgid "Minimize"
+msgstr ""
+
+#: src/lib/components/custom/Terminal.svelte
+msgid "Add new tab"
+msgstr ""
+
 #: src/lib/components/skeleton/LeftPanel.svelte
 msgid "Difuse-sidebar"
 msgstr ""
@@ -135,12 +299,19 @@ msgid "<0/> Create Virtual Machine"
 msgstr ""
 
 #: src/lib/components/custom/VM/Create/CreateVM.svelte
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Reset"
+msgid "Create Virtual Machine"
 msgstr ""
 
 #: src/lib/components/custom/VM/Create/CreateVM.svelte
-msgid "Create Virtual Machine"
+msgid "Created VM {0}"
+msgstr ""
+
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+msgid "Failed to create VM"
+msgstr ""
+
+#: src/lib/stores/terminal.svelte.ts
+msgid "Terminal"
 msgstr ""
 
 #: src/lib/components/custom/VM/Create/Advanced.svelte
@@ -173,6 +344,10 @@ msgstr ""
 
 #: src/lib/components/custom/VM/Create/Advanced.svelte
 msgid "Start On Boot"
+msgstr ""
+
+#: src/lib/components/custom/VM/Create/Advanced.svelte
+msgid "TPM Emulation (Experimental)"
 msgstr ""
 
 #: src/lib/components/custom/VM/Create/Basic.svelte
@@ -216,6 +391,10 @@ msgid "PCI Passthrough"
 msgstr ""
 
 #: src/lib/components/custom/VM/Create/Hardware.svelte
+msgid "You can only pin up to {0} vCPU{1}"
+msgstr ""
+
+#: src/lib/components/custom/VM/Create/Hardware.svelte
 msgid "At least one CPU must be left unpinned"
 msgstr ""
 
@@ -231,10 +410,6 @@ msgstr ""
 
 #: src/lib/components/custom/VM/Create/Network.svelte
 msgid "MAC Address"
-msgstr ""
-
-#: src/lib/components/custom/VM/Create/Storage.svelte
-msgid "ZFS Volume"
 msgstr ""
 
 #: src/lib/components/custom/VM/Create/Storage.svelte
@@ -267,180 +442,4 @@ msgstr ""
 
 #: src/lib/components/ui/custom-input/combobox.svelte
 msgid "No data"
-msgstr ""
-
-#: src/lib/components/ui/custom-input/combobox.svelte
-msgid "Enter"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "HDD"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "SSD"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "NVMe"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "No available disks"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Partitions"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "No available partitions"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "<0/> Create ZFS Pool"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Devices"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Options"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Name"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Virtual Devices"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Redundancy <0/>"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "VDEVs"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Drop disks here1"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Disks"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Comment"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Comments about the pool"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Mount Point"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Force Create"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Advanced"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "AShift"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Select ASHIFT"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Auto Expand"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Select Auto Expand"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Yes"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "No"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Auto Trim"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Select Auto Trim"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Delegation"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Select Delegation"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Fail Mode"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Select Fail Mode"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Continue"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Wait"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Panic"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Spares"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Select spares"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Auto Replace"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Select Auto Replace"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Create"
-msgstr ""
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-msgid "Drop disks here"
-msgstr ""
-
-#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
-msgid "Pool Usage"
-msgstr ""
-
-#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
-msgid "Select a pool"
 msgstr ""

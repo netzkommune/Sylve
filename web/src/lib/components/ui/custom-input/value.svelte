@@ -7,6 +7,7 @@
 
 	interface Props {
 		label: string;
+		labelHTML?: boolean;
 		value: string | number;
 		placeholder: string;
 		autocomplete?: FullAutoFill | null | undefined;
@@ -20,6 +21,7 @@
 	let {
 		value = $bindable(''),
 		label = '',
+		labelHTML = false,
 		placeholder = '',
 		autocomplete = 'off',
 		classes = 'space-y-1.5',
@@ -34,7 +36,14 @@
 
 <div class={`${classes}`}>
 	{#if label}
-		<Label class="w-full whitespace-nowrap text-sm" for={nanoId}>{label}</Label>
+		<Label class="w-full whitespace-nowrap text-sm" for={nanoId}>
+			<!-- {labelHTML ? {@html label} : label} -->
+			{#if labelHTML}
+				{@html label}
+			{:else}
+				{label}
+			{/if}
+		</Label>
 	{/if}
 	{#if type === 'textarea'}
 		<Textarea

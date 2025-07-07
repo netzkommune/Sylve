@@ -8,6 +8,7 @@
  * under sponsorship from the FreeBSD Foundation.
  */
 
+import cronstrue from 'cronstrue';
 import { format, formatDistance, formatRelative, fromUnixTime, parseISO, subDays } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 
@@ -88,4 +89,12 @@ export function formatUptime(seconds: number): string {
 	}
 
 	return parts.length ? parts.join(' ') : '0s';
+}
+
+export function cronToHuman(cron: string): string {
+	try {
+		return cronstrue.toString(cron, { throwExceptionOnParseError: true });
+	} catch (e) {
+		return '';
+	}
 }

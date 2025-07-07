@@ -7,6 +7,7 @@
 	import { getPools } from '$lib/api/zfs/pool';
 	import AlertDialog from '$lib/components/custom/Dialog/Alert.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
+	import Storage from '$lib/components/custom/VM/Hardware/Storage.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import type { Row } from '$lib/types/components/tree-table';
 	import type { Download } from '$lib/types/utilities/downloader';
@@ -103,19 +104,6 @@
 	let downloads: Download[] = $derived($results[4].data as Download[]);
 	let tableData = $derived(generateTableData(vm, datasets, downloads));
 
-	async function handleCreate() {
-		// For CD Disk
-		// await storageAttach(
-		// 	Number(vmId),
-		// 	'iso',
-		// 	'54fded81-fc06-5592-9526-51e6c0920479',
-		// 	'ahci-cd',
-		// 	1024
-		// );
-		// For ZVols
-		// await storageAttach(Number(vmId), 'zvol', '10237231054568828850', 'virtio-blk', 1024);
-	}
-
 	let options = {
 		attach: {
 			open: false
@@ -124,6 +112,9 @@
 			open: false,
 			id: null as number | null,
 			name: ''
+		},
+		setBootOrder: {
+			open: false
 		}
 	};
 
@@ -131,8 +122,8 @@
 </script>
 
 {#snippet button(type: string)}
-	{#if domain && domain.status === 'Shutoff' && activeRows && activeRows.length === 1}
-		{#if type === 'detach'}
+	{#if domain && domain.status === 'Shutoff'}
+		{#if type === 'detach' && activeRows && activeRows.length === 1}
 			<Button
 				onclick={() => {
 					properties.detach.open = true;
@@ -154,7 +145,15 @@
 
 <div class="flex h-full w-full flex-col">
 	<div class="flex h-10 w-full items-center gap-2 border p-2">
-		<Button onclick={() => handleCreate()} size="sm" class="h-6  ">
+		<Button
+			onclick={() => {
+				properties.attach.open = true;
+			}}
+			size="sm"
+			class="h-6"
+			title={domain && domain.status !== 'Shutoff' ? 'VM must be shut off to attach storage' : ''}
+			disabled={domain && domain.status !== 'Shutoff'}
+		>
 			<div class="flex items-center">
 				<Icon icon="gg:add" class="mr-1 h-4 w-4" />
 				<span>New</span>
@@ -198,3 +197,5 @@
 		}
 	}}
 />
+
+<Storage bind:open={properties.attach.open} {datasets} {downloads} {vm} />

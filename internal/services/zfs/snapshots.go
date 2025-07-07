@@ -15,6 +15,8 @@ import (
 	"sylve/internal/logger"
 	"sylve/pkg/zfs"
 	"time"
+
+	"github.com/robfig/cron/v3"
 )
 
 func (s *Service) DeleteSnapshot(guid string, recursive bool) error {
@@ -103,7 +105,7 @@ func (s *Service) GetPeriodicSnapshots() ([]zfsModels.PeriodicSnapshot, error) {
 	return snapshots, nil
 }
 
-func (s *Service) AddPeriodicSnapshot(guid string, prefix string, recursive bool, interval int) error {
+func (s *Service) AddPeriodicSnapshot(guid string, prefix string, recursive bool, interval int, cronExpr string) error {
 	dataset, err := s.GetDatasetByGUID(guid)
 	if err != nil {
 		return err
@@ -121,6 +123,7 @@ func (s *Service) AddPeriodicSnapshot(guid string, prefix string, recursive bool
 				Prefix:    prefix,
 				Recursive: recursive,
 				Interval:  interval,
+				CronExpr:  cronExpr,
 			}
 
 			if err := s.DB.Create(&snapshot).Error; err != nil {
@@ -150,6 +153,7 @@ func (s *Service) DeletePeriodicSnapshot(guid string) error {
 
 func (s *Service) StartSnapshotScheduler(ctx context.Context) {
 	ticker := time.NewTicker(30 * time.Second)
+
 	go func() {
 		for {
 			select {
@@ -163,39 +167,68 @@ func (s *Service) StartSnapshotScheduler(ctx context.Context) {
 				now := time.Now()
 
 				for _, job := range snapshotJobs {
-					if job.LastRunAt.IsZero() || now.Sub(job.LastRunAt).Seconds() >= float64(job.Interval) {
-						allSets, err := zfs.Snapshots("")
+					shouldRun := false
+
+					if job.CronExpr != "" {
+						sched, err := cron.ParseStandard(job.CronExpr)
 						if err != nil {
-							logger.L.Debug().Err(err).Msgf("Failed to get snapshots for %s", job.GUID)
+							logger.L.Debug().Err(err).Msgf("Invalid cron expression for job %s", job.GUID)
 							continue
 						}
 
-						name := job.Prefix + "-" + now.Format("2006-01-02-15-04")
-						dataset, err := s.GetDatasetByGUID(job.GUID)
-
-						if err != nil {
-							logger.L.Debug().Err(err).Msgf("Failed to get dataset for %s", job.GUID)
-							continue
+						nextRun := sched.Next(job.LastRunAt)
+						if job.LastRunAt.IsZero() || now.After(nextRun) {
+							shouldRun = true
 						}
-
-						for _, v := range allSets {
-							if v.Name == dataset.Name+"@"+name {
-								logger.L.Debug().Msgf("Snapshot %s already exists", name)
-								continue
-							}
+					} else if job.Interval > 0 {
+						if job.LastRunAt.IsZero() || now.Sub(job.LastRunAt).Seconds() >= float64(job.Interval) {
+							shouldRun = true
 						}
-
-						if err := s.CreateSnapshot(job.GUID, name, job.Recursive); err != nil {
-							logger.L.Debug().Err(err).Msgf("Failed to create snapshot for %s", job.GUID)
-							continue
-						}
-
-						if err := s.DB.Model(&job).Update("LastRunAt", now).Error; err != nil {
-							logger.L.Debug().Err(err).Msgf("Failed to update LastRunAt for %d", job.ID)
-						}
-
-						logger.L.Debug().Msgf("Snapshot %s created successfully", name)
+					} else {
+						logger.L.Debug().Msgf("Skipping job %s: no valid interval or cronExpr", job.GUID)
+						continue
 					}
+
+					if !shouldRun {
+						continue
+					}
+
+					allSets, err := zfs.Snapshots("")
+					if err != nil {
+						logger.L.Debug().Err(err).Msgf("Failed to get snapshots for %s", job.GUID)
+						continue
+					}
+
+					name := job.Prefix + "-" + now.Format("2006-01-02-15-04")
+					dataset, err := s.GetDatasetByGUID(job.GUID)
+					if err != nil {
+						logger.L.Debug().Err(err).Msgf("Failed to get dataset for %s", job.GUID)
+						continue
+					}
+
+					snapshotExists := false
+					for _, v := range allSets {
+						if v.Name == dataset.Name+"@"+name {
+							snapshotExists = true
+							break
+						}
+					}
+
+					if snapshotExists {
+						logger.L.Debug().Msgf("Snapshot %s already exists", name)
+						continue
+					}
+
+					if err := s.CreateSnapshot(job.GUID, name, job.Recursive); err != nil {
+						logger.L.Debug().Err(err).Msgf("Failed to create snapshot for %s", job.GUID)
+						continue
+					}
+
+					if err := s.DB.Model(&job).Update("LastRunAt", now).Error; err != nil {
+						logger.L.Debug().Err(err).Msgf("Failed to update LastRunAt for %d", job.ID)
+					}
+
+					logger.L.Debug().Msgf("Snapshot %s created successfully", name)
 				}
 			case <-ctx.Done():
 				ticker.Stop()

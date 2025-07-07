@@ -120,7 +120,7 @@
 
 			<div class="flex items-center gap-2" title="Language selection is disabled for now">
 				<Label for="language" class="w-44">Language</Label>
-				<Select.Root type="single" bind:value={language} disabled>
+				<Select.Root type="single" bind:value={language}>
 					<Select.Trigger class="h-8 w-full">
 						{languageArr.find((lang) => lang.value === language)?.label || 'Select Language'}
 					</Select.Trigger>

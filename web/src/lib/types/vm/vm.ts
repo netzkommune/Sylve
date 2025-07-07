@@ -31,6 +31,7 @@ export interface CreateData {
 		vncResolution: string;
 		startAtBoot: boolean;
 		bootOrder: number;
+		tpmEmulation: boolean;
 	};
 }
 
@@ -41,7 +42,9 @@ export const VMStorageSchema = z.object({
 	size: z.number().int(),
 	emulation: z.string(),
 	detached: z.boolean().optional(),
-	vmId: z.number().int().optional()
+	vmId: z.number().int().optional(),
+	bootOrder: z.number().int().optional(),
+	name: z.string().optional()
 });
 
 export const VMNetworkSchema = z.object({

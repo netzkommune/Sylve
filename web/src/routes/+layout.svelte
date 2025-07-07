@@ -23,18 +23,12 @@
 	import { toast } from 'svelte-sonner';
 	import '../app.css';
 
-	const locales = {
-		en: () => import('$lib/locales/en.js'),
-		mal: () => import('$lib/locales/mal.js')
-	};
-
-	function setLocale(locale: Locales) {
-		if (locales[locale]) {
-			locales[locale]().then((mod) => {
-				setTranslations(mod.default);
-			});
+	async function setLocale(locale: 'en' | 'mal') {
+		const mod = await import(`$lib/locales/${locale}.svelte.js`);
+		if (mod) {
+			setTranslations(mod);
 		} else {
-			console.error('Unknown locale:', locale);
+			console.error('Failed to load locale:', locale);
 		}
 	}
 

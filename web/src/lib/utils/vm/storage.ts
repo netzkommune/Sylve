@@ -85,7 +85,11 @@ export function generateTableData(
 				if (found) {
 					name = (found as Dataset).name;
 					if (storage.type === 'raw') {
-						name += `/sylve-vm-images/${vm.vmId}.img`;
+						if (storage.name?.endsWith('.img')) {
+							name += `/sylve-vm-images/${storage.name}`;
+						} else {
+							name += `/sylve-vm-images/${storage.name}.img`;
+						}
 						size = storage.size || 0;
 					} else if (storage.type === 'zvol') {
 						if (dataset.volsize) {

@@ -110,7 +110,7 @@
 		modalState.isDeleteOpen = false;
 		modalState.loading.open = true;
 		modalState.loading.title = 'Deleting Virtual Machine';
-		modalState.loading.description = `Please wait while VM <b>${vm.name} (${vm.vmId})</b> is being deleted.`;
+		modalState.loading.description = `Please wait while VM <b>${vm.name} (${vm.vmId})</b> is being deleted`;
 
 		await sleep(1000);
 		const result = await deleteVM(vm.id);
@@ -158,7 +158,7 @@
 	async function handleStop() {
 		modalState.loading.open = true;
 		modalState.loading.title = 'Stopping Virtual Machine';
-		modalState.loading.description = `Please wait while VM <b>${vm.name} (${vm.vmId})</b> is being stopped.`;
+		modalState.loading.description = `Please wait while VM <b>${vm.name} (${vm.vmId})</b> is being stopped`;
 		modalState.loading.iconColor = 'text-red-500';
 
 		const result = await actionVm(vm.id, 'stop');

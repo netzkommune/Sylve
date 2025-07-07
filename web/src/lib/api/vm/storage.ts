@@ -13,13 +13,25 @@ export async function storageAttach(
 	storageType: string,
 	dataset: string,
 	emulation: string,
-	size: number
+	size: number,
+	name: string
 ): Promise<APIResponse> {
 	return await apiRequest(`/vm/storage/attach`, APIResponseSchema, 'POST', {
 		vmId,
 		storageType,
 		dataset,
 		emulation,
-		size
+		size,
+		name
+	});
+}
+
+export async function reorderBootOrder(
+	vmId: number,
+	storages: { id: number; order: number }[]
+): Promise<APIResponse> {
+	return await apiRequest(`/vm/storage/reorder-boot-order`, APIResponseSchema, 'POST', {
+		vmId,
+		storages
 	});
 }

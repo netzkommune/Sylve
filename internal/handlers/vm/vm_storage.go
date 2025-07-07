@@ -25,6 +25,7 @@ type StorageAttachRequest struct {
 	Dataset     string `json:"dataset" binding:"required"`
 	Emulation   string `json:"emulation" binding:"required"`
 	Size        *int64 `json:"size" binding:"required"`
+	Name        string `json:"name"`
 }
 
 // @Summary Detach Storage from a Virtual Machine
@@ -100,7 +101,15 @@ func StorageAttach(libvirtService *libvirt.Service) gin.HandlerFunc {
 			size = *req.Size
 		}
 
-		if err := libvirtService.StorageAttach(req.VMID, req.StorageType, req.Dataset, req.Emulation, size); err != nil {
+		var name string
+
+		if req.Name == "" {
+			name = ""
+		} else {
+			name = req.Name
+		}
+
+		if err := libvirtService.StorageAttach(req.VMID, req.StorageType, req.Dataset, req.Emulation, size, name); err != nil {
 			c.JSON(500, internal.APIResponse[any]{
 				Status:  "error",
 				Message: "internal_server_error",

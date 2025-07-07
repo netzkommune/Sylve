@@ -10,6 +10,7 @@ package libvirtServiceInterfaces
 
 type LibvirtServiceInterface interface {
 	CheckVersion() error
+	StartTPM() error
 
 	ListStoragePools() ([]StoragePool, error)
 	CreateStoragePool(name string) error

@@ -9,6 +9,7 @@
 package libvirt
 
 import (
+	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"os"
@@ -19,6 +20,8 @@ import (
 	"sylve/internal/db/models"
 	vmModels "sylve/internal/db/models/vm"
 	libvirtServiceInterfaces "sylve/internal/interfaces/services/libvirt"
+	systemServiceInterfaces "sylve/internal/interfaces/services/system"
+	"sylve/internal/logger"
 	"sylve/pkg/utils"
 	"sylve/pkg/zfs"
 	"time"
@@ -55,6 +58,20 @@ func (s *Service) CreateVmXML(vm vmModels.VM, vmPath string) (string, error) {
 	uefi := fmt.Sprintf("%s,%s/%d_vars.fd", "/usr/local/share/uefi-firmware/BHYVE_UEFI.fd", vmPath, vm.VmID)
 
 	var bhyveArgs [][]libvirtServiceInterfaces.BhyveArg
+
+	/* Why does this fail with:
+	bhyve: invalid lpc device configuration ' tpm,swtpm,/root/Projects/Sylve/data/vms/100/100_tpm.socket'
+	when I have a space between "-l" and "tpm"
+	*/
+
+	if vm.TPMEmulation {
+		tpmArg := fmt.Sprintf("-ltpm,swtpm,%s", filepath.Join(vmPath, fmt.Sprintf("%d_tpm.socket", vm.VmID)))
+		bhyveArgs = append(bhyveArgs, []libvirtServiceInterfaces.BhyveArg{
+			{
+				Value: tpmArg,
+			},
+		})
+	}
 
 	if vm.Storages != nil && len(vm.Storages) > 0 {
 		for _, storage := range vm.Storages {
@@ -331,7 +348,7 @@ func (s *Service) CreateLvVm(id int) error {
 	if vm.Storages != nil && len(vm.Storages) > 0 {
 		for _, storage := range vm.Storages {
 			if storage.Type == "raw" {
-				err = s.CreateDiskImage(vm.VmID, storage.Dataset, storage.Size)
+				err = s.CreateDiskImage(vm.VmID, storage.Dataset, storage.Size, "")
 				if err != nil {
 					return fmt.Errorf("failed to create disk image: %w", err)
 				}
@@ -377,6 +394,11 @@ func (s *Service) RemoveLvVm(vmId int) error {
 		return fmt.Errorf("failed to get VMs path: %w", err)
 	}
 
+	err = s.StopTPM(vmId)
+	if err != nil {
+		return fmt.Errorf("failed to stop TPM for VM %d: %w", vmId, err)
+	}
+
 	vmPath := filepath.Join(vmDir, strconv.Itoa(vmId))
 	if _, err := os.Stat(vmPath); err == nil {
 		if err := os.RemoveAll(vmPath); err != nil {
@@ -419,6 +441,137 @@ func (s *Service) GetLvDomain(vmId int) (*libvirtServiceInterfaces.LvDomain, err
 	return &dom, nil
 }
 
+func (s *Service) StartTPM() error {
+	vms, err := s.ListVMs()
+	if err != nil {
+		return fmt.Errorf("failed_to_list_vms: %w", err)
+	}
+
+	vmDir, err := config.GetVMsPath()
+
+	if err != nil {
+		return fmt.Errorf("failed to get VMs path: %w", err)
+	}
+
+	vmIds := make([]int, 0, len(vms))
+	for _, vm := range vms {
+		if vm.TPMEmulation {
+			vmIds = append(vmIds, vm.VmID)
+		}
+	}
+
+	psOut, err := utils.RunCommand("ps", "--libxo", "json", "-aux")
+	if err != nil {
+		return fmt.Errorf("failed_to_run_ps_command: %w", err)
+	}
+
+	var top struct {
+		ProcessInformation systemServiceInterfaces.ProcessInformation `json:"process-information"`
+	}
+
+	if err := json.Unmarshal([]byte(psOut), &top); err != nil {
+		return fmt.Errorf("failed_to_unmarshal_ps_output: %w", err)
+	}
+
+	swtpmRunning := make(map[int]bool)
+
+	for _, proc := range top.ProcessInformation.Process {
+		for _, vmId := range vmIds {
+			if strings.Contains(proc.Command, fmt.Sprintf("%d_tpm.socket", vmId)) {
+				swtpmRunning[vmId] = true
+			}
+		}
+	}
+
+	for _, vmId := range vmIds {
+		if !swtpmRunning[vmId] {
+			vmPath := fmt.Sprintf("%s/%d", vmDir, vmId)
+			tpmSocket := filepath.Join(vmPath, fmt.Sprintf("%d_tpm.socket", vmId))
+			tpmState := filepath.Join(vmPath, fmt.Sprintf("%d_tpm.state", vmId))
+			tpmLog := filepath.Join(vmPath, fmt.Sprintf("%d_tpm.log", vmId))
+
+			args := []string{
+				"socket",
+				"--tpmstate",
+				fmt.Sprintf("backend-uri=file://%s", tpmState),
+				"--tpm2",
+				"--server",
+				fmt.Sprintf("type=unixio,path=%s", tpmSocket),
+				"--log",
+				fmt.Sprintf("file=%s", tpmLog),
+				"--flags",
+				"not-need-init",
+				"--daemon",
+			}
+
+			_, err = utils.RunCommand("swtpm", args...)
+			if err != nil {
+				return fmt.Errorf("failed_to_start_swtpm_for_vm: %d, error: %w", vmId, err)
+			}
+		}
+	}
+
+	return nil
+}
+
+func (s *Service) StopTPM(vmId int) error {
+	var vm vmModels.VM
+
+	err := s.DB.Find(&vm, "vm_id = ?", vmId).Error
+	if err != nil {
+		return fmt.Errorf("failed_to_find_vm: %w", err)
+	}
+
+	if vm.ID == 0 {
+		return fmt.Errorf("vm_not_found: %d", vmId)
+	}
+
+	if !vm.TPMEmulation {
+		return nil
+	}
+
+	vmDir, err := config.GetVMsPath()
+	if err != nil {
+		return fmt.Errorf("failed to get VMs path: %w", err)
+	}
+
+	tpmSocket := filepath.Join(vmDir, strconv.Itoa(vmId), fmt.Sprintf("%d_tpm.socket", vmId))
+	if _, err := os.Stat(tpmSocket); os.IsNotExist(err) {
+		return fmt.Errorf("tpm_socket_not_found: %s", tpmSocket)
+	}
+
+	psOut, err := utils.RunCommand("ps", "--libxo", "json", "-aux")
+	if err != nil {
+		return fmt.Errorf("failed_to_run_ps_command: %w", err)
+	}
+
+	var top struct {
+		ProcessInformation systemServiceInterfaces.ProcessInformation `json:"process-information"`
+	}
+
+	if err := json.Unmarshal([]byte(psOut), &top); err != nil {
+		return fmt.Errorf("failed_to_unmarshal_ps_output: %w", err)
+	}
+
+	for _, proc := range top.ProcessInformation.Process {
+		if strings.Contains(proc.Command, tpmSocket) {
+			pid, err := strconv.Atoi(proc.PID)
+			if err != nil {
+				return fmt.Errorf("failed_to_parse_pid: %s, error: %w", proc.PID, err)
+			}
+
+			if pid > 0 {
+				if err := utils.KillProcess(pid); err != nil {
+					return fmt.Errorf("failed_to_kill_swtpm_process: %d, error: %w", pid, err)
+				}
+				logger.L.Info().Msgf("Stopped swtpm process for VM ID %d", vmId)
+			}
+		}
+	}
+
+	return nil
+}
+
 func (s *Service) LvVMAction(vm vmModels.VM, action string) error {
 	s.actionMutex.Lock()
 	defer s.actionMutex.Unlock()
@@ -437,6 +590,12 @@ func (s *Service) LvVMAction(vm vmModels.VM, action string) error {
 
 		if state == 1 {
 			return nil
+		}
+
+		err = s.StartTPM()
+
+		if err != nil {
+			return fmt.Errorf("failed_to_start_tpm: %w", err)
 		}
 
 		if err := s.Conn.DomainCreate(domain); err != nil {

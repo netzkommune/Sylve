@@ -33,6 +33,7 @@ type CreateVMRequest struct {
 	VNCResolution        string  `json:"vncResolution"`
 	VNCWait              *bool   `json:"vncWait"`
 	StartAtBoot          *bool   `json:"startAtBoot" binding:"required"`
+	TPMEmulation         *bool   `json:"tpmEmulation" binding:"required"`
 	StartOrder           int     `json:"startOrder"`
 }
 

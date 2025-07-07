@@ -110,7 +110,7 @@
 		});
 
 		if (response.error) {
-			toast.error(`Failed to create volume`, {
+			toast.error('Failed to create volume', {
 				position: 'bottom-center'
 			});
 			handleAPIError(response);
@@ -144,7 +144,10 @@
 		<Dialog.Header class="p-0">
 			<Dialog.Title class="flex items-center justify-between text-left">
 				<div class="flex items-center">
-					<Icon icon="carbon:volume-block-storage" class="mr-2 h-5 w-5" />Create Volume
+					<div class="flex items-center">
+						<Icon icon="carbon:volume-block-storage" class="mr-2 h-5 w-5" />
+						<span>Create Volume</span>
+					</div>
 				</div>
 				<div class="flex items-center gap-0.5">
 					<Button

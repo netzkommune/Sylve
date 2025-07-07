@@ -19,7 +19,6 @@
 	import { slide } from 'svelte/transition';
 
 	import { createPool } from '$lib/api/zfs/pool';
-	import { buttonVariants } from '$lib/components/ui/button/index.js';
 	import type { APIResponse } from '$lib/types/common';
 	import { isValidPoolName } from '$lib/utils/zfs';
 	import Icon from '@iconify/svelte';

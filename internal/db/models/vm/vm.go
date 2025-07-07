@@ -60,6 +60,7 @@ type VM struct {
 	VNCResolution string `json:"vncResolution"`
 	VNCWait       bool   `json:"vncWait"`
 	StartAtBoot   bool   `json:"startAtBoot"`
+	TPMEmulation  bool   `json:"tpmEmulation"`
 	StartOrder    int    `json:"startOrder"`
 
 	ISO        string    `json:"iso"`

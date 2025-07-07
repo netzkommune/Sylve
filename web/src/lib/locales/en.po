@@ -1,5 +1,15 @@
 msgid ""
 msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language: English\n"
+"Language-Team: \n"
+"Content-Type: \n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=n == 1 ? 0 : 1;\n"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "1"
@@ -122,7 +132,7 @@ msgstr "Are you sure?"
 #: src/lib/components/custom/Dialog/AlertDialog.svelte
 #: src/lib/components/custom/Dialog/Alert.svelte
 msgid "This action cannot be undone. This will permanently delete"
-msgstr "This action cannot be undone. This will permanently delete"
+msgstr "This action cannot be undone. This will permanently delete "
 
 #: src/lib/components/custom/AlertDialog.svelte
 #: src/lib/components/custom/Dialog/AlertDialog.svelte
@@ -139,6 +149,7 @@ msgstr "."
 #: src/lib/components/custom/Dialog/Alert.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+#: src/lib/components/custom/VM/Hardware/BootOrder.svelte
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -237,6 +248,8 @@ msgstr "Minimize"
 #: src/lib/components/custom/VM/Create/CreateVM.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/VM/Hardware/BootOrder.svelte
 msgid "Close"
 msgstr "Close"
 
@@ -279,6 +292,8 @@ msgstr "Create Partitions"
 #: src/lib/components/custom/VM/Create/CreateVM.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/VM/Hardware/BootOrder.svelte
 msgid "Reset"
 msgstr "Reset"
 
@@ -294,6 +309,7 @@ msgstr "Reset"
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/VM/Hardware/BootOrder.svelte
 msgid "Name"
 msgstr "Name"
 
@@ -301,6 +317,7 @@ msgstr "Name"
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/VM/Hardware/BootOrder.svelte
 msgid "Size"
 msgstr "Size"
 
@@ -387,6 +404,7 @@ msgstr "View Snapshot Jobs"
 #: src/routes/[node]/network/interfaces/+page.svelte
 #: src/lib/components/custom/ZFS/SnapshotJobs.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+#: src/lib/components/custom/VM/Hardware/BootOrder.svelte
 msgid "ID"
 msgstr "ID"
 
@@ -395,6 +413,7 @@ msgstr "ID"
 #: src/lib/components/custom/ZFS/SnapshotJobs.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+#: src/lib/components/custom/VM/Hardware/BootOrder.svelte
 msgid "Dataset"
 msgstr "Dataset"
 
@@ -721,6 +740,7 @@ msgstr "MAC Address"
 #: src/lib/components/custom/CreateVM/Storage.svelte
 #: src/lib/components/custom/VM/CreateVM/Storage.svelte
 #: src/lib/components/custom/VM/Create/Storage.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "ZFS Volume"
 msgstr "ZFS Volume"
 
@@ -763,6 +783,7 @@ msgstr "Select installation media"
 #: src/lib/components/custom/CreateVM/Storage.svelte
 #: src/lib/components/custom/VM/CreateVM/Storage.svelte
 #: src/lib/components/custom/VM/Create/Storage.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 msgid "None"
 msgstr "None"
 
@@ -775,6 +796,7 @@ msgid "No data"
 msgstr "No data"
 
 #: src/lib/components/ui/custom-input/combobox.svelte
+#: src/lib/components/custom/Login.svelte
 msgid "Enter"
 msgstr "Enter"
 
@@ -848,6 +870,7 @@ msgstr "Disable IPV6"
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Create"
 msgstr "Create"
 
@@ -982,6 +1005,8 @@ msgstr "SSD"
 
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/routes/[node]/storage/disks/+page.svelte
 msgid "NVMe"
 msgstr "NVMe"
 
@@ -1315,6 +1340,7 @@ msgstr "Parent"
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "ATime"
 msgstr "ATime"
 
@@ -1717,6 +1743,7 @@ msgstr "Filesystems"
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Select ATime"
 msgstr "Select ATime"
 
@@ -1778,6 +1805,7 @@ msgid "Rolled back to snapshot{0}"
 msgstr "Rolled back to snapshot{0}"
 
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
 msgid "Snapshot GUID not found"
 msgstr "Snapshot GUID not found"
 
@@ -2082,3 +2110,625 @@ msgstr "This will detach the storage{0} from the VM {1}"
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Drop disks here1"
 msgstr "Drop disks here1"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "New Storage"
+msgstr "New Storage"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/VM/Hardware/BootOrder.svelte
+msgid "Type"
+msgstr "Type"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Select Type"
+msgstr "Select Type"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Disk"
+msgstr "Disk"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "CD-ROM"
+msgstr "CD-ROM"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Floppy"
+msgstr "Floppy"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "ISO"
+msgstr "ISO"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Select ISO"
+msgstr "Select ISO"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Attach"
+msgstr "Attach"
+
+#: src/routes/[node]/vm/[node]/console/+page.svelte
+msgid "The VM is currently shut off. Please start the VM to access the console."
+msgstr "The VM is currently shut off. Please start the VM to access the console."
+
+#: src/routes/[node]/vm/[node]/console/+page.svelte
+msgid "The virtual machine is currently powered off. <0/> Start the VM to access its console."
+msgstr "The virtual machine is currently powered off. <0/> Start the VM to access its console."
+
+#: src/routes/[node]/vm/[node]/console/+page.svelte
+msgid "The VM is currently powered off. <0/> Start the VM to access its console."
+msgstr "The VM is currently powered off. <0/> Start the VM to access its console."
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Select ZFS Volume"
+msgstr "Select ZFS Volume"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/VM/Hardware/BootOrder.svelte
+msgid "Emulation"
+msgstr "Emulation"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Select Emulation"
+msgstr "Select Emulation"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "AHCI HD"
+msgstr "AHCI HD"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "VirtIO Block"
+msgstr "VirtIO Block"
+
+#: src/routes/+layout.svelte
+msgid "Unknown locale:"
+msgstr "Unknown locale:"
+
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+msgid "Created VM {0}"
+msgstr "Created VM {0}"
+
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+msgid "Failed to create VM"
+msgstr "Failed to create VM"
+
+#: src/lib/stores/terminal.svelte.ts
+msgid "Terminal"
+msgstr "Terminal"
+
+#: src/lib/components/custom/VM/Create/Hardware.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "You can only pin up to {0} vCPU{1}"
+msgstr "You can only pin up to {0} vCPU{1}"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Deleting Virtual Machine"
+msgstr "Deleting Virtual Machine"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Please wait while VM <b>{0} ({1})</b> is being deleted"
+msgstr "Please wait while VM <b>{0} ({1})</b> is being deleted"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Error deleting VM"
+msgstr "Error deleting VM"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "VM deleted"
+msgstr "VM deleted"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Starting Virtual Machine"
+msgstr "Starting Virtual Machine"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Please wait while VM <b>{0} ({1})</b> is being started."
+msgstr "Please wait while VM <b>{0} ({1})</b> is being started."
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Start VM result:"
+msgstr "Start VM result:"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Error starting VM"
+msgstr "Error starting VM"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "VM started"
+msgstr "VM started"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Stopping Virtual Machine"
+msgstr "Stopping Virtual Machine"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Please wait while VM <b>{0} ({1})</b> is being stopped"
+msgstr "Please wait while VM <b>{0} ({1})</b> is being stopped"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Error stopping VM"
+msgstr "Error stopping VM"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "VM stopped"
+msgstr "VM stopped"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Note updated"
+msgstr "Note updated"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Failed to update note"
+msgstr "Failed to update note"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Note created"
+msgstr "Note created"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Failed to create note"
+msgstr "Failed to create note"
+
+#: src/routes/[node]/network/interfaces/+page.svelte
+msgid "Details - {0}"
+msgstr "Details - {0}"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Switch {0} deleted"
+msgstr "Switch {0} deleted"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Invalid switch name"
+msgstr "Invalid switch name"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Invalid MTU"
+msgstr "Invalid MTU"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Invalid VLAN"
+msgstr "Invalid VLAN"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Invalid IPv4 CIDR"
+msgstr "Invalid IPv4 CIDR"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Invalid IPv6 CIDR"
+msgstr "Invalid IPv6 CIDR"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Switch {0} created"
+msgstr "Switch {0} created"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Error creating switch"
+msgstr "Error creating switch"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Switch {0} updated"
+msgstr "Switch {0} updated"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Error updating switch"
+msgstr "Error updating switch"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Error {0}: {1}"
+msgstr "Error {0}: {1}"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "S.M.A.R.T Values ({0})"
+msgstr "S.M.A.R.T Values ({0})"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "This action cannot be undone. This will permanently <b>delete</b> partition <b>{0}</b>."
+msgstr "This action cannot be undone. This will permanently <b>delete</b> partition <b>{0}</b>."
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "This action cannot be undone. This will permanently <b>wipe</b> disk <b>{0}</b>."
+msgstr "This action cannot be undone. This will permanently <b>wipe</b> disk <b>{0}</b>."
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Disk {0} initialized with GPT"
+msgstr "Disk {0} initialized with GPT"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Partition{0} created"
+msgstr "Partition{0} created"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Error creating {0}"
+msgstr "Error creating {0}"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "New Partition {0}"
+msgstr "New Partition {0}"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Pool {0} deleted"
+msgstr "Pool {0} deleted"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Pool contains a mirror with devices of different sizes"
+msgstr "Pool contains a mirror with devices of different sizes"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Pool contains a RAIDZ vdev with devices of different sizes"
+msgstr "Pool contains a RAIDZ vdev with devices of different sizes"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Pool is busy"
+msgstr "Pool is busy"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Pool has a dataset that is in use by a VM or Jail"
+msgstr "Pool has a dataset that is in use by a VM or Jail"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Spare device is too small"
+msgstr "Spare device is too small"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Pool edit failed"
+msgstr "Pool edit failed"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Disks within a VDEV should ideally be the same type"
+msgstr "Disks within a VDEV should ideally be the same type"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Disks within a VDEV should ideally be the same drive type"
+msgstr "Disks within a VDEV should ideally be the same drive type"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Disks within a VDEV should ideally be the same size"
+msgstr "Disks within a VDEV should ideally be the same size"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Partitions within a VDEV should ideally be the same size"
+msgstr "Partitions within a VDEV should ideally be the same size"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Disks/Partitions within a VDEV should ideally be the same drive type"
+msgstr "Disks/Partitions within a VDEV should ideally be the same drive type"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "No available disks or partitions"
+msgstr "No available disks or partitions"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Invalid pool name"
+msgstr "Invalid pool name"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "At least one VDEV containing disks is required"
+msgstr "At least one VDEV containing disks is required"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Spares must be larger than the largest disk in the pool"
+msgstr "Spares must be larger than the largest disk in the pool"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Pool Created"
+msgstr "Pool Created"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+msgid "Pool edited"
+msgstr "Pool edited"
+
+#: src/lib/components/custom/ZFS/pools/Replace.svelte
+msgid "Replacement device not selected"
+msgstr "Replacement device not selected"
+
+#: src/lib/components/custom/ZFS/pools/Replace.svelte
+msgid "New disk is smaller than old disk"
+msgstr "New disk is smaller than old disk"
+
+#: src/lib/components/custom/ZFS/pools/Replace.svelte
+msgid "New partition is smaller than old device"
+msgstr "New partition is smaller than old device"
+
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+msgid "This will detach the storage {0} from the VM {1}"
+msgstr "This will detach the storage {0} from the VM {1}"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Please select a type and dataset"
+msgstr "Please select a type and dataset"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Failed to attach CD-ROM"
+msgstr "Failed to attach CD-ROM"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "CD-ROM attached"
+msgstr "CD-ROM attached"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Please select an emulation type"
+msgstr "Please select an emulation type"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Please select a ZFS Volume"
+msgstr "Please select a ZFS Volume"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Failed to attach ZFS Volume"
+msgstr "Failed to attach ZFS Volume"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "ZFS Volume attached"
+msgstr "ZFS Volume attached"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "CPU {0} is not pinned by this VM"
+msgstr "CPU {0} is not pinned by this VM"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "Failed to modify CPU"
+msgstr "Failed to modify CPU"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "VM not found"
+msgstr "VM not found"
+
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "RAM value must be greater than 0"
+msgstr "RAM value must be greater than 0"
+
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "RAM value exceeds available memory"
+msgstr "RAM value exceeds available memory"
+
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "RAM value is too high, at least 1 GiB must be reserved for the host"
+msgstr "RAM value is too high, at least 1 GiB must be reserved for the host"
+
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "Failed to modify RAM"
+msgstr "Failed to modify RAM"
+
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "RAM modified"
+msgstr "RAM modified"
+
+#: src/routes/+layout.svelte
+msgid "Failed to load locale:"
+msgstr "Failed to load locale:"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Rolled back to snapshot {0}"
+msgstr "Rolled back to snapshot {0}"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Failed to rollback to snapshot {0}"
+msgstr "Failed to rollback to snapshot {0}"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Deleted filesystem {0}"
+msgstr "Deleted filesystem {0}"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Failed to delete filesystem {0}"
+msgstr "Failed to delete filesystem {0}"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Are you sure you want to delete {0}? This action cannot be undone."
+msgstr "Are you sure you want to delete {0}? This action cannot be undone."
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Deleted {0} datasets"
+msgstr "Deleted {0} datasets"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Invalid quota size"
+msgstr "Invalid quota size"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "Quota size is less than current used or reserved space"
+msgstr "Quota size is less than current used or reserved space"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "Failed to edit filesystem"
+msgstr "Failed to edit filesystem"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "File System {0} edited"
+msgstr "File System {0} edited"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+msgid "Invalid name"
+msgstr "Invalid name"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "No parent selected"
+msgstr "No parent selected"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Encryption key is required"
+msgstr "Encryption key is required"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Failed to create filesystem"
+msgstr "Failed to create filesystem"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "File System {0} created"
+msgstr "File System {0} created"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
+msgid "Deleted snapshot {0}"
+msgstr "Deleted snapshot {0}"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
+msgid "Failed to delete snapshot {0}"
+msgstr "Failed to delete snapshot {0}"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Deleted volume {0}"
+msgstr "Deleted volume {0}"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Failed to delete volume {0}"
+msgstr "Failed to delete volume {0}"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "This will delete {0}. This action cannot be undone."
+msgstr "This will delete {0}. This action cannot be undone."
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Invalid volume size"
+msgstr "Invalid volume size"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+msgid "Size must be a multiple of volume block size ({0}K)"
+msgstr "Size must be a multiple of volume block size ({0}K)"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+msgid "Failed to edit volume"
+msgstr "Failed to edit volume"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+msgid "Volume edited successfully"
+msgstr "Volume edited successfully"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Create Volume"
+msgstr "Create Volume"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Invalid volume name"
+msgstr "Invalid volume name"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Please select a pool"
+msgstr "Please select a pool"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Parent not found"
+msgstr "Parent not found"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Volume size is greater than available space"
+msgstr "Volume size is greater than available space"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Failed to create volume"
+msgstr "Failed to create volume"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Volume {0} created"
+msgstr "Volume {0} created"
+
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "Are you sure you want to delete {0} snapshot{1}? This action cannot be undone."
+msgstr "Are you sure you want to delete {0} snapshot{1}? This action cannot be undone."
+
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "Deleted {0} snapshot{1}"
+msgstr "Deleted {0} snapshot{1}"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+msgid "Failed to create snapshot"
+msgstr "Failed to create snapshot"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+msgid "Snapshot {0}@{1} created"
+msgstr "Snapshot {0}@{1} created"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Please enter a valid URL"
+msgstr "Please enter a valid URL"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Please enter a valid magnet or HTTP URL"
+msgstr "Please enter a valid magnet or HTTP URL"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Download started"
+msgstr "Download started"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Download failed"
+msgstr "Download failed"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Failed to get download link"
+msgstr "Failed to get download link"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Are you sure you want to pass through <b>{0}</b> by <b>{1}</b>? This will make it unavailable to the host."
+msgstr "Are you sure you want to pass through <b>{0}</b> by <b>{1}</b>? This will make it unavailable to the host."
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Are you sure you want to remove passthrough for <b>{0}</b> by <b>{1}</b>? This will make it available to the host again."
+msgstr "Are you sure you want to remove passthrough for <b>{0}</b> by <b>{1}</b>? This will make it available to the host again."
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+msgid "Simple"
+msgstr "Simple"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+msgid "Cron Expression"
+msgstr "Cron Expression"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+msgid "Cron Expression {0}"
+msgstr "Cron Expression {0}"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+msgid "Cron Expression <br> {0}"
+msgstr "Cron Expression <br> {0}"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+msgid "Cron Expression <span class=\"text-ellipsis\">{0}</span>"
+msgstr "Cron Expression <span class=\"text-ellipsis\">{0}</span>"
+
+#: src/lib/components/custom/VM/Create/Advanced.svelte
+msgid "TPM Emulation (Experimental)"
+msgstr "TPM Emulation (Experimental)"
+
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+#: src/lib/components/custom/VM/Hardware/BootOrder.svelte
+msgid "Set Boot Order"
+msgstr "Set Boot Order"
+
+#: src/lib/components/custom/VM/Hardware/BootOrder.svelte
+msgid "Storages attached to VM # {0}"
+msgstr "Storages attached to VM # {0}"
+
+#: src/lib/components/custom/VM/Hardware/BootOrder.svelte
+msgid "Boot Order"
+msgstr "Boot Order"
+
+#: src/lib/components/custom/VM/Hardware/BootOrder.svelte
+msgid "Order"
+msgstr "Order"
+
+#: src/lib/components/custom/VM/Hardware/BootOrder.svelte
+msgid "Reorder Boot Devices"
+msgstr "Reorder Boot Devices"
+
+#: src/lib/components/custom/VM/Hardware/BootOrder.svelte
+msgid "Save Order"
+msgstr "Save Order"
+
+#: src/lib/components/custom/VM/Hardware/BootOrder.svelte
+msgid "Device"
+msgstr "Device"
+
+#: src/lib/components/custom/VM/Hardware/BootOrder.svelte
+msgid "Move up"
+msgstr "Move up"
+
+#: src/lib/components/custom/VM/Hardware/BootOrder.svelte
+msgid "Move down"
+msgstr "Move down"

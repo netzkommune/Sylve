@@ -157,6 +157,10 @@ func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface)
 		return err
 	}
 
+	if err := s.Libvirt.StartTPM(); err != nil {
+		return err
+	}
+
 	go s.Info.Cron()
 	go s.ZFS.Cron()
 	go s.ZFS.StartSnapshotScheduler(context.Background())

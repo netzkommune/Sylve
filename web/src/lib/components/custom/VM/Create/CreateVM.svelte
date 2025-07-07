@@ -171,7 +171,8 @@
 			vncWait: false,
 			vncResolution: '1024x768',
 			startAtBoot: false,
-			bootOrder: 0
+			bootOrder: 0,
+			tpmEmulation: false
 		}
 	});
 
@@ -225,7 +226,8 @@
 				vncWait: false,
 				vncResolution: '1024x768',
 				startAtBoot: false,
-				bootOrder: 0
+				bootOrder: 0,
+				tpmEmulation: false
 			}
 		};
 	}
@@ -315,6 +317,7 @@
 									bind:startAtBoot={modal.advanced.startAtBoot}
 									bind:bootOrder={modal.advanced.bootOrder}
 									bind:vncResolution={modal.advanced.vncResolution}
+									bind:tpmEmulation={modal.advanced.tpmEmulation}
 								/>
 							{/if}
 						</div>

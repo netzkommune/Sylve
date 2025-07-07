@@ -21,7 +21,7 @@ import (
 	"github.com/beevik/etree"
 )
 
-func (s *Service) CreateDiskImage(vmId int, guid string, size int64) error {
+func (s *Service) CreateDiskImage(vmId int, guid string, size int64, name string) error {
 	dataset, err := zfs.Datasets("")
 	if err != nil {
 		return fmt.Errorf("failed_to_get_datasets: %w", err)
@@ -66,7 +66,14 @@ func (s *Service) CreateDiskImage(vmId int, guid string, size int64) error {
 		}
 	}
 
-	imagePath := filepath.Join(vmPath, fmt.Sprintf("%d.img", vmId))
+	var imagePath string
+
+	if name == "" {
+		imagePath = filepath.Join(vmPath, fmt.Sprintf("%d.img", vmId))
+	} else {
+		imagePath = filepath.Join(vmPath, fmt.Sprintf("%s.img", name))
+	}
+
 	if _, err := os.Stat(imagePath); !os.IsNotExist(err) {
 		if err := os.Remove(imagePath); err != nil {
 			return fmt.Errorf("failed_to_remove_existing_image: %w", err)
@@ -185,6 +192,13 @@ func (s *Service) StorageDetach(vmId int, storageId int) error {
 						strings.Contains(value, storage.Name) {
 						bhyveCommandline.RemoveChild(arg)
 					}
+
+					imagePath := filepath.Join(dataset.Mountpoint, "sylve-vm-images", strconv.Itoa(vmId), fmt.Sprintf("%s.img", storage.Name))
+					if _, err := os.Stat(imagePath); !os.IsNotExist(err) {
+						if err := os.Remove(imagePath); err != nil {
+							return fmt.Errorf("failed_to_remove_disk_image: %w", err)
+						}
+					}
 				}
 			}
 		}
@@ -210,7 +224,7 @@ func (s *Service) StorageDetach(vmId int, storageId int) error {
 	return nil
 }
 
-func (s *Service) StorageAttach(vmId int, sType string, dataset string, emulation string, size int64) error {
+func (s *Service) StorageAttach(vmId int, sType string, dataset string, emulation string, size int64, name string) error {
 	domain, err := s.Conn.DomainLookupByName(strconv.Itoa(vmId))
 	if err != nil {
 		return fmt.Errorf("failed_to_lookup_domain_by_name: %w", err)
@@ -368,6 +382,69 @@ func (s *Service) StorageAttach(vmId int, sType string, dataset string, emulatio
 		}
 
 		argValue := fmt.Sprintf("-s %d:0,%s,%s", index, emulation, fmt.Sprintf("/dev/zvol/%s", targetDataset.Name))
+		bhyveCommandline.CreateElement("bhyve:arg").CreateAttr("value", argValue)
+	} else if sType == "raw" {
+		var existingStorage vmModels.Storage
+		err = s.DB.First(&existingStorage, "dataset = ? AND type = ? AND name = ? AND vm_id = ?", dataset, sType, name, vmId).Error
+		if err != nil {
+			if err.Error() != "record not found" {
+				return fmt.Errorf("failed_to_find_existing_storage: %w", err)
+			}
+		}
+
+		if existingStorage.ID != 0 {
+			return fmt.Errorf("raw_storage_already_attached: %s", dataset)
+		}
+
+		if name == "" {
+			return fmt.Errorf("name_required_for_raw_storage")
+		}
+
+		datasets, err := zfs.Datasets("")
+		if err != nil {
+			return fmt.Errorf("failed_to_get_datasets: %w", err)
+		}
+
+		var targetDataset *zfs.Dataset
+		for _, d := range datasets {
+			guid, err := d.GetProperty("guid")
+			if err != nil {
+				return fmt.Errorf("failed_to_get_dataset_property: %w", err)
+			}
+
+			if guid == dataset {
+				targetDataset = d
+				break
+			}
+		}
+
+		if targetDataset == nil {
+			return fmt.Errorf("dataset_not_found: %s", dataset)
+		}
+
+		newStorage := vmModels.Storage{
+			Type:      sType,
+			Dataset:   dataset,
+			Size:      size,
+			Emulation: emulation,
+			Name:      name,
+			VMID:      uint(vm.ID),
+		}
+
+		if err := s.DB.Create(&newStorage).Error; err != nil {
+			return fmt.Errorf("failed_to_create_storage: %w", err)
+		}
+
+		if err := s.CreateDiskImage(vmId, dataset, size, name); err != nil {
+			return fmt.Errorf("failed_to_create_disk_image: %w", err)
+		}
+
+		index, err := findLowestIndex(xml)
+		if err != nil {
+			return fmt.Errorf("failed_to_find_lowest_index: %w", err)
+		}
+
+		argValue := fmt.Sprintf("-s %d:0,%s,%s/%s.img", index, emulation, filepath.Join(targetDataset.Mountpoint, "sylve-vm-images", strconv.Itoa(vmId)), name)
 		bhyveCommandline.CreateElement("bhyve:arg").CreateAttr("value", argValue)
 	}
 

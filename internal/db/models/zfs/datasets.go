@@ -16,6 +16,7 @@ type PeriodicSnapshot struct {
 	Interval  int       `gorm:"uniqueIndex:uniq_guid_interval_prefix,priority:2" json:"interval"`
 	Prefix    string    `gorm:"uniqueIndex:uniq_guid_interval_prefix,priority:3" json:"prefix"`
 	Recursive bool      `json:"recursive"`
+	CronExpr  string    `json:"cronExpr"`
 	CreatedAt time.Time `gorm:"autoCreateTime" json:"createdAt,omitempty"`
 	LastRunAt time.Time `json:"lastRunAt,omitempty"`
 }

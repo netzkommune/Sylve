@@ -6,7 +6,7 @@
 	import type { Dataset, PeriodicSnapshot } from '$lib/types/zfs/dataset';
 	import type { Zpool } from '$lib/types/zfs/pool';
 	import { handleAPIError } from '$lib/utils/http';
-	import { dateToAgo } from '$lib/utils/time';
+	import { cronToHuman, dateToAgo } from '$lib/utils/time';
 	import { getDatasetByGUID } from '$lib/utils/zfs/dataset/dataset';
 	import Icon from '@iconify/svelte';
 	import { toast } from 'svelte-sonner';
@@ -121,7 +121,13 @@
 								<Table.Cell>{snapshot.id}</Table.Cell>
 								<Table.Cell>{getDatasetName(snapshot.guid)}</Table.Cell>
 								<Table.Cell>{snapshot.prefix}</Table.Cell>
-								<Table.Cell>{intervalToString(snapshot.interval)}</Table.Cell>
+
+								{#if snapshot.interval !== 0}
+									<Table.Cell>{intervalToString(snapshot.interval)}</Table.Cell>
+								{:else if snapshot.cronExpr}
+									<Table.Cell>{cronToHuman(snapshot.cronExpr)}</Table.Cell>
+								{/if}
+
 								<Table.Cell title={snapshot.lastRunAt.toLocaleString()}>
 									{@const lastRun = dateToAgo(snapshot.lastRunAt)}
 									{#if lastRun === 'Jan 01, 0001'}

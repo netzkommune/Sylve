@@ -37,6 +37,7 @@ export async function newVM(data: CreateData): Promise<APIResponse> {
 		vncWait: data.advanced.vncWait,
 		vncResolution: data.advanced.vncResolution,
 		startAtBoot: data.advanced.startAtBoot,
+		tpmEmulation: data.advanced.tpmEmulation,
 		bootOrder: parseInt(data.advanced.bootOrder.toString(), 10),
 		pciDevices: data.hardware.passthroughIds,
 		description: data.description

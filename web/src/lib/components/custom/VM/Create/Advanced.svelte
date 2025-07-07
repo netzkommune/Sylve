@@ -17,6 +17,7 @@
 		vncResolution: string;
 		startAtBoot: boolean;
 		bootOrder: number;
+		tpmEmulation: boolean;
 	}
 
 	let {
@@ -25,7 +26,8 @@
 		vncWait = $bindable(),
 		vncResolution = $bindable(),
 		startAtBoot = $bindable(),
-		bootOrder = $bindable()
+		bootOrder = $bindable(),
+		tpmEmulation = $bindable()
 	}: Props = $props();
 
 	onMount(() => {
@@ -102,13 +104,19 @@
 		/>
 	</div>
 
-	<div class="mt-1 grid grid-cols-1 gap-4 lg:grid-cols-3">
+	<div class="mt-1 grid grid-cols-1 gap-4 lg:grid-cols-2">
 		<CustomCheckbox label="VNC Wait" bind:checked={vncWait} classes="flex items-center gap-2"
 		></CustomCheckbox>
 
 		<CustomCheckbox
 			label="Start On Boot"
 			bind:checked={startAtBoot}
+			classes="flex items-center gap-2"
+		></CustomCheckbox>
+
+		<CustomCheckbox
+			label="TPM Emulation (Experimental)"
+			bind:checked={tpmEmulation}
 			classes="flex items-center gap-2"
 		></CustomCheckbox>
 	</div>

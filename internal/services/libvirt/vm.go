@@ -280,6 +280,7 @@ func (s *Service) CreateVM(data libvirtServiceInterfaces.CreateVMRequest) error 
 
 	vncWait := false
 	startAtBoot := false
+	tpmEmulation := false
 
 	if data.VNCWait != nil {
 		vncWait = *data.VNCWait
@@ -291,6 +292,12 @@ func (s *Service) CreateVM(data libvirtServiceInterfaces.CreateVMRequest) error 
 		startAtBoot = true
 	} else {
 		startAtBoot = *data.StartAtBoot
+	}
+
+	if data.TPMEmulation != nil {
+		tpmEmulation = *data.TPMEmulation
+	} else {
+		tpmEmulation = false
 	}
 
 	var networks []vmModels.Network
@@ -317,7 +324,7 @@ func (s *Service) CreateVM(data libvirtServiceInterfaces.CreateVMRequest) error 
 		var name string
 
 		if data.StorageType == "raw" {
-			name = fmt.Sprintf("%d.img", *data.VMID)
+			name = fmt.Sprintf("%d", *data.VMID)
 		}
 
 		storages = append(storages, vmModels.Storage{
@@ -356,6 +363,7 @@ func (s *Service) CreateVM(data libvirtServiceInterfaces.CreateVMRequest) error 
 		VNCResolution: data.VNCResolution,
 		VNCWait:       vncWait,
 		StartAtBoot:   startAtBoot,
+		TPMEmulation:  tpmEmulation,
 		StartOrder:    data.StartOrder,
 		PCIDevices:    data.PCIDevices,
 		ISO:           data.ISO,

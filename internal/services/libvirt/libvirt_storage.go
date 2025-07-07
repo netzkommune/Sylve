@@ -188,7 +188,7 @@ func (s *Service) StorageDetach(vmId int, storageId int) error {
 
 				/* Takes care of RAW Disk removals */
 				if storage.Type == "raw" {
-					if strings.Contains(value, fmt.Sprintf(dataset.Name)) &&
+					if strings.Contains(value, dataset.Name) &&
 						strings.Contains(value, storage.Name) {
 						bhyveCommandline.RemoveChild(arg)
 					}

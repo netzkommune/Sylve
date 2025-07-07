@@ -385,6 +385,10 @@ func createStandardBridge(sw networkModels.StandardSwitch) error {
 		}
 	}
 
+	if _, err := utils.RunCommand("ifconfig", sw.BridgeName, "up"); err != nil {
+		return fmt.Errorf("create_standard_bridge: failed to bring up bridge: %v", err)
+	}
+
 	for _, port := range sw.Ports {
 		if err := addBridgeMember(sw.BridgeName, port.Name, sw.MTU, sw.VLAN); err != nil {
 			return fmt.Errorf("create_standard_bridge: %v", err)
@@ -550,6 +554,10 @@ func editStandardBridge(oldSw, newSw networkModels.StandardSwitch) error {
 				return fmt.Errorf("edit_standard_bridge: bring up tap %s: %v", m, err)
 			}
 		}
+	}
+
+	if _, err := utils.RunCommand("ifconfig", br, "up"); err != nil {
+		return fmt.Errorf("edit_standard_bridge: failed to bring up bridge: %v", err)
 	}
 
 	return nil

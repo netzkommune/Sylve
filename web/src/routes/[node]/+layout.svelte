@@ -48,6 +48,11 @@
 					label: 'Hardware',
 					icon: 'ix:hardware-cabinet',
 					href: `/${node}/vm/${vmName}/hardware`
+				},
+				{
+					label: 'Network',
+					icon: 'mdi:network',
+					href: `/${node}/vm/${vmName}/network`
 				}
 			];
 		} else {

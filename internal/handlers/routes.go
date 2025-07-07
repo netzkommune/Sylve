@@ -192,6 +192,7 @@ func RegisterRoutes(r *gin.Engine,
 		vm.POST("/storage/attach", vmHandlers.StorageAttach(libvirtService))
 
 		vm.POST("/network/detach", vmHandlers.NetworkDetach(libvirtService))
+		vm.POST("/network/attach", vmHandlers.NetworkAttach(libvirtService))
 
 		vm.PUT("/hardware/:vmid", vmHandlers.ModifyHardware(libvirtService))
 	}

@@ -707,3 +707,22 @@ func (s *Service) GetVMXML(vmId int) (string, error) {
 
 	return xmlDesc, nil
 }
+
+func (s *Service) IsDomainInactive(vmId int) (bool, error) {
+	domain, err := s.Conn.DomainLookupByName(strconv.Itoa(vmId))
+	if err != nil {
+		return false, fmt.Errorf("failed_to_lookup_domain_by_name: %w", err)
+	}
+
+	state, _, err := s.Conn.DomainGetState(domain, 0)
+
+	if err != nil {
+		return false, fmt.Errorf("failed_to_get_domain_state: %w", err)
+	}
+
+	if state != 5 {
+		return false, nil
+	}
+
+	return true, nil
+}

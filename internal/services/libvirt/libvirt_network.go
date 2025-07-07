@@ -9,46 +9,198 @@
 package libvirt
 
 import (
-	"encoding/xml"
 	"fmt"
+	"strconv"
+	"strings"
+	networkModels "sylve/internal/db/models/network"
 	vmModels "sylve/internal/db/models/vm"
-	libvirtServiceInterfaces "sylve/internal/interfaces/services/libvirt"
+	"sylve/pkg/utils"
+
+	"github.com/beevik/etree"
 )
 
 func (s *Service) NetworkDetach(vmId int, networkId int) error {
-	def, err := s.GetVMXML(vmId)
+	inactive, err := s.IsDomainInactive(vmId)
+	if err != nil {
+		return fmt.Errorf("failed_to_check_vm_inactive: %w", err)
+	}
+
+	if !inactive {
+		return fmt.Errorf("vm_is_active: cannot_detach_network")
+	}
+
+	xmlDesc, err := s.GetVMXML(vmId)
 	if err != nil {
 		return fmt.Errorf("failed_to_get_vm_xml: %w", err)
 	}
 
 	var network vmModels.Network
-	err = s.DB.Preload("Switch").First(&network, "id = ?", networkId).Error
-
-	if err != nil {
+	if err := s.DB.Preload("Switch").
+		First(&network, "id = ?", networkId).
+		Error; err != nil {
 		return fmt.Errorf("failed_to_find_network: %w", err)
 	}
 
-	var parsed libvirtServiceInterfaces.Domain
-	err = xml.Unmarshal([]byte(def), &parsed)
-	if err != nil {
-		return fmt.Errorf("failed_to_parse_domain_xml: %w", err)
+	doc := etree.NewDocument()
+	if err := doc.ReadFromString(xmlDesc); err != nil {
+		return fmt.Errorf("failed_to_parse_vm_xml: %w", err)
 	}
 
-	for i, iface := range parsed.Devices.Interfaces {
-		if iface.Source.Bridge != "" {
-			if iface.Source.Bridge == network.Switch.BridgeName {
-				parsed.Devices.Interfaces = append(parsed.Devices.Interfaces[:i], parsed.Devices.Interfaces[i+1:]...)
-				break
-			}
+	found := false
+	for _, iface := range doc.FindElements("//interface[@type='bridge']") {
+		macEl := iface.FindElement("mac")
+		if macEl == nil {
+			continue
+		}
+		addrAttr := macEl.SelectAttr("address")
+		if addrAttr == nil {
+			continue
+		}
+
+		if strings.EqualFold(addrAttr.Value, network.MAC) {
+			parent := iface.Parent()
+			parent.RemoveChild(iface)
+			found = true
+			break
 		}
 	}
 
-	_, err = xml.MarshalIndent(parsed, "", "  ")
-	if err != nil {
-		return fmt.Errorf("failed_to_marshal_updated_domain_xml: %w", err)
+	if !found {
+		return fmt.Errorf("network_interface_not_found_in_xml: %s", network.MAC)
 	}
 
-	// save updated XML back to the domain
+	newXML, err := doc.WriteToString()
+	if err != nil {
+		return fmt.Errorf("failed_to_serialize_modified_xml: %w", err)
+	}
+
+	domain, err := s.Conn.DomainLookupByName(strconv.Itoa(vmId))
+	if err != nil {
+		return fmt.Errorf("failed_to_lookup_domain_by_name: %w", err)
+	}
+
+	if err := s.Conn.DomainUndefineFlags(domain, 0); err != nil {
+		return fmt.Errorf("failed_to_undefine_domain: %w", err)
+	}
+
+	if _, err := s.Conn.DomainDefineXML(newXML); err != nil {
+		return fmt.Errorf("failed_to_define_domain_with_modified_xml: %w", err)
+	}
+
+	if err := s.DB.Delete(&network).Error; err != nil {
+		return fmt.Errorf("failed_to_delete_network_record: %w", err)
+	}
+
+	return nil
+}
+
+func (s *Service) NetworkAttach(vmId int, switchId int, emulation, macAddress string) error {
+	inactive, err := s.IsDomainInactive(vmId)
+	if err != nil {
+		return fmt.Errorf("failed_to_check_vm_inactive: %w", err)
+	}
+
+	if !inactive {
+		return fmt.Errorf("vm_is_active: cannot_attach_network")
+	}
+
+	if emulation == "" || (emulation != "virtio" && emulation != "e1000") {
+		return fmt.Errorf("invalid_emulation_type: %s", emulation)
+	}
+
+	var stdSwitch networkModels.StandardSwitch
+	if err := s.DB.First(&stdSwitch, switchId).Error; err != nil {
+		return fmt.Errorf("failed_to_find_switch: %w", err)
+	}
+
+	vms, err := s.ListVMs()
+	if err != nil {
+		return fmt.Errorf("failed_to_list_vms: %w", err)
+	}
+
+	var vm *vmModels.VM
+	for _, v := range vms {
+		if v.VmID == vmId {
+			vm = &v
+			break
+		}
+	}
+
+	var existingNetwork vmModels.Network
+	if err := s.DB.First(&existingNetwork, "vm_id = ? AND switch_id = ?", vm.ID, switchId).Error; err == nil {
+		return fmt.Errorf("network_already_attached_to_vm: %s", existingNetwork.MAC)
+	}
+
+	if macAddress == "" {
+		macAddress = utils.GenerateRandomMAC()
+	}
+
+	network := vmModels.Network{
+		VMID:      vm.ID,
+		SwitchID:  uint(switchId),
+		MAC:       macAddress,
+		Emulation: emulation,
+	}
+
+	if err := s.DB.Create(&network).Error; err != nil {
+		return fmt.Errorf("failed_to_create_network_record: %w", err)
+	}
+
+	xmlDesc, err := s.GetVMXML(vmId)
+	if err != nil {
+		return fmt.Errorf("failed_to_get_vm_xml: %w", err)
+	}
+
+	doc := etree.NewDocument()
+	if err := doc.ReadFromString(xmlDesc); err != nil {
+		return fmt.Errorf("failed_to_parse_vm_xml: %w", err)
+	}
+
+	domainEl := doc.SelectElement("domain")
+	if domainEl == nil {
+		return fmt.Errorf("malformed_vm_xml: missing <domain> element")
+	}
+
+	devicesEl := domainEl.FindElement("devices")
+	if devicesEl == nil {
+		devicesEl = etree.NewElement("devices")
+		domainEl.AddChild(devicesEl)
+	}
+
+	ifaceEl := etree.NewElement("interface")
+	ifaceEl.CreateAttr("type", "bridge")
+
+	macEl := etree.NewElement("mac")
+	macEl.CreateAttr("address", network.MAC)
+	ifaceEl.AddChild(macEl)
+
+	sourceEl := etree.NewElement("source")
+	sourceEl.CreateAttr("bridge", stdSwitch.BridgeName)
+	ifaceEl.AddChild(sourceEl)
+
+	modelEl := etree.NewElement("model")
+	modelEl.CreateAttr("type", network.Emulation)
+	ifaceEl.AddChild(modelEl)
+
+	devicesEl.AddChild(ifaceEl)
+
+	newXML, err := doc.WriteToString()
+	if err != nil {
+		return fmt.Errorf("failed_to_serialize_modified_xml: %w", err)
+	}
+
+	domain, err := s.Conn.DomainLookupByName(strconv.Itoa(vmId))
+	if err != nil {
+		return fmt.Errorf("failed_to_lookup_domain_by_name: %w", err)
+	}
+
+	if err := s.Conn.DomainUndefineFlags(domain, 0); err != nil {
+		return fmt.Errorf("failed_to_undefine_domain: %w", err)
+	}
+
+	if _, err := s.Conn.DomainDefineXML(newXML); err != nil {
+		return fmt.Errorf("failed_to_define_domain_with_modified_xml: %w", err)
+	}
 
 	return nil
 }

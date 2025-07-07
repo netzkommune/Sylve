@@ -46,12 +46,42 @@ definitions:
     - device
     - sizes
     type: object
+  internal_handlers_info.HistoricalNetworkInterfaceResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_internal_interfaces_services_info.HistoricalNetworkInterface'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  internal_handlers_info.HistoricalRamInfoResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models_info.RAM'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
   internal_handlers_network.CreateStandardSwitchRequest:
     properties:
       address:
         type: string
       address6:
         type: string
+      dhcp:
+        type: boolean
+      disableIPv6:
+        type: boolean
       mtu:
         type: integer
       name:
@@ -61,6 +91,8 @@ definitions:
           type: string
         type: array
       private:
+        type: boolean
+      slaac:
         type: boolean
       vlan:
         type: integer
@@ -95,6 +127,10 @@ definitions:
         type: string
       address6:
         type: string
+      dhcp:
+        type: boolean
+      disableIPv6:
+        type: boolean
       id:
         type: integer
       mtu:
@@ -104,6 +140,8 @@ definitions:
           type: string
         type: array
       private:
+        type: boolean
+      slaac:
         type: boolean
       vlan:
         type: integer
@@ -121,6 +159,37 @@ definitions:
     required:
     - deviceId
     - domain
+    type: object
+  internal_handlers_vm.ModifyHardwareRequest:
+    properties:
+      cpuCores:
+        type: integer
+      cpuPinning:
+        items:
+          type: integer
+        type: array
+      cpuSockets:
+        type: integer
+      cpuThreads:
+        type: integer
+      ram:
+        type: integer
+    required:
+    - cpuCores
+    - cpuPinning
+    - cpuSockets
+    - cpuThreads
+    - ram
+    type: object
+  internal_handlers_vm.VMEditDescRequest:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+    required:
+    - description
+    - id
     type: object
   internal_handlers_zfs.AvgIODelayResponse:
     properties:
@@ -152,6 +221,8 @@ definitions:
     type: object
   internal_handlers_zfs.CreatePeriodicSnapshotJobRequest:
     properties:
+      cronExpr:
+        type: string
       guid:
         type: string
       interval:
@@ -191,6 +262,40 @@ definitions:
     - name
     - parent
     type: object
+  internal_handlers_zfs.EditFilesystemRequest:
+    properties:
+      guid:
+        type: string
+      properties:
+        additionalProperties:
+          type: string
+        type: object
+    required:
+    - guid
+    - properties
+    type: object
+  internal_handlers_zfs.EditVolumeRequest:
+    properties:
+      name:
+        type: string
+      properties:
+        additionalProperties:
+          type: string
+        type: object
+    required:
+    - name
+    - properties
+    type: object
+  internal_handlers_zfs.FlashVolumeRequest:
+    properties:
+      guid:
+        type: string
+      uuid:
+        type: string
+    required:
+    - guid
+    - uuid
+    type: object
   internal_handlers_zfs.PoolEditRequest:
     properties:
       name:
@@ -199,6 +304,10 @@ definitions:
         additionalProperties:
           type: string
         type: object
+      spares:
+        items:
+          type: string
+        type: array
     type: object
   internal_handlers_zfs.PoolStatPointResponse:
     properties:
@@ -310,6 +419,19 @@ definitions:
       status:
         type: string
     type: object
+  sylve_internal.APIResponse-array_sylve_internal_db_models_info_Swap:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models_info.Swap'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
   sylve_internal.APIResponse-array_sylve_internal_db_models_utilities_Downloads:
     properties:
       data:
@@ -328,6 +450,19 @@ definitions:
       data:
         items:
           $ref: '#/definitions/sylve_internal_db_models_vm.VM'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-array_sylve_internal_db_models_vm_VMStats:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models_vm.VMStats'
         type: array
       error:
         type: string
@@ -513,6 +648,8 @@ definitions:
         type: integer
       id:
         type: integer
+      oldDriver:
+        type: string
     type: object
   sylve_internal_db_models_info.AuditLog:
     properties:
@@ -570,6 +707,24 @@ definitions:
       updatedAt:
         type: string
     type: object
+  sylve_internal_db_models_info.RAM:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      usage:
+        type: number
+    type: object
+  sylve_internal_db_models_info.Swap:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      usage:
+        type: number
+    type: object
   sylve_internal_db_models_network.NetworkPort:
     properties:
       id:
@@ -591,6 +746,10 @@ definitions:
         type: string
       createdAt:
         type: string
+      dhcp:
+        type: boolean
+      disableIPv6:
+        type: boolean
       id:
         type: integer
       mtu:
@@ -602,6 +761,8 @@ definitions:
           $ref: '#/definitions/sylve_internal_db_models_network.NetworkPort'
         type: array
       private:
+        type: boolean
+      slaac:
         type: boolean
       updatedAt:
         type: string
@@ -671,6 +832,8 @@ definitions:
         type: string
       id:
         type: integer
+      name:
+        type: string
       size:
         type: integer
       type:
@@ -682,6 +845,10 @@ definitions:
     properties:
       cpuCores:
         type: integer
+      cpuPinning:
+        items:
+          type: integer
+        type: array
       cpuSockets:
         type: integer
       cpuThreads:
@@ -718,6 +885,8 @@ definitions:
         items:
           $ref: '#/definitions/sylve_internal_db_models_vm.Storage'
         type: array
+      tpmEmulation:
+        type: boolean
       updatedAt:
         type: string
       vmId:
@@ -731,9 +900,26 @@ definitions:
       vncWait:
         type: boolean
     type: object
+  sylve_internal_db_models_vm.VMStats:
+    properties:
+      cpuUsage:
+        type: number
+      createdAt:
+        type: string
+      id:
+        type: integer
+      memoryUsage:
+        type: number
+      memoryUsed:
+        type: number
+      vmId:
+        type: integer
+    type: object
   sylve_internal_db_models_zfs.PeriodicSnapshot:
     properties:
       createdAt:
+        type: string
+      cronExpr:
         type: string
       guid:
         type: string
@@ -836,6 +1022,15 @@ definitions:
       usage:
         type: number
     type: object
+  sylve_internal_interfaces_services_info.HistoricalNetworkInterface:
+    properties:
+      createdAt:
+        type: string
+      receivedBytes:
+        type: integer
+      sentBytes:
+        type: integer
+    type: object
   sylve_internal_interfaces_services_info.RAMInfo:
     properties:
       free:
@@ -858,6 +1053,10 @@ definitions:
     properties:
       cpuCores:
         type: integer
+      cpuPinning:
+        items:
+          type: integer
+        type: array
       cpuSockets:
         type: integer
       cpuThreads:
@@ -892,6 +1091,8 @@ definitions:
         type: string
       switchId:
         type: integer
+      tpmEmulation:
+        type: boolean
       vmId:
         type: integer
       vncPassword:
@@ -904,6 +1105,7 @@ definitions:
         type: boolean
     required:
     - cpuCores
+    - cpuPinning
     - cpuSockets
     - cpuThreads
     - name
@@ -913,13 +1115,12 @@ definitions:
     - storageSize
     - storageType
     - switchId
+    - tpmEmulation
     - vmId
     - vncPort
     type: object
   sylve_internal_interfaces_services_libvirt.LvDomain:
     properties:
-      cpuUsage:
-        type: number
       id:
         type: integer
       name:
@@ -957,6 +1158,8 @@ definitions:
         type: integer
       usedbydataset:
         type: integer
+      volblocksize:
+        type: integer
       volsize:
         type: integer
       written:
@@ -977,10 +1180,6 @@ definitions:
     type: object
   sylve_internal_interfaces_services_zfs.ReplaceDevice:
     properties:
-      name:
-        maxLength: 24
-        minLength: 1
-        type: string
       new:
         maxLength: 24
         minLength: 1
@@ -990,7 +1189,6 @@ definitions:
         minLength: 1
         type: string
     required:
-    - name
     - new
     - old
     type: object
@@ -1600,6 +1798,38 @@ paths:
       summary: Wipe disk
       tags:
       - Disk
+  /hardware/:vmid:
+    put:
+      consumes:
+      - application/json
+      description: Modify the hardware configuration of a virtual machine
+      parameters:
+      - description: Modify Hardware Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_vm.ModifyHardwareRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Modify Hardware of a Virtual Machine
+      tags:
+      - VM
   /health/basic:
     get:
       consumes:
@@ -1699,6 +1929,25 @@ paths:
           schema:
             $ref: '#/definitions/sylve_internal.APIResponse-any'
       summary: Get Historical CPU information
+      tags:
+      - system
+  /info/network-interfaces/historical:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves historical Network info
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers_info.HistoricalNetworkInterfaceResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      summary: Get Historical Network information
       tags:
       - system
   /info/notes:
@@ -1841,6 +2090,25 @@ paths:
       summary: Get RAM Info
       tags:
       - Info
+  /info/ram/historical:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves historical RAM info
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers_info.HistoricalRamInfoResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      summary: Get Historical RAM information
+      tags:
+      - system
   /info/swap:
     get:
       consumes:
@@ -1862,6 +2130,75 @@ paths:
       summary: Get Swap Info
       tags:
       - Info
+  /info/swap/historical:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves historical Swap info
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_internal_db_models_info_Swap'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      summary: Get Historical Swap information
+      tags:
+      - system
+  /network/attach:
+    post:
+      consumes:
+      - application/json
+      description: Attach a network interface to a virtual machine
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Attach Network to a Virtual Machine
+      tags:
+      - VM
+  /network/detach:
+    post:
+      consumes:
+      - application/json
+      description: Detach a network interface from a virtual machine
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Detach Network from a Virtual Machine
+      tags:
+      - VM
   /network/interface:
     get:
       consumes:
@@ -2002,6 +2339,56 @@ paths:
       summary: Delete a Standard Switch
       tags:
       - Network
+  /storage/attach:
+    post:
+      consumes:
+      - application/json
+      description: Attach a storage volume to a virtual machine
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Attach Storage to a Virtual Machine
+      tags:
+      - VM
+  /storage/detach:
+    post:
+      consumes:
+      - application/json
+      description: Detach a storage volume from a virtual machine
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Detach Storage from a Virtual Machine
+      tags:
+      - VM
   /system/pci-devices:
     get:
       consumes:
@@ -2401,6 +2788,34 @@ paths:
       summary: Perform an action on a Virtual Machine
       tags:
       - VM
+  /vm/description:
+    put:
+      consumes:
+      - application/json
+      description: Update the description of a virtual machine by its ID
+      parameters:
+      - description: Edit Virtual Machine Description Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_vm.VMEditDescRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Edit a Virtual Machine's description
+      tags:
+      - VM
   /vm/domain/{id}:
     get:
       consumes:
@@ -2434,6 +2849,31 @@ paths:
       security:
       - BearerAuth: []
       summary: Get a Virtual Machine's Domain
+      tags:
+      - VM
+  /vm/stats:
+    post:
+      consumes:
+      - application/json
+      description: Retrieve statistics for a virtual machine
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_internal_db_models_vm_VMStats'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Get VM Statistics
       tags:
       - VM
   /zfs/datasets:
@@ -2486,6 +2926,37 @@ paths:
       tags:
       - ZFS
   /zfs/datasets/filesystem:
+    patch:
+      consumes:
+      - application/json
+      description: Edit a ZFS filesystem
+      parameters:
+      - description: Edit Filesystem Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_zfs.EditFilesystemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Edit a ZFS filesystem
+      tags:
+      - ZFS
     post:
       consumes:
       - application/json
@@ -2715,6 +3186,37 @@ paths:
       tags:
       - ZFS
   /zfs/datasets/volume:
+    patch:
+      consumes:
+      - application/json
+      description: Edit a ZFS volume
+      parameters:
+      - description: Edit Volume Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_zfs.EditVolumeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Edit a ZFS volume
+      tags:
+      - ZFS
     post:
       consumes:
       - application/json
@@ -2771,6 +3273,38 @@ paths:
       security:
       - BearerAuth: []
       summary: Delete a ZFS volume
+      tags:
+      - ZFS
+  /zfs/datasets/volume/flash:
+    post:
+      consumes:
+      - application/json
+      description: Flash a ZFS volume with a UUID pointing to a disk iso/img
+      parameters:
+      - description: Flash Volume Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_zfs.FlashVolumeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Flash a ZFS volume
       tags:
       - ZFS
   /zfs/pool/avg-io-delay:
@@ -2922,15 +3456,15 @@ paths:
       summary: Create Pool
       tags:
       - ZFS
-  /zfs/pools/{name}:
+  /zfs/pools/{guid}:
     delete:
       consumes:
       - application/json
       description: Delete a ZFS pool
       parameters:
-      - description: Pool Name
+      - description: Pool GUID
         in: path
-        name: name
+        name: guid
         required: true
         type: string
       produces:
@@ -2949,7 +3483,7 @@ paths:
       summary: Delete Pool
       tags:
       - ZFS
-  /zfs/pools/{name}/replace-device:
+  /zfs/pools/{guid}/replace-device:
     post:
       consumes:
       - application/json
@@ -2977,15 +3511,15 @@ paths:
       summary: Replace Device
       tags:
       - ZFS
-  /zfs/pools/{name}/scrub:
+  /zfs/pools/{guid}/scrub:
     post:
       consumes:
       - application/json
       description: Start a scrub on a ZFS pool
       parameters:
-      - description: Pool Name
+      - description: Pool GUID
         in: path
-        name: name
+        name: guid
         required: true
         type: string
       produces:

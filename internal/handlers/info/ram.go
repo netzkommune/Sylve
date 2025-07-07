@@ -11,6 +11,7 @@ package infoHandlers
 import (
 	"net/http"
 	"sylve/internal"
+	infoModels "sylve/internal/db/models/info"
 	infoServiceInterfaces "sylve/internal/interfaces/services/info"
 	"sylve/internal/services/info"
 
@@ -48,12 +49,19 @@ func RAMInfo(infoService *info.Service) gin.HandlerFunc {
 	}
 }
 
+type HistoricalRamInfoResponse struct {
+	Status  string           `json:"status"`
+	Message string           `json:"message"`
+	Error   string           `json:"error"`
+	Data    []infoModels.RAM `json:"data"`
+}
+
 // @Summary Get Historical RAM information
 // @Description Retrieves historical RAM info
 // @Tags system
 // @Accept json
 // @Produce json
-// @Success 200 {object} internal.APIResponse[[]infoModels.RAM]
+// @Success 200 {object} HistoricalRamInfoResponse
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
 // @Router /info/ram/historical [get]
 func HistoricalRAMInfoHandler(infoService *info.Service) gin.HandlerFunc {
@@ -69,7 +77,7 @@ func HistoricalRAMInfoHandler(infoService *info.Service) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, internal.APIResponse[any]{
+		c.JSON(http.StatusOK, internal.APIResponse[[]infoModels.RAM]{
 			Status:  "success",
 			Message: "ram_info",
 			Error:   "",

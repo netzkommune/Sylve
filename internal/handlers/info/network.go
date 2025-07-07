@@ -11,17 +11,25 @@ package infoHandlers
 import (
 	"net/http"
 	"sylve/internal"
+	infoServiceInterfaces "sylve/internal/interfaces/services/info"
 	"sylve/internal/services/info"
 
 	"github.com/gin-gonic/gin"
 )
+
+type HistoricalNetworkInterfaceResponse struct {
+	Status  string                                             `json:"status"`
+	Message string                                             `json:"message"`
+	Error   string                                             `json:"error"`
+	Data    []infoServiceInterfaces.HistoricalNetworkInterface `json:"data"`
+}
 
 // @Summary Get Historical Network information
 // @Description Retrieves historical Network info
 // @Tags system
 // @Accept json
 // @Produce json
-// @Success 200 {object} internal.APIResponse[[]infoServiceInterfaces.HistoricalNetworkInterface]
+// @Success 200 {object} HistoricalNetworkInterfaceResponse
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
 // @Router /info/network-interfaces/historical [get]
 func HistoricalNetworkInterfacesInfoHandler(infoService *info.Service) gin.HandlerFunc {
@@ -37,7 +45,7 @@ func HistoricalNetworkInterfacesInfoHandler(infoService *info.Service) gin.Handl
 			return
 		}
 
-		c.JSON(http.StatusOK, internal.APIResponse[any]{
+		c.JSON(http.StatusOK, internal.APIResponse[[]infoServiceInterfaces.HistoricalNetworkInterface]{
 			Status:  "success",
 			Message: "network_interfaces_info",
 			Error:   "",

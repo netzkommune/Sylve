@@ -87,6 +87,7 @@ func main() {
 		uS.(*utilities.Service),
 		sysS.(*system.Service),
 		lvS.(*libvirt.Service),
+		d,
 	)
 
 	tlsConfig, err := aS.GetSylveCertificate()

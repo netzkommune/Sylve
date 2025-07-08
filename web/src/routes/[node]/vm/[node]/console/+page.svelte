@@ -1,15 +1,17 @@
 <script lang="ts">
 	import type { VMDomain } from '$lib/types/vm/vm';
+	import { sha256 } from '$lib/utils/string';
 	import Icon from '@iconify/svelte';
 
 	interface Data {
 		port: number;
 		password: string;
 		domain: VMDomain;
+		hash: string;
 	}
 
 	let { data }: { data: Data } = $props();
-	let path = $derived(`/api/vnc/${encodeURIComponent(String(data.port))}`);
+	let path = $derived(`/api/vnc/${encodeURIComponent(String(data.port))}?hash=${data.hash}`);
 
 	$inspect(data.domain);
 </script>

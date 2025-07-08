@@ -40,12 +40,6 @@ var WSUpgrader = websocket.Upgrader{
 }
 
 func HandleTerminalWebsocket(c *gin.Context) {
-	_, exists := c.Get("Token")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-		return
-	}
-
 	id := c.Query("id")
 	if id == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
@@ -63,11 +57,17 @@ func HandleTerminalWebsocket(c *gin.Context) {
 
 	w := c.Writer
 	r := c.Request
-	subprotocols := websocket.Subprotocols(r)
-	conn, err := WSUpgrader.Upgrade(w, r, http.Header{"Sec-WebSocket-Protocol": {subprotocols[0]}})
+	conn, err := WSUpgrader.Upgrade(w, r, nil)
 
 	if err != nil {
 		logger.L.Error().Msgf("WebSocket upgrade failed: %v", err)
+
+		killSession := exec.Command("tmux", "kill-session", "-t", id)
+		if err := killSession.Run(); err != nil {
+			logger.L.Error().Msgf("Error killing tmux session %s: %v", id, err)
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "websocket upgrade failed"})
 		return
 	}
 

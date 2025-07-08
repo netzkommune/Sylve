@@ -57,10 +57,7 @@ export async function actionVm(id: number | string, action: string): Promise<API
 }
 
 export async function getStats(vmId: number, limit: number): Promise<VMStat[]> {
-	return await apiRequest(`/vm/stats`, z.array(VMStatSchema), 'POST', {
-		vmId,
-		limit
-	});
+	return await apiRequest(`/vm/stats/${vmId}/${limit}`, z.array(VMStatSchema), 'GET');
 }
 
 export async function updateDescription(id: number, description: string): Promise<APIResponse> {

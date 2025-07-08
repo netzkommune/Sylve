@@ -18,18 +18,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Summary Get Audit Logs
-// @Description Get the latest audit logs
+// @Summary Get Audit Records
+// @Description Get the latest audit records
 // @Tags Info
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Success 200 {object} internal.APIResponse[[]infoModels.AuditLog] "Success"
+// @Success 200 {object} internal.APIResponse[[]infoModels.AuditRecord] "Success"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
-// @Router /info/audit-logs [get]
-func AuditLogs(infoService *info.Service) gin.HandlerFunc {
+// @Router /info/audit-records [get]
+func AuditRecords(infoService *info.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		logs, err := infoService.GetAuditLogs(64)
+		records, err := infoService.GetAuditRecords(64)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
@@ -43,9 +43,9 @@ func AuditLogs(infoService *info.Service) gin.HandlerFunc {
 
 		c.JSON(http.StatusOK, internal.APIResponse[any]{
 			Status:  "success",
-			Message: "audit_logs",
+			Message: "audit_records",
 			Error:   "",
-			Data:    logs,
+			Data:    records,
 		})
 	}
 }

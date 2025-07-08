@@ -22,9 +22,7 @@ type InfoServiceInterface interface {
 	DeleteNoteByID(id int) error
 	UpdateNoteByID(id int, title, note string) error
 
-	GetAuditLogs(limit int) ([]infoModels.AuditLog, error)
-	StartAuditLog(token string, action string, status string) uint
-	EndAuditLog(logID uint, status string) error
+	GetAuditRecords(limit int) ([]infoModels.AuditRecord, error)
 
 	StoreStats()
 	Cron()

@@ -31,10 +31,23 @@ func EnsureAuthenticated(authService *authService.Service) gin.HandlerFunc {
 			return
 		}
 
-		token, err := utils.GetTokenFromHeader(c.Request.Header)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "no_token_provided"})
-			return
+		var token string
+		var err error
+
+		if hash := c.Query("hash"); hash != "" {
+			token, err = authService.GetTokenBySHA256(hash)
+			if err != nil {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"status": "error", "error": "invalid_hash"})
+				return
+			}
+		}
+
+		if token == "" {
+			token, err = utils.GetTokenFromHeader(c.Request.Header)
+			if err != nil {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "no_token_provided"})
+				return
+			}
 		}
 
 		_, err = authService.ValidateToken(token)

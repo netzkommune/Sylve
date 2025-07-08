@@ -13,7 +13,6 @@ import (
 	"fmt"
 	"strings"
 	"sylve/internal/db/models"
-	infoModels "sylve/internal/db/models/info"
 	serviceInterfaces "sylve/internal/interfaces/services"
 	"sylve/internal/logger"
 	"sylve/pkg/utils"
@@ -130,25 +129,8 @@ func (s *Service) CreateJWT(username, password, authType string, remember bool) 
 		}
 	}
 
-	hostname, err := utils.GetSystemHostname()
-
 	if err != nil {
 		return "", fmt.Errorf("hostname_fetch_failed")
-	}
-
-	auditLog := infoModels.AuditLog{
-		UserID:   user.ID,
-		User:     user.Username,
-		Node:     hostname,
-		AuthType: authType,
-		Started:  time.Now(),
-		Ended:    time.Now(),
-		Action:   "login",
-		Status:   "success",
-	}
-
-	if err := s.DB.Create(&auditLog).Error; err != nil {
-		return "", fmt.Errorf("audit_log_failed")
 	}
 
 	return token, nil
@@ -169,27 +151,6 @@ func (s *Service) RevokeJWT(token string) error {
 
 	if err := s.DB.Where("id = ?", tokenRecord.UserID).First(&user).Error; err != nil {
 		return fmt.Errorf("user_not_found")
-	}
-
-	hostname, err := utils.GetSystemHostname()
-
-	if err != nil {
-		return fmt.Errorf("hostname_fetch_failed")
-	}
-
-	auditLog := infoModels.AuditLog{
-		UserID:   user.ID,
-		User:     user.Username,
-		Node:     hostname,
-		AuthType: tokenRecord.AuthType,
-		Started:  time.Now(),
-		Ended:    time.Now(),
-		Action:   "revoke_token",
-		Status:   "success",
-	}
-
-	if err := s.DB.Create(&auditLog).Error; err != nil {
-		return fmt.Errorf("audit_log_failed")
 	}
 
 	return nil
@@ -343,4 +304,20 @@ func (s *Service) ClearExpiredJWTTokens() {
 			}
 		}
 	}
+}
+
+func (s *Service) GetTokenBySHA256(hash string) (string, error) {
+	var tokens []models.Token
+	if err := s.DB.Find(&tokens).Error; err != nil {
+		return "", fmt.Errorf("failed_to_fetch_tokens: %v", err)
+	}
+
+	for _, token := range tokens {
+		tokenHash := utils.SHA256(token.Token, 1)
+		if tokenHash == hash {
+			return token.Token, nil
+		}
+	}
+
+	return "", fmt.Errorf("token_not_found")
 }

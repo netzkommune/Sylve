@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { getDatasets } from '$lib/api/zfs/datasets';
 	import { getPools, getPoolStats } from '$lib/api/zfs/pool';
+	import AreaChart from '$lib/components/custom/Charts/Area.svelte';
 	import BarChart from '$lib/components/custom/Charts/Bar.svelte';
 	import LineGraph from '$lib/components/custom/Charts/LineGraph.svelte';
 	import PieChart from '$lib/components/custom/Charts/Pie.svelte';
+	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card';
 	import CustomComboBox from '$lib/components/ui/custom-input/combobox.svelte';
 	import type { Dataset } from '$lib/types/zfs/dataset';
@@ -12,10 +14,12 @@
 	import {
 		getDatasetCompressionHist,
 		getPoolStatsCombined,
-		getPoolUsagePieData
+		getPoolUsagePieData,
+		type StatType
 	} from '$lib/utils/zfs/pool';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
+	import type { Chart } from 'chart.js';
 
 	interface Data {
 		pools: Zpool[];
@@ -26,6 +30,8 @@
 	type CardType = 'pools' | 'datasets' | 'file_systems' | 'volumes' | 'snapshots';
 
 	let { data }: { data: Data } = $props();
+
+	let chartRef: Chart | undefined;
 	const results = useQueries([
 		{
 			queryKey: ['poolList'],
@@ -54,7 +60,7 @@
 		{
 			queryKey: ['poolStats'],
 			queryFn: async () => {
-				return await getPoolStats(1, 128);
+				return await getPoolStats(Number(comboBoxes.poolStats.interval.value), 128);
 			},
 			refetchInterval: 1000,
 			keepPreviousData: false,
@@ -124,28 +130,61 @@
 		}
 	}
 
-	let poolState = $state({
-		poolUsageOpen: false,
-		poolUsageValue: pools[0]?.name || ''
-	});
-
-	let comboBoxData = $derived({
-		poolUsage: pools.map((pool) => ({
-			value: pool.name,
-			label: pool.name
-		}))
+	let comboBoxes = $state({
+		poolUsage: {
+			open: false,
+			value: pools[0]?.name || '',
+			data: pools.map((pool) => ({
+				value: pool.name,
+				label: pool.name
+			}))
+		},
+		poolStats: {
+			interval: {
+				open: false,
+				value: poolStats?.intervalMap[0]?.value || '1',
+				data: poolStats?.intervalMap
+			},
+			statType: {
+				open: false,
+				value: 'allocated',
+				data: [
+					{ value: 'allocated', label: 'Allocated' },
+					{ value: 'free', label: 'Free' },
+					{ value: 'size', label: 'Size' },
+					{ value: 'dedupRatio', label: 'Dedup Ratio' }
+				]
+			}
+		}
 	});
 
 	let pieCharts = $derived.by(() => {
 		return {
 			poolUsage: {
-				data: getPoolUsagePieData(pools, poolState.poolUsageValue)
+				data: getPoolUsagePieData(pools, comboBoxes.poolUsage.value)
 			}
 		};
 	});
 
-	$inspect('pool usage', comboBoxData);
-	$inspect('pie charts', pieCharts);
+	let { poolStatSeries } = $derived.by(() => {
+		const statType = comboBoxes.poolStats.statType.value;
+		const { poolStatsData, poolStatsKeys } = getPoolStatsCombined(
+			poolStats.poolStatPoint,
+			statType as StatType
+		);
+
+		const poolStatSeries = poolStatsKeys.map((series, index) => ({
+			field: series.key,
+			label: series.title,
+			color: series.color,
+			data: poolStatsData[index].map((item) => ({
+				date: item.date,
+				value: item[series.key]
+			}))
+		}));
+
+		return { poolStatSeries };
+	});
 </script>
 
 {#snippet card(type: string)}
@@ -177,10 +216,8 @@
 
 	<div class="flex flex-wrap gap-4">
 		{#if pools.length > 0}
-			<div
-				class="mt-3 flex h-[310px] min-h-[200px] w-[300px] min-w-[280px] resize flex-col overflow-auto"
-			>
-				<Card.Root class="flex flex-1 flex-col ">
+			<div class="mt-3 flex w-full min-w-[280px] flex-col overflow-auto sm:w-[300px]">
+				<Card.Root class="flex flex-1 flex-col">
 					<Card.Header>
 						<Card.Title class="mb-[-100px]">
 							<div class="flex w-full items-center justify-between">
@@ -189,10 +226,10 @@
 									<span class="text-sm font-bold md:text-lg xl:text-xl">Pool Usage</span>
 								</div>
 								<CustomComboBox
-									bind:open={poolState.poolUsageOpen}
+									bind:open={comboBoxes.poolUsage.open}
 									label=""
-									bind:value={poolState.poolUsageValue}
-									data={comboBoxData.poolUsage}
+									bind:value={comboBoxes.poolUsage.value}
+									data={comboBoxes.poolUsage.data}
 									classes=""
 									placeholder="Select a pool"
 									width="w-48"
@@ -205,11 +242,70 @@
 					<Card.Content class="flex-1 overflow-hidden">
 						<div class="mt-4 flex h-full items-center justify-center">
 							<PieChart
-								containerClass="h-full w-full rounded"
+								containerClass="h-full w-full rounded flex items-center justify-center"
 								data={pieCharts.poolUsage.data}
 								formatter={'size-formatter'}
 							/>
 						</div>
+					</Card.Content>
+				</Card.Root>
+			</div>
+
+			<div class="mt-3 w-full flex-col overflow-auto md:flex-1">
+				<Card.Root class="flex flex-1 flex-col">
+					<Card.Header>
+						<Card.Title class="mb-[-100px]">
+							<div
+								class="flex w-full flex-col items-start justify-between gap-2 md:flex-row md:items-center"
+							>
+								<div class="flex items-center">
+									<Icon icon="mdi:data-usage" class="mr-2" />
+									<span class="text-sm font-bold md:text-lg xl:text-xl">PoolStats</span>
+								</div>
+								<div class="flex items-center gap-2">
+									<CustomComboBox
+										bind:open={comboBoxes.poolStats.statType.open}
+										label=""
+										bind:value={comboBoxes.poolStats.statType.value}
+										data={comboBoxes.poolStats.statType.data}
+										classes=""
+										placeholder="Select a stat type"
+										width="w-48"
+										disallowEmpty={true}
+									/>
+									<CustomComboBox
+										bind:open={comboBoxes.poolStats.interval.open}
+										label=""
+										bind:value={comboBoxes.poolStats.interval.value}
+										data={comboBoxes.poolStats.interval.data}
+										classes=""
+										placeholder="Select a interval"
+										width="w-48"
+										disallowEmpty={true}
+									/>
+									<Button
+										onclick={() => chartRef?.resetZoom()}
+										variant="outline"
+										size="sm"
+										class="h-8"
+									>
+										<Icon icon="carbon:reset" class="h-4 w-4" />
+										Reset zoom
+									</Button>
+								</div>
+							</div>
+						</Card.Title>
+					</Card.Header>
+
+					<Card.Content class="mt-10 flex-1 overflow-hidden md:mt-2">
+						<AreaChart
+							bind:chart={chartRef}
+							elements={poolStatSeries}
+							formatSize={comboBoxes.poolStats.statType.value !== 'dedupRatio'}
+							containerClass="border-none shadow-none !p-0"
+							icon=""
+							showResetButton={false}
+						/>
 					</Card.Content>
 				</Card.Root>
 			</div>

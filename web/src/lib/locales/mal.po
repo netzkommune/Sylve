@@ -1,16 +1,5 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-08T09:40:02.124Z\n"
-"PO-Revision-Date: 2025-07-08T10:03:25.315Z\n"
-"Last-Translator: \n"
-"Language: Malayalam\n"
-"Language-Team: \n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n == 1 ? 0 : 1;\n"
-"MIME-Version: 1.0\n"
 
 #: src/lib/components/ui/sheet/sheet-content.svelte
 #: src/routes/[node]/notes/+page.svelte
@@ -26,6 +15,9 @@ msgstr ""
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/Terminal.svelte
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+#: src/lib/components/ui/dialog/dialog-content.svelte
 msgid "Close"
 msgstr ""
 
@@ -228,6 +220,7 @@ msgstr ""
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
 msgid "Reset"
 msgstr ""
 
@@ -402,6 +395,7 @@ msgstr ""
 #: src/routes/[node]/network/interfaces/+page.svelte
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
 msgid "Status"
 msgstr ""
 
@@ -1511,4 +1505,131 @@ msgstr ""
 
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 msgid "VM attached to switch"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/Header.svelte
+msgid "Sylve Logo"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/Throbber.svelte
+#: src/lib/components/custom/Header.svelte
+msgid "SYLVE"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+msgid "Username"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+msgid "Enter your username"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+msgid "Password"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+msgid "Realm"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+msgid "PAM"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+msgid "Sylve"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+msgid "Language selection is disabled for now"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+msgid "Language"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+msgid "English"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+msgid "Malayalam"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+msgid "Remember Me"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+msgid "Login"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "Toggle navigation menu"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "Virtual Environment 0.0.1"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "<0/> Create VM"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "<0/> Root <1/> <2>Toggle user menu</2>"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "Log out"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "⌘⇧Q"
+msgstr ""
+
+#: src/lib/components/custom/Terminal.svelte
+msgid "Minimize"
+msgstr ""
+
+#: src/lib/components/custom/Terminal.svelte
+msgid "Add new tab"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Start Time"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "End Time"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Node"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "User"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Action"
+msgstr ""
+
+#: src/lib/components/skeleton/LeftPanel.svelte
+msgid "Difuse-sidebar"
+msgstr ""
+
+#: src/lib/components/skeleton/LeftPanel.svelte
+msgid "Data Center"
+msgstr ""
+
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+msgid "<0/> Create Virtual Machine"
+msgstr ""
+
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+msgid "Create Virtual Machine"
 msgstr ""

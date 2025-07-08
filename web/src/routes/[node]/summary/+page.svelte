@@ -347,12 +347,21 @@
 					</Card.Content>
 				</Card.Root>
 
-				<AreaChart title="CPU Usage" elements={[chartElements[1], chartElements[0]]} />
-				<AreaChart title="Memory Usage" elements={[chartElements[3], chartElements[2]]} />
+				<AreaChart
+					title="CPU Usage"
+					elements={[chartElements[1], chartElements[0]]}
+					icon="solar:cpu-bold"
+				/>
+				<AreaChart
+					title="Memory Usage"
+					elements={[chartElements[3], chartElements[2]]}
+					icon="la:memory"
+				/>
 				<AreaChart
 					title="Network Usage"
 					elements={[chartElements[4], chartElements[5]]}
 					formatSize={true}
+					icon="gg:smartphone-ram"
 				/>
 			</div>
 		</ScrollArea>

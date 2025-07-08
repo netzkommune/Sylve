@@ -20,8 +20,6 @@
 	import humanFormat from 'human-format';
 	import { onDestroy, onMount } from 'svelte';
 
-	let { title, description = '', elements, formatSize = false }: Props = $props();
-
 	let data = $derived.by(() => {
 		if (!elements?.length) return [];
 
@@ -85,7 +83,7 @@
 	const switchColor = (color: string, alpha: number = 1) => {
 		const base = (val: string) => val.replace(')', ` / ${alpha})`);
 		switch (color) {
-			case 'chart1':
+			case 'chart-1':
 				return base('oklch(0.646 0.222 41.116)');
 			case 'chart-2':
 				return base('oklch(0.6 0.118 184.704)');
@@ -115,13 +113,26 @@
 	});
 
 	interface Props {
-		title: string;
+		title?: string;
 		description?: string;
+		icon?: string;
 		elements: AreaChartElement[];
 		formatSize?: boolean;
+		containerClass?: string;
+		showResetButton?: boolean;
+		chart?: Chart;
 	}
 
-	let chart: Chart | undefined;
+	let {
+		title = '',
+		description = '',
+		icon = '',
+		elements,
+		formatSize = false,
+		containerClass = 'p-5',
+		showResetButton = true,
+		chart = $bindable()
+	}: Props = $props();
 	let canvas: HTMLCanvasElement;
 
 	Chart.register(
@@ -228,31 +239,43 @@
 		setTimeout(() => chart?.resize(), 300);
 	});
 
+	$effect(() => {
+		if (chart && data && datasets) {
+			chart.data.labels = labels;
+			chart.data.datasets = datasets;
+			chart.update('none');
+		}
+	});
+
 	onDestroy(() => {
 		chart?.destroy();
 	});
 </script>
 
-<Card.Root class="p-5">
+<Card.Root class={containerClass}>
 	<Card.Header class="p-0">
 		<Card.Title class="flex items-center justify-between gap-4">
 			<div class="flex items-center gap-2">
-				<Icon icon="solar:cpu-bold" class="h-5 w-5" />
+				{#if icon}
+					<Icon {icon} class="h-5 w-5" />
+				{/if}
 				{title}
 			</div>
-			<div>
-				<Button
-					onclick={() => {
-						chart?.resetZoom();
-					}}
-					variant="outline"
-					size="sm"
-					class="h-8"
-				>
-					<Icon icon="carbon:reset" class="h-4 w-4" />
-					Reset zoom
-				</Button>
-			</div>
+			{#if showResetButton}
+				<div>
+					<Button
+						onclick={() => {
+							chart?.resetZoom();
+						}}
+						variant="outline"
+						size="sm"
+						class="h-8"
+					>
+						<Icon icon="carbon:reset" class="h-4 w-4" />
+						Reset zoom
+					</Button>
+				</div>
+			{/if}
 		</Card.Title>
 		{#if description}
 			<Card.Description>{description}</Card.Description>

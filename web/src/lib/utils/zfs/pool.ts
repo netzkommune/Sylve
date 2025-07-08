@@ -365,7 +365,7 @@ export function getDatasetCompressionHist(
     return results;
 }
 
-type StatType = 'allocated' | 'free' | 'size' | 'dedupRatio';
+export type StatType = 'allocated' | 'free' | 'size' | 'dedupRatio';
 
 export function getPoolStatsCombined(poolStats: Record<string, any[]>, statType: StatType) {
     if (!poolStats) {
@@ -389,11 +389,11 @@ export function getPoolStatsCombined(poolStats: Record<string, any[]>, statType:
         .map((dataPoints) => dataPoints.sort((a, b) => a.date.getTime() - b.date.getTime()));
 
     const poolStatsKeys = Object.keys(poolStats).map((poolName, index) => {
-        const hue = (index * 137) % 360;
+        const colorId = `chart-${(index % 5) + 1}`; // cycle through chart1 → chart5
         return {
             key: poolName,
             title: poolName.charAt(0).toUpperCase() + poolName.slice(1),
-            color: `hsl(${hue}, 70%, 50%)`
+            color: colorId
         };
     });
 

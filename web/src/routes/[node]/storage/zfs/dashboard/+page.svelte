@@ -144,8 +144,7 @@
 		};
 	});
 
-	$inspect('pool usage', comboBoxData);
-	$inspect('pie charts', pieCharts);
+	$inspect(poolStats);
 </script>
 
 {#snippet card(type: string)}

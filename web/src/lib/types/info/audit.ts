@@ -1,19 +1,35 @@
 import { z } from 'zod/v4';
 
-export const AuditLogSchema = z.array(
-	z.object({
-		id: z.number(),
-		userId: z.number(),
-		user: z.string(),
-		authType: z.string(),
-		node: z.string(),
-		started: z.string(),
-		ended: z.string(),
-		action: z.string(),
-		status: z.string(),
-		createdAt: z.string(),
-		updatedAt: z.string()
-	})
-);
+export const AuditRecordSchema = z.object({
+	id: z.number(),
+	userId: z.number().nullable(),
+	user: z.string(),
+	authType: z.string(),
+	node: z.string(),
+	started: z.string(),
+	ended: z.string(),
+	action: z.preprocess(
+		(val) => {
+			if (typeof val === 'string') {
+				try {
+					return JSON.parse(val);
+				} catch {
+					return {};
+				}
+			}
+			return val;
+		},
+		z.object({
+			method: z.string(),
+			path: z.string(),
+			body: z.any().optional(),
+			response: z.any().optional()
+		})
+	),
 
-export type AuditLog = z.infer<typeof AuditLogSchema>;
+	status: z.string(),
+	createdAt: z.string(),
+	updatedAt: z.string()
+});
+
+export type AuditRecord = z.infer<typeof AuditRecordSchema>;

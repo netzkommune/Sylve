@@ -15,6 +15,7 @@
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
 	import { toast } from 'svelte-sonner';
+	import type { CellComponent } from 'tabulator-tables';
 
 	interface Data {
 		vms: VM[];
@@ -89,7 +90,20 @@
 			{ field: 'id', title: 'ID', visible: false },
 			{ field: 'name', title: 'Name' },
 			{ field: 'mac', title: 'MAC Address' },
-			{ field: 'emulation', title: 'Emulation' }
+			{
+				field: 'emulation',
+				title: 'Emulation',
+				formatter(cell: CellComponent, formatterParams, onRendered) {
+					const value = cell.getValue();
+					if (value === 'virtio') {
+						return 'VirtIO';
+					} else if (value === 'e1000') {
+						return 'E1000';
+					}
+
+					return value;
+				}
+			}
 		];
 
 		if (vm?.networks) {

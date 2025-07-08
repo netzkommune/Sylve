@@ -14,6 +14,7 @@ import (
 
 	static "github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 
 	"sylve/internal/assets"
 	diskHandlers "sylve/internal/handlers/disk"
@@ -66,11 +67,13 @@ func RegisterRoutes(r *gin.Engine,
 	utilitiesService *utilitiesService.Service,
 	systemService *systemService.Service,
 	libvirtService *libvirt.Service,
+	db *gorm.DB,
 ) {
 	api := r.Group("/api")
 
 	health := api.Group("/health")
 	health.Use(middleware.EnsureAuthenticated(authService))
+	health.Use(middleware.RequestLoggerMiddleware(db))
 	{
 		health.GET("/basic", BasicHealthCheckHandler)
 		health.GET("/http", HTTPHealthCheckHandler)
@@ -79,6 +82,7 @@ func RegisterRoutes(r *gin.Engine,
 	info := api.Group("/info")
 
 	info.Use(middleware.EnsureAuthenticated(authService))
+	info.Use(middleware.RequestLoggerMiddleware(db))
 	{
 		info.GET("/basic", infoHandlers.BasicInfo(infoService))
 
@@ -102,12 +106,13 @@ func RegisterRoutes(r *gin.Engine,
 			notes.POST("/bulk-delete", infoHandlers.NotesHandler(infoService))
 		}
 
-		info.GET("/audit-logs", infoHandlers.AuditLogs(infoService))
+		info.GET("/audit-records", infoHandlers.AuditRecords(infoService))
 		info.GET("/terminal", infoHandlers.HandleTerminalWebsocket)
 	}
 
 	zfs := api.Group("/zfs")
 	zfs.Use(middleware.EnsureAuthenticated(authService))
+	zfs.Use(middleware.RequestLoggerMiddleware(db))
 	{
 		zfs.GET("/pool/stats/:interval/:limit", zfsHandlers.PoolStats(zfsService))
 		zfs.GET("/pool/io-delay", zfsHandlers.AvgIODelay(zfsService))
@@ -149,6 +154,7 @@ func RegisterRoutes(r *gin.Engine,
 
 	disk := api.Group("/disk")
 	disk.Use(middleware.EnsureAuthenticated(authService))
+	disk.Use(middleware.RequestLoggerMiddleware(db))
 	{
 		disk.GET("/list", diskHandlers.List(diskService))
 		disk.POST("/wipe", diskHandlers.WipeDisk(diskService, infoService))
@@ -159,6 +165,7 @@ func RegisterRoutes(r *gin.Engine,
 
 	network := api.Group("/network")
 	network.Use(middleware.EnsureAuthenticated(authService))
+	network.Use(middleware.RequestLoggerMiddleware(db))
 	{
 		network.GET("/interface", networkHandlers.ListInterfaces(networkService))
 
@@ -170,6 +177,7 @@ func RegisterRoutes(r *gin.Engine,
 
 	system := api.Group("/system")
 	system.Use(middleware.EnsureAuthenticated(authService))
+	system.Use(middleware.RequestLoggerMiddleware(db))
 	{
 		system.GET("/pci-devices", systemHandlers.ListDevices())
 		system.GET("/ppt-devices", systemHandlers.ListPPTDevices(systemService))
@@ -179,6 +187,7 @@ func RegisterRoutes(r *gin.Engine,
 
 	vm := api.Group("/vm")
 	vm.Use(middleware.EnsureAuthenticated(authService))
+	vm.Use(middleware.RequestLoggerMiddleware(db))
 	{
 		vm.POST("/:id/:action", vmHandlers.VMActionHandler(libvirtService))
 		vm.GET("", vmHandlers.ListVMs(libvirtService))
@@ -199,6 +208,7 @@ func RegisterRoutes(r *gin.Engine,
 
 	utilities := api.Group("/utilities")
 	utilities.Use(middleware.EnsureAuthenticated(authService))
+	utilities.Use(middleware.RequestLoggerMiddleware(db))
 	{
 		utilities.POST("/downloads", utilitiesHandlers.DownloadFile(utilitiesService))
 		utilities.GET("/downloads", utilitiesHandlers.ListDownloads(utilitiesService))
@@ -209,12 +219,16 @@ func RegisterRoutes(r *gin.Engine,
 	}
 
 	auth := api.Group("/auth")
+	auth.Use(middleware.RequestLoggerMiddleware(db))
 	{
 		auth.POST("/login", LoginHandler(authService))
 		auth.Any("/logout", LogoutHandler(authService))
 	}
 
-	api.GET("/vnc/:port", vncHandler.VNCProxyHandler)
+	vnc := api.Group("/vnc")
+	vnc.Use(middleware.EnsureAuthenticated(authService))
+	vnc.Use(middleware.RequestLoggerMiddleware(db))
+	vnc.GET("/:port", vncHandler.VNCProxyHandler)
 
 	if proxyToVite {
 		r.NoRoute(func(c *gin.Context) {

@@ -9,7 +9,6 @@
 package infoHandlers
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 	"sylve/internal"
@@ -110,7 +109,6 @@ func handlePostNotes(c *gin.Context, infoService *info.Service) {
 		return
 	}
 
-	id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("notes.created|-|%s", req.Title), "started")
 	note, err := infoService.AddNote(req.Title, req.Content)
 
 	if err != nil {
@@ -121,7 +119,6 @@ func handlePostNotes(c *gin.Context, infoService *info.Service) {
 			Data:    nil,
 		})
 
-		infoService.EndAuditLog(id, "failed")
 		return
 	}
 
@@ -131,8 +128,6 @@ func handlePostNotes(c *gin.Context, infoService *info.Service) {
 		Error:   "",
 		Data:    note,
 	})
-
-	infoService.EndAuditLog(id, "success")
 }
 
 // @Summary Delete a note by ID
@@ -159,7 +154,8 @@ func handleDeleteNoteByID(c *gin.Context, infoService *info.Service) {
 		return
 	}
 
-	note, err := infoService.GetNoteByID(id)
+	_, err = infoService.GetNoteByID(id)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 			Status:  "error",
@@ -171,11 +167,8 @@ func handleDeleteNoteByID(c *gin.Context, infoService *info.Service) {
 		return
 	}
 
-	aid := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("notes.delete|-|%s", note.Title), "started")
 	err = infoService.DeleteNoteByID(id)
 	if err != nil {
-		infoService.EndAuditLog(aid, "failed")
-
 		if err.Error() == "record not found" {
 			c.JSON(http.StatusNotFound, internal.APIResponse[any]{
 				Status:  "error",
@@ -203,8 +196,6 @@ func handleDeleteNoteByID(c *gin.Context, infoService *info.Service) {
 		Error:   "",
 		Data:    nil,
 	})
-
-	infoService.EndAuditLog(aid, "success")
 }
 
 // @Summary Update a note by ID
@@ -251,7 +242,7 @@ func handleUpdateNoteByID(c *gin.Context, infoService *info.Service) {
 		return
 	}
 
-	note, err := infoService.GetNoteByID(id)
+	_, err = infoService.GetNoteByID(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 			Status:  "error",
@@ -263,10 +254,8 @@ func handleUpdateNoteByID(c *gin.Context, infoService *info.Service) {
 		return
 	}
 
-	aid := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("notes.update|-|%s", note.Title), "started")
 	err = infoService.UpdateNoteByID(id, req.Title, req.Content)
 	if err != nil {
-		infoService.EndAuditLog(aid, "failed")
 		c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 			Status:  "error",
 			Message: "note_update_failed",
@@ -282,7 +271,6 @@ func handleUpdateNoteByID(c *gin.Context, infoService *info.Service) {
 		Error:   "",
 		Data:    nil,
 	})
-	infoService.EndAuditLog(aid, "success")
 }
 
 // @Summary Bulk delete notes
@@ -308,10 +296,8 @@ func handleBulkDeleteNotes(c *gin.Context, infoService *info.Service) {
 		return
 	}
 
-	aid := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("notes.bulk_delete|-|%v", req.IDs), "started")
 	err := infoService.BulkDeleteNotes(req.IDs)
 	if err != nil {
-		infoService.EndAuditLog(aid, "failed")
 		c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 			Status:  "error",
 			Message: "bulk_delete_failed",
@@ -327,5 +313,4 @@ func handleBulkDeleteNotes(c *gin.Context, infoService *info.Service) {
 		Error:   "",
 		Data:    nil,
 	})
-	infoService.EndAuditLog(aid, "success")
 }

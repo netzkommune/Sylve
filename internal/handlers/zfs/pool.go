@@ -9,7 +9,6 @@
 package zfsHandlers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -153,7 +152,6 @@ func CreatePool(infoService *info.Service, zfsService *zfs.Service) gin.HandlerF
 			return
 		}
 
-		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("zfs.pool.create_pool|-|%s", request.Name), "started")
 		err := zfsService.CreatePool(request)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
@@ -163,7 +161,6 @@ func CreatePool(infoService *info.Service, zfsService *zfs.Service) gin.HandlerF
 				Data:    nil,
 			})
 
-			infoService.EndAuditLog(id, "failed")
 			return
 		}
 
@@ -173,8 +170,6 @@ func CreatePool(infoService *info.Service, zfsService *zfs.Service) gin.HandlerF
 			Error:   "",
 			Data:    nil,
 		})
-
-		infoService.EndAuditLog(id, "success")
 	}
 }
 
@@ -192,7 +187,6 @@ func ScrubPool(infoService *info.Service, zfsService *zfs.Service) gin.HandlerFu
 	return func(c *gin.Context) {
 		guid := c.Param("guid")
 
-		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("zfs.pool.scrub_pool|-|%s", guid), "started")
 		err := zfsUtils.ScrubPool(guid)
 		if err != nil {
 			if strings.HasPrefix(err.Error(), "error_getting_pool") {
@@ -203,7 +197,6 @@ func ScrubPool(infoService *info.Service, zfsService *zfs.Service) gin.HandlerFu
 					Data:    nil,
 				})
 
-				infoService.EndAuditLog(id, "failed")
 				return
 			}
 
@@ -214,7 +207,6 @@ func ScrubPool(infoService *info.Service, zfsService *zfs.Service) gin.HandlerFu
 				Data:    nil,
 			})
 
-			infoService.EndAuditLog(id, "failed")
 			return
 		}
 
@@ -224,8 +216,6 @@ func ScrubPool(infoService *info.Service, zfsService *zfs.Service) gin.HandlerFu
 			Error:   "",
 			Data:    nil,
 		})
-
-		infoService.EndAuditLog(id, "success")
 	}
 }
 
@@ -243,7 +233,6 @@ func DeletePool(infoService *info.Service, zfsService *zfs.Service) gin.HandlerF
 	return func(c *gin.Context) {
 		guid := c.Param("guid")
 
-		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("zfs.pool.delete_pool|-|%s", guid), "started")
 		err := zfsService.DeletePool(guid)
 		if err != nil {
 			if strings.HasPrefix(err.Error(), "error_getting_pool") {
@@ -254,7 +243,6 @@ func DeletePool(infoService *info.Service, zfsService *zfs.Service) gin.HandlerF
 					Data:    nil,
 				})
 
-				infoService.EndAuditLog(id, "failed")
 				return
 			}
 
@@ -265,7 +253,6 @@ func DeletePool(infoService *info.Service, zfsService *zfs.Service) gin.HandlerF
 				Data:    nil,
 			})
 
-			infoService.EndAuditLog(id, "failed")
 			return
 		}
 
@@ -275,7 +262,6 @@ func DeletePool(infoService *info.Service, zfsService *zfs.Service) gin.HandlerF
 			Error:   "",
 			Data:    nil,
 		})
-		infoService.EndAuditLog(id, "success")
 	}
 }
 
@@ -304,7 +290,6 @@ func ReplaceDevice(infoService *info.Service, zfsService *zfs.Service) gin.Handl
 			return
 		}
 
-		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("zfs.pool.replace_device|-|%s", fmt.Sprintf("%s in %s", request.Old, guid)), "started")
 		err := zfsService.ReplaceDevice(guid, request.Old, request.New)
 		if err != nil {
 			if strings.HasPrefix(err.Error(), "pool_not_found") {
@@ -315,7 +300,6 @@ func ReplaceDevice(infoService *info.Service, zfsService *zfs.Service) gin.Handl
 					Data:    nil,
 				})
 
-				infoService.EndAuditLog(id, "failed")
 				return
 			}
 
@@ -326,7 +310,6 @@ func ReplaceDevice(infoService *info.Service, zfsService *zfs.Service) gin.Handl
 				Data:    nil,
 			})
 
-			infoService.EndAuditLog(id, "failed")
 			return
 		}
 
@@ -336,8 +319,6 @@ func ReplaceDevice(infoService *info.Service, zfsService *zfs.Service) gin.Handl
 			Error:   "",
 			Data:    nil,
 		})
-
-		infoService.EndAuditLog(id, "success")
 	}
 }
 
@@ -428,7 +409,6 @@ func EditPool(infoService *info.Service, zfsService *zfs.Service) gin.HandlerFun
 			return
 		}
 
-		id := infoService.StartAuditLog(c.GetString("Token"), fmt.Sprintf("zfs.pool.edit_pool|-|%s", request.Name), "started")
 		err := zfsService.EditPool(request.Name, request.Properties, request.Spares)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
@@ -437,8 +417,6 @@ func EditPool(infoService *info.Service, zfsService *zfs.Service) gin.HandlerFun
 				Error:   err.Error(),
 				Data:    nil,
 			})
-
-			infoService.EndAuditLog(id, "failed")
 			return
 		}
 
@@ -448,7 +426,5 @@ func EditPool(infoService *info.Service, zfsService *zfs.Service) gin.HandlerFun
 			Error:   "",
 			Data:    nil,
 		})
-
-		infoService.EndAuditLog(id, "success")
 	}
 }

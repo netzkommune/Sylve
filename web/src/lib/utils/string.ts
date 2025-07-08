@@ -162,3 +162,16 @@ export function isValidVMName(name: string): boolean {
 export function isValidMACAddress(mac: string): boolean {
 	return isMACAddress(mac, { no_colons: false });
 }
+
+export async function sha256(str: string, rounds: number = 1): Promise<string> {
+	const encoder = new TextEncoder();
+	let data = encoder.encode(str);
+
+	for (let i = 0; i < rounds; i++) {
+		const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+		data = new Uint8Array(hashBuffer);
+	}
+
+	const hashArray = Array.from(data);
+	return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+}

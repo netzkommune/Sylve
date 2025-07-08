@@ -305,3 +305,19 @@ func (s *Service) ClearExpiredJWTTokens() {
 		}
 	}
 }
+
+func (s *Service) GetTokenBySHA256(hash string) (string, error) {
+	var tokens []models.Token
+	if err := s.DB.Find(&tokens).Error; err != nil {
+		return "", fmt.Errorf("failed_to_fetch_tokens: %v", err)
+	}
+
+	for _, token := range tokens {
+		tokenHash := utils.SHA256(token.Token, 1)
+		if tokenHash == hash {
+			return token.Token, nil
+		}
+	}
+
+	return "", fmt.Errorf("token_not_found")
+}

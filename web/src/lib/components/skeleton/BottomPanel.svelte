@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { getAuditRecords } from '$lib/api/info/audit';
+	import { getVMs } from '$lib/api/vm/vm';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import type { AuditRecord } from '$lib/types/info/audit';
+	import type { VM } from '$lib/types/vm/vm';
 	import { convertDbTime } from '$lib/utils/time';
 	import { useQueries } from '@sveltestack/svelte-query';
 
@@ -14,15 +16,27 @@
 			},
 			refetchInterval: 1000,
 			keepPreviousData: true
+		},
+		{
+			queryKey: ['vms-list'],
+			queryFn: async () => {
+				return await getVMs();
+			},
+			refetchInterval: 1000,
+			keepPreviousData: true,
+			initialData: [] as VM[],
+			refetchOnMount: 'always'
 		}
 	]);
 
 	let data = $derived($results[0].data as AuditRecord[]);
+	let vms = $derived($results[1].data as VM[]);
 
 	const pathToActionMap: Record<string, string> = {
 		'/api/auth/login': 'Login',
 		'/api/info/notes': 'Notes',
-		'/api/network/switch': 'Switch'
+		'/api/network/switch': 'Switch',
+		'/api/vnc': 'VNC'
 	};
 
 	let records = $derived.by(() => {
@@ -41,7 +55,14 @@
 				const label = matchedEntry[1];
 				switch (method.toUpperCase()) {
 					case 'GET':
-						resolvedAction = `${label} - View`;
+						if (path.includes('vnc')) {
+							const port = path.split('/').pop();
+							const vm = vms.find((vm) => vm.vncPort === Number(port));
+
+							resolvedAction = `${label} - ${vm ? vm.name : 'Unknown VM'} (${port})`;
+						} else {
+							resolvedAction = `${label} - View`;
+						}
 						break;
 					case 'POST':
 						resolvedAction = `${label} - Create`;
@@ -74,6 +95,8 @@
 
 	export function formatStatus(status: string): string {
 		switch (status) {
+			case 'started':
+				return 'Started';
 			case 'success':
 				return 'OK';
 			case 'client_error':

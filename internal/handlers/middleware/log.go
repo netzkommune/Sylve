@@ -13,7 +13,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strings"
 	infoModels "sylve/internal/db/models/info"
+	authService "sylve/internal/services/auth"
+
 	"sylve/internal/logger"
 	"sylve/pkg/utils"
 	"time"
@@ -23,7 +26,7 @@ import (
 )
 
 var hostname string
-var importantGetPaths = []string{}
+var importantGetPaths = []string{"/api/vnc"}
 
 type claim struct {
 	UserID   *uint
@@ -38,9 +41,22 @@ type action struct {
 	Response interface{} `json:"response,omitempty"`
 }
 
-func getClaims(c *gin.Context) (claim, error) {
+func getClaims(c *gin.Context, authService *authService.Service) (claim, error) {
 	var claims claim
 	token := c.GetString("Token")
+
+	if token == "" {
+		if hash := c.Query("hash"); hash != "" {
+			t, err := authService.GetTokenBySHA256(hash)
+
+			if err != nil {
+				return claims, fmt.Errorf("invalid_hash: %w", err)
+			}
+
+			token = t
+		}
+	}
+
 	if token == "" {
 		return claims, fmt.Errorf("token_not_found")
 	}
@@ -79,7 +95,7 @@ func (w bodyWriter) Write(b []byte) (int, error) {
 	return w.ResponseWriter.Write(b)
 }
 
-func RequestLoggerMiddleware(db *gorm.DB) gin.HandlerFunc {
+func RequestLoggerMiddleware(db *gorm.DB, authService *authService.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if hostname == "" {
 			stored, err := utils.GetSystemHostname()
@@ -90,7 +106,7 @@ func RequestLoggerMiddleware(db *gorm.DB) gin.HandlerFunc {
 			}
 		}
 
-		if !utils.Contains(importantGetPaths, c.Request.URL.Path) {
+		if !utils.Contains(importantGetPaths, c.Request.URL.Path) && !strings.Contains(c.Request.URL.Path, "vnc") {
 			if c.Request.Method == "OPTIONS" || c.Request.Method == "HEAD" || c.Request.Method == "GET" {
 				c.Next()
 				return
@@ -101,7 +117,7 @@ func RequestLoggerMiddleware(db *gorm.DB) gin.HandlerFunc {
 		c.Writer = bw
 
 		var claims claim
-		claims, err := getClaims(c)
+		claims, err := getClaims(c, authService)
 		if err != nil && c.Request.URL.Path == "/api/auth/login" {
 			claims = claim{
 				UserID:   nil,

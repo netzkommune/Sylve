@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { store } from '$lib/stores/auth';
 	import { getDefaultTitle, terminalStore } from '$lib/stores/terminal.svelte';
+	import { sha256 } from '$lib/utils/string';
 	import {
 		Xterm,
 		XtermAddon,
@@ -70,7 +71,9 @@
 			terminal?.loadAddon(fitAddon);
 			fitAddon.fit();
 
-			ws = new WebSocket(`/api/info/terminal?id=${currentTab?.id}`, ['Bearer', $store]);
+			const hash = await sha256($store, 1);
+
+			ws = new WebSocket(`/api/info/terminal?id=${currentTab?.id}&hash=${hash}`);
 			ws.binaryType = 'arraybuffer';
 			ws.onopen = () => {
 				if (!currentTab) return;
@@ -150,8 +153,11 @@
 	}
 
 	function addTab() {
+		const terminalCount = $terminalStore.tabs.length;
+		let tabId = `sylve-${terminalCount + 1}`;
+
 		const newTab = {
-			id: nanoid(5),
+			id: tabId,
 			title: getDefaultTitle()
 		};
 

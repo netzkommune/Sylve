@@ -53,14 +53,28 @@
 		return options;
 	});
 
+	let dVolumes = $derived.by(() => {
+		return volumes
+			.filter((v) => v.properties.volmode && v.properties.volmode === 'dev')
+			.map((v) => ({
+				label: v.name,
+				value: v.properties.guid || ''
+			}));
+	});
+
+	let dFilesystems = $derived.by(() => {
+		return filesystems.map((fs) => ({
+			label: fs.name,
+			value: fs.properties.guid || ''
+		}));
+	});
+
 	let comboBoxes = $state({
 		volumes: {
-			open: false,
-			options: [] as { label: string; value: string }[]
+			open: false
 		},
 		filesystems: {
-			open: false,
-			options: [] as { label: string; value: string }[]
+			open: false
 		},
 		emulationType: {
 			open: false,
@@ -78,33 +92,7 @@
 			]
 		},
 		isos: {
-			open: false,
-			options: isos || []
-		}
-	});
-
-	$effect(() => {
-		if (isos) {
-			comboBoxes.isos.options = isos.map((iso) => ({
-				label: iso.label || iso.value,
-				value: iso.value || ''
-			}));
-		}
-	});
-
-	$effect(() => {
-		if (volumes || filesystems) {
-			comboBoxes.volumes.options = volumes
-				.filter((v) => v.properties.volmode && v.properties.volmode === 'dev')
-				.map((v) => ({
-					label: v.name,
-					value: v.properties.guid || ''
-				}));
-
-			comboBoxes.filesystems.options = filesystems.map((fs) => ({
-				label: fs.name,
-				value: fs.properties.guid || ''
-			}));
+			open: false
 		}
 	});
 
@@ -141,7 +129,7 @@
 			bind:open={comboBoxes.volumes.open}
 			label="ZFS Volume"
 			bind:value={guid}
-			data={comboBoxes.volumes.options}
+			data={dVolumes}
 			classes="flex-1 space-y-1"
 			placeholder="Select ZFS volume"
 			triggerWidth="w-full "
@@ -161,7 +149,7 @@
 			bind:open={comboBoxes.filesystems.open}
 			label="Filesystem Dataset"
 			bind:value={guid}
-			data={comboBoxes.filesystems.options}
+			data={dFilesystems}
 			classes="flex-1 space-y-1"
 			placeholder="Select filesystem"
 			triggerWidth="w-full"
@@ -199,7 +187,7 @@
 			bind:open={comboBoxes.isos.open}
 			label="Installation Media"
 			bind:value={iso}
-			data={comboBoxes.isos.options}
+			data={isos}
 			classes="flex-1 space-y-1"
 			placeholder="Select installation media"
 			triggerWidth="w-full "

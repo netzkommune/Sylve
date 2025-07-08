@@ -75,10 +75,12 @@
 		}));
 	});
 
-	const labels = data.map((v) => [
-		format(new Date(v.date), 'dd/MM/yyyy'),
-		format(new Date(v.date), 'HH:mm')
-	]);
+	const labels = $derived.by(() => {
+		return data.map((v) => [
+			format(new Date(v.date), 'dd/MM/yyyy'),
+			format(new Date(v.date), 'HH:mm')
+		]);
+	});
 
 	const switchColor = (color: string, alpha: number = 1) => {
 		const base = (val: string) => val.replace(')', ` / ${alpha})`);
@@ -98,17 +100,19 @@
 		}
 	};
 
-	const datasets = series.map((s, i) => ({
-		label: s.label,
-		data: data.map((d) => Number(d[s.key])),
-		borderColor: switchColor(s.color),
-		backgroundColor: switchColor(s.color, 0.2),
-		fill: i === 0 ? 'origin' : '-1',
-		tension: 0.4,
-		pointRadius: 0,
-		pointHoverRadius: 4,
-		order: s.label === 'CPU Usage' ? 2 : 1
-	}));
+	let datasets = $derived.by(() => {
+		return series.map((s, i) => ({
+			label: s.label,
+			data: data.map((d) => Number(d[s.key])),
+			borderColor: switchColor(s.color),
+			backgroundColor: switchColor(s.color, 0.2),
+			fill: i === 0 ? 'origin' : '-1',
+			tension: 0.4,
+			pointRadius: 0,
+			pointHoverRadius: 4,
+			order: s.label === 'CPU Usage' ? 2 : 1
+		}));
+	});
 
 	interface Props {
 		title: string;

@@ -31,7 +31,9 @@
 
 	let { data }: { data: Data } = $props();
 
-	let chartRef: Chart | undefined;
+	let poolStatsRef: Chart | undefined;
+	let datasetChartRef: Chart | undefined;
+
 	const results = useQueries([
 		{
 			queryKey: ['poolList'],
@@ -139,6 +141,14 @@
 				label: pool.name
 			}))
 		},
+		datasetCompression: {
+			open: false,
+			value: pools[0]?.name || '',
+			data: pools.map((pool) => ({
+				value: pool.name,
+				label: pool.name
+			}))
+		},
 		poolStats: {
 			interval: {
 				open: false,
@@ -162,6 +172,14 @@
 		return {
 			poolUsage: {
 				data: getPoolUsagePieData(pools, comboBoxes.poolUsage.value)
+			}
+		};
+	});
+
+	let histograms = $derived.by(() => {
+		return {
+			compression: {
+				data: getDatasetCompressionHist(comboBoxes.datasetCompression.value, datasets)
 			}
 		};
 	});
@@ -214,101 +232,152 @@
 		{/each}
 	</div>
 
-	<div class="flex flex-wrap gap-4">
-		{#if pools.length > 0}
-			<div class="mt-3 flex w-full min-w-[280px] flex-col overflow-auto sm:w-[300px]">
-				<Card.Root class="flex flex-1 flex-col">
-					<Card.Header>
-						<Card.Title class="mb-[-100px]">
-							<div class="flex w-full items-center justify-between">
-								<div class="flex items-center">
-									<Icon icon="mdi:data-usage" class="mr-2" />
-									<span class="text-sm font-bold md:text-lg xl:text-xl">Pool Usage</span>
-								</div>
+	{#if pools.length > 0}
+		<Card.Root class="mt-4 w-full flex-col">
+			<Card.Header>
+				<Card.Title class="mb-[-100px]">
+					<div
+						class="flex w-full flex-col items-start justify-between gap-2 md:flex-row md:items-center"
+					>
+						<div class="flex items-center">
+							<Icon icon="mdi:data-usage" class="mr-2" />
+							<span class="text-sm font-bold md:text-lg xl:text-xl">PoolStats</span>
+						</div>
+						<div class="flex items-center gap-2">
+							<CustomComboBox
+								bind:open={comboBoxes.poolStats.statType.open}
+								label=""
+								bind:value={comboBoxes.poolStats.statType.value}
+								data={comboBoxes.poolStats.statType.data}
+								classes=""
+								placeholder="Select a stat type"
+								width="w-48"
+								disallowEmpty={true}
+							/>
+							<CustomComboBox
+								bind:open={comboBoxes.poolStats.interval.open}
+								label=""
+								bind:value={comboBoxes.poolStats.interval.value}
+								data={comboBoxes.poolStats.interval.data}
+								classes=""
+								placeholder="Select a interval"
+								width="w-48"
+								disallowEmpty={true}
+							/>
+							<Button
+								onclick={() => poolStatsRef?.resetZoom()}
+								variant="outline"
+								size="sm"
+								class="h-9"
+							>
+								<Icon icon="carbon:reset" class="h-4 w-4" />
+								Reset zoom
+							</Button>
+						</div>
+					</div>
+				</Card.Title>
+			</Card.Header>
+
+			<Card.Content class="mt-10 flex-1 overflow-hidden md:mt-2">
+				<AreaChart
+					bind:chart={poolStatsRef}
+					elements={poolStatSeries}
+					formatSize={comboBoxes.poolStats.statType.value !== 'dedupRatio'}
+					containerClass="border-none shadow-none !p-0"
+					icon=""
+					showResetButton={false}
+				/>
+			</Card.Content>
+		</Card.Root>
+
+		<div class="mt-4 grid h-full w-full grid-cols-12 gap-4">
+			<Card.Root class="col-span-12 min-h-[300px]  w-full flex-col md:col-span-8">
+				<Card.Header>
+					<Card.Title class="mb-[-100px]">
+						<div
+							class="flex w-full flex-col items-start justify-between gap-2 md:flex-row md:items-center"
+						>
+							<div class="flex items-center">
+								<Icon icon="mdi:data-usage" class="mr-2" />
+								<span class="text-sm font-bold md:text-lg xl:text-xl">Dataset Compression</span>
+							</div>
+							<div class="flex items-center gap-2">
 								<CustomComboBox
-									bind:open={comboBoxes.poolUsage.open}
+									bind:open={comboBoxes.datasetCompression.open}
 									label=""
-									bind:value={comboBoxes.poolUsage.value}
-									data={comboBoxes.poolUsage.data}
+									bind:value={comboBoxes.datasetCompression.value}
+									data={comboBoxes.datasetCompression.data}
 									classes=""
 									placeholder="Select a pool"
 									width="w-48"
 									disallowEmpty={true}
 								/>
+								<Button
+									onclick={() => datasetChartRef?.resetZoom()}
+									variant="outline"
+									size="sm"
+									class="h-9"
+								>
+									<Icon icon="carbon:reset" class="h-4 w-4" />
+									Reset zoom
+								</Button>
 							</div>
-						</Card.Title>
-					</Card.Header>
-
-					<Card.Content class="flex-1 overflow-hidden">
-						<div class="mt-4 flex h-full items-center justify-center">
-							<PieChart
-								containerClass="h-full w-full rounded flex items-center justify-center"
-								data={pieCharts.poolUsage.data}
-								formatter={'size-formatter'}
-							/>
 						</div>
-					</Card.Content>
-				</Card.Root>
-			</div>
+					</Card.Title>
+				</Card.Header>
 
-			<div class="mt-3 w-full flex-col overflow-auto md:flex-1">
-				<Card.Root class="flex flex-1 flex-col">
-					<Card.Header>
-						<Card.Title class="mb-[-100px]">
-							<div
-								class="flex w-full flex-col items-start justify-between gap-2 md:flex-row md:items-center"
-							>
-								<div class="flex items-center">
-									<Icon icon="mdi:data-usage" class="mr-2" />
-									<span class="text-sm font-bold md:text-lg xl:text-xl">PoolStats</span>
-								</div>
-								<div class="flex items-center gap-2">
-									<CustomComboBox
-										bind:open={comboBoxes.poolStats.statType.open}
-										label=""
-										bind:value={comboBoxes.poolStats.statType.value}
-										data={comboBoxes.poolStats.statType.data}
-										classes=""
-										placeholder="Select a stat type"
-										width="w-48"
-										disallowEmpty={true}
-									/>
-									<CustomComboBox
-										bind:open={comboBoxes.poolStats.interval.open}
-										label=""
-										bind:value={comboBoxes.poolStats.interval.value}
-										data={comboBoxes.poolStats.interval.data}
-										classes=""
-										placeholder="Select a interval"
-										width="w-48"
-										disallowEmpty={true}
-									/>
-									<Button
-										onclick={() => chartRef?.resetZoom()}
-										variant="outline"
-										size="sm"
-										class="h-8"
-									>
-										<Icon icon="carbon:reset" class="h-4 w-4" />
-										Reset zoom
-									</Button>
-								</div>
-							</div>
-						</Card.Title>
-					</Card.Header>
-
-					<Card.Content class="mt-10 flex-1 overflow-hidden md:mt-2">
-						<AreaChart
-							bind:chart={chartRef}
-							elements={poolStatSeries}
-							formatSize={comboBoxes.poolStats.statType.value !== 'dedupRatio'}
-							containerClass="border-none shadow-none !p-0"
-							icon=""
+				<Card.Content class="mt-10 flex-1 overflow-hidden md:mt-2">
+					{#if histograms.compression.data.length === 0}
+						<div class="flex h-full items-center justify-center">
+							<p class="text-md">No data available</p>
+						</div>
+					{:else}
+						<BarChart
+							bind:chart={datasetChartRef}
+							data={histograms.compression.data}
+							colors={{
+								baseline: 'chart-3',
+								value: 'chart-4'
+							}}
+							formatter="size-formatter"
 							showResetButton={false}
 						/>
-					</Card.Content>
-				</Card.Root>
-			</div>
-		{/if}
-	</div>
+					{/if}
+				</Card.Content>
+			</Card.Root>
+
+			<Card.Root class="col-span-12 flex w-full flex-col md:col-span-4">
+				<Card.Header>
+					<Card.Title class="mb-[-100px]">
+						<div class="flex w-full items-center justify-between">
+							<div class="flex items-center">
+								<Icon icon="mdi:data-usage" class="mr-2" />
+								<span class="text-sm font-bold md:text-lg xl:text-xl">Pool Usage</span>
+							</div>
+							<CustomComboBox
+								bind:open={comboBoxes.poolUsage.open}
+								label=""
+								bind:value={comboBoxes.poolUsage.value}
+								data={comboBoxes.poolUsage.data}
+								classes=""
+								placeholder="Select a pool"
+								width="w-48"
+								disallowEmpty={true}
+							/>
+						</div>
+					</Card.Title>
+				</Card.Header>
+
+				<Card.Content class="flex-1 overflow-hidden">
+					<div class="mt-4 flex h-full items-center justify-center">
+						<PieChart
+							containerClass="h-full w-full rounded flex items-start justify-center"
+							data={pieCharts.poolUsage.data}
+							formatter={'size-formatter'}
+						/>
+					</div>
+				</Card.Content>
+			</Card.Root>
+		</div>
+	{/if}
 </div>

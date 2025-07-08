@@ -2,6 +2,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import type { AreaChartElement } from '$lib/types/components/chart';
+	import { switchColor } from '$lib/utils/chart';
 	import Icon from '@iconify/svelte';
 	import {
 		CategoryScale,
@@ -79,24 +80,6 @@
 			format(new Date(v.date), 'HH:mm')
 		]);
 	});
-
-	const switchColor = (color: string, alpha: number = 1) => {
-		const base = (val: string) => val.replace(')', ` / ${alpha})`);
-		switch (color) {
-			case 'chart-1':
-				return base('oklch(0.646 0.222 41.116)');
-			case 'chart-2':
-				return base('oklch(0.6 0.118 184.704)');
-			case 'chart-3':
-				return base('oklch(0.398 0.07 227.392)');
-			case 'chart-4':
-				return base('oklch(0.828 0.189 84.429)');
-			case 'chart-5':
-				return base('oklch(0.769 0.188 70.08)');
-			default:
-				return base('oklch(0.646 0.222 41.116)');
-		}
-	};
 
 	let datasets = $derived.by(() => {
 		return series.map((s, i) => ({

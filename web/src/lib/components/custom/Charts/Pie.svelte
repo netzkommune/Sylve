@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PieChartData } from '$lib/types/common';
+	import { switchColor } from '$lib/utils/chart';
 	import { ArcElement, Chart, Legend, PieController, Tooltip } from 'chart.js';
 	import humanFormat from 'human-format';
 	import { onDestroy, onMount } from 'svelte';
@@ -25,24 +26,6 @@
 
 	Chart.register(ArcElement, PieController, Tooltip, Legend);
 
-	const switchColor = (color: string, alpha: number = 1) => {
-		const base = (val: string) => val.replace(')', ` / ${alpha})`);
-		switch (color) {
-			case 'chart1':
-				return base('oklch(0.646 0.222 41.116)');
-			case 'chart-2':
-				return base('oklch(0.6 0.118 184.704)');
-			case 'chart-3':
-				return base('oklch(0.398 0.07 227.392)');
-			case 'chart-4':
-				return base('oklch(0.828 0.189 84.429)');
-			case 'chart-5':
-				return base('oklch(0.769 0.188 70.08)');
-			default:
-				return base('oklch(0.646 0.222 41.116)');
-		}
-	};
-
 	onMount(() => {
 		chart = new Chart(canvas, {
 			type: 'pie',
@@ -51,7 +34,8 @@
 				datasets: [
 					{
 						data: data.map((d) => d.value),
-						backgroundColor: data.map((d) => switchColor(d.color)),
+						backgroundColor: data.map((d) => switchColor(d.color, 0.6)),
+						borderColor: data.map((d) => switchColor(d.color, 1)),
 						borderWidth: 1
 					}
 				]

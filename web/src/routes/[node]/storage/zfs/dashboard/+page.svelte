@@ -176,7 +176,6 @@
 		};
 	});
 
-<<<<<<< HEAD
 	let histograms = $derived.by(() => {
 		return {
 			compression: {
@@ -204,9 +203,6 @@
 
 		return { poolStatSeries };
 	});
-=======
-	$inspect(poolStats);
->>>>>>> 9885680f1f9a159b4df8d57ea68e4f136870891a
 </script>
 
 {#snippet card(type: string)}

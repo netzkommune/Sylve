@@ -191,18 +191,22 @@
 			statType as StatType
 		);
 
-		const poolStatSeries = poolStatsKeys.map((series, index) => ({
-			field: series.key,
-			label: series.title,
-			color: series.color,
-			data: poolStatsData[index].map((item) => ({
-				date: item.date,
-				value: item[series.key]
+		const poolStatSeries = poolStatsKeys
+			.map((series, index) => ({
+				field: series.key,
+				label: series.title,
+				color: series.color,
+				data: poolStatsData[index].map((item) => ({
+					date: item.date,
+					value: item[series.key]
+				}))
 			}))
-		}));
+			.filter((series) => series.field === 'zroot' || series.field === 'pooly');
 
 		return { poolStatSeries };
 	});
+
+	$inspect(poolStatSeries);
 </script>
 
 {#snippet card(type: string)}

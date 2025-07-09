@@ -18,7 +18,10 @@
 
 {#if data.domain && data.domain.status !== 'Shutoff'}
 	<div class="flex h-full w-full flex-col">
-		<iframe class="w-full flex-1" src={`/vnc/vnc.html?path=${path}&password=${data.password}`}
+		<iframe
+			class="w-full flex-1"
+			src={`/vnc/vnc.html?path=${path}&password=${data.password}`}
+			title="VM Console"
 		></iframe>
 	</div>
 {:else}

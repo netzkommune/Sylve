@@ -14,6 +14,7 @@ import (
 	"strings"
 	networkModels "sylve/internal/db/models/network"
 	vmModels "sylve/internal/db/models/vm"
+	"sylve/internal/logger"
 	"sylve/pkg/utils"
 
 	"github.com/beevik/etree"
@@ -66,7 +67,12 @@ func (s *Service) NetworkDetach(vmId int, networkId int) error {
 	}
 
 	if !found {
-		return fmt.Errorf("network_interface_not_found_in_xml: %s", network.MAC)
+		logger.L.Debug().Msgf("Network detach: network_interface_not_found_in_xml: %s", network.MAC)
+		if err := s.DB.Delete(&network).Error; err != nil {
+			return fmt.Errorf("failed_to_delete_network_record: %w", err)
+		}
+
+		return nil
 	}
 
 	newXML, err := doc.WriteToString()

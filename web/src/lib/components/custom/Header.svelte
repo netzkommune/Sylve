@@ -1,5 +1,5 @@
 <script>
-	import { logOut } from '$lib/api/auth';
+	import { getJWTClaims, logOut } from '$lib/api/auth';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import * as Sheet from '$lib/components/ui/sheet/index.js';
@@ -13,13 +13,12 @@
 			open: false
 		},
 		menuItems: [
-			{ icon: 'ic:baseline-settings', label: 'My Settings', shortcut: '⌘S' },
-			{ icon: 'solar:key-bold', label: 'Password', shortcut: '⇧⌘P' },
-			{ icon: 'ic:round-lock', label: 'TFA', shortcut: '⌘K' },
 			{ icon: 'mdi:palette', label: 'Color Theme', shortcut: '⌘⇧T' },
 			{ icon: 'meteor-icons:language', label: 'Language', shortcut: '⌘K' }
 		]
 	});
+
+	let jwt = $state(getJWTClaims());
 </script>
 
 <header class="sticky top-0 flex h-[5vh] items-center gap-4 border-x border-b px-2 md:h-[4vh]">
@@ -87,11 +86,12 @@
 		</div>
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger>
-				<Button variant="outline" size="sm" class="h-6.5"
-					><Icon icon="mdi:user" class="h-4 w-4" /> Root <Icon
-						icon="famicons:chevron-down"
-						class="h-4 w-4"
-					/>
+				<Button variant="outline" size="sm" class="h-6.5">
+					<div class="flex items-center gap-2">
+						<Icon icon="mdi:user" class="h-4 w-4" />
+						<span>{jwt?.custom_claims.username}</span>
+						<Icon icon="famicons:chevron-down" class="h-4 w-4" />
+					</div>
 					<span class="sr-only">Toggle user menu</span></Button
 				>
 			</DropdownMenu.Trigger>

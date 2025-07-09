@@ -32,18 +32,23 @@
 	let data = $derived($results[0].data as AuditRecord[]);
 	let vms = $derived($results[1].data as VM[]);
 
-	const pathToActionMap: Record<string, string> = {
+	const pathToActionMap: Record<string, string> = $derived({
 		'/api/auth/login': 'Login',
 		'/api/info/notes': 'Notes',
 		'/api/network/switch': 'Switch',
-		'/api/vnc': 'VNC'
-	};
+		'/api/vnc': 'VNC',
+		'/api/disk/initialize-gpt': 'Disk - Initialize GPT',
+		'/api/disk/wipe': 'Disk - Wipe'
+	});
 
 	let records = $derived.by(() => {
 		if (!data) return [];
 
 		return data.map((record) => {
 			const path = record.action?.path || '';
+
+			console.log(path);
+
 			const method = record.action?.method || '';
 			let resolvedAction = method;
 
@@ -53,32 +58,36 @@
 
 			if (matchedEntry) {
 				const label = matchedEntry[1];
-				switch (method.toUpperCase()) {
-					case 'GET':
-						if (path.includes('vnc')) {
-							const port = path.split('/').pop();
-							const vm = vms.find((vm) => vm.vncPort === Number(port));
+				if (!label.includes('-')) {
+					switch (method.toUpperCase()) {
+						case 'GET':
+							if (path.includes('vnc')) {
+								const port = path.split('/').pop();
+								const vm = vms.find((vm) => vm.vncPort === Number(port));
 
-							resolvedAction = `${label} - ${vm ? vm.name : 'Unknown VM'} (${port})`;
-						} else {
-							resolvedAction = `${label} - View`;
-						}
-						break;
-					case 'POST':
-						resolvedAction = `${label} - Create`;
-						break;
-					case 'PUT':
-					case 'PATCH':
-						resolvedAction = `${label} - Update`;
-						break;
-					case 'DELETE':
-						resolvedAction = `${label} - Delete`;
-						record.action.body = {
-							id: record.id
-						};
-						break;
-					default:
-						resolvedAction = label;
+								resolvedAction = `${label} - ${vm ? vm.name : 'Unknown VM'} (${port})`;
+							} else {
+								resolvedAction = `${label} - View`;
+							}
+							break;
+						case 'POST':
+							resolvedAction = `${label} - Create`;
+							break;
+						case 'PUT':
+						case 'PATCH':
+							resolvedAction = `${label} - Update`;
+							break;
+						case 'DELETE':
+							resolvedAction = `${label} - Delete`;
+							record.action.body = {
+								id: record.id
+							};
+							break;
+						default:
+							resolvedAction = label;
+					}
+				} else {
+					resolvedAction = label;
 				}
 			}
 

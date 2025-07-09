@@ -12,9 +12,11 @@ import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
 import { oldStore, store } from '$lib/stores/auth';
 import { hostname, language as langStore } from '$lib/stores/basic';
+import type { JWTClaims } from '$lib/types/auth';
 import type { APIResponse } from '$lib/types/common';
 import adze from 'adze';
 import axios, { AxiosError } from 'axios';
+// import jwt from 'jsonwebtoken';
 import { toast } from 'svelte-sonner';
 import { get } from 'svelte/store';
 
@@ -152,4 +154,17 @@ export async function revokeJWT() {
 	} catch (_e: unknown) {
 		adze.error('Failed to revoke JWT');
 	}
+}
+
+export function getJWTClaims(): JWTClaims | null {
+	const token = getToken();
+	if (token) {
+		try {
+			return JSON.parse(atob(token.split('.')[1])) as JWTClaims;
+		} catch (e) {
+			return null;
+		}
+	}
+
+	return null;
 }

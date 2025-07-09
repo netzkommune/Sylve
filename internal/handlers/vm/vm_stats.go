@@ -31,12 +31,12 @@ import (
 // @Success 200 {object} internal.APIResponse[[]vmModels.VMStats] "Success"
 // @Failure 400 {object} internal.APIResponse[any] "Bad Request"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
-// @Router /vm/stats/:vmid/:limit [get]
+// @Router /vm/stats/:vmId/:limit [get]
 func GetVMStats(libvirtService *libvirt.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		vmID := c.Param("vmid")
+		vmId := c.Param("vmId")
 		limit := c.Param("limit")
-		if vmID == "" || limit == "" {
+		if vmId == "" || limit == "" {
 			c.JSON(400, internal.APIResponse[any]{
 				Status:  "error",
 				Message: "invalid_request",
@@ -46,7 +46,7 @@ func GetVMStats(libvirtService *libvirt.Service) gin.HandlerFunc {
 			return
 		}
 
-		stats, err := libvirtService.GetVMUsage(int(utils.StringToUint64(vmID)), int(utils.StringToUint64(limit)))
+		stats, err := libvirtService.GetVMUsage(int(utils.StringToUint64(vmId)), int(utils.StringToUint64(limit)))
 		if err != nil {
 			c.JSON(500, internal.APIResponse[any]{
 				Status:  "error",

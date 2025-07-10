@@ -60,7 +60,7 @@
 			}
 		},
 		{
-			queryKey: ['poolStats'],
+			queryKey: ['pool-stats'],
 			queryFn: async () => {
 				return await getPoolStats(Number(comboBoxes.poolStats.interval.value), 128);
 			},
@@ -68,7 +68,7 @@
 			keepPreviousData: false,
 			initialData: Array.isArray(data.poolStats) ? data.poolStats[0] : data.poolStats,
 			onSuccess: (data: PoolStatPointsResponse) => {
-				updateCache('poolStats', data);
+				updateCache('pool-stats', data);
 			}
 		}
 	]);
@@ -191,17 +191,15 @@
 			statType as StatType
 		);
 
-		const poolStatSeries = poolStatsKeys
-			.map((series, index) => ({
-				field: series.key,
-				label: series.title,
-				color: series.color,
-				data: poolStatsData[index].map((item) => ({
-					date: item.date,
-					value: item[series.key]
-				}))
+		const poolStatSeries = poolStatsKeys.map((series, index) => ({
+			field: series.key,
+			label: series.title,
+			color: series.color,
+			data: poolStatsData[index].map((item) => ({
+				date: item.date,
+				value: item[series.key]
 			}))
-			.filter((series) => series.field === 'zroot' || series.field === 'pooly');
+		}));
 
 		return { poolStatSeries };
 	});
@@ -245,7 +243,7 @@
 					>
 						<div class="flex items-center">
 							<Icon icon="mdi:data-usage" class="mr-2" />
-							<span class="text-sm font-bold md:text-lg xl:text-xl">PoolStats</span>
+							<span class="text-sm font-bold md:text-lg xl:text-xl">Pool Stats</span>
 						</div>
 						<div class="flex items-center gap-2">
 							<CustomComboBox

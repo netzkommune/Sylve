@@ -62,10 +62,12 @@
 				vm.cpuCores,
 				vm.cpuThreads,
 				bytes,
-				cpuPinning
+				cpuPinning,
+				vm.vncPort,
+				vm.vncResolution,
+				vm.vncPassword,
+				vm.vncWait ?? false
 			);
-
-			console.log(response);
 
 			if (response.error) {
 				handleAPIError(response);

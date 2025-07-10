@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 	vmModels "sylve/internal/db/models/vm"
+	"sylve/pkg/utils"
 
 	"github.com/beevik/etree"
 )
@@ -120,12 +121,95 @@ func updateCPU(xml string, cpuSockets, cpuCores, cpuThreads int, cpuPinning []in
 	return out, nil
 }
 
+func updateVNC(xml string, vncPort int, vncResolution string, vncPassword string, vncWait bool) (string, error) {
+	doc := etree.NewDocument()
+	if err := doc.ReadFromString(xml); err != nil {
+		return "", fmt.Errorf("failed to parse XML: %w", err)
+	}
+
+	bhyveCommandline := doc.FindElement("//bhyve:commandline")
+	if bhyveCommandline == nil || bhyveCommandline.Space != "bhyve" {
+		root := doc.Root()
+		if root.SelectAttr("xmlns:bhyve") == nil {
+			root.CreateAttr("xmlns:bhyve", "http://libvirt.org/schemas/domain/bhyve/1.0")
+		}
+		bhyveCommandline = root.CreateElement("bhyve:commandline")
+	}
+
+	index := 0
+
+	for _, arg := range bhyveCommandline.ChildElements() {
+		valueAttr := arg.SelectAttr("value")
+		if valueAttr != nil {
+			value := valueAttr.Value
+			if value != "" && strings.Contains(value, "fbuf,tcp") {
+				fmt.Println("Found existing VNC argument:", value)
+				start := strings.Index(value, "-s")
+				end := strings.Index(value, ":")
+				if start != -1 && end != -1 && end > start {
+					indexStr := value[start+2 : end]
+					if idx, err := strconv.Atoi(indexStr); err == nil {
+						index = idx
+					}
+				}
+				bhyveCommandline.RemoveChild(arg)
+			}
+		}
+	}
+
+	resolutionParts := strings.Split(vncResolution, "x")
+	if len(resolutionParts) != 2 {
+		return "", fmt.Errorf("invalid_vnc_resolution_format: %s", vncResolution)
+	}
+
+	width, err := strconv.Atoi(resolutionParts[0])
+	if err != nil {
+		return "", fmt.Errorf("invalid_vnc_resolution_width: %s", resolutionParts[0])
+	}
+
+	height, err := strconv.Atoi(resolutionParts[1])
+	if err != nil {
+		return "", fmt.Errorf("invalid_vnc_resolution_height: %s", resolutionParts[1])
+	}
+
+	wait := ""
+
+	if vncWait {
+		wait = ",wait"
+	}
+
+	if index == 0 {
+		index, err = findLowestIndex(xml)
+		if err != nil {
+			return "", fmt.Errorf("failed_to_find_lowest_index: %w", err)
+		}
+	}
+
+	vnc := fmt.Sprintf("-s %d:0,fbuf,tcp=0.0.0.0:%d,w=%d,h=%d,password=%s%s", index, vncPort, width, height, vncPassword, wait)
+
+	if vnc != "" {
+		arg := bhyveCommandline.CreateElement("bhyve:arg")
+		arg.CreateAttr("value", vnc)
+	}
+
+	out, err := doc.WriteToString()
+	if err != nil {
+		return "", fmt.Errorf("failed to serialize XML: %w", err)
+	}
+
+	return out, nil
+}
+
 func (s *Service) ModifyHardware(vmId int,
 	cpuSockets int,
 	cpuCores int,
 	cpuThreads int,
 	cpuPinning []int,
-	ram int) error {
+	ram int,
+	vncPort int,
+	vncResolution string,
+	vncPassword string,
+	vncWait bool) error {
 
 	vms, err := s.ListVMs()
 	if err != nil {
@@ -235,6 +319,32 @@ func (s *Service) ModifyHardware(vmId int,
 		}
 	}
 
+	if vm.VNCPort != vncPort ||
+		vm.VNCResolution != vncResolution ||
+		vm.VNCPassword != vncPassword ||
+		vm.VNCWait != vncWait {
+		if utils.IsValidPort(vncPort) == false {
+			return fmt.Errorf("invalid_vnc_port: %d", vncPort)
+		}
+
+		if utils.IsPortInUse(vncPort) {
+			return fmt.Errorf("vnc_port_in_use: %d", vncPort)
+		}
+
+		vm.VNCPort = vncPort
+		vm.VNCResolution = vncResolution
+		vm.VNCPassword = vncPassword
+		vm.VNCWait = vncWait
+		if err := s.DB.Save(&vm).Error; err != nil {
+			return fmt.Errorf("failed_to_update_vm_vnc_in_db: %w", err)
+		}
+
+		updatedXML, err = updateVNC(xml, vncPort, vncResolution, vncPassword, vncWait)
+		if err != nil {
+			return fmt.Errorf("failed_to_update_vnc_in_xml: %w", err)
+		}
+	}
+
 	if err := s.Conn.DomainUndefineFlags(domain, 0); err != nil {
 		return fmt.Errorf("failed_to_undefine_domain: %w", err)
 	}
@@ -242,113 +352,6 @@ func (s *Service) ModifyHardware(vmId int,
 	if _, err := s.Conn.DomainDefineXML(updatedXML); err != nil {
 		return fmt.Errorf("failed_to_define_domain_with_modified_xml: %w", err)
 	}
-
-	// var parsed libvirtServiceInterfaces.Domain
-
-	// domainXML, err := s.Conn.DomainGetXMLDesc(domain, 0)
-	// if err != nil {
-	// 	return fmt.Errorf("failed_to_get_domain_xml_desc: %w", err)
-	// }
-
-	// err = xml.Unmarshal([]byte(domainXML), &parsed)
-
-	// if err != nil {
-	// 	return fmt.Errorf("failed_to_parse_domain_xml: %w", err)
-	// }
-
-	// if vm.RAM != ram {
-	// 	if err := s.DB.Model(&vm).Update("ram", ram).Error; err != nil {
-	// 		return fmt.Errorf("failed_to_update_vm_ram_in_db: %w", err)
-	// 	}
-
-	// 	parsed.Memory = libvirtServiceInterfaces.Memory{
-	// 		Unit: "B",
-	// 		Text: strconv.Itoa(ram),
-	// 	}
-	// }
-
-	// if vm.CPUCores != cpuCores {
-	// 	if err := s.DB.Model(&vm).Update("cpu_cores", cpuCores).Error; err != nil {
-	// 		return fmt.Errorf("failed_to_update_vm_cpu_cores_in_db: %w", err)
-	// 	}
-
-	// 	parsed.CPU.Topology.Cores = strconv.Itoa(cpuCores)
-	// }
-
-	// if vm.CPUSockets != cpuSockets {
-	// 	if err := s.DB.Model(&vm).Update("cpu_sockets", cpuSockets).Error; err != nil {
-	// 		return fmt.Errorf("failed_to_update_vm_cpu_sockets_in_db: %w", err)
-	// 	}
-
-	// 	parsed.CPU.Topology.Sockets = strconv.Itoa(cpuSockets)
-	// }
-
-	// if vm.CPUsThreads != cpuThreads {
-	// 	if err := s.DB.Model(&vm).Update("cpu_threads", cpuThreads).Error; err != nil {
-	// 		return fmt.Errorf("failed_to_update_vm_cpu_threads_in_db: %w", err)
-	// 	}
-
-	// 	parsed.CPU.Topology.Threads = strconv.Itoa(cpuThreads)
-	// }
-
-	// if parsed.VCPU != vCPUs {
-	// 	parsed.VCPU = vCPUs
-	// }
-
-	// if len(cpuPinning) > 0 {
-	// 	vm.CPUPinning = cpuPinning
-
-	// 	if err := s.DB.Save(&vm).Error; err != nil {
-	// 		return fmt.Errorf("failed_to_update_vm_cpu_pinning_in_db: %w", err)
-	// 	}
-
-	// 	if parsed.BhyveCommandline == nil {
-	// 		parsed.BhyveCommandline = &libvirtServiceInterfaces.BhyveCommandline{}
-	// 	}
-
-	// 	cleanedArgs := make([]libvirtServiceInterfaces.BhyveArg, 0, len(parsed.BhyveCommandline.Args))
-	// 	for _, arg := range parsed.BhyveCommandline.Args {
-	// 		if !strings.HasPrefix(arg.Value, "-p") {
-	// 			cleanedArgs = append(cleanedArgs, arg)
-	// 		}
-	// 	}
-	// 	parsed.BhyveCommandline.Args = cleanedArgs
-
-	// 	fmt.Println("1.2")
-
-	// 	for i, cpu := range cpuPinning {
-	// 		parsed.BhyveCommandline.Args = append(parsed.BhyveCommandline.Args, libvirtServiceInterfaces.BhyveArg{
-	// 			Value: fmt.Sprintf("-p %d:%d", i, cpu),
-	// 		})
-	// 	}
-	// }
-
-	// newXML, err := xml.MarshalIndent(parsed, "", "  ")
-	// if err != nil {
-	// 	return fmt.Errorf("failed_to_marshal_updated_domain_xml: %w", err)
-	// }
-
-	// newXMLStr := string(newXML)
-
-	// fmt.Println("3", newXMLStr)
-
-	// // if err := s.Conn.DomainUndefineFlags(domain, 0); err != nil {
-	// // 	return fmt.Errorf("failed_to_undefine_domain: %w", err)
-	// // }
-
-	// // fmt.Println(newXMLStr)
-
-	// // if _, err := s.Conn.DomainDefineXMLFlags(newXMLStr, libvirt.DomainDefineValidate); err != nil {
-	// // 	return fmt.Errorf("xml_validation_failed: %w", err)
-	// // }
-
-	// if err := s.Conn.DomainUndefineFlags(domain, 0); err != nil {
-	// 	return fmt.Errorf("failed_to_undefine_domain: %w", err)
-	// }
-
-	// if _, err := s.Conn.DomainDefineXML(newXMLStr); err != nil {
-	// 	return fmt.Errorf("failed_to_define_domain_with_modified_xml: %w", err)
-	// }
 
 	return nil
 }

@@ -6,12 +6,10 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 	import type { CPUInfo } from '$lib/types/info/cpu';
-	import type { RAMInfo } from '$lib/types/info/ram';
 	import type { VM } from '$lib/types/vm/vm';
 	import { getCache, handleAPIError } from '$lib/utils/http';
 
 	import Icon from '@iconify/svelte';
-	import humanFormat from 'human-format';
 	import { toast } from 'svelte-sonner';
 
 	interface Props {
@@ -89,7 +87,11 @@
 				parseInt(properties.cpu.cores.toString(), 10),
 				parseInt(properties.cpu.threads.toString(), 10),
 				parseInt(vm.ram.toString(), 10),
-				properties.cpu.pinning.map((x) => parseInt(x.toString(), 10))
+				properties.cpu.pinning.map((x) => parseInt(x.toString(), 10)),
+				vm.vncPort,
+				vm.vncResolution,
+				vm.vncPassword,
+				vm.vncWait ?? false
 			);
 
 			if (response.error) {

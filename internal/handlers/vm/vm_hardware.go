@@ -17,11 +17,15 @@ import (
 )
 
 type ModifyHardwareRequest struct {
-	CPUSockets int   `json:"cpuSockets" binding:"required"`
-	CPUCores   int   `json:"cpuCores" binding:"required"`
-	CPUThreads int   `json:"cpuThreads" binding:"required"`
-	RAM        int   `json:"ram" binding:"required"`
-	CPUPinning []int `json:"cpuPinning" binding:"required"`
+	CPUSockets    int    `json:"cpuSockets" binding:"required"`
+	CPUCores      int    `json:"cpuCores" binding:"required"`
+	CPUThreads    int    `json:"cpuThreads" binding:"required"`
+	RAM           int    `json:"ram" binding:"required"`
+	CPUPinning    []int  `json:"cpuPinning" binding:"required"`
+	VNCPort       int    `json:"vncPort" binding:"required"`
+	VNCResolution string `json:"vncResolution" binding:"required"`
+	VNCPassword   string `json:"vncPassword" binding:"required"`
+	VNCWait       *bool  `json:"vncWait" binding:"required"`
 }
 
 // @Summary Modify Hardware of a Virtual Machine
@@ -70,7 +74,12 @@ func ModifyHardware(libvirtService *libvirt.Service) gin.HandlerFunc {
 			return
 		}
 
-		if err := libvirtService.ModifyHardware(vmIdInt, req.CPUSockets, req.CPUCores, req.CPUThreads, req.CPUPinning, req.RAM); err != nil {
+		wait := false
+		if req.VNCWait != nil {
+			wait = *req.VNCWait
+		}
+
+		if err := libvirtService.ModifyHardware(vmIdInt, req.CPUSockets, req.CPUCores, req.CPUThreads, req.CPUPinning, req.RAM, req.VNCPort, req.VNCResolution, req.VNCPassword, wait); err != nil {
 			c.JSON(500, internal.APIResponse[any]{
 				Status:  "error",
 				Message: "internal_server_error",

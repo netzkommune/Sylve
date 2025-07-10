@@ -3,6 +3,7 @@
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import CPU from '$lib/components/custom/VM/Hardware/CPU.svelte';
 	import RAM from '$lib/components/custom/VM/Hardware/RAM.svelte';
+	import VNC from '$lib/components/custom/VM/Hardware/VNC.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import type { Row } from '$lib/components/ui/table';
 	import type { RAMInfo } from '$lib/types/info/ram';
@@ -51,6 +52,12 @@
 		ram: {
 			value: data.vm.ram,
 			open: false
+		},
+		vnc: {
+			resolution: data.vm.vncResolution,
+			port: data.vm.vncPort,
+			password: data.vm.vncPassword,
+			open: false
 		}
 	};
 
@@ -63,6 +70,8 @@
 			properties.cpu.threads = vm.cpuThreads;
 			properties.cpu.vCPUs = vm.cpuSockets * vm.cpuCores * vm.cpuThreads;
 			properties.ram.value = vm.ram;
+			properties.vnc.port = vm.vncPort;
+			properties.vnc.password = vm.vncPassword;
 		}
 	});
 
@@ -85,6 +94,11 @@
 				id: generateNanoId(`${properties.ram.value}-ram`),
 				property: 'RAM',
 				value: bytesToHumanReadable(properties.ram.value)
+			},
+			{
+				id: generateNanoId(`${properties.vnc.port}-vnc-port`),
+				property: 'VNC',
+				value: `${properties.vnc.resolution} / ${properties.vnc.port}`
 			}
 		]
 	});
@@ -132,6 +146,26 @@
 					</div>
 				</Button>
 			{/if}
+
+			{#if activeRow && activeRow.property === 'VNC'}
+				<Button
+					onclick={() => {
+						properties.vnc.open = true;
+					}}
+					size="sm"
+					variant="outline"
+					class="h-6.5"
+					title={data.domain.status === 'Shutoff'
+						? ''
+						: 'VNC can only be edited when the VM is shut off'}
+					disabled={data.domain.status !== 'Shutoff'}
+				>
+					<div class="flex items-center">
+						<Icon icon="mdi:pencil" class="mr-1 h-4 w-4" />
+						<span>Edit VNC</span>
+					</div>
+				</Button>
+			{/if}
 		</div>
 	{/if}
 
@@ -152,4 +186,8 @@
 
 {#if properties.cpu.open}
 	<CPU bind:open={properties.cpu.open} {vm} {vms} />
+{/if}
+
+{#if properties.vnc.open}
+	<VNC bind:open={properties.vnc.open} {vm} {vms} />
 {/if}

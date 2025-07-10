@@ -7,13 +7,21 @@ export async function modifyHardware(
 	cpuCores: number,
 	cpuThreads: number,
 	ram: number,
-	cpuPinning: number[]
+	cpuPinning: number[],
+	vncPort: number,
+	vncResolution: string,
+	vncPassword: string,
+	vncWait: boolean
 ): Promise<APIResponse> {
 	return await apiRequest(`/vm/hardware/${vmId}`, APIResponseSchema, 'PUT', {
 		cpuSockets,
 		cpuCores,
 		cpuThreads,
 		ram,
-		cpuPinning
+		cpuPinning,
+		vncPort,
+		vncResolution,
+		vncPassword,
+		vncWait
 	});
 }

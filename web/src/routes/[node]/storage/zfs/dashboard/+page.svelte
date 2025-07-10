@@ -33,6 +33,7 @@
 
 	let poolStatsRef: Chart | undefined;
 	let datasetChartRef: Chart | undefined;
+	let poolStatsInterval = $state('1');
 
 	const results = useQueries([
 		{
@@ -62,7 +63,7 @@
 		{
 			queryKey: ['pool-stats'],
 			queryFn: async () => {
-				return await getPoolStats(Number(comboBoxes.poolStats.interval.value), 128);
+				return await getPoolStats(Number(poolStatsInterval), 128);
 			},
 			refetchInterval: 1000,
 			keepPreviousData: false,
@@ -152,7 +153,7 @@
 		poolStats: {
 			interval: {
 				open: false,
-				value: poolStats?.intervalMap[0]?.value || '1',
+				value: poolStatsInterval || '1',
 				data: poolStats?.intervalMap
 			},
 			statType: {
@@ -203,8 +204,6 @@
 
 		return { poolStatSeries };
 	});
-
-	$inspect(poolStatSeries);
 </script>
 
 {#snippet card(type: string)}
@@ -259,7 +258,7 @@
 							<CustomComboBox
 								bind:open={comboBoxes.poolStats.interval.open}
 								label=""
-								bind:value={comboBoxes.poolStats.interval.value}
+								bind:value={poolStatsInterval}
 								data={comboBoxes.poolStats.interval.data}
 								classes=""
 								placeholder="Select a interval"

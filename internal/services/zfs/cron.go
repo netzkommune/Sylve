@@ -91,8 +91,6 @@ func (s *Service) RemoveNonExistentPools() {
 		} else {
 			logger.L.Info().Int("count", len(idsToDelete)).Msg("zfs_cron: Deleted non-existent pool entries")
 		}
-	} else {
-		logger.L.Debug().Msg("zfs_cron: No non-existent pools to delete")
 	}
 }
 

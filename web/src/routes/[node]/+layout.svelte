@@ -150,6 +150,11 @@
 							label: 'PCI Passthrough',
 							icon: 'eos-icons:hardware-circuit',
 							href: `/${node}/settings/device-passthrough`
+						},
+						{
+							label: 'Authentication',
+							icon: 'mdi:shield-key',
+							href: `/${node}/settings/authentication`
 						}
 					]
 				}

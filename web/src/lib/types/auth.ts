@@ -10,4 +10,17 @@ export const JWTClaimsSchema = z.object({
 	})
 });
 
+export const UserSchema = z.object({
+	id: z.number().int(),
+	username: z.string(),
+	email: z.string(),
+	notes: z.string(),
+	totp: z.string(),
+	admin: z.boolean(),
+	createdAt: z.string(),
+	updatedAt: z.string(),
+	lastLoginTime: z.string()
+});
+
 export type JWTClaims = z.infer<typeof JWTClaimsSchema>;
+export type User = z.infer<typeof UserSchema>;

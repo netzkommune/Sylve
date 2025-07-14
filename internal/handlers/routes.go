@@ -17,6 +17,7 @@ import (
 	"gorm.io/gorm"
 
 	"sylve/internal/assets"
+	authHandlers "sylve/internal/handlers/auth"
 	diskHandlers "sylve/internal/handlers/disk"
 	infoHandlers "sylve/internal/handlers/info"
 	"sylve/internal/handlers/middleware"
@@ -221,8 +222,15 @@ func RegisterRoutes(r *gin.Engine,
 	auth := api.Group("/auth")
 	auth.Use(middleware.RequestLoggerMiddleware(db, authService))
 	{
-		auth.POST("/login", LoginHandler(authService))
-		auth.Any("/logout", LogoutHandler(authService))
+		auth.POST("/login", authHandlers.LoginHandler(authService))
+		auth.Any("/logout", authHandlers.LogoutHandler(authService))
+	}
+
+	users := auth.Group("/users")
+	users.Use(middleware.EnsureAuthenticated(authService))
+	users.Use(middleware.RequestLoggerMiddleware(db, authService))
+	{
+		users.GET("", authHandlers.ListUsersHandler(authService))
 	}
 
 	vnc := api.Group("/vnc")

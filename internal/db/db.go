@@ -17,6 +17,7 @@ import (
 	vmModels "sylve/internal/db/models/vm"
 	zfsModels "sylve/internal/db/models/zfs"
 	"sylve/internal/logger"
+	"sylve/pkg/system"
 	"sylve/pkg/utils"
 
 	"gorm.io/driver/sqlite"
@@ -114,6 +115,7 @@ func setupInitUsers(db *gorm.DB, cfg *internal.SylveConfig) error {
 					Username: admin.Username,
 					Email:    admin.Email,
 					Password: hashed,
+					Admin:    true,
 				}
 				if err := db.Create(&newUser).Error; err != nil {
 					logger.L.Error().Msgf("Failed to create admin user %s: %v", admin.Email, err)
@@ -124,6 +126,32 @@ func setupInitUsers(db *gorm.DB, cfg *internal.SylveConfig) error {
 				logger.L.Error().Msgf("Error checking user %s: %v", admin.Email, result.Error)
 				return result.Error
 			}
+		} else {
+			if !user.Admin {
+				if err := db.Model(&user).Update("admin", true).Error; err != nil {
+					logger.L.Error().Msgf("Failed to promote user %s to admin: %v", admin.Email, err)
+					return err
+				}
+				logger.L.Info().Msgf("User %s promoted to admin", admin.Email)
+			} else {
+				logger.L.Info().Msgf("User %s already has admin privileges", admin.Email)
+			}
+		}
+
+		exists, err := system.UnixUserExists(admin.Username)
+		if err != nil {
+			logger.L.Error().Msgf("Error checking if Unix user %s exists: %v", admin.Username, err)
+		}
+
+		if !exists {
+			err = system.CreateUnixUser(admin.Username, "/usr/sbin/nologin", "/nonexistent")
+			if err != nil {
+				logger.L.Error().Msgf("Failed to create Unix user %s: %v", admin.Username, err)
+				return err
+			}
+			logger.L.Info().Msgf("Unix user %s created successfully", admin.Username)
+		} else {
+			logger.L.Info().Msgf("Unix user %s already exists", admin.Username)
 		}
 	}
 	return nil

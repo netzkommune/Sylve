@@ -46,10 +46,8 @@
 
 		return data.map((record) => {
 			const path = record.action?.path || '';
-
-			console.log(path);
-
 			const method = record.action?.method || '';
+
 			let resolvedAction = method;
 
 			const matchedEntry = Object.entries(pathToActionMap).find(([prefix]) =>

@@ -13,15 +13,16 @@ import (
 )
 
 type User struct {
-	ID            uint   `gorm:"primarykey"`
-	Username      string `gorm:"unique"`
-	Email         string `gorm:"unique"`
-	Password      string
-	Notes         string
-	TOTP          string
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
-	LastLoginTime time.Time
+	ID            uint      `gorm:"primarykey" json:"id"`
+	Username      string    `gorm:"unique" json:"username"`
+	Email         string    `gorm:"unique" json:"email"`
+	Password      string    `json:"-"`
+	Notes         string    `json:"notes"`
+	TOTP          string    `json:"totp"`
+	Admin         bool      `json:"admin"`
+	CreatedAt     time.Time `gorm:"autoCreateTime" json:"createdAt"`
+	UpdatedAt     time.Time `gorm:"autoUpdateTime" json:"updatedAt"`
+	LastLoginTime time.Time `json:"lastLoginTime"`
 }
 
 type Token struct {

@@ -155,7 +155,7 @@
 			delete: {
 				open: false
 			},
-			filesytemModal: {
+			fileExplorer: {
 				open: false
 			}
 		},
@@ -317,32 +317,41 @@
 
 		<Button
 			onclick={() => {
-				modals.fs.filesytemModal.open = true;
+				if (modals.fs.fileExplorer.open) {
+					activeRows = null;
+				}
+				modals.fs.fileExplorer.open = !modals.fs.fileExplorer.open;
 			}}
 			size="sm"
 			class="h-6"
 		>
-			<div class="flex items-center">
-				<Icon icon="eos-icons:file-system" class="mr-1 h-4 w-4" />
-				<span>File System</span>
-			</div>
+			<Icon icon="eos-icons:file-system" class="mr-1 h-4 w-4" />
+			<span>
+				{modals.fs.fileExplorer.open ? 'Close Explorer ' : 'Open Explorer'}
+			</span>
 		</Button>
 
-		{@render button('create-snapshot')}
-		{@render button('rollback-snapshot')}
-		{@render button('delete-snapshot')}
-		{@render button('edit-filesystem')}
-		{@render button('delete-filesystem')}
-		{@render button('bulk-delete')}
+		{#if !modals.fs.fileExplorer.open}
+			{@render button('create-snapshot')}
+			{@render button('rollback-snapshot')}
+			{@render button('delete-snapshot')}
+			{@render button('edit-filesystem')}
+			{@render button('delete-filesystem')}
+			{@render button('bulk-delete')}
+		{/if}
 	</div>
 
-	<TreeTable
-		data={tableData}
-		name={tableName}
-		bind:parentActiveRow={activeRows}
-		multipleSelect={true}
-		bind:query
-	/>
+	{#if modals.fs.fileExplorer.open}
+		<FileSystem />
+	{:else}
+		<TreeTable
+			data={tableData}
+			name={tableName}
+			bind:parentActiveRow={activeRows}
+			multipleSelect={true}
+			bind:query
+		/>
+	{/if}
 </div>
 
 <!-- Create Snapshot -->
@@ -469,5 +478,3 @@
 {#if modals.fs.edit.open && activeDataset && activeDataset.type === 'filesystem'}
 	<EditFS bind:open={modals.fs.edit.open} dataset={activeDataset} />
 {/if}
-
-<FileSystem bind:open={modals.fs.filesytemModal.open} />

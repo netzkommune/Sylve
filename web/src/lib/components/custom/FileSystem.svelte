@@ -1,14 +1,6 @@
 <script lang="ts">
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import Icon from '@iconify/svelte';
 	import { mode } from 'mode-watcher';
 	import { Filemanager, Willow, WillowDark } from 'wx-svelte-filemanager';
-
-	interface Props {
-		open: boolean;
-	}
-
-	let { open = $bindable() }: Props = $props();
 
 	const rawdata = [
 		{
@@ -46,30 +38,17 @@
 	];
 </script>
 
-<Dialog.Root bind:open>
-	<Dialog.Trigger>Open</Dialog.Trigger>
-	<Dialog.Content class="h-[90vh] !w-full !max-w-6xl !border-transparent !bg-transparent p-0">
-		<!-- <Dialog.Header>
-                <Dialog.Title></Dialog.Title>
-                <Dialog.Description></Dialog.Description>
-            </Dialog.Header> -->
-		<Dialog.Close
-			class="hover:bg-muted dark: absolute right-0 top-2 cursor-pointer rounded-lg  border border-none
-            px-1"><Icon icon="si:close-duotone" class="text-foreground h-7 w-7" /></Dialog.Close
+<div class="h-full w-full">
+	{#if mode.current === 'light'}
+		<Willow>
+			<Filemanager data={rawdata} /></Willow
 		>
-		<div class="mt-10">
-			{#if mode.current === 'light'}
-				<Willow>
-					<Filemanager data={rawdata} /></Willow
-				>
-			{:else}
-				<WillowDark>
-					<Filemanager data={rawdata} /></WillowDark
-				>
-			{/if}
-		</div>
-	</Dialog.Content>
-</Dialog.Root>
+	{:else}
+		<WillowDark>
+			<Filemanager data={rawdata} /></WillowDark
+		>
+	{/if}
+</div>
 
 <style>
 	:global(.wx-willow-theme) {
@@ -87,10 +66,6 @@
 		--wx-fm-button-font-color: #9fa1ae;
 		--wx-fm-toolbar-height: 56px;
 	}
-
-	/* :global(.wx-willow-theme .wx-filemanager .wx-cards) {
-		color: rgb(0, 128, 0);
-	} */
 
 	/* Willow Dark Theme */
 	:global(.wx-willow-dark-theme) {
@@ -118,6 +93,12 @@
 	:global(.wx-willow-dark-theme .wx-sidebar .wx-wrapper) {
 		background-color: var(--sidebar) !important;
 		border: 1px solid var(--sidebar) !important;
+	}
+
+	:global(.wx-willow-dark-theme .wx-sidebar .wx-wrapper .wx-button) {
+		padding: 0 !important;
+		border-radius: 0.3rem !important;
+		height: 35px;
 	}
 
 	:global(.wx-willow-dark-theme .wx-filemanager .wx-breadcrumbs) {
@@ -180,5 +161,29 @@
 		background-color: var(--muted) !important;
 		border: 1px solid var(--border) !important;
 		border-radius: var(--radius) !important;
+	}
+
+	:global(.wx-willow-dark-theme .wx-filemanager .wx-table-box .wx-row) {
+		background-color: var(--background) !important;
+		border: 1px solid var(--border) !important;
+	}
+
+	:global(.wx-willow-dark-theme .wx-filemanager .wx-table-box .wx-row:hover) {
+		background-color: var(--muted) !important;
+	}
+
+	:global(.wx-willow-dark-theme .wx-filemanager .wx-list) {
+		background-color: var(--background) !important;
+		border: var(--border) !important;
+	}
+
+	:global(.wx-willow-dark-theme .wx-menu .wx-item) {
+		background-color: var(--muted) !important;
+		border: var(--border) !important;
+	}
+
+	:global(.wx-willow-dark-theme .wx-menu .wx-item:hover) {
+		background-color: var(--background) !important;
+		border: var(--border) !important;
 	}
 </style>

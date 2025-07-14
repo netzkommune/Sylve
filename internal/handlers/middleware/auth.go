@@ -50,11 +50,13 @@ func EnsureAuthenticated(authService *authService.Service) gin.HandlerFunc {
 			}
 		}
 
-		_, err = authService.ValidateToken(token)
+		claims, err := authService.ValidateToken(token)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"status": "error", "error": err.Error()})
 			return
 		}
+
+		authService.UpdateLastUsageTime(claims.UserID)
 
 		c.Set("Token", token)
 		c.Next()

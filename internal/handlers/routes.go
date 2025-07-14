@@ -9,7 +9,6 @@
 package handlers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -221,17 +220,18 @@ func RegisterRoutes(r *gin.Engine,
 	}
 
 	auth := api.Group("/auth")
+	auth.Use(middleware.EnsureAuthenticated(authService))
 	auth.Use(middleware.RequestLoggerMiddleware(db, authService))
 	{
 		auth.POST("/login", authHandlers.LoginHandler(authService))
-		auth.Any("/logout", authHandlers.LogoutHandler(authService))
+		auth.GET("/logout", authHandlers.LogoutHandler(authService))
 	}
 
 	users := auth.Group("/users")
-	users.Use(middleware.EnsureAuthenticated(authService))
-	users.Use(middleware.RequestLoggerMiddleware(db, authService))
 	{
 		users.GET("", authHandlers.ListUsersHandler(authService))
+		users.POST("", authHandlers.CreateUserHandler(authService))
+		users.DELETE("/:id", authHandlers.DeleteUserHandler(authService))
 	}
 
 	vnc := api.Group("/vnc")
@@ -251,9 +251,6 @@ func RegisterRoutes(r *gin.Engine,
 
 		r.Use(static.Serve("/", files))
 		r.NoRoute(func(c *gin.Context) {
-			path := c.Request.URL.Path
-			fmt.Println("Requested path:", path)
-
 			indexFile, err := assets.SvelteKitFiles.ReadFile("web-files/index.html")
 			if err != nil {
 				c.String(http.StatusInternalServerError, "Internal Server Error")

@@ -1,6 +1,7 @@
 package system
 
 import (
+	"fmt"
 	"strings"
 	"sylve/pkg/utils"
 )
@@ -38,6 +39,21 @@ func CreateUnixUser(name string, shell string, dir string) error {
 
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func DeleteUnixUser(name string, removeHome bool) error {
+	args := []string{"userdel", name}
+
+	if removeHome {
+		args = append(args, "-r")
+	}
+
+	_, err := utils.RunCommand("pw", args...)
+	if err != nil {
+		return fmt.Errorf("failed to delete user %s: %w", name, err)
 	}
 
 	return nil

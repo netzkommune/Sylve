@@ -12,6 +12,7 @@ import { getIcon, loadIcon } from '@iconify/svelte';
 import isCidr from 'is-cidr';
 import { isIP, isIPv4 } from 'is-ip';
 import { customRandom, nanoid } from 'nanoid';
+import isEmail from 'validator/lib/isEmail';
 import isMACAddress from 'validator/lib/isMACAddress';
 import isURL from 'validator/lib/isURL';
 import { Mnemonic } from './vendor/mnemonic';
@@ -174,4 +175,22 @@ export async function sha256(str: string, rounds: number = 1): Promise<string> {
 
 	const hashArray = Array.from(data);
 	return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+export function isValidUsername(username: string): boolean {
+	const invalidUsernames = ['root', 'admin', 'superuser'];
+	if (invalidUsernames.includes(username.toLowerCase())) {
+		return false;
+	}
+
+	const regex = /^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$/;
+	return regex.test(username);
+}
+
+export function isValidEmail(email: string): boolean {
+	return isEmail(email, {
+		require_tld: true,
+		allow_utf8_local_part: true,
+		allow_display_name: false
+	});
 }

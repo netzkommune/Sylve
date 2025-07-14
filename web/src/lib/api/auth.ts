@@ -14,6 +14,7 @@ import { oldStore, store } from '$lib/stores/auth';
 import { hostname, language as langStore } from '$lib/stores/basic';
 import type { JWTClaims } from '$lib/types/auth';
 import type { APIResponse } from '$lib/types/common';
+import { handleAPIError } from '$lib/utils/http';
 import adze from 'adze';
 import axios, { AxiosError } from 'axios';
 // import jwt from 'jsonwebtoken';
@@ -69,10 +70,17 @@ export async function login(
 		if (axios.isAxiosError(error)) {
 			const axiosError = error as AxiosError;
 			const data = axiosError.response?.data as APIResponse;
+			handleAPIError(data);
 			if (data.error) {
-				toast.error('Authentication failed', {
-					position: 'bottom-center'
-				});
+				if (data.error.includes('only_admin_allowed')) {
+					toast.error('Only admin users can log in', {
+						position: 'bottom-center'
+					});
+				} else {
+					toast.error('Authentication failed', {
+						position: 'bottom-center'
+					});
+				}
 			}
 		} else {
 			toast.error('Fatal error logging in, check logs!', {

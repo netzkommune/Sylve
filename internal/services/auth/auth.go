@@ -60,6 +60,10 @@ func (s *Service) CreateJWT(username, password, authType string, remember bool) 
 		if !utils.CheckPasswordHash(password, user.Password) {
 			return "", fmt.Errorf("invalid_credentials")
 		}
+
+		if !user.Admin {
+			return "", fmt.Errorf("only_admin_allowed")
+		}
 	} else if authType == "pam" {
 		valid, err := s.AuthenticatePAM(username, password)
 

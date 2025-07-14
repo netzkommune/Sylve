@@ -56,6 +56,16 @@ export function dateToAgo(date: Date | string): string {
 	}
 }
 
+export function getLastUsage(time: string): string {
+	const formatted = convertDbTime(time);
+
+	if (formatted.startsWith('2001-01-01')) {
+		return 'Never';
+	}
+
+	return formatted;
+}
+
 export function convertDbTime(time: string): string {
 	try {
 		const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;

@@ -23,6 +23,8 @@ type User struct {
 	CreatedAt     time.Time `gorm:"autoCreateTime" json:"createdAt"`
 	UpdatedAt     time.Time `gorm:"autoUpdateTime" json:"updatedAt"`
 	LastLoginTime time.Time `json:"lastLoginTime"`
+
+	Tokens []Token `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE" json:"tokens,omitempty"`
 }
 
 type Token struct {
@@ -33,6 +35,8 @@ type Token struct {
 	Expiry    time.Time `json:"expiry,omitempty"`
 	CreatedAt time.Time `gorm:"autoCreateTime" json:"createdAt,omitempty"`
 	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"updatedAt,omitempty"`
+
+	User *User `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"user,omitempty"`
 }
 
 type SystemSecrets struct {

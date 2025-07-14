@@ -21,6 +21,7 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -337,4 +338,31 @@ func IsHex(s string) bool {
 		}
 	}
 	return true
+}
+
+func IsValidEmail(email string) bool {
+	if email == "" {
+		return false
+	}
+
+	validator := validator.New()
+	err := validator.Var(email, "email")
+
+	if err != nil {
+		return false
+	}
+
+	return true
+}
+
+func IsValidUsername(username string) bool {
+	invalidUsernames := []string{"root", "admin", "superuser"}
+	for _, invalid := range invalidUsernames {
+		if strings.EqualFold(username, invalid) {
+			return false
+		}
+	}
+
+	regex := regexp.MustCompile(`^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$`)
+	return regex.MatchString(username)
 }

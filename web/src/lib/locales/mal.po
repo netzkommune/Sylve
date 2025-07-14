@@ -1,5 +1,16 @@
 msgid ""
 msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-07-14T07:50:20.151Z\n"
+"PO-Revision-Date: 2025-07-14T08:00:53.510Z\n"
+"Last-Translator: \n"
+"Language: Malayalam\n"
+"Language-Team: \n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n == 1 ? 0 : 1;\n"
+"MIME-Version: 1.0\n"
 
 #: src/lib/components/ui/sheet/sheet-content.svelte
 #: src/routes/[node]/notes/+page.svelte
@@ -98,6 +109,7 @@ msgid "CPU Pinning"
 msgstr ""
 
 #: src/lib/components/custom/VM/Create/Hardware.svelte
+#: src/routes/[node]/+layout.svelte
 msgid "PCI Passthrough"
 msgstr ""
 
@@ -362,6 +374,7 @@ msgid "Network TX"
 msgstr ""
 
 #: src/lib/components/custom/Charts/Area.svelte
+#: src/lib/components/custom/Charts/Bar.svelte
 msgid "<0/> Reset zoom"
 msgstr ""
 
@@ -569,6 +582,7 @@ msgid "Disk {0} initialized with GPT"
 msgstr ""
 
 #: src/routes/[node]/storage/disks/+page.svelte
+#: src/routes/[node]/+layout.svelte
 msgid "ZFS"
 msgstr ""
 
@@ -737,6 +751,7 @@ msgid "Drop disks here"
 msgstr ""
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/routes/[node]/+layout.svelte
 msgid "Disks"
 msgstr ""
 
@@ -822,6 +837,7 @@ msgstr ""
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/Dialog/Alert.svelte
 msgid "Continue"
 msgstr ""
 
@@ -1053,6 +1069,7 @@ msgid "No snapshot jobs"
 msgstr ""
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+#: src/lib/components/custom/Dialog/Alert.svelte
 msgid "Cancel"
 msgstr ""
 
@@ -1476,6 +1493,7 @@ msgid "New Network"
 msgstr ""
 
 #: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
 msgid "Switch"
 msgstr ""
 
@@ -1563,6 +1581,7 @@ msgid "Remember Me"
 msgstr ""
 
 #: src/lib/components/custom/Login.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
 msgid "Login"
 msgstr ""
 
@@ -1619,10 +1638,12 @@ msgid "Action"
 msgstr ""
 
 #: src/lib/components/skeleton/LeftPanel.svelte
+#: src/routes/[node]/+layout.svelte
 msgid "Difuse-sidebar"
 msgstr ""
 
 #: src/lib/components/skeleton/LeftPanel.svelte
+#: src/routes/[node]/+layout.svelte
 msgid "Data Center"
 msgstr ""
 
@@ -1632,4 +1653,172 @@ msgstr ""
 
 #: src/lib/components/custom/VM/Create/CreateVM.svelte
 msgid "Create Virtual Machine"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Datacenter"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Help"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Summary"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Console"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Storage"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Hardware"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Network"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Notes"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Interfaces"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Switches"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Dashboard"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Pools"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Datasets"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "File Systems"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Volumes"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Snapshots"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Utilities"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Downloader"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Settings"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "Toggle user menu"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "Color Theme"
+msgstr ""
+
+#: src/lib/components/custom/KVTableModal.svelte
+msgid "Object ({0} properties)"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+msgid "Select Language"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+msgid "Malayalam (മലയാളം)"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+msgid "Chinese (简体中文)"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/Terminal.svelte
+#: src/lib/components/ui/custom-input/combobox.svelte
+msgid "Enter"
+msgstr ""
+
+#: src/lib/components/custom/Terminal.svelte
+msgid "Session killed: {0}"
+msgstr ""
+
+#: src/lib/components/custom/TreeTable.svelte
+msgid "No data available"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "VNC"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Disk - Initialize GPT"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Disk - Wipe"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Login - Create"
+msgstr ""
+
+#: src/lib/components/custom/Charts/Area.svelte
+msgid "HH:mm"
+msgstr ""
+
+#: src/lib/components/custom/Dialog/Alert.svelte
+msgid "Are you sure?"
+msgstr ""
+
+#: src/lib/components/custom/Dialog/Alert.svelte
+msgid "This action cannot be undone. This will permanently delete "
+msgstr ""
+
+#: src/lib/components/custom/TreeTable/Search.svelte
+#: src/lib/components/ui/custom-input/combobox.svelte
+msgid "Search..."
+msgstr ""
+
+#: src/lib/components/custom/TreeTable/Search.svelte
+msgid "Escape"
+msgstr ""
+
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+msgid "Created VM {0}"
+msgstr ""
+
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+msgid "Failed to create VM"
+msgstr ""
+
+#: src/lib/stores/terminal.svelte.ts
+msgid "Terminal"
+msgstr ""
+
+#: src/lib/components/ui/custom-input/combobox.svelte
+msgid "No data"
 msgstr ""

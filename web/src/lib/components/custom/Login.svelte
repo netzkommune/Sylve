@@ -62,7 +62,8 @@
 
 	let languageArr = [
 		{ value: 'en', label: 'English' },
-		{ value: 'mal', label: 'മലയാളം' }
+		{ value: 'mal', label: 'മലയാളം' },
+		{ value: 'cn-simplified', label: '简体中文' }
 	];
 </script>
 
@@ -126,7 +127,8 @@
 					</Select.Trigger>
 					<Select.Content>
 						<Select.Item value="en">English</Select.Item>
-						<Select.Item value="mal">Malayalam</Select.Item>
+						<Select.Item value="mal">Malayalam (മലയാളം)</Select.Item>
+						<Select.Item value="cn-simplified">Chinese (简体中文)</Select.Item>
 					</Select.Content>
 				</Select.Root>
 			</div>

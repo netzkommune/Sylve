@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-08T09:39:56.780Z\n"
-"PO-Revision-Date: 2025-07-08T10:03:25.312Z\n"
+"PO-Revision-Date: 2025-07-14T07:51:51.800Z\n"
 "Last-Translator: \n"
 "Language: English\n"
 "Language-Team: \n"
@@ -51,6 +51,7 @@ msgid "Storage"
 msgstr "Storage"
 
 #: src/routes/[node]/+layout.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
 msgid "Notes"
 msgstr "Notes"
 
@@ -216,6 +217,7 @@ msgid "Remember Me"
 msgstr "Remember Me"
 
 #: src/lib/components/custom/Login.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
 msgid "Login"
 msgstr "Login"
 
@@ -808,6 +810,7 @@ msgstr "No data"
 
 #: src/lib/components/ui/custom-input/combobox.svelte
 #: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/Terminal.svelte
 msgid "Enter"
 msgstr "Enter"
 
@@ -830,6 +833,7 @@ msgstr "Active"
 
 #: src/routes/[node]/network/switches/+page.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
 msgid "Switch"
 msgstr "Switch"
 
@@ -2835,3 +2839,47 @@ msgstr "Error attaching VM to switch"
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 msgid "VM attached to switch"
 msgstr "VM attached to switch"
+
+#: src/lib/components/custom/Header.svelte
+msgid "Toggle user menu"
+msgstr "Toggle user menu"
+
+#: src/lib/components/custom/Header.svelte
+msgid "Color Theme"
+msgstr "Color Theme"
+
+#: src/lib/components/custom/KVTableModal.svelte
+msgid "Object ({0} properties)"
+msgstr "Object ({0} properties)"
+
+#: src/lib/components/custom/Login.svelte
+msgid "Select Language"
+msgstr "Select Language"
+
+#: src/lib/components/custom/Login.svelte
+msgid "Malayalam (മലയാളം)"
+msgstr "Malayalam (മലയാളം)"
+
+#: src/lib/components/custom/Login.svelte
+msgid "Chinese (简体中文)"
+msgstr "Chinese (简体中文)"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "VNC"
+msgstr "VNC"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Disk - Initialize GPT"
+msgstr "Disk - Initialize GPT"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Disk - Wipe"
+msgstr "Disk - Wipe"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Login - Create"
+msgstr "Login - Create"
+
+#: src/lib/components/custom/Charts/Area.svelte
+msgid "HH:mm"
+msgstr "HH:mm"

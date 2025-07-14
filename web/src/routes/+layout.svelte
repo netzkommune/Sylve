@@ -23,7 +23,7 @@
 	import { toast } from 'svelte-sonner';
 	import '../app.css';
 
-	async function setLocale(locale: 'en' | 'mal') {
+	async function setLocale(locale: Locales) {
 		const mod = await import(`$lib/locales/${locale}.svelte.js`);
 		if (mod) {
 			setTranslations(mod);

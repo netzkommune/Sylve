@@ -6,5 +6,5 @@ export default defineConfig({
 		mal: { name: 'Malayalam' },
 		'cn-simplified': { name: '简体中文' }
 	},
-	hmr: true
+	hmr: false
 });

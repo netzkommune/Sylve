@@ -10,5 +10,5 @@ package assets
 
 import "embed"
 
-//go:embed web-files/*
+//go:embed web-files/**
 var SvelteKitFiles embed.FS

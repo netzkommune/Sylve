@@ -103,7 +103,7 @@
 		formatSize?: boolean;
 		containerClass?: string;
 		showResetButton?: boolean;
-		chart?: Chart;
+		chart: Chart | null;
 	}
 
 	let {

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-08T09:39:56.780Z\n"
-"PO-Revision-Date: 2025-07-14T07:51:51.800Z\n"
+"PO-Revision-Date: 2025-07-14T09:50:15.733Z\n"
 "Last-Translator: \n"
 "Language: English\n"
 "Language-Team: \n"
@@ -254,6 +254,7 @@ msgstr "Minimize"
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/lib/components/custom/VM/Hardware/BootOrder.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
 msgid "Close"
 msgstr "Close"
 
@@ -299,6 +300,7 @@ msgstr "Create Partitions"
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/lib/components/custom/VM/Hardware/BootOrder.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
 msgid "Reset"
 msgstr "Reset"
 
@@ -317,6 +319,7 @@ msgstr "Reset"
 #: src/lib/components/custom/VM/Hardware/BootOrder.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/routes/[node]/settings/authentication/+page.svelte
 msgid "Name"
 msgstr "Name"
 
@@ -326,6 +329,7 @@ msgstr "Name"
 #: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
 #: src/lib/components/custom/VM/Hardware/BootOrder.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
 msgid "Size"
 msgstr "Size"
 
@@ -397,6 +401,7 @@ msgid "Status"
 msgstr "Status"
 
 #: src/lib/components/skeleton/LeftPanel.svelte
+#: src/routes/[node]/+layout.svelte
 msgid "Data Center"
 msgstr "Data Center"
 
@@ -414,6 +419,7 @@ msgstr "View Snapshot Jobs"
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
 #: src/lib/components/custom/VM/Hardware/BootOrder.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/routes/[node]/settings/authentication/+page.svelte
 msgid "ID"
 msgstr "ID"
 
@@ -528,6 +534,7 @@ msgstr "This is a note"
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
 msgid "Save"
 msgstr "Save"
 
@@ -621,6 +628,7 @@ msgstr "Enter or generate passphrase"
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 #: src/lib/components/custom/VM/CreateVM/Advanced.svelte
 #: src/lib/components/custom/VM/Create/Advanced.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
 msgid "VNC Resolution"
 msgstr "VNC Resolution"
 
@@ -628,6 +636,7 @@ msgstr "VNC Resolution"
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 #: src/lib/components/custom/VM/CreateVM/Advanced.svelte
 #: src/lib/components/custom/VM/Create/Advanced.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
 msgid "Select VNC resolution"
 msgstr "Select VNC resolution"
 
@@ -1013,11 +1022,13 @@ msgstr "Replace Device"
 
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/routes/[node]/storage/disks/+page.svelte
 msgid "HDD"
 msgstr "HDD"
 
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/routes/[node]/storage/disks/+page.svelte
 msgid "SSD"
 msgstr "SSD"
 
@@ -1035,6 +1046,7 @@ msgstr "No available disks"
 
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/routes/[node]/storage/disks/+page.svelte
 msgid "Partitions"
 msgstr "Partitions"
 
@@ -1633,6 +1645,7 @@ msgid "Enter your username"
 msgstr "Enter your username"
 
 #: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
 msgid "Password"
 msgstr "Password"
 
@@ -2022,6 +2035,8 @@ msgid "<0/> Reset"
 msgstr "<0/> Reset"
 
 #: src/lib/components/custom/Charts/Area.svelte
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+#: src/lib/components/custom/Charts/Bar.svelte
 msgid "<0/> Reset zoom"
 msgstr "<0/> Reset zoom"
 
@@ -2034,6 +2049,7 @@ msgid "Failed to delete downloads"
 msgstr "Failed to delete downloads"
 
 #: src/lib/components/custom/TreeTable/Search.svelte
+#: src/lib/components/ui/custom-input/combobox.svelte
 msgid "Search..."
 msgstr "Search..."
 
@@ -2075,6 +2091,9 @@ msgid "Property"
 msgstr "Property"
 
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
+#: src/routes/[node]/vm/[node]/console/+page.svelte
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
 msgid "Shutoff"
 msgstr "Shutoff"
 
@@ -2865,6 +2884,8 @@ msgid "Chinese (简体中文)"
 msgstr "Chinese (简体中文)"
 
 #: src/lib/components/skeleton/BottomPanel.svelte
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
 msgid "VNC"
 msgstr "VNC"
 
@@ -2883,3 +2904,103 @@ msgstr "Login - Create"
 #: src/lib/components/custom/Charts/Area.svelte
 msgid "HH:mm"
 msgstr "HH:mm"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Authentication"
+msgstr "Authentication"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Unused"
+msgstr "Unused"
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "Pool Stats"
+msgstr "Pool Stats"
+
+#: src/routes/[node]/vm/[node]/console/+page.svelte
+msgid "VM Console"
+msgstr "VM Console"
+
+#: src/routes/[node]/vm/[node]/console/+page.svelte
+msgid "The VM is currently powered off.<0/> Start the VM to access its console."
+msgstr "The VM is currently powered off.<0/> Start the VM to access its console."
+
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+msgid "Edit VNC"
+msgstr "Edit VNC"
+
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "Unknown Switch"
+msgstr "Unknown Switch"
+
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "Unknown"
+msgstr "Unknown"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "<0/>Create Filesystem"
+msgstr "<0/>Create Filesystem"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "<0/>Edit Filesystem - {0}"
+msgstr "<0/>Edit Filesystem - {0}"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+msgid "<0/>Edit Volume - {0}"
+msgstr "<0/>Edit Volume - {0}"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "<0/>Create ZFS Pool"
+msgstr "<0/>Create ZFS Pool"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "A pool with this name already exists"
+msgstr "A pool with this name already exists"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Port"
+msgstr "Port"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Enter or generate password"
+msgstr "Enter or generate password"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Wait for VNC"
+msgstr "Wait for VNC"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Password too short"
+msgstr "Password too short"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Port must be between 5900 and 65535"
+msgstr "Port must be between 5900 and 65535"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Invalid resolution selected"
+msgstr "Invalid resolution selected"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "VNC port already in use"
+msgstr "VNC port already in use"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Failed to modify VNC"
+msgstr "Failed to modify VNC"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "VNC modified"
+msgstr "VNC modified"
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "Allocated"
+msgstr "Allocated"
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "Free"
+msgstr "Free"
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "Dedup Ratio"
+msgstr "Dedup Ratio"

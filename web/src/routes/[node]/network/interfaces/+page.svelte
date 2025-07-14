@@ -112,7 +112,7 @@
 		}
 	]);
 
-	let tableData = $state(generateTableData(columns, $results[0].data as Iface[]));
+	let tableData = $derived(generateTableData(columns, $results[0].data as Iface[]));
 	let activeRow: Row[] | null = $state(null);
 	let query: string = $state('');
 	let viewModal = $state({

@@ -9,6 +9,7 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -250,6 +251,9 @@ func RegisterRoutes(r *gin.Engine,
 
 		r.Use(static.Serve("/", files))
 		r.NoRoute(func(c *gin.Context) {
+			path := c.Request.URL.Path
+			fmt.Println("Requested path:", path)
+
 			indexFile, err := assets.SvelteKitFiles.ReadFile("web-files/index.html")
 			if err != nil {
 				c.String(http.StatusInternalServerError, "Internal Server Error")

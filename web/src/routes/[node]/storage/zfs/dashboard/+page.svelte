@@ -31,8 +31,8 @@
 
 	let { data }: { data: Data } = $props();
 
-	let poolStatsRef: Chart | undefined;
-	let datasetChartRef: Chart | undefined;
+	let poolStatsRef: Chart | null = $state(null);
+	let datasetChartRef: Chart | null = $state(null);
 	let poolStatsInterval = $state('1');
 
 	const results = useQueries([
@@ -133,7 +133,7 @@
 		}
 	}
 
-	let comboBoxes = $state({
+	let comboBoxes = $derived({
 		poolUsage: {
 			open: false,
 			value: pools[0]?.name || '',

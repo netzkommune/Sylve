@@ -352,7 +352,7 @@
 	/>
 {/if}
 
-<Create bind:open={modals.create.open} {usable} {disks} {parsePoolActionError} />
+<Create bind:open={modals.create.open} {usable} {disks} {pools} {parsePoolActionError} />
 
 {#if activePool}
 	<Edit bind:open={modals.edit.open} pool={activePool} {usable} {parsePoolActionError} />

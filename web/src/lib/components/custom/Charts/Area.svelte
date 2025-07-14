@@ -190,9 +190,13 @@
 						title: { color: '#ccc', display: true, text: 'Date' },
 						ticks: {
 							callback: function (value, index, ticks) {
-								const labelValue = typeof value === 'number' ? value : Number(value);
-								const date = new Date(this.getLabelForValue(labelValue));
-								return [format(date, 'dd/MM/yyyy'), format(date, 'HH:mm')];
+								try {
+									const labelValue = typeof value === 'number' ? value : Number(value);
+									const date = new Date(this.getLabelForValue(labelValue));
+									return [format(date, 'dd/MM/yyyy'), format(date, 'HH:mm')];
+								} catch (e) {
+									return [value]; // Fallback in case of error
+								}
 							}
 						},
 						grid: {

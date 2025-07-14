@@ -12,7 +12,7 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import type { Disk, Partition } from '$lib/types/disk/disk';
-	import type { ZpoolRaidType } from '$lib/types/zfs/pool';
+	import type { Zpool, ZpoolRaidType } from '$lib/types/zfs/pool';
 	import { draggable, dropzone } from '$lib/utils/dnd';
 	import { raidTypeArr } from '$lib/utils/zfs/pool';
 	import { flip } from 'svelte/animate';
@@ -28,6 +28,7 @@
 	interface Props {
 		open: boolean;
 		disks: Disk[];
+		pools: Zpool[];
 		usable: { disks: Disk[]; partitions: Partition[] };
 		parsePoolActionError: (response: APIResponse) => string;
 	}
@@ -38,7 +39,7 @@
 		partitions: Partition[];
 	}
 
-	let { open = $bindable(), disks, usable, parsePoolActionError }: Props = $props();
+	let { open = $bindable(), disks, pools, usable, parsePoolActionError }: Props = $props();
 
 	let options = {
 		name: '',
@@ -160,7 +161,7 @@
 				case 'stripe':
 					return { ...type, available: true };
 				case 'mirror':
-					const allMirrors = vdevLengths.every((length) => length === 2) && vdevLengths.length > 0;
+					const allMirrors = vdevLengths.every((length) => length >= 2) && vdevLengths.length > 0;
 					return { ...type, available: allMirrors };
 				case 'raidz':
 					return {
@@ -419,6 +420,15 @@
 				properties.creating = false;
 				return;
 			}
+		}
+
+		const existingPools = pools.filter((pool) => pool.name === properties.name);
+		if (existingPools.length > 0) {
+			toast.error('A pool with this name already exists', {
+				position: 'bottom-center'
+			});
+			properties.creating = false;
+			return;
 		}
 
 		const response = await createPool({

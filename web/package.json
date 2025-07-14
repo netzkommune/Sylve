@@ -76,6 +76,7 @@
 		"tabulator-tables": "^6.3.1",
 		"validator": "^13.15.15",
 		"wuchale": "0.7.7",
+		"wx-svelte-filemanager": "^2.1.0",
 		"zod": "^3.25.67"
 	}
 }

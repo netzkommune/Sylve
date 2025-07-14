@@ -7,6 +7,7 @@
 	} from '$lib/api/zfs/datasets';
 	import { getPools } from '$lib/api/zfs/pool';
 	import AlertDialogModal from '$lib/components/custom/Dialog/Alert.svelte';
+	import FileSystem from '$lib/components/custom/FileSystem.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import Search from '$lib/components/custom/TreeTable/Search.svelte';
 	import CreateFS from '$lib/components/custom/ZFS/datasets/fs/Create.svelte';
@@ -152,6 +153,9 @@
 				open: false
 			},
 			delete: {
+				open: false
+			},
+			filesytemModal: {
 				open: false
 			}
 		},
@@ -311,6 +315,19 @@
 			</div>
 		</Button>
 
+		<Button
+			onclick={() => {
+				modals.fs.filesytemModal.open = true;
+			}}
+			size="sm"
+			class="h-6"
+		>
+			<div class="flex items-center">
+				<Icon icon="eos-icons:file-system" class="mr-1 h-4 w-4" />
+				<span>File System</span>
+			</div>
+		</Button>
+
 		{@render button('create-snapshot')}
 		{@render button('rollback-snapshot')}
 		{@render button('delete-snapshot')}
@@ -452,3 +469,5 @@
 {#if modals.fs.edit.open && activeDataset && activeDataset.type === 'filesystem'}
 	<EditFS bind:open={modals.fs.edit.open} dataset={activeDataset} />
 {/if}
+
+<FileSystem bind:open={modals.fs.filesytemModal.open} />

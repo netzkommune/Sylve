@@ -88,6 +88,11 @@
 					icon: 'mdi:storage',
 					children: [
 						{
+							label: 'Explorer',
+							icon: 'bxs:folder-open',
+							href: `/${node}/storage/explorer`
+						},
+						{
 							label: 'Disks',
 							icon: 'mdi:harddisk',
 							href: `/${node}/storage/disks`
@@ -128,6 +133,22 @@
 									]
 								}
 							]
+						},
+						{
+							label: 'Samba',
+							icon: 'material-symbols:smb-share',
+							children: [
+								{
+									label: 'Shares',
+									icon: 'mdi:folder-network',
+									href: `/${node}/storage/samba/shares`
+								},
+								{
+									label: 'Settings',
+									icon: 'mdi:folder-settings-variant',
+									href: `/${node}/storage/samba/settings`
+								}
+							]
 						}
 					]
 				},
@@ -154,7 +175,18 @@
 						{
 							label: 'Authentication',
 							icon: 'mdi:shield-key',
-							href: `/${node}/settings/authentication`
+							children: [
+								{
+									label: 'Users',
+									icon: 'mdi:account',
+									href: `/${node}/settings/authentication/users`
+								},
+								{
+									label: 'Groups',
+									icon: 'mdi:account-group',
+									href: `/${node}/settings/authentication/groups`
+								}
+							]
 						}
 					]
 				}

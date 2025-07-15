@@ -52,7 +52,9 @@
 		dedup: 'off',
 		encryption: 'off',
 		encryptionKey: '',
-		quota: ''
+		quota: '',
+		aclinherit: 'passthrough',
+		aclmode: 'passthrough'
 	};
 
 	let zfsProperties = $state(createFSProps);
@@ -128,7 +130,9 @@
 			dedup: properties.dedup,
 			encryption: properties.encryption,
 			encryptionKey: properties.encryptionKey,
-			quota: properties.quota
+			quota: properties.quota,
+			aclinherit: properties.aclinherit,
+			aclmode: properties.aclmode
 		});
 
 		if (response.status === 'error') {
@@ -295,6 +299,22 @@
 						placeholder="256M (Empty for no quota)"
 					/>
 				</div>
+
+				<SimpleSelect
+					label="ACL Inherit"
+					placeholder="Select ACL Inherit"
+					options={zfsProperties.aclInherit}
+					bind:value={properties.aclinherit}
+					onChange={(value) => (properties.aclinherit = value)}
+				/>
+
+				<SimpleSelect
+					label="ACL Mode"
+					placeholder="Select ACL Mode"
+					options={zfsProperties.aclMode}
+					bind:value={properties.aclmode}
+					onChange={(value) => (properties.aclmode = value)}
+				/>
 			</div>
 		</div>
 

@@ -75,7 +75,7 @@ func (s *Service) CreateJWT(username, password, authType string, remember bool) 
 			return "", fmt.Errorf("invalid_credentials")
 		}
 
-		user.ID = utils.StringToUint(username)
+		user.ID = utils.StringToUintId(username)
 		user.Username = username
 	} else {
 		return "", fmt.Errorf("invalid_auth_type")

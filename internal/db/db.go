@@ -13,11 +13,13 @@ import (
 	"sylve/internal/db/models"
 	infoModels "sylve/internal/db/models/info"
 	networkModels "sylve/internal/db/models/network"
+	sambaModels "sylve/internal/db/models/samba"
 	utilitiesModels "sylve/internal/db/models/utilities"
 	vmModels "sylve/internal/db/models/vm"
 	zfsModels "sylve/internal/db/models/zfs"
 	"sylve/internal/logger"
 	"sylve/pkg/system"
+	"sylve/pkg/system/samba"
 	"sylve/pkg/utils"
 
 	"gorm.io/driver/sqlite"
@@ -51,6 +53,7 @@ func SetupDatabase(cfg *internal.SylveConfig, isTest bool) *gorm.DB {
 	err = db.AutoMigrate(
 		&models.System{},
 		&models.User{},
+		&models.Group{},
 		&models.Token{},
 		&models.SystemSecrets{},
 
@@ -78,6 +81,9 @@ func SetupDatabase(cfg *internal.SylveConfig, isTest bool) *gorm.DB {
 
 		&utilitiesModels.DownloadedFile{},
 		&utilitiesModels.Downloads{},
+
+		&sambaModels.SambaSettings{},
+		&sambaModels.SambaShare{},
 	)
 
 	if err != nil {
@@ -133,8 +139,6 @@ func setupInitUsers(db *gorm.DB, cfg *internal.SylveConfig) error {
 					return err
 				}
 				logger.L.Info().Msgf("User %s promoted to admin", admin.Email)
-			} else {
-				logger.L.Info().Msgf("User %s already has admin privileges", admin.Email)
 			}
 		}
 
@@ -150,8 +154,20 @@ func setupInitUsers(db *gorm.DB, cfg *internal.SylveConfig) error {
 				return err
 			}
 			logger.L.Info().Msgf("Unix user %s created successfully", admin.Username)
-		} else {
-			logger.L.Info().Msgf("Unix user %s already exists", admin.Username)
+		}
+
+		smbExists, err := samba.SambaUserExists(admin.Username)
+		if err != nil {
+			logger.L.Error().Msgf("Error checking if Samba user %s exists: %v", admin.Username, err)
+			return err
+		}
+
+		if !smbExists {
+			err = samba.CreateSambaUser(admin.Username, admin.Password)
+			if err != nil {
+				logger.L.Error().Msgf("Failed to create Samba user %s: %v", admin.Username, err)
+				return err
+			}
 		}
 	}
 	return nil

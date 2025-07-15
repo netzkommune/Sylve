@@ -30,6 +30,7 @@ import (
 	"sylve/internal/services/info"
 	"sylve/internal/services/libvirt"
 	"sylve/internal/services/network"
+	"sylve/internal/services/samba"
 	"sylve/internal/services/system"
 	"sylve/internal/services/utilities"
 	"sylve/internal/services/zfs"
@@ -55,6 +56,7 @@ func main() {
 	uS := serviceRegistry.UtilitiesService
 	sysS := serviceRegistry.SystemService
 	lvS := serviceRegistry.LibvirtService
+	smbS := serviceRegistry.SambaService
 
 	err := sS.Initialize(aS.(*auth.Service))
 
@@ -87,6 +89,7 @@ func main() {
 		uS.(*utilities.Service),
 		sysS.(*system.Service),
 		lvS.(*libvirt.Service),
+		smbS.(*samba.Service),
 		d,
 	)
 

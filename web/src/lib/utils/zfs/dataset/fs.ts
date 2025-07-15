@@ -125,6 +125,50 @@ export const createFSProps = {
 			label: 'aes-256-gcm',
 			value: 'aes-256-gcm'
 		}
+	],
+	aclInherit: [
+		{
+			label: 'Discard',
+			value: 'discard'
+		},
+		{
+			label: 'No Allow',
+			value: 'noallow'
+		},
+		{
+			label: 'Restricted',
+			value: 'restricted'
+		},
+		{
+			label: 'Passthrough',
+			value: 'passthrough'
+		},
+		{
+			label: 'Passthrough-X',
+			value: 'passthrough-x'
+		}
+	],
+	aclMode: [
+		{
+			label: 'Discard',
+			value: 'discard'
+		},
+		{
+			label: 'Group Mask',
+			value: 'groupmask'
+		},
+		{
+			label: 'Passthrough',
+			value: 'passthrough'
+		},
+		{
+			label: 'Passthrough-X',
+			value: 'passthrough-x'
+		},
+		{
+			label: 'Restricted',
+			value: 'restricted'
+		}
 	]
 };
 

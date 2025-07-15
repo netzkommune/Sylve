@@ -156,7 +156,7 @@ func TestRemoveSpaces(t *testing.T) {
 	}
 }
 
-func TestStringToUint(t *testing.T) {
+func TestStringToUintId(t *testing.T) {
 	tests := []struct {
 		input    string
 		expected uint
@@ -185,9 +185,9 @@ func TestStringToUint(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("input=%q", tt.input), func(t *testing.T) {
-			result := StringToUint(tt.input)
+			result := StringToUintId(tt.input)
 			if result != tt.expected {
-				t.Errorf("StringToUint(%q) = %d; want %d", tt.input, result, tt.expected)
+				t.Errorf("StringToUintId(%q) = %d; want %d", tt.input, result, tt.expected)
 			}
 		})
 	}

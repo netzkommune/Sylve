@@ -35,7 +35,6 @@ We also need to enable some services in order to run Sylve, you can drop these i
 ```sh
 ntpd_enable="YES" # Optional
 ntpd_sync_on_start="YES" # Optional
-smartd_enable="YES"
 zfs_enable="YES"
 linux_enable="YES"
 libvirtd_enable="YES"

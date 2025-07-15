@@ -22,5 +22,15 @@ export const UserSchema = z.object({
 	lastLoginTime: z.string()
 });
 
+export const GroupSchema = z.object({
+	id: z.number().int(),
+	name: z.string(),
+	notes: z.string(),
+	createdAt: z.string(),
+	updatedAt: z.string(),
+	users: z.array(UserSchema).optional()
+});
+
 export type JWTClaims = z.infer<typeof JWTClaimsSchema>;
 export type User = z.infer<typeof UserSchema>;
+export type Group = z.infer<typeof GroupSchema>;

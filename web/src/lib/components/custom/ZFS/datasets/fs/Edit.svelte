@@ -23,7 +23,9 @@
 		checksum: dataset.properties.checksum || 'on',
 		compression: dataset.properties.compression || 'on',
 		dedup: dataset.properties.dedup || 'off',
-		quota: dataset.properties.quota ? bytesToHumanReadable(dataset.properties.quota) : ''
+		quota: dataset.properties.quota ? bytesToHumanReadable(dataset.properties.quota) : '',
+		aclinherit: dataset.properties.aclinherit || 'passthrough',
+		aclmode: dataset.properties.aclmode || 'passthrough'
 	};
 
 	let zfsProperties = $state(createFSProps);
@@ -44,7 +46,9 @@
 			checksum: properties.checksum,
 			compression: properties.compression,
 			dedup: properties.dedup,
-			quota: parseQuotaToZFSBytes(properties.quota)
+			quota: parseQuotaToZFSBytes(properties.quota),
+			aclinherit: properties.aclinherit,
+			aclmode: properties.aclmode
 		});
 
 		if (response.status === 'error') {
@@ -157,6 +161,22 @@
 						placeholder="256M (Empty for no quota)"
 					/>
 				</div>
+
+				<SimpleSelect
+					label="ACL Inherit"
+					placeholder="Select ACL Inherit"
+					options={zfsProperties.aclInherit}
+					bind:value={properties.aclinherit}
+					onChange={(value) => (properties.aclinherit = value)}
+				/>
+
+				<SimpleSelect
+					label="ACL Mode"
+					placeholder="Select ACL Mode"
+					options={zfsProperties.aclMode}
+					bind:value={properties.aclmode}
+					onChange={(value) => (properties.aclmode = value)}
+				/>
 			</div>
 		</div>
 

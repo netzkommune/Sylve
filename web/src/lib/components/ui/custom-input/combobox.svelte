@@ -8,7 +8,7 @@
 
 	interface Props {
 		open: boolean;
-		label: string;
+		label?: string;
 		value: string | string[];
 		data: { value: string; label: string }[];
 		onValueChange?: (value: string | string[]) => void;
@@ -80,9 +80,11 @@
 </script>
 
 <div class={classes}>
-	<Label class="w-full whitespace-nowrap text-sm" for={label.toLowerCase()}>
-		{label}
-	</Label>
+	{#if label}
+		<Label class="w-full whitespace-nowrap text-sm" for={label.toLowerCase()}>
+			{label}
+		</Label>
+	{/if}
 	<Popover.Root bind:open>
 		<Popover.Trigger class={triggerWidth}>
 			<Button

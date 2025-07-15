@@ -246,7 +246,7 @@ func (z *zfs) EditFilesystem(name string, props map[string]string) error {
 	}
 
 	if _, ok := props["quota"]; ok {
-		if props["quota"] == "" {
+		if props["quota"] == "" || props["quota"] == "0B" {
 			delete(props, "quota")
 		}
 	}

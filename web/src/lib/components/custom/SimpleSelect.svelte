@@ -13,10 +13,11 @@
 		};
 		onChange: (value: string) => void;
 		disabled?: boolean;
+		single?: boolean;
 	}
 
 	let {
-		label = 'Select',
+		label,
 		placeholder = 'Select an option',
 		options,
 		classes = { parent: 'flex-1 space-y-1', label: 'w-24 whitespace-nowrap text-sm' },
@@ -27,7 +28,9 @@
 </script>
 
 <div class={classes.parent}>
-	<Label class={classes.label}>{label}</Label>
+	{#if label}
+		<Label class={classes.label}>{label}</Label>
+	{/if}
 	<Select.Root
 		type="single"
 		bind:value

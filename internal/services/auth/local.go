@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sylve/internal/db/models"
 	"sylve/pkg/system"
+	"sylve/pkg/system/samba"
 	"sylve/pkg/utils"
 	"time"
 )
@@ -41,6 +42,8 @@ func (s *Service) CreateUser(user *models.User) error {
 		return fmt.Errorf("invalid_username_format: %s", user.Username)
 	}
 
+	pwCopy := user.Password
+
 	hashed, err := utils.HashPassword(user.Password)
 	if err != nil {
 		return fmt.Errorf("failed_to_hash_password: %w", err)
@@ -59,6 +62,10 @@ func (s *Service) CreateUser(user *models.User) error {
 
 	if err := system.CreateUnixUser(user.Username, "", ""); err != nil {
 		return fmt.Errorf("failed_to_create_unix_user: %w", err)
+	}
+
+	if err := samba.CreateSambaUser(user.Username, pwCopy); err != nil {
+		return fmt.Errorf("failed_to_create_samba_user: %w", err)
 	}
 
 	if err := s.DB.Create(user).Error; err != nil {
@@ -83,6 +90,10 @@ func (s *Service) DeleteUser(userID uint) error {
 
 	if user.Username == "" {
 		return fmt.Errorf("user_not_found: %d", userID)
+	}
+
+	if err := samba.DeleteSambaUser(user.Username); err != nil {
+		return fmt.Errorf("failed_to_delete_samba_user: %w", err)
 	}
 
 	if err := system.DeleteUnixUser(user.Username, true); err != nil {

@@ -5,7 +5,7 @@ BIN_DIR := bin
 
 all: build
 
-build: depcheck
+build: build-depcheck
 	npm install --prefix web
 	npm run build --prefix web
 	cp -rf web/build/* internal/assets/web-files
@@ -21,5 +21,5 @@ run: build
 test:
 	go test ./...
 
-depcheck:
-	@./scripts/check_deps.sh
+build-depcheck:
+	@./scripts/build-deps-check.sh

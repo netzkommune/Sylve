@@ -123,3 +123,25 @@ func IsGPT(sector []byte) bool {
 func KillProcess(pid int) error {
 	return syscall.Kill(pid, syscall.SIGKILL)
 }
+
+func GetSupportedCharsets() []string {
+	output, err := RunCommand("iconv", "-l")
+	if err != nil {
+		return nil
+	}
+
+	lines := strings.Split(output, "\n")
+	charsets := make([]string, 0)
+
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+
+		tokens := strings.Fields(line)
+		charsets = append(charsets, tokens...)
+	}
+
+	return charsets
+}

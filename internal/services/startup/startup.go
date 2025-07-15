@@ -16,15 +16,12 @@ import (
 	infoServiceInterfaces "sylve/internal/interfaces/services/info"
 	libvirtServiceInterfaces "sylve/internal/interfaces/services/libvirt"
 	networkServiceInterfaces "sylve/internal/interfaces/services/network"
+	sambaServiceInterfaces "sylve/internal/interfaces/services/samba"
 	systemServiceInterfaces "sylve/internal/interfaces/services/system"
 	utilitiesServiceInterfaces "sylve/internal/interfaces/services/utilities"
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
 	"sylve/internal/logger"
-	"sync"
 	"time"
-
-	"sylve/pkg/pkg"
-	sysctl "sylve/pkg/utils/sysctl"
 
 	"gorm.io/gorm"
 )
@@ -39,6 +36,7 @@ type Service struct {
 	Libvirt   libvirtServiceInterfaces.LibvirtServiceInterface
 	Utilities utilitiesServiceInterfaces.UtilitiesServiceInterface
 	System    systemServiceInterfaces.SystemServiceInterface
+	Samba     sambaServiceInterfaces.SambaServiceInterface
 }
 
 func NewStartupService(db *gorm.DB,
@@ -48,6 +46,7 @@ func NewStartupService(db *gorm.DB,
 	libvirt libvirtServiceInterfaces.LibvirtServiceInterface,
 	utiliies utilitiesServiceInterfaces.UtilitiesServiceInterface,
 	system systemServiceInterfaces.SystemServiceInterface,
+	samba sambaServiceInterfaces.SambaServiceInterface,
 ) serviceInterfaces.StartupServiceInterface {
 	return &Service{
 		DB:        db,
@@ -57,6 +56,7 @@ func NewStartupService(db *gorm.DB,
 		Libvirt:   libvirt,
 		Utilities: utiliies,
 		System:    system,
+		Samba:     samba,
 	}
 }
 
@@ -72,74 +72,36 @@ func (s *Service) InitKeys(authService serviceInterfaces.AuthServiceInterface) e
 	return nil
 }
 
-func (s *Service) SysctlSync() error {
-	intVals := map[string]int32{
-		"net.inet.ip.forwarding":      1,
-		"net.link.bridge.inherit_mac": 1,
+func (s *Service) PreFlightChecklist() error {
+	if err := s.FreeBSDCheck(); err != nil {
+		return err
 	}
 
-	for k, v := range intVals {
-		_, err := sysctl.GetInt64(k)
-		if err != nil {
-			logger.L.Error().Msgf("Error getting sysctl %s: %v, skipping!", k, err)
-			continue
-		}
-
-		err = sysctl.SetInt32(k, v)
-		if err != nil {
-			logger.L.Error().Msgf("Error setting sysctl %s: %v", k, err)
-		}
+	if err := s.CheckPackageDependencies(); err != nil {
+		return err
 	}
 
-	return nil
-}
-
-func (s *Service) InitFirewall() error {
-	// if len(config.ParsedConfig.WANInterfaces) == 0 {
-	// 	return fmt.Errorf("no WAN interfaces found in config")
-	// }
-
-	return nil
-}
-
-func (s *Service) CheckPackageDepdencies() error {
-	requiredPackages := []string{
-		"libvirt",
-		"bhyve-firmware",
-		"smartmontools",
-		"tmux",
+	if err := s.CheckServiceDependencies(); err != nil {
+		return err
 	}
 
-	var wg sync.WaitGroup
-	errCh := make(chan error, len(requiredPackages))
-
-	for _, p := range requiredPackages {
-		p := p
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			if !pkg.IsPackageInstalled(p) {
-				errCh <- fmt.Errorf("Required package %s is not installed", p)
-			}
-		}()
+	if err := s.CheckLoaderConf(); err != nil {
+		return err
 	}
 
-	wg.Wait()
-	close(errCh)
-
-	for err := range errCh {
-		if err != nil {
-			return err
-		}
+	if err := s.CheckKernelModules(); err != nil {
+		return err
 	}
 
 	return nil
 }
 
 func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface) error {
-	if err := s.CheckPackageDepdencies(); err != nil {
-		return err
+	if err := s.PreFlightChecklist(); err != nil {
+		return fmt.Errorf("Pre-flight check failed: %w", err)
 	}
+
+	s.SysctlSync()
 
 	if err := s.InitKeys(authService); err != nil {
 		return err
@@ -153,10 +115,6 @@ func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface)
 		return err
 	}
 
-	if err := s.InitFirewall(); err != nil {
-		return err
-	}
-
 	if err := s.Libvirt.StartTPM(); err != nil {
 		return err
 	}
@@ -166,10 +124,6 @@ func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface)
 	go s.ZFS.StartSnapshotScheduler(context.Background())
 	go s.Libvirt.StoreVMUsage()
 
-	if err := s.SysctlSync(); err != nil {
-		return err
-	}
-
 	err := s.Network.SyncStandardSwitches(nil, "sync")
 	if err != nil {
 		logger.L.Error().Msgf("Error syncing standard switches: %v", err)
@@ -177,6 +131,10 @@ func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface)
 
 	if err := s.System.SyncPPTDevices(); err != nil {
 		return fmt.Errorf("failed to sync passthrough devices: %w", err)
+	}
+
+	if err := s.InitSamba(); err != nil {
+		return fmt.Errorf("failed to initialize Samba: %w", err)
 	}
 
 	go func() {

@@ -20,6 +20,7 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v4"
@@ -64,7 +65,7 @@ func RemoveSpaces(input string) string {
 	return strings.ReplaceAll(input, " ", "")
 }
 
-func StringToUint(s string) uint {
+func StringToUintId(s string) uint {
 	hasher := fnv.New64a()
 	hasher.Write([]byte(s))
 	return uint(hasher.Sum64())
@@ -365,4 +366,70 @@ func IsValidUsername(username string) bool {
 
 	regex := regexp.MustCompile(`^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$`)
 	return regex.MatchString(username)
+}
+
+func IsValidWorkgroup(name string) bool {
+	if len(name) == 0 || len(name) > 15 {
+		return false
+	}
+
+	validPattern := regexp.MustCompile(`^[A-Za-z0-9_-]+$`)
+	if !validPattern.MatchString(name) {
+		return false
+	}
+
+	if strings.HasPrefix(name, ".") || strings.HasPrefix(name, "-") {
+		return false
+	}
+
+	return true
+}
+
+func IsValidServerString(s string) bool {
+	return utf8.ValidString(s) && len(s) <= 100
+}
+
+func RemoveDuplicates(input []string) []string {
+	seen := make(map[string]struct{})
+	var result []string
+
+	for _, val := range input {
+		val = strings.TrimSpace(val)
+		if _, ok := seen[val]; !ok && val != "" {
+			seen[val] = struct{}{}
+			result = append(result, val)
+		}
+	}
+
+	return result
+}
+
+func IsValidGroupName(name string) bool {
+	if len(name) == 0 || len(name) > 32 {
+		return false
+	}
+
+	validPattern := regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
+	if !validPattern.MatchString(name) {
+		return false
+	}
+
+	if strings.HasPrefix(name, ".") || strings.HasPrefix(name, "-") {
+		return false
+	}
+
+	return true
+}
+
+func JoinStringSlices(slices ...[]string) []string {
+	if len(slices) == 0 {
+		return nil
+	}
+
+	result := make([]string, 0)
+	for _, slice := range slices {
+		result = append(result, slice...)
+	}
+
+	return RemoveDuplicates(result)
 }

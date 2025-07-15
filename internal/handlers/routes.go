@@ -22,6 +22,7 @@ import (
 	infoHandlers "sylve/internal/handlers/info"
 	"sylve/internal/handlers/middleware"
 	networkHandlers "sylve/internal/handlers/network"
+	sambaHandlers "sylve/internal/handlers/samba"
 	systemHandlers "sylve/internal/handlers/system"
 	utilitiesHandlers "sylve/internal/handlers/utilities"
 	vmHandlers "sylve/internal/handlers/vm"
@@ -31,6 +32,7 @@ import (
 	infoService "sylve/internal/services/info"
 	"sylve/internal/services/libvirt"
 	networkService "sylve/internal/services/network"
+	"sylve/internal/services/samba"
 	systemService "sylve/internal/services/system"
 	utilitiesService "sylve/internal/services/utilities"
 	zfsService "sylve/internal/services/zfs"
@@ -68,6 +70,7 @@ func RegisterRoutes(r *gin.Engine,
 	utilitiesService *utilitiesService.Service,
 	systemService *systemService.Service,
 	libvirtService *libvirt.Service,
+	sambaService *samba.Service,
 	db *gorm.DB,
 ) {
 	api := r.Group("/api")
@@ -153,6 +156,18 @@ func RegisterRoutes(r *gin.Engine,
 		}
 	}
 
+	samba := api.Group("/samba")
+	samba.Use(middleware.EnsureAuthenticated(authService))
+	samba.Use(middleware.RequestLoggerMiddleware(db, authService))
+	{
+		samba.GET("/config", sambaHandlers.GetGlobalConfig(sambaService))
+		samba.POST("/config", sambaHandlers.SetGlobalConfig(sambaService))
+
+		samba.GET("/shares", sambaHandlers.GetShares(sambaService))
+		samba.POST("/shares", sambaHandlers.CreateShare(sambaService))
+		samba.DELETE("/shares/:id", sambaHandlers.DeleteShare(sambaService))
+	}
+
 	disk := api.Group("/disk")
 	disk.Use(middleware.EnsureAuthenticated(authService))
 	disk.Use(middleware.RequestLoggerMiddleware(db, authService))
@@ -184,6 +199,13 @@ func RegisterRoutes(r *gin.Engine,
 		system.GET("/ppt-devices", systemHandlers.ListPPTDevices(systemService))
 		system.POST("/ppt-devices", systemHandlers.AddPPTDevice(systemService))
 		system.DELETE("/ppt-devices/:id", systemHandlers.RemovePPTDevice(systemService))
+	}
+
+	fileExplorer := system.Group("/file-explorer")
+	fileExplorer.Use(middleware.EnsureAuthenticated(authService))
+	fileExplorer.Use(middleware.RequestLoggerMiddleware(db, authService))
+	{
+		fileExplorer.GET("/files", systemHandlers.Files(systemService))
 	}
 
 	vm := api.Group("/vm")
@@ -232,6 +254,14 @@ func RegisterRoutes(r *gin.Engine,
 		users.GET("", authHandlers.ListUsersHandler(authService))
 		users.POST("", authHandlers.CreateUserHandler(authService))
 		users.DELETE("/:id", authHandlers.DeleteUserHandler(authService))
+	}
+
+	groups := auth.Group("/groups")
+	{
+		groups.GET("", authHandlers.ListGroupsHandler(authService))
+		groups.POST("", authHandlers.CreateGroupHandler(authService))
+		groups.DELETE("/:id", authHandlers.DeleteGroupHandler(authService))
+		groups.POST("/users", authHandlers.AddUsersToGroupHandler(authService))
 	}
 
 	vnc := api.Group("/vnc")

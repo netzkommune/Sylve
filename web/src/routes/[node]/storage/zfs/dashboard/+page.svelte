@@ -20,6 +20,7 @@
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
 	import type { Chart } from 'chart.js';
+	import { untrack } from 'svelte';
 
 	interface Data {
 		pools: Zpool[];
@@ -133,28 +134,22 @@
 		}
 	}
 
-	let comboBoxes = $derived({
+	let comboBoxes = $state({
 		poolUsage: {
 			open: false,
-			value: pools[0]?.name || '',
-			data: pools.map((pool) => ({
-				value: pool.name,
-				label: pool.name
-			}))
+			value: '',
+			data: [] as { value: string; label: string }[]
 		},
 		datasetCompression: {
 			open: false,
-			value: pools[0]?.name || '',
-			data: pools.map((pool) => ({
-				value: pool.name,
-				label: pool.name
-			}))
+			value: '',
+			data: [] as { value: string; label: string }[]
 		},
 		poolStats: {
 			interval: {
 				open: false,
-				value: poolStatsInterval || '1',
-				data: poolStats?.intervalMap
+				value: '1',
+				data: [] as { value: string; label: string }[]
 			},
 			statType: {
 				open: false,
@@ -166,6 +161,30 @@
 					{ value: 'dedupRatio', label: 'Dedup Ratio' }
 				]
 			}
+		}
+	});
+
+	$effect(() => {
+		if (pools) {
+			comboBoxes.poolUsage.value = pools[0]?.name || '';
+			comboBoxes.poolUsage.data = pools.map((pool) => ({
+				value: pool.name,
+				label: pool.name
+			}));
+
+			comboBoxes.datasetCompression.value = pools[0]?.name || '';
+			comboBoxes.datasetCompression.data = pools.map((pool) => ({
+				value: pool.name,
+				label: pool.name
+			}));
+		}
+
+		if (poolStats?.intervalMap) {
+			comboBoxes.poolStats.interval.data = poolStats.intervalMap;
+		}
+
+		if (poolStatsInterval) {
+			comboBoxes.poolStats.interval.value = poolStatsInterval;
 		}
 	});
 

@@ -15,7 +15,7 @@ import (
 type User struct {
 	ID            uint      `gorm:"primarykey" json:"id"`
 	Username      string    `gorm:"unique" json:"username"`
-	Email         string    `gorm:"unique" json:"email"`
+	Email         string    `json:"email"`
 	Password      string    `json:"-"`
 	Notes         string    `json:"notes"`
 	TOTP          string    `json:"totp"`
@@ -25,6 +25,15 @@ type User struct {
 	LastLoginTime time.Time `json:"lastLoginTime"`
 
 	Tokens []Token `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE" json:"tokens,omitempty"`
+}
+
+type Group struct {
+	ID        uint      `gorm:"primarykey" json:"id"`
+	Name      string    `gorm:"unique" json:"name"`
+	Notes     string    `json:"notes"`
+	CreatedAt time.Time `gorm:"autoCreateTime" json:"createdAt"`
+	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"updatedAt"`
+	Users     []User    `gorm:"many2many:user_groups;constraint:OnDelete:CASCADE" json:"users,omitempty"`
 }
 
 type Token struct {

@@ -6,7 +6,7 @@
 	import type { FullAutoFill } from 'svelte/elements';
 
 	interface Props {
-		label: string;
+		label?: string;
 		labelHTML?: boolean;
 		value: string | number;
 		placeholder: string;

@@ -13,6 +13,7 @@ import (
 	"context"
 	"fmt"
 	"os/exec"
+	"strings"
 )
 
 var execCommand = exec.Command
@@ -32,6 +33,19 @@ func RunCommand(command string, args ...string) (string, error) {
 	}
 
 	return output, nil
+}
+
+func RunCommandWithInput(command string, input string, args ...string) (string, error) {
+	cmd := exec.Command(command, args...)
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &out
+	cmd.Stdin = strings.NewReader(input)
+
+	if err := cmd.Run(); err != nil {
+		return out.String(), fmt.Errorf("command execution failed: %v, output: %s", err, out.String())
+	}
+	return out.String(), nil
 }
 
 func RunCommandWithContext(ctx context.Context, command string, args ...string) (string, error) {

@@ -11,13 +11,10 @@
 
 	let { data }: { data: Data } = $props();
 	let api;
-
-	let rawData = $state(data.files as FileNode[]);
-
 	async function loadData(req: { id?: string }) {
 		if (req && req.id) {
 			const response = await getFiles(req.id);
-			rawData = response;
+			api.exec('provide-data', { data: response, id: req.id });
 		}
 	}
 </script>
@@ -25,11 +22,11 @@
 <div class="h-full w-full">
 	{#if mode.current === 'light'}
 		<Willow>
-			<Filemanager bind:this={api} data={rawData} onrequestdata={loadData} /></Willow
+			<Filemanager bind:this={api} data={data.files} onrequestdata={loadData} /></Willow
 		>
 	{:else}
 		<WillowDark>
-			<Filemanager bind:this={api} data={rawData} onrequestdata={loadData} /></WillowDark
+			<Filemanager bind:this={api} data={data.files} onrequestdata={loadData} /></WillowDark
 		>
 	{/if}
 </div>

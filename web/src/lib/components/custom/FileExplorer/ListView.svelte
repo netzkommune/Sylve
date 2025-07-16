@@ -2,6 +2,8 @@
 	import * as ContextMenu from '$lib/components/ui/context-menu/index.js';
 	import type { FileNode } from '$lib/types/system/file-explorer';
 	import { getFileIcon } from '$lib/utils/icons';
+	import { format, isThisYear, isToday, isYesterday } from 'date-fns';
+	import humanFormat from 'human-format';
 	import { Copy, Download, Edit, Folder, FolderOpen, Scissors, Trash2 } from 'lucide-svelte';
 
 	interface Props {
@@ -13,11 +15,36 @@
 	}
 
 	let { items, onItemClick, onItemSelect, selectedItems, onItemDelete }: Props = $props();
+
+	function formatFileSize(bytes?: number): string {
+		if (!bytes || bytes === 0) return '-';
+		return humanFormat(bytes, {
+			separator: ' ',
+			scale: 'binary',
+			unit: 'B'
+		});
+	}
+
+	function formatDate(date: Date): string {
+		if (isToday(date)) {
+			return format(date, 'hh:mm a'); // e.g., "03:45 PM"
+		} else if (isYesterday(date)) {
+			return 'Yesterday';
+		} else if (isThisYear(date)) {
+			return format(date, 'MMM d'); // e.g., "Jul 10"
+		} else {
+			return format(date, 'MMM d, yyyy'); // e.g., "Jul 10, 2023"
+		}
+	}
 </script>
 
 <div class="rounded-md">
 	<div class="border-b p-3">
-		<div class="text-muted-foreground text-sm font-medium">Name</div>
+		<div class="text-muted-foreground grid grid-cols-12 gap-4 text-sm font-medium">
+			<div class="col-span-6">Name</div>
+			<div class="col-span-3">Size</div>
+			<div class="col-span-3">Modified</div>
+		</div>
 	</div>
 	<div>
 		{#each items as item}
@@ -37,9 +64,17 @@
 						}
 					}}
 				>
-					<div class="flex items-center gap-3">
-						<ItemIcon class="text-muted-foreground h-4 w-4" />
-						<span class="text-sm">{itemName}</span>
+					<div class="grid w-full grid-cols-12 items-center gap-4">
+						<div class="col-span-6 flex items-center gap-3">
+							<ItemIcon class="text-muted-foreground h-4 w-4" />
+							<span class="truncate text-sm">{itemName}</span>
+						</div>
+						<div class="text-muted-foreground col-span-3 text-sm">
+							{item.type === 'folder' ? '' : formatFileSize(item.size)}
+						</div>
+						<div class="text-muted-foreground col-span-3 text-sm">
+							{formatDate(item.date)}
+						</div>
 					</div>
 				</ContextMenu.Trigger>
 				<ContextMenu.Content>

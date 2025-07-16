@@ -13,7 +13,18 @@
 	import { Input } from '$lib/components/ui/input';
 	import type { FileNode } from '$lib/types/system/file-explorer';
 	import Icon from '@iconify/svelte';
-	import { Grid3X3, List, Plus, Search, Upload } from 'lucide-svelte';
+	import {
+		Copy,
+		FileText,
+		Folder,
+		Grid3X3,
+		List,
+		Plus,
+		RotateCcw,
+		Scissors,
+		Search,
+		UploadIcon
+	} from 'lucide-svelte';
 
 	interface Data {
 		files: FileNode[];
@@ -307,16 +318,19 @@
 				{/if}
 			</ContextMenu.Trigger>
 			<ContextMenu.Content>
-				<ContextMenu.Item class="gap-2" onclick={refreshCurrentFolder}>Refresh</ContextMenu.Item>
-				<ContextMenu.Item class="gap-2">Copy</ContextMenu.Item>
-				<ContextMenu.Item class="gap-2">Cut</ContextMenu.Item>
+				<ContextMenu.Item class="gap-2" onclick={refreshCurrentFolder}>
+					<RotateCcw />
+					Refresh</ContextMenu.Item
+				>
+				<ContextMenu.Item class="gap-2"><Copy class="h-4 w-4" />Copy</ContextMenu.Item>
+				<ContextMenu.Item class="gap-2"><Scissors class="h-4 w-4" />Cut</ContextMenu.Item>
 				<ContextMenu.Item
 					class="gap-2"
 					onclick={() => {
 						modals.create.isFolder = false;
 						modals.create.isOpen = true;
 					}}
-				>
+					><FileText />
 					New File
 				</ContextMenu.Item>
 				<ContextMenu.Item
@@ -325,10 +339,13 @@
 						modals.create.isFolder = true;
 						modals.create.isOpen = true;
 					}}
-				>
+					><Folder />
 					New Folder
 				</ContextMenu.Item>
-				<ContextMenu.Item class="gap-2">Upload File</ContextMenu.Item>
+				<ContextMenu.Item class="gap-2">
+					<UploadIcon />
+					Upload File</ContextMenu.Item
+				>
 			</ContextMenu.Content>
 		</ContextMenu.Root>
 

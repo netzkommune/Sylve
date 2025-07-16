@@ -6,6 +6,7 @@
 	import ListView from '$lib/components/custom/FileExplorer/ListView.svelte';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
 	import { Button } from '$lib/components/ui/button';
+	import * as ContextMenu from '$lib/components/ui/context-menu/index.js';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
@@ -154,6 +155,33 @@
 		modals.delete.item = item;
 		modals.delete.isOpen = true;
 	}
+
+	async function refreshCurrentFolder() {
+		delete folderData[currentPath];
+		await loadFolderData(currentPath);
+		selectedItems = [];
+	}
+
+	function handleEmptySpaceInteraction(e: MouseEvent) {
+		// Clear selection when clicking or right-clicking on empty space
+		const target = e.target as HTMLElement;
+
+		const hasFileItemClasses =
+			target.classList.contains('group') ||
+			target.classList.contains('cursor-pointer') ||
+			target.closest('.group.cursor-pointer') ||
+			target.closest('[title]');
+
+		const isContainerElement =
+			target.classList.contains('grid-container') ||
+			target.classList.contains('list-container') ||
+			target.classList.contains('file-explorer-container') ||
+			target.classList.contains('grid');
+
+		if (!hasFileItemClasses && (isContainerElement || target === e.currentTarget)) {
+			selectedItems = [];
+		}
+	}
 </script>
 
 <div class="flex h-full">
@@ -250,25 +278,59 @@
 			</div>
 		</div>
 
-		<div class="flex-1 overflow-y-auto">
-			{#if viewMode === 'grid'}
-				<GridView
-					items={filteredItems}
-					onItemClick={handleItemClick}
-					onItemSelect={handleItemSelect}
-					selectedItems={new Set(selectedItems)}
-					onItemDelete={handleDeleteFileOrFolder}
-				/>
-			{:else}
-				<ListView
-					items={filteredItems}
-					onItemClick={handleItemClick}
-					onItemSelect={handleItemSelect}
-					selectedItems={new Set(selectedItems)}
-					onItemDelete={handleDeleteFileOrFolder}
-				/>
-			{/if}
-		</div>
+		<ContextMenu.Root>
+			<ContextMenu.Trigger
+				class="file-explorer-container flex-1 overflow-y-auto"
+				onclick={handleEmptySpaceInteraction}
+				oncontextmenu={handleEmptySpaceInteraction}
+			>
+				{#if viewMode === 'grid'}
+					<div class="grid-container h-full w-full">
+						<GridView
+							items={filteredItems}
+							onItemClick={handleItemClick}
+							onItemSelect={handleItemSelect}
+							selectedItems={new Set(selectedItems)}
+							onItemDelete={handleDeleteFileOrFolder}
+						/>
+					</div>
+				{:else}
+					<div class="list-container h-full w-full">
+						<ListView
+							items={filteredItems}
+							onItemClick={handleItemClick}
+							onItemSelect={handleItemSelect}
+							selectedItems={new Set(selectedItems)}
+							onItemDelete={handleDeleteFileOrFolder}
+						/>
+					</div>
+				{/if}
+			</ContextMenu.Trigger>
+			<ContextMenu.Content>
+				<ContextMenu.Item class="gap-2" onclick={refreshCurrentFolder}>Refresh</ContextMenu.Item>
+				<ContextMenu.Item class="gap-2">Copy</ContextMenu.Item>
+				<ContextMenu.Item class="gap-2">Cut</ContextMenu.Item>
+				<ContextMenu.Item
+					class="gap-2"
+					onclick={() => {
+						modals.create.isFolder = false;
+						modals.create.isOpen = true;
+					}}
+				>
+					New File
+				</ContextMenu.Item>
+				<ContextMenu.Item
+					class="gap-2"
+					onclick={() => {
+						modals.create.isFolder = true;
+						modals.create.isOpen = true;
+					}}
+				>
+					New Folder
+				</ContextMenu.Item>
+				<ContextMenu.Item class="gap-2">Upload File</ContextMenu.Item>
+			</ContextMenu.Content>
+		</ContextMenu.Root>
 
 		<div class="bg-muted/30 flex flex-shrink-0 items-center justify-between border-t px-4 py-1">
 			<div class="text-muted-foreground flex items-center gap-4 text-sm">

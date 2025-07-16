@@ -15,7 +15,7 @@
 	let { items, onItemClick, onItemSelect, selectedItems, onItemDelete }: Props = $props();
 </script>
 
-<div class="rounded-md border">
+<div class="rounded-md">
 	<div class="border-b p-3">
 		<div class="text-muted-foreground text-sm font-medium">Name</div>
 	</div>
@@ -66,8 +66,7 @@
 						<Edit class="h-4 w-4" />
 						Rename
 					</ContextMenu.Item>
-					<ContextMenu.Separator />
-					<ContextMenu.Item class="text-destructive gap-2" onclick={() => onItemDelete?.(item)}>
+					<ContextMenu.Item class=" gap-2" onclick={() => onItemDelete?.(item)}>
 						<Trash2 class="h-4 w-4" />
 						Delete
 					</ContextMenu.Item>

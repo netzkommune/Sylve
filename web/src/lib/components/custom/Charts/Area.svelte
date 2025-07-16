@@ -159,9 +159,18 @@
 						intersect: false,
 						callbacks: {
 							title: (tooltipItems) => {
-								const rawLabel = tooltipItems[0].label;
-								const date = new Date(rawLabel);
-								return [format(date, 'dd/MM/yyyy'), format(date, 'HH:mm:ss')];
+								try {
+									const dataIndex = tooltipItems[0].dataIndex;
+									const date = data[dataIndex]?.date;
+									if (!date) return 'Invalid Date';
+
+									const dateObj = date instanceof Date ? date : new Date(date);
+									if (isNaN(dateObj.getTime())) return 'Invalid Date';
+
+									return [format(dateObj, 'dd/MM/yyyy'), format(dateObj, 'HH:mm:ss')];
+								} catch (e) {
+									return 'Invalid Date';
+								}
 							},
 							label: (tooltipItem) => {
 								const datasetLabel = tooltipItem.dataset.label || '';
@@ -191,12 +200,20 @@
 						title: { color: '#ccc', display: true, text: 'Date' },
 						ticks: {
 							callback: function (value, index, ticks) {
+								console.log('value', value, 'index', index, 'ticks', ticks);
+								const date = data[index]?.date;
+								console.log('date', date);
+
 								try {
-									const labelValue = typeof value === 'number' ? value : Number(value);
-									const date = new Date(this.getLabelForValue(labelValue));
+									const date = data[index]?.date;
+									if (!date) return '';
+
+									const dateObj = date instanceof Date ? date : new Date(date);
+									if (isNaN(dateObj.getTime())) return '';
+
 									return [format(date, 'dd/MM/yyyy'), format(date, 'HH:mm')];
 								} catch (e) {
-									return [value]; // Fallback in case of error
+									return '';
 								}
 							}
 						},

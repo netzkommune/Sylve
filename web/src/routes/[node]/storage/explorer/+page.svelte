@@ -265,6 +265,7 @@
 					onItemClick={handleItemClick}
 					onItemSelect={handleItemSelect}
 					selectedItems={new Set(selectedItems)}
+					onItemDelete={handleDeleteFileOrFolder}
 				/>
 			{/if}
 		</div>

@@ -1,20 +1,9 @@
 <script lang="ts">
 	import * as ContextMenu from '$lib/components/ui/context-menu/index.js';
 	import type { FileNode } from '$lib/types/system/file-explorer';
+	import { getFileIcon } from '$lib/utils/icons';
 	import Icon from '@iconify/svelte';
-	import {
-		Archive,
-		Copy,
-		Download,
-		Edit,
-		FileText,
-		FolderOpen,
-		ImageIcon,
-		Music,
-		Scissors,
-		Trash2,
-		Video
-	} from 'lucide-svelte';
+	import { Copy, Download, Edit, FolderOpen, Scissors, Trash2 } from 'lucide-svelte';
 
 	interface Props {
 		items: FileNode[];
@@ -25,55 +14,6 @@
 	}
 
 	let { items, onItemClick, onItemSelect, selectedItems, onItemDelete }: Props = $props();
-
-	function getFileIcon(filename: string) {
-		const ext = filename.split('.').pop()?.toLowerCase() || '';
-		switch (ext) {
-			case 'jpg':
-			case 'jpeg':
-			case 'png':
-			case 'gif':
-			case 'bmp':
-			case 'svg':
-				return ImageIcon;
-			case 'mp4':
-			case 'avi':
-			case 'mkv':
-			case 'mov':
-			case 'wmv':
-				return Video;
-			case 'mp3':
-			case 'wav':
-			case 'flac':
-			case 'ogg':
-				return Music;
-			case 'zip':
-			case 'tar':
-			case 'gz':
-			case 'rar':
-			case '7z':
-				return Archive;
-			case 'exe':
-			case 'sh':
-			case 'bin':
-				return FileText;
-			case 'pdf':
-			case 'doc':
-			case 'docx':
-			case 'txt':
-			case 'md':
-			case 'html':
-			case 'css':
-			case 'js':
-			case 'ts':
-			case 'json':
-			case 'xml':
-			case 'cshrc':
-			case 'profile':
-			default:
-				return FileText;
-		}
-	}
 </script>
 
 <div

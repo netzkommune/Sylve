@@ -111,6 +111,9 @@ func (s *Service) GlobalConfig() (string, error) {
 		config += "bind interfaces only = no\n"
 	}
 
+	config += "vfs objects = zfsacl\n"
+	config += "inherit acls = yes\n"
+
 	return config, nil
 }
 
@@ -181,6 +184,25 @@ func (s *Service) ShareConfig() (string, error) {
 		config.WriteString(fmt.Sprintf("\tcreate mask = %s\n", share.CreateMask))
 		config.WriteString(fmt.Sprintf("\tdirectory mask = %s\n", share.DirectoryMask))
 		config.WriteString("\n\n")
+
+		_, err := utils.RunCommand("setfacl", "-b", dataset.Mountpoint)
+		if err != nil {
+			return "", fmt.Errorf("failed to clear ACLs on mountpoint %s: %w", dataset.Mountpoint, err)
+		}
+
+		if len(rGroups) > 0 {
+			_, err := utils.RunCommand("setfacl", "-m", fmt.Sprintf("g:%s:read_set:fd:allow", strings.Join(rGroups, ",")), dataset.Mountpoint)
+			if err != nil {
+				return "", fmt.Errorf("failed to set read ACLs for groups %v on mountpoint %s: %w", rGroups, dataset.Mountpoint, err)
+			}
+		}
+
+		if len(wGroups) > 0 {
+			_, err := utils.RunCommand("setfacl", "-m", fmt.Sprintf("g:%s:modify_set:fd:allow", strings.Join(wGroups, ",")), dataset.Mountpoint)
+			if err != nil {
+				return "", fmt.Errorf("failed to set write ACLs for groups %v on mountpoint %s: %w", wGroups, dataset.Mountpoint, err)
+			}
+		}
 	}
 
 	return config.String(), nil

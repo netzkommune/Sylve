@@ -14,6 +14,7 @@
 	import type { FileNode } from '$lib/types/system/file-explorer';
 	import Icon from '@iconify/svelte';
 	import {
+		ArrowUpDown,
 		Copy,
 		FileText,
 		Folder,
@@ -37,6 +38,9 @@
 	let currentPath = $state('/');
 	let folderData = $state<{ [path: string]: FileNode[] }>({ '/': data.files });
 	let selectedItems = $state<string[]>([]);
+	let sortBy = $state<
+		'name-asc' | 'name-desc' | 'modified-asc' | 'modified-desc' | 'size-desc' | 'type'
+	>('name-asc');
 
 	let modals = $state({
 		create: {
@@ -62,6 +66,46 @@
 			return itemName.toLowerCase().includes(searchQuery.toLowerCase());
 		})
 	);
+
+	let sortedItems = $derived.by(() => {
+		const items = [...filteredItems];
+
+		switch (sortBy) {
+			case 'name-asc':
+				return items.sort((a, b) => {
+					const nameA = (a.id.split('/').pop() || a.id).toLowerCase();
+					const nameB = (b.id.split('/').pop() || b.id).toLowerCase();
+					return nameA.localeCompare(nameB);
+				});
+			case 'name-desc':
+				return items.sort((a, b) => {
+					const nameA = (a.id.split('/').pop() || a.id).toLowerCase();
+					const nameB = (b.id.split('/').pop() || b.id).toLowerCase();
+					return nameB.localeCompare(nameA);
+				});
+			case 'modified-asc':
+				return items.sort((a, b) => a.date.getTime() - b.date.getTime());
+			case 'modified-desc':
+				return items.sort((a, b) => b.date.getTime() - a.date.getTime());
+			case 'size-desc':
+				return items.sort((a, b) => {
+					const sizeA = a.size || 0;
+					const sizeB = b.size || 0;
+					return sizeB - sizeA;
+				});
+			case 'type':
+				return items.sort((a, b) => {
+					if (a.type !== b.type) {
+						return a.type === 'folder' ? -1 : 1;
+					}
+					const nameA = (a.id.split('/').pop() || a.id).toLowerCase();
+					const nameB = (b.id.split('/').pop() || b.id).toLowerCase();
+					return nameA.localeCompare(nameB);
+				});
+			default:
+				return items;
+		}
+	});
 
 	let breadcrumbItems = $derived.by(() => {
 		const parts = currentPath.split('/').filter(Boolean);
@@ -97,15 +141,15 @@
 				? selectedItems.filter((id) => id !== item.id)
 				: [...selectedItems, item.id];
 		} else if (event?.shiftKey && selectedItems.length > 0) {
-			const currentIndex = filteredItems.findIndex((i) => i.id === item.id);
-			const lastSelectedIndex = filteredItems.findIndex(
+			const currentIndex = sortedItems.findIndex((i) => i.id === item.id);
+			const lastSelectedIndex = sortedItems.findIndex(
 				(i) => i.id === selectedItems[selectedItems.length - 1]
 			);
 
 			if (lastSelectedIndex !== -1) {
 				const start = Math.min(currentIndex, lastSelectedIndex);
 				const end = Math.max(currentIndex, lastSelectedIndex);
-				const rangeIds = filteredItems.slice(start, end + 1).map((i) => i.id);
+				const rangeIds = sortedItems.slice(start, end + 1).map((i) => i.id);
 				selectedItems = [...new Set([...selectedItems, ...rangeIds])];
 			}
 		} else {
@@ -116,10 +160,6 @@
 	$effect(() => {
 		selectedItems = [];
 	});
-
-	function handleBreadcrumbClick(path: string) {
-		currentPath = path;
-	}
 
 	function handleBackClick() {
 		if (currentPath === '/') return;
@@ -174,7 +214,6 @@
 	}
 
 	function handleEmptySpaceInteraction(e: MouseEvent) {
-		// Clear selection when clicking or right-clicking on empty space
 		const target = e.target as HTMLElement;
 
 		const hasFileItemClasses =
@@ -219,7 +258,7 @@
 									href="#"
 									onclick={(e: any) => {
 										e.preventDefault();
-										handleBreadcrumbClick(item.path);
+										currentPath = item.path;
 									}}
 								>
 									{item.name}
@@ -268,6 +307,54 @@
 					<Search class="text-muted-foreground absolute left-2 top-2.5 h-4 w-4" />
 					<Input placeholder="Search files..." bind:value={searchQuery} class="w-64 pl-8" />
 				</div>
+				<DropdownMenu.Root>
+					<DropdownMenu.Trigger>
+						<Button variant="outline" size="sm" class="gap-2">
+							<ArrowUpDown class="h-4 w-4" />
+							Sort
+						</Button>
+					</DropdownMenu.Trigger>
+					<DropdownMenu.Content align="end">
+						<DropdownMenu.Group>
+							<DropdownMenu.Item
+								class={`${sortBy === 'name-asc' ? 'bg-accent' : ''}`}
+								onclick={() => (sortBy = 'name-asc')}
+							>
+								A - Z
+							</DropdownMenu.Item>
+							<DropdownMenu.Item
+								class={`${sortBy === 'name-desc' ? 'bg-accent' : ''}`}
+								onclick={() => (sortBy = 'name-desc')}
+							>
+								Z - A
+							</DropdownMenu.Item>
+							<DropdownMenu.Item
+								class={`${sortBy === 'modified-desc' ? 'bg-accent' : ''}`}
+								onclick={() => (sortBy = 'modified-desc')}
+							>
+								Last Modified
+							</DropdownMenu.Item>
+							<DropdownMenu.Item
+								class={`${sortBy === 'modified-asc' ? 'bg-accent' : ''}`}
+								onclick={() => (sortBy = 'modified-asc')}
+							>
+								First Modified
+							</DropdownMenu.Item>
+							<DropdownMenu.Item
+								class={`${sortBy === 'size-desc' ? 'bg-accent' : ''}`}
+								onclick={() => (sortBy = 'size-desc')}
+							>
+								Size
+							</DropdownMenu.Item>
+							<DropdownMenu.Item
+								class={`${sortBy === 'type' ? 'bg-accent' : ''}`}
+								onclick={() => (sortBy = 'type')}
+							>
+								Type
+							</DropdownMenu.Item>
+						</DropdownMenu.Group>
+					</DropdownMenu.Content>
+				</DropdownMenu.Root>
 				<div class="flex items-center rounded-md border">
 					<Button
 						variant={viewMode === 'grid' ? 'default' : 'ghost'}
@@ -298,7 +385,7 @@
 				{#if viewMode === 'grid'}
 					<div class="grid-container h-full w-full">
 						<GridView
-							items={filteredItems}
+							items={sortedItems}
 							onItemClick={handleItemClick}
 							onItemSelect={handleItemSelect}
 							selectedItems={new Set(selectedItems)}
@@ -308,7 +395,7 @@
 				{:else}
 					<div class="list-container h-full w-full">
 						<ListView
-							items={filteredItems}
+							items={sortedItems}
 							onItemClick={handleItemClick}
 							onItemSelect={handleItemSelect}
 							selectedItems={new Set(selectedItems)}
@@ -351,11 +438,11 @@
 
 		<div class="bg-muted/30 flex flex-shrink-0 items-center justify-between border-t px-4 py-1">
 			<div class="text-muted-foreground flex items-center gap-4 text-sm">
-				<span>{filteredItems.length} items</span>
+				<span>{sortedItems.length} items</span>
 			</div>
 			<div class="text-muted-foreground text-sm">
-				{filteredItems.filter((item: any) => item.type === 'folder').length} folders,
-				{filteredItems.filter((item: any) => item.type === 'file').length} files
+				{sortedItems.filter((item: any) => item.type === 'folder').length} folders,
+				{sortedItems.filter((item: any) => item.type === 'file').length} files
 			</div>
 		</div>
 	</div>

@@ -69,8 +69,8 @@
 							<ItemIcon class="text-muted-foreground h-4 w-4" />
 							<span class="truncate text-sm">{itemName}</span>
 						</div>
-						<div class="text-muted-foreground col-span-3 text-sm">
-							{item.type === 'folder' ? '' : formatFileSize(item.size)}
+						<div class="text-muted-foreground col-span-3 ml-0.5 text-sm">
+							{item.type === 'folder' ? '-' : formatFileSize(item.size)}
 						</div>
 						<div class="text-muted-foreground col-span-3 text-sm">
 							{formatDate(item.date)}

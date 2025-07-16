@@ -11,3 +11,25 @@ export async function getFiles(id?: string): Promise<FileNode[]> {
 
 	return await apiRequest(url, FileNodeSchema.array(), 'GET');
 }
+
+export async function addFileOrFolder(
+	path: string,
+	name: string,
+	isFolder: boolean
+): Promise<APIResponse> {
+	const body = {
+		path,
+		name,
+		isFolder
+	};
+
+	return await apiRequest('/system/file-explorer/add', APIResponseSchema, 'POST', body);
+}
+
+export async function deleteFileOrFolder(path: string): Promise<APIResponse> {
+	return await apiRequest(
+		'/system/file-explorer/delete?id=' + encodeURIComponent(path),
+		APIResponseSchema,
+		'DELETE'
+	);
+}

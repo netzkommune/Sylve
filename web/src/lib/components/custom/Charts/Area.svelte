@@ -117,6 +117,7 @@
 		chart = $bindable()
 	}: Props = $props();
 	let canvas: HTMLCanvasElement;
+	let zoomEnabled = $state(false);
 
 	Chart.register(
 		LineController,
@@ -174,12 +175,12 @@
 					},
 					zoom: {
 						zoom: {
-							wheel: { enabled: true },
-							pinch: { enabled: true },
+							wheel: { enabled: zoomEnabled },
+							pinch: { enabled: zoomEnabled },
 							mode: 'xy'
 						},
 						pan: {
-							enabled: true,
+							enabled: zoomEnabled,
 							mode: 'xy'
 						}
 					}
@@ -227,9 +228,10 @@
 	});
 
 	$effect(() => {
-		if (chart && data && datasets) {
-			chart.data.labels = labels;
-			chart.data.datasets = datasets;
+		if (chart) {
+			chart.options.plugins.zoom.zoom.wheel.enabled = zoomEnabled;
+			chart.options.plugins.zoom.zoom.pinch.enabled = zoomEnabled;
+			chart.options.plugins.zoom.pan.enabled = zoomEnabled;
 			chart.update('none');
 		}
 	});
@@ -248,8 +250,19 @@
 				{/if}
 				{title}
 			</div>
-			{#if showResetButton}
-				<div>
+			<div class="flex items-center gap-2">
+				<Button
+					onclick={() => {
+						zoomEnabled = !zoomEnabled;
+					}}
+					variant={zoomEnabled ? 'default' : 'outline'}
+					size="sm"
+					class="h-8"
+				>
+					<Icon icon="material-symbols:zoom-in" class="h-4 w-4" />
+					{zoomEnabled ? 'Disable Zoom' : 'Enable Zoom'}
+				</Button>
+				{#if showResetButton && zoomEnabled}
 					<Button
 						onclick={() => {
 							chart?.resetZoom();
@@ -261,8 +274,8 @@
 						<Icon icon="carbon:reset" class="h-4 w-4" />
 						Reset zoom
 					</Button>
-				</div>
-			{/if}
+				{/if}
+			</div>
 		</Card.Title>
 		{#if description}
 			<Card.Description>{description}</Card.Description>

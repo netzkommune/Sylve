@@ -1,9 +1,13 @@
 <script lang="ts">
-	import { getFiles } from '$lib/api/system/file-explorer';
+	import { handleAPIResponse } from '$lib/api/common';
+	import { addFileOrFolder, deleteFileOrFolder, getFiles } from '$lib/api/system/file-explorer';
+	import AlertDialog from '$lib/components/custom/Dialog/Alert.svelte';
 	import GridView from '$lib/components/custom/FileExplorer/GridView.svelte';
 	import ListView from '$lib/components/custom/FileExplorer/ListView.svelte';
-	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
+	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
 	import { Button } from '$lib/components/ui/button';
+	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
+	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import { Input } from '$lib/components/ui/input';
 	import type { FileNode } from '$lib/types/system/file-explorer';
@@ -21,6 +25,18 @@
 	let currentPath = $state('/');
 	let folderData = $state<{ [path: string]: FileNode[] }>({ '/': data.files });
 	let selectedItems = $state<string[]>([]);
+
+	let modals = $state({
+		create: {
+			isOpen: false,
+			isFolder: true,
+			name: ''
+		},
+		delete: {
+			isOpen: false,
+			item: null as FileNode | null
+		}
+	});
 
 	function findItemsInPath(path: string) {
 		return folderData[path] || [];
@@ -117,6 +133,27 @@
 			folderData = { ...folderData, [folderId]: [] };
 		}
 	}
+
+	async function createFileOrFolder() {
+		let name = modals.create.name;
+		let isFolder = modals.create.isFolder;
+		const response = await addFileOrFolder(currentPath, name, isFolder);
+
+		delete folderData[currentPath];
+		await loadFolderData(currentPath);
+
+		handleAPIResponse(response, {
+			success: `${isFolder ? 'Folder' : 'File'} "${name}" created successfully`,
+			error: `Failed to create ${isFolder ? 'folder' : 'file'} "${name}"`
+		});
+
+		modals.create.name = '';
+	}
+
+	async function handleDeleteFileOrFolder(item: FileNode) {
+		modals.delete.item = item;
+		modals.delete.isOpen = true;
+	}
 </script>
 
 <div class="flex h-full">
@@ -167,8 +204,20 @@
 					>
 					<DropdownMenu.Content>
 						<DropdownMenu.Group>
-							<DropdownMenu.Item>Add New File</DropdownMenu.Item>
-							<DropdownMenu.Item>Add New Foilder</DropdownMenu.Item>
+							<DropdownMenu.Item
+								onclick={() => {
+									modals.create.isFolder = false;
+									modals.create.isOpen = true;
+								}}
+							>
+								New File</DropdownMenu.Item
+							>
+							<DropdownMenu.Item
+								onclick={() => {
+									modals.create.isFolder = true;
+									modals.create.isOpen = true;
+								}}>New Folder</DropdownMenu.Item
+							>
 							<DropdownMenu.Item>Upload File</DropdownMenu.Item>
 						</DropdownMenu.Group>
 					</DropdownMenu.Content>
@@ -208,6 +257,7 @@
 					onItemClick={handleItemClick}
 					onItemSelect={handleItemSelect}
 					selectedItems={new Set(selectedItems)}
+					onItemDelete={handleDeleteFileOrFolder}
 				/>
 			{:else}
 				<ListView
@@ -230,3 +280,100 @@
 		</div>
 	</div>
 </div>
+
+<Dialog.Root bind:open={modals.create.isOpen}>
+	<Dialog.Content
+		onInteractOutside={() => {
+			modals.create.isOpen = false;
+			modals.create.isFolder = true;
+		}}
+		class="fixed  flex transform flex-col gap-4 overflow-auto p-5 transition-all duration-300 ease-in-out lg:max-w-md"
+	>
+		<Dialog.Header class="p-0">
+			<Dialog.Title class="flex  justify-between  text-left">
+				<div class="flex items-center gap-2">
+					<Icon icon="bi:hdd-stack-fill" class="h-5 w-5 " />Create {modals.create.isFolder
+						? 'Folder'
+						: 'File'}
+				</div>
+				<div class="flex items-center gap-0.5">
+					<Button
+						onclick={() => {
+							modals.create.name = '';
+						}}
+						size="sm"
+						variant="link"
+						class="h-4"
+						title={'Reset'}
+					>
+						<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only">Reset</span>
+					</Button>
+
+					<Button
+						size="sm"
+						variant="link"
+						class="h-4"
+						title={'Close'}
+						onclick={() => {
+							modals.create.isOpen = false;
+							modals.create.isFolder = true;
+						}}
+					>
+						<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only">Close</span>
+					</Button>
+				</div>
+			</Dialog.Title>
+		</Dialog.Header>
+		<div class="mt-2">
+			<CustomValueInput
+				placeholder={`Enter ${modals.create.isFolder ? 'folder' : 'file'} name`}
+				bind:value={modals.create.name}
+				classes="flex-1 space-y-1.5"
+			/>
+		</div>
+		<Dialog.Footer class="mt-2">
+			<div class="flex items-center justify-end space-x-4">
+				<Button
+					onclick={() => {
+						createFileOrFolder();
+						modals.create.isOpen = false;
+						modals.create.isFolder = true;
+					}}
+					size="sm"
+					type="button"
+					class="h-8 w-full lg:w-28">Create</Button
+				>
+			</div>
+		</Dialog.Footer>
+	</Dialog.Content>
+</Dialog.Root>
+
+<AlertDialog
+	open={modals.delete.isOpen}
+	names={{
+		parent: modals.delete.item?.type === 'folder' ? 'folder' : 'file',
+		element: modals.delete.item?.id.split('/').pop() || ''
+	}}
+	actions={{
+		onConfirm: async () => {
+			if (modals.delete.item) {
+				const response = await deleteFileOrFolder(modals.delete.item.id);
+
+				delete folderData[currentPath];
+				await loadFolderData(currentPath);
+				handleAPIResponse(response, {
+					success: `${modals.delete.item?.type === 'folder' ? 'Folder' : 'File'} ${modals.delete.item?.id.split('/').pop() || ''} deleted`,
+					error: `Failed to delete ${modals.delete.item?.type === 'folder' ? 'folder' : 'file'}`
+				});
+			}
+			modals.delete.isOpen = false;
+			modals.delete.item = null;
+		},
+		onCancel: () => {
+			modals.delete.isOpen = false;
+			modals.delete.item = null;
+		}
+	}}
+></AlertDialog>

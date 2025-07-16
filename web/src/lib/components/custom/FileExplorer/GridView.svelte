@@ -21,9 +21,10 @@
 		onItemClick: (item: FileNode) => void;
 		onItemSelect: (item: FileNode, event?: MouseEvent) => void;
 		selectedItems: Set<string>;
+		onItemDelete?: (item: FileNode) => void;
 	}
 
-	let { items, onItemClick, onItemSelect, selectedItems }: Props = $props();
+	let { items, onItemClick, onItemSelect, selectedItems, onItemDelete }: Props = $props();
 
 	function getFileIcon(filename: string) {
 		const ext = filename.split('.').pop()?.toLowerCase() || '';
@@ -75,7 +76,9 @@
 	}
 </script>
 
-<div class="grid grid-cols-2 gap-4 p-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-10">
+<div
+	class="grid grid-cols-2 gap-4 p-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10"
+>
 	{#each items as item}
 		{@const itemName = item.id.split('/').pop() || item.id}
 		{@const FileIcon = getFileIcon(itemName)}
@@ -83,7 +86,8 @@
 
 		<ContextMenu.Root>
 			<ContextMenu.Trigger
-				class="group relative flex cursor-pointer flex-col items-center rounded-lg p-4 {isSelected
+				title={itemName}
+				class="group relative flex w-full cursor-pointer flex-col items-center rounded-lg p-3 {isSelected
 					? 'bg-muted border-secondary'
 					: 'hover:bg-muted/50'}"
 				ondblclick={() => onItemClick(item)}
@@ -95,11 +99,17 @@
 				}}
 			>
 				{#if item.type === 'folder'}
-					<Icon icon="material-symbols:folder-rounded" class="h-12 w-12 text-blue-400" />
+					<Icon
+						icon="material-symbols:folder-rounded"
+						class="mb-2 h-12 w-12 flex-shrink-0 text-blue-400"
+					/>
 				{:else}
-					<FileIcon class="h-12 w-12 text-blue-400" />
+					<FileIcon class="mb-2 h-12 w-12 flex-shrink-0 text-blue-400" />
 				{/if}
-				<span class="line-clamp-2 text-center text-sm font-medium">{itemName}</span>
+				<span
+					class="line-clamp-2 w-full break-words px-1 text-center text-xs font-medium leading-tight"
+					>{itemName}</span
+				>
 			</ContextMenu.Trigger>
 			<ContextMenu.Content>
 				{#if item.type === 'folder'}
@@ -125,8 +135,14 @@
 					<Edit class="h-4 w-4" />
 					Rename
 				</ContextMenu.Item>
-				<ContextMenu.Separator />
-				<ContextMenu.Item class="text-destructive gap-2">
+				<ContextMenu.Item
+					class=" gap-2"
+					onclick={() => {
+						if (onItemDelete) {
+							onItemDelete(item);
+						}
+					}}
+				>
 					<Trash2 class="h-4 w-4" />
 					Delete
 				</ContextMenu.Item>

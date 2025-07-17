@@ -12,6 +12,7 @@
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import { Input } from '$lib/components/ui/input';
+	import { explorerCurrentPath } from '$lib/stores/basic';
 	import type { FileNode } from '$lib/types/system/file-explorer';
 	import Icon from '@iconify/svelte';
 	import {
@@ -27,6 +28,7 @@
 		Search,
 		UploadIcon
 	} from 'lucide-svelte';
+	import { get } from 'svelte/store';
 
 	interface Data {
 		files: FileNode[];
@@ -36,7 +38,7 @@
 
 	let viewMode = $state<'grid' | 'list'>('grid');
 	let searchQuery = $state('');
-	let currentPath = $state('/');
+	let currentPath = $state(get(explorerCurrentPath));
 	let folderData = $state<{ [path: string]: FileNode[] }>({ '/': data.files });
 	let selectedItems = $state<string[]>([]);
 	let sortBy = $state<
@@ -159,7 +161,11 @@
 	}
 
 	$effect(() => {
+		explorerCurrentPath.set(currentPath);
 		selectedItems = [];
+		if (currentPath !== '/' && !folderData[currentPath]) {
+			loadFolderData(currentPath);
+		}
 	});
 
 	function handleBackClick() {

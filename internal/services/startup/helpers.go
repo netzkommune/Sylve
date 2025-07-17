@@ -13,8 +13,10 @@ import (
 
 func (s *Service) SysctlSync() error {
 	intVals := map[string]int32{
-		"net.inet.ip.forwarding":      1,
-		"net.link.bridge.inherit_mac": 1,
+		"net.inet.ip.forwarding":            1,
+		"net.link.bridge.inherit_mac":       1,
+		"kern.geom.label.disk_ident.enable": 0,
+		"kern.geom.label.gptid.enable":      0,
 	}
 
 	for k, v := range intVals {
@@ -145,55 +147,34 @@ func (s *Service) CheckServiceDependencies() error {
 	return nil
 }
 
-func (s *Service) CheckLoaderConf() error {
-	const loaderConfPath = "/boot/loader.conf"
-
-	required := map[string]string{
-		"kern.geom.label.disk_ident.enable": "0",
-		"kern.geom.label.gptid.enable":      "0",
-		"cryptodev_load":                    "YES",
-		"zfs_load":                          "YES",
-		"vmm_load":                          "YES",
-		"nmdm_load":                         "YES",
-		"if_tap_load":                       "YES",
-		"if_bridge_load":                    "YES",
-		"hw.vmm.iommu.passthrough":          "1",
-	}
-
-	config, err := rcconf.Parse(loaderConfPath)
-	if err != nil {
-		return fmt.Errorf("failed to parse %s: %w", loaderConfPath, err)
-	}
-
-	for key, expected := range required {
-		val, ok := config[key]
-		if !ok {
-			return fmt.Errorf("missing required key in %s: %s", loaderConfPath, key)
-		}
-		if val != expected {
-			return fmt.Errorf("invalid value for %s in %s: got %q, want %q", key, loaderConfPath, val, expected)
-		}
-	}
-
-	return nil
-}
-
 func (s *Service) CheckKernelModules() error {
 	requiredModules := []string{
 		"vmm",
 		"nmdm",
 		"if_bridge",
+		"zfs",
+		"cryptodev",
 	}
 
-	output, err := utils.RunCommand("kldstat", "-q")
-
+	output, err := utils.RunCommand("kldstat", "-v")
 	if err != nil {
-		return fmt.Errorf("failed to run kldstat command: %w", err)
+		return fmt.Errorf("failed to run kldstat -v: %w", err)
 	}
 
 	for _, module := range requiredModules {
-		if !strings.Contains(output, fmt.Sprintf("%s.ko", module)) {
-			return fmt.Errorf("required kernel module %s is not loaded", module)
+		loaded := false
+		lines := strings.Split(output, "\n")
+		for _, line := range lines {
+			fields := strings.Fields(line)
+			if len(fields) > 0 && fields[len(fields)-1] == module {
+				loaded = true
+				break
+			}
+		}
+		if !loaded {
+			if _, err := utils.RunCommand("kldload", module); err != nil {
+				return fmt.Errorf("failed to load kernel module %s: %w", module, err)
+			}
 		}
 	}
 

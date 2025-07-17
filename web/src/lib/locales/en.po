@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-08T09:39:56.780Z\n"
-"PO-Revision-Date: 2025-07-14T09:50:15.733Z\n"
+"PO-Revision-Date: 2025-07-17T16:49:07.560Z\n"
 "Last-Translator: \n"
 "Language: English\n"
 "Language-Team: \n"
@@ -3004,3 +3004,23 @@ msgstr "Free"
 #: src/routes/[node]/storage/zfs/dashboard/+page.svelte
 msgid "Dedup Ratio"
 msgstr "Dedup Ratio"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Explorer"
+msgstr "Explorer"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Samba"
+msgstr "Samba"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Shares"
+msgstr "Shares"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Users"
+msgstr "Users"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Groups"
+msgstr "Groups"

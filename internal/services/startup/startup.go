@@ -85,10 +85,6 @@ func (s *Service) PreFlightChecklist() error {
 		return err
 	}
 
-	if err := s.CheckLoaderConf(); err != nil {
-		return err
-	}
-
 	if err := s.CheckKernelModules(); err != nil {
 		return err
 	}

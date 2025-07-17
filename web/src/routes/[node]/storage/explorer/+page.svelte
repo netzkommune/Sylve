@@ -235,11 +235,24 @@
 	}
 
 	async function downloadFile(item: FileNode) {
-		if (item.type === 'file') {
-			window.open(
-				`/api/system/file-explorer/download?id=${encodeURIComponent(item.id)}&hash=${await getTokenHash()}`,
-				'_blank'
-			);
+		if (item.type !== 'file') return;
+
+		const hash = await getTokenHash();
+		const downloadUrl = `/api/system/file-explorer/download?id=${encodeURIComponent(item.id)}&hash=${hash}`;
+		const filename = item.id.split('/').pop() || 'download';
+
+		try {
+			const link = Object.assign(document.createElement('a'), {
+				href: downloadUrl,
+				download: filename,
+				style: 'display:none'
+			});
+			document.body.appendChild(link);
+			link.click();
+			link.remove();
+		} catch (error) {
+			console.error('Download failed:', error);
+			window.open(downloadUrl, '_blank');
 		}
 	}
 </script>
@@ -411,6 +424,7 @@
 							onItemSelect={handleItemSelect}
 							selectedItems={new Set(selectedItems)}
 							onItemDelete={handleDeleteFileOrFolder}
+							onItemDownload={downloadFile}
 						/>
 					</div>
 				{/if}

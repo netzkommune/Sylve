@@ -12,9 +12,11 @@
 		onItemSelect: (item: FileNode, event?: MouseEvent) => void;
 		selectedItems: Set<string>;
 		onItemDelete?: (item: FileNode) => void;
+		onItemDownload?: (item: FileNode) => void;
 	}
 
-	let { items, onItemClick, onItemSelect, selectedItems, onItemDelete }: Props = $props();
+	let { items, onItemClick, onItemSelect, selectedItems, onItemDelete, onItemDownload }: Props =
+		$props();
 
 	function formatFileSize(bytes?: number): string {
 		if (!bytes || bytes === 0) return '-';
@@ -84,7 +86,7 @@
 							Open
 						</ContextMenu.Item>
 					{:else}
-						<ContextMenu.Item class="gap-2">
+						<ContextMenu.Item class="gap-2" onclick={() => onItemDownload?.(item)}>
 							<Download class="h-4 w-4" />
 							Download
 						</ContextMenu.Item>

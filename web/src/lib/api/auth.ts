@@ -15,6 +15,7 @@ import { hostname, language as langStore } from '$lib/stores/basic';
 import type { JWTClaims } from '$lib/types/auth';
 import type { APIResponse } from '$lib/types/common';
 import { handleAPIError } from '$lib/utils/http';
+import { sha256 } from '$lib/utils/string';
 import adze from 'adze';
 import axios, { AxiosError } from 'axios';
 // import jwt from 'jsonwebtoken';
@@ -175,4 +176,13 @@ export function getJWTClaims(): JWTClaims | null {
 	}
 
 	return null;
+}
+
+export async function getTokenHash(): Promise<string | null> {
+	const token = getToken();
+	if (!token) {
+		return null;
+	}
+
+	return await sha256(token);
 }

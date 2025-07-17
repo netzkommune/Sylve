@@ -53,7 +53,6 @@
 
 	let downloads = $derived($results[0].data as Download[]);
 	let tableData = $derived(generateTableData(downloads));
-	$inspect(tableData);
 	let query: string = $state('');
 	let activeRows: Row[] | null = $state(null);
 	let onlyParentsSelected: boolean = $derived.by(() => {

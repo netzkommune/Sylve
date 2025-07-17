@@ -205,9 +205,12 @@ func RegisterRoutes(r *gin.Engine,
 	fileExplorer.Use(middleware.EnsureAuthenticated(authService))
 	fileExplorer.Use(middleware.RequestLoggerMiddleware(db, authService))
 	{
-		fileExplorer.GET("/files", systemHandlers.Files(systemService))
-		fileExplorer.POST("/add", systemHandlers.AddFileOrFolder(systemService))
-		fileExplorer.DELETE("/delete", systemHandlers.DeleteFileOrFolder(systemService))
+		fileExplorer.GET("", systemHandlers.Files(systemService))
+		fileExplorer.POST("", systemHandlers.AddFileOrFolder(systemService))
+		fileExplorer.DELETE("", systemHandlers.DeleteFileOrFolder(systemService))
+		fileExplorer.POST("/rename", systemHandlers.RenameFileOrFolder(systemService))
+		fileExplorer.GET("/download", systemHandlers.DownloadFile(systemService))
+		fileExplorer.POST("/copy-or-move", systemHandlers.CopyOrMoveFileOrFolder(systemService))
 	}
 
 	vm := api.Group("/vm")

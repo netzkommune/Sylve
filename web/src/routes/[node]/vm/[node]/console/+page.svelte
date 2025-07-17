@@ -12,8 +12,6 @@
 
 	let { data }: { data: Data } = $props();
 	let path = $derived(`/api/vnc/${encodeURIComponent(String(data.port))}?hash=${data.hash}`);
-
-	$inspect(data.domain);
 </script>
 
 {#if data.domain && data.domain.status !== 'Shutoff'}

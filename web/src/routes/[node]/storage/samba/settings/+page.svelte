@@ -65,8 +65,6 @@
 		return filtered;
 	});
 
-	$inspect(usableIfaces, 'Usable Interfaces');
-
 	let options = {
 		unixCharset: {
 			value: (() => $state.snapshot(sambaConfig.unixCharset))(),
@@ -181,8 +179,6 @@
 			});
 		}
 	}
-
-	$inspect(interfaces);
 </script>
 
 <div class="flex h-full w-full flex-col">

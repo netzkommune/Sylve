@@ -200,10 +200,6 @@
 						title: { color: '#ccc', display: true, text: 'Date' },
 						ticks: {
 							callback: function (value, index, ticks) {
-								console.log('value', value, 'index', index, 'ticks', ticks);
-								const date = data[index]?.date;
-								console.log('date', date);
-
 								try {
 									const date = data[index]?.date;
 									if (!date) return '';

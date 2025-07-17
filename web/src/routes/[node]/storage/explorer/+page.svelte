@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { getTokenHash } from '$lib/api/auth';
 	import { handleAPIResponse } from '$lib/api/common';
 	import { addFileOrFolder, deleteFileOrFolder, getFiles } from '$lib/api/system/file-explorer';
 	import AlertDialog from '$lib/components/custom/Dialog/Alert.svelte';
@@ -232,6 +233,15 @@
 			selectedItems = [];
 		}
 	}
+
+	async function downloadFile(item: FileNode) {
+		if (item.type === 'file') {
+			window.open(
+				`/api/system/file-explorer/download?id=${encodeURIComponent(item.id)}&hash=${await getTokenHash()}`,
+				'_blank'
+			);
+		}
+	}
 </script>
 
 <div class="flex h-full">
@@ -390,6 +400,7 @@
 							onItemSelect={handleItemSelect}
 							selectedItems={new Set(selectedItems)}
 							onItemDelete={handleDeleteFileOrFolder}
+							onItemDownload={downloadFile}
 						/>
 					</div>
 				{:else}

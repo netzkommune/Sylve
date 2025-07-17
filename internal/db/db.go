@@ -19,7 +19,6 @@ import (
 	zfsModels "sylve/internal/db/models/zfs"
 	"sylve/internal/logger"
 	"sylve/pkg/system"
-	"sylve/pkg/system/samba"
 	"sylve/pkg/utils"
 
 	"gorm.io/driver/sqlite"
@@ -154,20 +153,6 @@ func setupInitUsers(db *gorm.DB, cfg *internal.SylveConfig) error {
 				return err
 			}
 			logger.L.Info().Msgf("Unix user %s created successfully", admin.Username)
-		}
-
-		smbExists, err := samba.SambaUserExists(admin.Username)
-		if err != nil {
-			logger.L.Error().Msgf("Error checking if Samba user %s exists: %v", admin.Username, err)
-			return err
-		}
-
-		if !smbExists {
-			err = samba.CreateSambaUser(admin.Username, admin.Password)
-			if err != nil {
-				logger.L.Error().Msgf("Failed to create Samba user %s: %v", admin.Username, err)
-				return err
-			}
 		}
 	}
 	return nil

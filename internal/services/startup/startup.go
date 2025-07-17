@@ -137,6 +137,10 @@ func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface)
 		return fmt.Errorf("failed to initialize Samba: %w", err)
 	}
 
+	if err := s.InitSambaAdmins(); err != nil {
+		return fmt.Errorf("failed to initialize Samba admins: %w", err)
+	}
+
 	go func() {
 		for {
 			err := s.Utilities.SyncDownloadProgress()

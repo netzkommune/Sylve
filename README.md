@@ -11,13 +11,17 @@ https://github.com/user-attachments/assets/bf727ef4-4316-4084-a61f-cb8ec978e43d
 
 Sylve aims to be a lightweight, open-source virtualization platform for FreeBSD, leveraging Bhyve for VMs and Jails for containerization, with deep ZFS integration. It seeks to provide a streamlined, Proxmox-like experience tailored for FreeBSD environments. It's backend is written in Go and the frontend is written in Svelte (with Kit).
 
-# Requirements
+# Development Requirements
 
 These only apply to the development version of Sylve, the production version will be a single binary.
 
 - Go >= 1.24
 - Node.js (v20.18.2)
 - NPM (v10.9.2)
+
+# Runtime Requirements
+
+Sylve is designed to run on FreeBSD 14.3 or later, and it is recommended to use the latest version of FreeBSD for the best experience.
 
 ## Dependencies
 
@@ -29,6 +33,8 @@ Running Sylve is pretty easy, but sylve depends on some packages that you can in
 | tmux           | 3.2          | No       | No       | Terminal multiplexer, used for the (web) console |
 | libvirt        | 11.1.0       | No       | No       | Virtualization API, used for Bhyve               |
 | bhyve-firmware | 1.0_2        | No       | No       | Collection of Firmware for bhyve                 |
+| samba419       | 4.19.9_9     | No       | No       | SMB file sharing service                         |
+| jansson        | 2.14.1       | No       | No       | JSON library for C                               |
 
 We also need to enable some services in order to run Sylve, you can drop these into `/etc/rc.conf` if you don't have it already:
 
@@ -36,9 +42,13 @@ We also need to enable some services in order to run Sylve, you can drop these i
 ntpd_enable="YES" # Optional
 ntpd_sync_on_start="YES" # Optional
 zfs_enable="YES"
-linux_enable="YES"
+linux_enable="YES" # Optional
 libvirtd_enable="YES"
-gateway_enable="YES"
+dnsmasq_enable="YES"
+rpcbind_enable="YES"
+nfs_server_enable="YES"
+mountd_enable="YES"
+samba_server_enable="YES"
 ```
 
 And these into `/boot/loader.conf`:
@@ -62,7 +72,6 @@ Please reboot your system after adding those entries to ensure that the services
 ```sh
 git clone https://github.com/AlchemillaHQ/Sylve.git
 cd Sylve
-./scripts/check_deps.sh # Optional, but recommended
 make
 ```
 

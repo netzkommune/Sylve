@@ -3,9 +3,13 @@ package startup
 import (
 	"os"
 	"strings"
+	"sylve/internal/config"
 	sambaModels "sylve/internal/db/models/samba"
+	"sylve/internal/logger"
 	"sylve/pkg/system"
 	"sylve/pkg/utils"
+
+	sambaUtils "sylve/pkg/system/samba"
 )
 
 func (s *Service) InitSamba() error {
@@ -49,4 +53,29 @@ func (s *Service) InitSamba() error {
 	}
 
 	return system.ServiceAction("samba_server", "restart")
+}
+
+func (s *Service) InitSambaAdmins() error {
+	cfg := config.ParsedConfig
+	if cfg == nil {
+		return nil
+	}
+
+	for _, admin := range cfg.Admins {
+		smbExists, err := sambaUtils.SambaUserExists(admin.Username)
+		if err != nil {
+			logger.L.Error().Msgf("Error checking if Samba user %s exists: %v", admin.Username, err)
+			return err
+		}
+
+		if !smbExists {
+			err = sambaUtils.CreateSambaUser(admin.Username, admin.Password)
+			if err != nil {
+				logger.L.Error().Msgf("Failed to create Samba user %s: %v", admin.Username, err)
+				return err
+			}
+		}
+	}
+
+	return nil
 }

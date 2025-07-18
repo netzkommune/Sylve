@@ -11,7 +11,8 @@ export async function modifyHardware(
 	vncPort: number,
 	vncResolution: string,
 	vncPassword: string,
-	vncWait: boolean
+	vncWait: boolean,
+	pciDevices: number[]
 ): Promise<APIResponse> {
 	return await apiRequest(`/vm/hardware/${vmId}`, APIResponseSchema, 'PUT', {
 		cpuSockets,
@@ -22,6 +23,7 @@ export async function modifyHardware(
 		vncPort,
 		vncResolution,
 		vncPassword,
-		vncWait
+		vncWait,
+		pciDevices
 	});
 }

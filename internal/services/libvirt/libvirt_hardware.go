@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"sylve/internal/db/models"
 	vmModels "sylve/internal/db/models/vm"
 	"sylve/pkg/utils"
 
@@ -200,6 +201,95 @@ func updateVNC(xml string, vncPort int, vncResolution string, vncPassword string
 	return out, nil
 }
 
+func updatePassthrough(xml string, pciDevices []string) (string, error) {
+	doc := etree.NewDocument()
+	if err := doc.ReadFromString(xml); err != nil {
+		return "", fmt.Errorf("failed to parse XML: %w", err)
+	}
+
+	root := doc.Root()
+	if root.SelectAttr("xmlns:bhyve") == nil {
+		root.CreateAttr("xmlns:bhyve", "http://libvirt.org/schemas/domain/bhyve/1.0")
+	}
+
+	if len(pciDevices) > 0 {
+		memBacking := doc.FindElement("//memoryBacking")
+		if memBacking == nil {
+			memBacking = root.CreateElement("memoryBacking")
+		}
+		if memBacking.FindElement("locked") == nil {
+			memBacking.CreateElement("locked")
+		}
+	}
+
+	bhyveCL := doc.FindElement("//bhyve:commandline")
+	if bhyveCL == nil {
+		bhyveCL = root.CreateElement("bhyve:commandline")
+	}
+
+	for _, arg := range bhyveCL.SelectElements("bhyve:arg") {
+		if v := arg.SelectAttrValue("value", ""); strings.Contains(v, "passthru") {
+			bhyveCL.RemoveChild(arg)
+		}
+	}
+
+	startIdx, err := findLowestIndex(xml)
+	if err != nil {
+		return "", fmt.Errorf("failed to find starting slot index: %w", err)
+	}
+
+	for i, devID := range pciDevices {
+		idx := startIdx + i
+		arg := bhyveCL.CreateElement("bhyve:arg")
+		arg.CreateAttr("value", fmt.Sprintf("-s %d:0,passthru,%s", idx, devID))
+	}
+
+	out, err := doc.WriteToString()
+	if err != nil {
+		return "", fmt.Errorf("failed to serialize XML: %w", err)
+	}
+	return out, nil
+}
+
+func removeMemoryBacking(xml string) (string, error) {
+	doc := etree.NewDocument()
+	if err := doc.ReadFromString(xml); err != nil {
+		return "", fmt.Errorf("failed to parse XML: %w", err)
+	}
+
+	if mem := doc.FindElement("//memoryBacking"); mem != nil {
+		parent := mem.Parent()
+		parent.RemoveChild(mem)
+	}
+
+	out, err := doc.WriteToString()
+	if err != nil {
+		return "", fmt.Errorf("failed to serialize XML: %w", err)
+	}
+	return out, nil
+}
+
+func cleanPassthrough(xml string) (string, error) {
+	doc := etree.NewDocument()
+	if err := doc.ReadFromString(xml); err != nil {
+		return "", fmt.Errorf("failed to parse XML: %w", err)
+	}
+
+	if bhyveCL := doc.FindElement("//bhyve:commandline"); bhyveCL != nil {
+		for _, arg := range bhyveCL.SelectElements("bhyve:arg") {
+			if v := arg.SelectAttrValue("value", ""); strings.Contains(v, "passthru") {
+				bhyveCL.RemoveChild(arg)
+			}
+		}
+	}
+
+	out, err := doc.WriteToString()
+	if err != nil {
+		return "", fmt.Errorf("failed to serialize XML: %w", err)
+	}
+	return out, nil
+}
+
 func (s *Service) ModifyHardware(vmId int,
 	cpuSockets int,
 	cpuCores int,
@@ -209,8 +299,8 @@ func (s *Service) ModifyHardware(vmId int,
 	vncPort int,
 	vncResolution string,
 	vncPassword string,
-	vncWait bool) error {
-
+	vncWait bool,
+	pciDevices []int) error {
 	vms, err := s.ListVMs()
 	if err != nil {
 		return fmt.Errorf("failed_to_get_vm_by_id: %w", err)
@@ -227,6 +317,27 @@ func (s *Service) ModifyHardware(vmId int,
 
 	if vm.VmID == 0 {
 		return fmt.Errorf("vm_not_found: %d", vmId)
+	}
+
+	var storedPciDevices []models.PassedThroughIDs
+	if len(pciDevices) > 0 {
+		if err := s.DB.Find(&storedPciDevices).Error; err != nil {
+			return fmt.Errorf("failed_to_get_stored_pci_devices: %w", err)
+		}
+
+		for _, pciDevice := range pciDevices {
+			found := false
+			for _, storedDevice := range storedPciDevices {
+				if storedDevice.ID == pciDevice {
+					found = true
+					break
+				}
+			}
+
+			if !found {
+				return fmt.Errorf("pci_device_not_found: %s", pciDevice)
+			}
+		}
 	}
 
 	if vm.CPUCores == cpuCores &&
@@ -342,6 +453,40 @@ func (s *Service) ModifyHardware(vmId int,
 		updatedXML, err = updateVNC(xml, vncPort, vncResolution, vncPassword, vncWait)
 		if err != nil {
 			return fmt.Errorf("failed_to_update_vnc_in_xml: %w", err)
+		}
+	}
+
+	if len(pciDevices) > 0 {
+		fmt.Println("Updating PCI devices:", pciDevices)
+
+		vm.PCIDevices = pciDevices
+
+		if err := s.DB.Save(&vm).Error; err != nil {
+			return fmt.Errorf("failed_to_update_vm_vnc_in_db: %w", err)
+		}
+
+		// 3) For the XML, convert ints → strings and inject passthru + memoryBacking
+		strSlice := utils.IntSliceToStrSlice(pciDevices)
+		updatedXML, err = updatePassthrough(updatedXML, strSlice)
+		if err != nil {
+			return fmt.Errorf("failed_to_update_passthrough_in_xml: %w", err)
+		}
+	} else {
+		// Remove any existing <memoryBacking> block
+		updatedXML, err = removeMemoryBacking(updatedXML)
+		if err != nil {
+			return fmt.Errorf("failed_to_remove_memory_backing: %w", err)
+		}
+		// Remove any lingering passthru args
+		updatedXML, err = cleanPassthrough(updatedXML)
+		if err != nil {
+			return fmt.Errorf("failed_to_clean_passthrough: %w", err)
+		}
+
+		vm.PCIDevices = []int{}
+
+		if err := s.DB.Save(&vm).Error; err != nil {
+			return fmt.Errorf("failed_to_update_vm_pci_devices_in_db: %w", err)
 		}
 	}
 

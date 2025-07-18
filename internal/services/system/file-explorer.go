@@ -187,6 +187,10 @@ func (s *Service) CopyOrMoveFileOrFolder(source, destination string, move bool) 
 		return fmt.Errorf("source does not exist: %w", err)
 	}
 
+	if destInfo, err := os.Stat(destination); err == nil && destInfo.IsDir() {
+		destination = filepath.Join(destination, filepath.Base(source))
+	}
+
 	if move {
 		if err := os.Rename(source, destination); err != nil {
 			return fmt.Errorf("failed to move: %w", err)
@@ -197,5 +201,6 @@ func (s *Service) CopyOrMoveFileOrFolder(source, destination string, move bool) 
 	if info.IsDir() {
 		return copyDir(source, destination)
 	}
+
 	return copyFile(source, destination, info.Mode())
 }

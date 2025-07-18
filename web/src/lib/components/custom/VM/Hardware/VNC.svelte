@@ -82,7 +82,8 @@
 			Number(properties.port),
 			properties.resolution,
 			properties.password,
-			properties.wait ?? false
+			properties.wait ?? false,
+			vm.pciDevices || []
 		);
 
 		if (response.error) {

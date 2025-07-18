@@ -26,6 +26,7 @@ type ModifyHardwareRequest struct {
 	VNCResolution string `json:"vncResolution" binding:"required"`
 	VNCPassword   string `json:"vncPassword" binding:"required"`
 	VNCWait       *bool  `json:"vncWait" binding:"required"`
+	PCIDevices    []int  `json:"pciDevices" binding:"required"`
 }
 
 // @Summary Modify Hardware of a Virtual Machine
@@ -79,7 +80,17 @@ func ModifyHardware(libvirtService *libvirt.Service) gin.HandlerFunc {
 			wait = *req.VNCWait
 		}
 
-		if err := libvirtService.ModifyHardware(vmIdInt, req.CPUSockets, req.CPUCores, req.CPUThreads, req.CPUPinning, req.RAM, req.VNCPort, req.VNCResolution, req.VNCPassword, wait); err != nil {
+		if err := libvirtService.ModifyHardware(vmIdInt,
+			req.CPUSockets,
+			req.CPUCores,
+			req.CPUThreads,
+			req.CPUPinning,
+			req.RAM,
+			req.VNCPort,
+			req.VNCResolution,
+			req.VNCPassword,
+			wait,
+			req.PCIDevices); err != nil {
 			c.JSON(500, internal.APIResponse[any]{
 				Status:  "error",
 				Message: "internal_server_error",

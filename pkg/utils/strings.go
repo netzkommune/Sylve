@@ -433,3 +433,36 @@ func JoinStringSlices(slices ...[]string) []string {
 
 	return RemoveDuplicates(result)
 }
+
+func SliceEqual(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+
+	m := make(map[string]int)
+	for _, v := range a {
+		m[v]++
+	}
+	for _, v := range b {
+		if _, ok := m[v]; !ok || m[v] == 0 {
+			return false
+		}
+		m[v]--
+	}
+
+	for _, count := range m {
+		if count != 0 {
+			return false
+		}
+	}
+
+	return true
+}
+
+func IntSliceToStrSlice(slice []int) []string {
+	strSlice := make([]string, len(slice))
+	for i, v := range slice {
+		strSlice[i] = strconv.Itoa(v)
+	}
+	return strSlice
+}

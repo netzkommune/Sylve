@@ -287,7 +287,11 @@ func CopyOrMoveFileOrFolder(systemService *system.Service) gin.HandlerFunc {
 			return
 		}
 
-		move := request.Cut != nil && *request.Cut
+		move := false
+		if request.Cut != nil {
+			move = *request.Cut
+		}
+
 		if err := systemService.CopyOrMoveFileOrFolder(request.ID, request.NewPath, move); err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 				Status:  "error",

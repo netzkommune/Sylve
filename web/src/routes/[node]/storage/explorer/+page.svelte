@@ -144,15 +144,12 @@
 	}
 
 	async function loadFolderData(folderId: string) {
-		if (folderData[folderId]) {
-			return;
-		}
 		try {
 			const response = await getFiles(folderId);
-			folderData = { ...folderData, [folderId]: response };
+			folderData = { [folderId]: response };
 		} catch (error) {
 			console.error('Error loading folder data:', error);
-			folderData = { ...folderData, [folderId]: [] };
+			folderData = { [folderId]: [] };
 		}
 	}
 

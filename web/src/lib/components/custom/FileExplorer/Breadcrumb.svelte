@@ -3,7 +3,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Icon from '@iconify/svelte';
 
-	let { currentPath, onBackClick, items } = $props();
+	let { currentPath, onBackClick, items, onNavigate } = $props();
 </script>
 
 <header class="flex shrink-0 items-center gap-2 border-b px-4">
@@ -28,7 +28,7 @@
 							href="#"
 							onclick={(e: any) => {
 								e.preventDefault();
-								currentPath = item.path;
+								onNavigate(item.path);
 							}}
 						>
 							{item.name}

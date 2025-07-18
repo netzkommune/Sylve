@@ -1,11 +1,20 @@
 <script lang="ts">
 	import { getTokenHash } from '$lib/api/auth';
 	import { handleAPIResponse } from '$lib/api/common';
-	import { addFileOrFolder, deleteFileOrFolder, getFiles } from '$lib/api/system/file-explorer';
+	import {
+		addFileOrFolder,
+		copyOrMoveFileOrFolder,
+		deleteFilesOrFolders,
+		getFiles,
+		renameFileOrFolder
+	} from '$lib/api/system/file-explorer';
 	import AlertDialog from '$lib/components/custom/Dialog/Alert.svelte';
+	import Breadcrumb from '$lib/components/custom/FileExplorer/Breadcrumb.svelte';
+	import CreateFileOrFolderModal from '$lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte';
 	import GridView from '$lib/components/custom/FileExplorer/GridView.svelte';
 	import ListView from '$lib/components/custom/FileExplorer/ListView.svelte';
-	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
+	import RenameModal from '$lib/components/custom/FileExplorer/RenameModal.svelte';
+	import Toolbar from '$lib/components/custom/FileExplorer/Toolbar.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as ContextMenu from '$lib/components/ui/context-menu/index.js';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
@@ -17,14 +26,13 @@
 	import Icon from '@iconify/svelte';
 	import {
 		ArrowUpDown,
-		Copy,
+		Clipboard,
 		FileText,
 		Folder,
 		Grid3X3,
 		List,
 		Plus,
 		RotateCcw,
-		Scissors,
 		Search,
 		UploadIcon
 	} from 'lucide-svelte';
@@ -45,6 +53,11 @@
 		'name-asc' | 'name-desc' | 'modified-asc' | 'modified-desc' | 'size-desc' | 'type'
 	>('name-asc');
 
+	let copyFileOrFolder = $state({
+		id: '',
+		isCut: false
+	});
+
 	let modals = $state({
 		create: {
 			isOpen: false,
@@ -54,6 +67,11 @@
 		delete: {
 			isOpen: false,
 			item: null as FileNode | null
+		},
+		rename: {
+			isOpen: false,
+			id: '',
+			newName: ''
 		}
 	});
 
@@ -261,149 +279,69 @@
 			window.open(downloadUrl, '_blank');
 		}
 	}
+
+	async function handleCopyFileOrFolder(item: FileNode, isCut: boolean) {
+		copyFileOrFolder.id = item.id;
+		copyFileOrFolder.isCut = isCut;
+	}
+
+	async function pasteFileOrFolder() {
+		if (!copyFileOrFolder.id) return;
+		const response = await copyOrMoveFileOrFolder(
+			copyFileOrFolder.id,
+			currentPath,
+			copyFileOrFolder.isCut
+		);
+		delete folderData[currentPath];
+		await loadFolderData(currentPath);
+	}
+
+	async function handleRenameFileOrFolder(item: FileNode) {
+		modals.rename.id = item.id;
+		modals.rename.isOpen = true;
+		let name = item.id.split('/').pop() || item.id;
+		modals.rename.newName = name;
+	}
+
+	async function rename() {
+		if (!modals.rename.id || !modals.rename.newName) return;
+
+		const response = await renameFileOrFolder(modals.rename.id, modals.rename.newName);
+		delete folderData[currentPath];
+		await loadFolderData(currentPath);
+		handleAPIResponse(response, {
+			success: 'Renamed successfully',
+			error: 'Failed to rename'
+		});
+		modals.rename.isOpen = false;
+		modals.rename.id = '';
+		modals.rename.newName = '';
+	}
 </script>
 
 <div class="flex h-full">
 	<div class="flex flex-1 flex-col">
-		<header class="flex shrink-0 items-center gap-2 border-b px-4">
-			<Button
-				variant="ghost"
-				size="icon"
-				class="cursor-pointer"
-				onclick={handleBackClick}
-				disabled={currentPath === '/'}
-			>
-				<Icon icon="tabler:arrow-left" class="pointer-events-none !h-6 !w-6" />
-			</Button>
+		<Breadcrumb onBackClick={handleBackClick} {currentPath} items={breadcrumbItems} />
 
-			<Breadcrumb.Root>
-				<Breadcrumb.List>
-					{#each breadcrumbItems as item, index}
-						<Breadcrumb.Item>
-							{#if item.isLast}
-								<Breadcrumb.Page>{item.name}</Breadcrumb.Page>
-							{:else}
-								<Breadcrumb.Link
-									href="#"
-									onclick={(e: any) => {
-										e.preventDefault();
-										currentPath = item.path;
-									}}
-								>
-									{item.name}
-								</Breadcrumb.Link>
-							{/if}
-						</Breadcrumb.Item>
-						{#if !item.isLast}
-							<Breadcrumb.Separator />
-						{/if}
-					{/each}
-				</Breadcrumb.List>
-			</Breadcrumb.Root>
-		</header>
-
-		<div class="flex flex-shrink-0 items-center justify-between gap-4 border-b px-4 py-2">
-			<div class="flex items-center gap-2">
-				<DropdownMenu.Root>
-					<DropdownMenu.Trigger
-						><Button size="sm" class="gap-2"><Plus class="h-4 w-4" />Add New</Button
-						></DropdownMenu.Trigger
-					>
-					<DropdownMenu.Content>
-						<DropdownMenu.Group>
-							<DropdownMenu.Item
-								onclick={() => {
-									modals.create.isFolder = false;
-									modals.create.isOpen = true;
-								}}
-							>
-								New File</DropdownMenu.Item
-							>
-							<DropdownMenu.Item
-								onclick={() => {
-									modals.create.isFolder = true;
-									modals.create.isOpen = true;
-								}}>New Folder</DropdownMenu.Item
-							>
-							<DropdownMenu.Item>Upload File</DropdownMenu.Item>
-						</DropdownMenu.Group>
-					</DropdownMenu.Content>
-				</DropdownMenu.Root>
-			</div>
-
-			<div class="flex items-center gap-2">
-				<div class="relative">
-					<Search class="text-muted-foreground absolute left-2 top-2.5 h-4 w-4" />
-					<Input placeholder="Search files..." bind:value={searchQuery} class="w-64 pl-8" />
-				</div>
-				<DropdownMenu.Root>
-					<DropdownMenu.Trigger>
-						<Button variant="outline" size="sm" class="gap-2">
-							<ArrowUpDown class="h-4 w-4" />
-							Sort
-						</Button>
-					</DropdownMenu.Trigger>
-					<DropdownMenu.Content align="end">
-						<DropdownMenu.Group>
-							<DropdownMenu.Item
-								class={`${sortBy === 'name-asc' ? 'bg-accent' : ''}`}
-								onclick={() => (sortBy = 'name-asc')}
-							>
-								A - Z
-							</DropdownMenu.Item>
-							<DropdownMenu.Item
-								class={`${sortBy === 'name-desc' ? 'bg-accent' : ''}`}
-								onclick={() => (sortBy = 'name-desc')}
-							>
-								Z - A
-							</DropdownMenu.Item>
-							<DropdownMenu.Item
-								class={`${sortBy === 'modified-desc' ? 'bg-accent' : ''}`}
-								onclick={() => (sortBy = 'modified-desc')}
-							>
-								Last Modified
-							</DropdownMenu.Item>
-							<DropdownMenu.Item
-								class={`${sortBy === 'modified-asc' ? 'bg-accent' : ''}`}
-								onclick={() => (sortBy = 'modified-asc')}
-							>
-								First Modified
-							</DropdownMenu.Item>
-							<DropdownMenu.Item
-								class={`${sortBy === 'size-desc' ? 'bg-accent' : ''}`}
-								onclick={() => (sortBy = 'size-desc')}
-							>
-								Size
-							</DropdownMenu.Item>
-							<DropdownMenu.Item
-								class={`${sortBy === 'type' ? 'bg-accent' : ''}`}
-								onclick={() => (sortBy = 'type')}
-							>
-								Type
-							</DropdownMenu.Item>
-						</DropdownMenu.Group>
-					</DropdownMenu.Content>
-				</DropdownMenu.Root>
-				<div class="flex items-center rounded-md border">
-					<Button
-						variant={viewMode === 'grid' ? 'default' : 'ghost'}
-						size="sm"
-						onclick={() => (viewMode = 'grid')}
-						class="rounded-r-none"
-					>
-						<Grid3X3 class="h-4 w-4" />
-					</Button>
-					<Button
-						variant={viewMode === 'list' ? 'default' : 'ghost'}
-						size="sm"
-						onclick={() => (viewMode = 'list')}
-						class="rounded-l-none"
-					>
-						<List class="h-4 w-4" />
-					</Button>
-				</div>
-			</div>
-		</div>
+		<Toolbar
+			{searchQuery}
+			{sortBy}
+			{viewMode}
+			onSearchChange={(value) => (searchQuery = value)}
+			onSortChange={(sort) => (sortBy = sort)}
+			onViewModeChange={(mode) => (viewMode = mode)}
+			onCreateFile={() => {
+				modals.create.isFolder = false;
+				modals.create.isOpen = true;
+			}}
+			onCreateFolder={() => {
+				modals.create.isFolder = true;
+				modals.create.isOpen = true;
+			}}
+			onUploadFile={() => {
+				// TODO: Implement upload functionality
+			}}
+		/>
 
 		<ContextMenu.Root>
 			<ContextMenu.Trigger
@@ -420,6 +358,9 @@
 							selectedItems={new Set(selectedItems)}
 							onItemDelete={handleDeleteFileOrFolder}
 							onItemDownload={downloadFile}
+							onItemCopy={handleCopyFileOrFolder}
+							onItemRename={handleRenameFileOrFolder}
+							isCopying={copyFileOrFolder.id !== ''}
 						/>
 					</div>
 				{:else}
@@ -440,8 +381,12 @@
 					<RotateCcw />
 					Refresh</ContextMenu.Item
 				>
-				<ContextMenu.Item class="gap-2"><Copy class="h-4 w-4" />Copy</ContextMenu.Item>
-				<ContextMenu.Item class="gap-2"><Scissors class="h-4 w-4" />Cut</ContextMenu.Item>
+				{#if copyFileOrFolder.id !== ''}
+					<ContextMenu.Item class="gap-2" onclick={pasteFileOrFolder}>
+						<Clipboard class="h-4 w-4" />
+						Paste
+					</ContextMenu.Item>
+				{/if}
 				<ContextMenu.Item
 					class="gap-2"
 					onclick={() => {
@@ -479,74 +424,38 @@
 	</div>
 </div>
 
-<Dialog.Root bind:open={modals.create.isOpen}>
-	<Dialog.Content
-		onInteractOutside={() => {
-			modals.create.isOpen = false;
-			modals.create.isFolder = true;
-		}}
-		class="fixed  flex transform flex-col gap-4 overflow-auto p-5 transition-all duration-300 ease-in-out lg:max-w-md"
-	>
-		<Dialog.Header class="p-0">
-			<Dialog.Title class="flex  justify-between  text-left">
-				<div class="flex items-center gap-2">
-					<Icon icon="bi:hdd-stack-fill" class="h-5 w-5 " />Create {modals.create.isFolder
-						? 'Folder'
-						: 'File'}
-				</div>
-				<div class="flex items-center gap-0.5">
-					<Button
-						onclick={() => {
-							modals.create.name = '';
-						}}
-						size="sm"
-						variant="link"
-						class="h-4"
-						title={'Reset'}
-					>
-						<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
-						<span class="sr-only">Reset</span>
-					</Button>
+<CreateFileOrFolderModal
+	bind:isOpen={modals.create.isOpen}
+	bind:isFolder={modals.create.isFolder}
+	bind:name={modals.create.name}
+	onClose={() => {
+		modals.create.isOpen = false;
+		modals.create.isFolder = true;
+	}}
+	onReset={() => {
+		modals.create.name = '';
+	}}
+	onCreate={() => {
+		createFileOrFolder();
+		modals.create.isOpen = false;
+		modals.create.isFolder = true;
+	}}
+/>
 
-					<Button
-						size="sm"
-						variant="link"
-						class="h-4"
-						title={'Close'}
-						onclick={() => {
-							modals.create.isOpen = false;
-							modals.create.isFolder = true;
-						}}
-					>
-						<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
-						<span class="sr-only">Close</span>
-					</Button>
-				</div>
-			</Dialog.Title>
-		</Dialog.Header>
-		<div class="mt-2">
-			<CustomValueInput
-				placeholder={`Enter ${modals.create.isFolder ? 'folder' : 'file'} name`}
-				bind:value={modals.create.name}
-				classes="flex-1 space-y-1.5"
-			/>
-		</div>
-		<Dialog.Footer class="mt-2">
-			<div class="flex items-center justify-end space-x-4">
-				<Button
-					onclick={() => {
-						createFileOrFolder();
-						modals.create.isOpen = false;
-						modals.create.isFolder = true;
-					}}
-					size="sm"
-					type="button"
-					class="h-8 w-full lg:w-28">Create</Button
-				>
-			</div>
-		</Dialog.Footer>
-	</Dialog.Content>
-</Dialog.Root>
+<RenameModal
+	bind:isOpen={modals.rename.isOpen}
+	bind:newName={modals.rename.newName}
+	onClose={() => {
+		modals.rename.isOpen = false;
+		modals.rename.id = '';
+	}}
+	onReset={() => {
+		modals.rename.newName = modals.rename.id.split('/').pop() || '';
+	}}
+	onRename={() => {
+		rename();
+	}}
+/>
 
 <AlertDialog
 	open={modals.delete.isOpen}
@@ -557,7 +466,7 @@
 	actions={{
 		onConfirm: async () => {
 			if (modals.delete.item) {
-				const response = await deleteFileOrFolder(modals.delete.item.id);
+				const response = await deleteFilesOrFolders(selectedItems);
 
 				delete folderData[currentPath];
 				await loadFolderData(currentPath);

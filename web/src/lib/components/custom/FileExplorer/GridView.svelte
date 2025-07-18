@@ -3,7 +3,7 @@
 	import type { FileNode } from '$lib/types/system/file-explorer';
 	import { getFileIcon } from '$lib/utils/icons';
 	import Icon from '@iconify/svelte';
-	import { Copy, Download, Edit, FolderOpen, Scissors, Trash2 } from 'lucide-svelte';
+	import { Clipboard, Copy, Download, Edit, FolderOpen, Scissors, Trash2 } from 'lucide-svelte';
 
 	interface Props {
 		items: FileNode[];
@@ -12,10 +12,22 @@
 		selectedItems: Set<string>;
 		onItemDelete?: (item: FileNode) => void;
 		onItemDownload?: (item: FileNode) => void;
+		isCopying?: boolean;
+		onItemCopy?: (item: FileNode, isCut: boolean) => void;
+		onItemRename?: (item: FileNode) => void;
 	}
 
-	let { items, onItemClick, onItemSelect, selectedItems, onItemDelete, onItemDownload }: Props =
-		$props();
+	let {
+		items,
+		onItemClick,
+		onItemSelect,
+		selectedItems,
+		onItemDelete,
+		onItemDownload,
+		isCopying,
+		onItemCopy,
+		onItemRename
+	}: Props = $props();
 </script>
 
 <div
@@ -65,15 +77,18 @@
 						Download
 					</ContextMenu.Item>
 				{/if}
-				<ContextMenu.Item class="gap-2">
-					<Copy class="h-4 w-4" />
-					Copy
-				</ContextMenu.Item>
-				<ContextMenu.Item class="gap-2">
-					<Scissors class="h-4 w-4" />
-					Cut
-				</ContextMenu.Item>
-				<ContextMenu.Item class="gap-2">
+				{#if !isCopying}
+					<ContextMenu.Item class="gap-2" onclick={() => onItemCopy?.(item, false)}>
+						<Copy class="h-4 w-4" />
+						Copy
+					</ContextMenu.Item>
+					<ContextMenu.Item class="gap-2" onclick={() => onItemCopy?.(item, true)}>
+						<Scissors class="h-4 w-4" />
+						Cut
+					</ContextMenu.Item>
+				{/if}
+
+				<ContextMenu.Item class="gap-2" onclick={() => onItemRename?.(item)}>
 					<Edit class="h-4 w-4" />
 					Rename
 				</ContextMenu.Item>

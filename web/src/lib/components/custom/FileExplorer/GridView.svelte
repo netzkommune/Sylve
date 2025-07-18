@@ -3,7 +3,7 @@
 	import type { FileNode } from '$lib/types/system/file-explorer';
 	import { getFileIcon } from '$lib/utils/icons';
 	import Icon from '@iconify/svelte';
-	import { Clipboard, Copy, Download, Edit, FolderOpen, Scissors, Trash2 } from 'lucide-svelte';
+	import { Copy, Download, Edit, FolderOpen, Scissors, Trash2 } from 'lucide-svelte';
 
 	interface Props {
 		items: FileNode[];

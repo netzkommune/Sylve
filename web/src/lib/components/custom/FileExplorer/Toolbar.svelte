@@ -2,16 +2,15 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import { Input } from '$lib/components/ui/input';
+	import type { SortBy } from '$lib/utils/explorer';
 	import { ArrowUpDown, Grid3X3, List, Plus, Search } from 'lucide-svelte';
 
 	interface Props {
 		searchQuery: string;
-		sortBy: 'name-asc' | 'name-desc' | 'modified-asc' | 'modified-desc' | 'size-desc' | 'type';
+		sortBy: SortBy;
 		viewMode: 'grid' | 'list';
 		onSearchChange: (value: string) => void;
-		onSortChange: (
-			sort: 'name-asc' | 'name-desc' | 'modified-asc' | 'modified-desc' | 'size-desc' | 'type'
-		) => void;
+		onSortChange: (sort: SortBy) => void;
 		onViewModeChange: (mode: 'grid' | 'list') => void;
 		onCreateFile: () => void;
 		onCreateFolder: () => void;

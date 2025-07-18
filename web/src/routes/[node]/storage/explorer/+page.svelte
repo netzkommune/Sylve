@@ -4,6 +4,7 @@
 	import {
 		addFileOrFolder,
 		copyOrMoveFileOrFolder,
+		copyOrMoveFilesOrFolders,
 		deleteFilesOrFolders,
 		getFiles,
 		renameFileOrFolder
@@ -16,24 +17,10 @@
 	import RenameModal from '$lib/components/custom/FileExplorer/RenameModal.svelte';
 	import Toolbar from '$lib/components/custom/FileExplorer/Toolbar.svelte';
 	import * as ContextMenu from '$lib/components/ui/context-menu/index.js';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import { Input } from '$lib/components/ui/input';
 	import { explorerCurrentPath } from '$lib/stores/basic';
 	import type { FileNode } from '$lib/types/system/file-explorer';
-	import Icon from '@iconify/svelte';
-	import {
-		ArrowUpDown,
-		Clipboard,
-		FileText,
-		Folder,
-		Grid3X3,
-		List,
-		Plus,
-		RotateCcw,
-		Search,
-		UploadIcon
-	} from 'lucide-svelte';
+	import { sortFileItems, type SortBy } from '$lib/utils/explorer';
+	import { Clipboard, FileText, Folder, RotateCcw, UploadIcon } from 'lucide-svelte';
 	import { get } from 'svelte/store';
 
 	interface Data {
@@ -47,12 +34,10 @@
 	let currentPath = $state(get(explorerCurrentPath));
 	let folderData = $state<{ [path: string]: FileNode[] }>({ '/': data.files });
 	let selectedItems = $state<string[]>([]);
-	let sortBy = $state<
-		'name-asc' | 'name-desc' | 'modified-asc' | 'modified-desc' | 'size-desc' | 'type'
-	>('name-asc');
+	let sortBy = $state<SortBy>('name-asc');
 
 	let copyFileOrFolder = $state({
-		id: '',
+		items: [] as string[],
 		isCut: false
 	});
 
@@ -86,45 +71,7 @@
 		})
 	);
 
-	let sortedItems = $derived.by(() => {
-		const items = [...filteredItems];
-
-		switch (sortBy) {
-			case 'name-asc':
-				return items.sort((a, b) => {
-					const nameA = (a.id.split('/').pop() || a.id).toLowerCase();
-					const nameB = (b.id.split('/').pop() || b.id).toLowerCase();
-					return nameA.localeCompare(nameB);
-				});
-			case 'name-desc':
-				return items.sort((a, b) => {
-					const nameA = (a.id.split('/').pop() || a.id).toLowerCase();
-					const nameB = (b.id.split('/').pop() || b.id).toLowerCase();
-					return nameB.localeCompare(nameA);
-				});
-			case 'modified-asc':
-				return items.sort((a, b) => a.date.getTime() - b.date.getTime());
-			case 'modified-desc':
-				return items.sort((a, b) => b.date.getTime() - a.date.getTime());
-			case 'size-desc':
-				return items.sort((a, b) => {
-					const sizeA = a.size || 0;
-					const sizeB = b.size || 0;
-					return sizeB - sizeA;
-				});
-			case 'type':
-				return items.sort((a, b) => {
-					if (a.type !== b.type) {
-						return a.type === 'folder' ? -1 : 1;
-					}
-					const nameA = (a.id.split('/').pop() || a.id).toLowerCase();
-					const nameB = (b.id.split('/').pop() || b.id).toLowerCase();
-					return nameA.localeCompare(nameB);
-				});
-			default:
-				return items;
-		}
-	});
+	let sortedItems = $derived(sortFileItems(filteredItems, sortBy));
 
 	let breadcrumbItems = $derived.by(() => {
 		const parts = currentPath.split('/').filter(Boolean);
@@ -279,19 +226,27 @@
 	}
 
 	async function handleCopyFileOrFolder(item: FileNode, isCut: boolean) {
-		copyFileOrFolder.id = item.id;
+		// Use selected items if multiple items are selected, otherwise use the single item
+		const itemsToCopy = selectedItems.length > 0 ? selectedItems : [item.id];
+		copyFileOrFolder.items = itemsToCopy;
 		copyFileOrFolder.isCut = isCut;
 	}
 
 	async function pasteFileOrFolder() {
-		if (!copyFileOrFolder.id) return;
-		const response = await copyOrMoveFileOrFolder(
-			copyFileOrFolder.id,
-			currentPath,
-			copyFileOrFolder.isCut
-		);
+		if (!copyFileOrFolder.items || copyFileOrFolder.items.length === 0) return;
+
+		const requestData: [string, string][] = copyFileOrFolder.items.map((itemId) => [
+			itemId,
+			currentPath
+		]);
+
+		await copyOrMoveFilesOrFolders(requestData, copyFileOrFolder.isCut);
+
 		delete folderData[currentPath];
 		await loadFolderData(currentPath);
+
+		copyFileOrFolder.items = [];
+		copyFileOrFolder.isCut = false;
 	}
 
 	async function handleRenameFileOrFolder(item: FileNode) {
@@ -314,7 +269,7 @@
 		await loadFolderData(currentPath);
 		handleAPIResponse(response, {
 			success: 'Renamed successfully',
-			error: 'Failed to rename'
+			error: response.error || 'Failed to rename'
 		});
 		modals.rename.isOpen = false;
 		modals.rename.id = '';
@@ -368,7 +323,7 @@
 							onItemDownload={downloadFile}
 							onItemCopy={handleCopyFileOrFolder}
 							onItemRename={handleRenameFileOrFolder}
-							isCopying={copyFileOrFolder.id !== ''}
+							isCopying={copyFileOrFolder.items.length > 0}
 						/>
 					</div>
 				{:else}
@@ -380,6 +335,9 @@
 							selectedItems={new Set(selectedItems)}
 							onItemDelete={handleDeleteFileOrFolder}
 							onItemDownload={downloadFile}
+							onItemCopy={handleCopyFileOrFolder}
+							onItemRename={handleRenameFileOrFolder}
+							isCopying={copyFileOrFolder.items.length > 0}
 						/>
 					</div>
 				{/if}
@@ -389,7 +347,7 @@
 					<RotateCcw />
 					Refresh</ContextMenu.Item
 				>
-				{#if copyFileOrFolder.id !== ''}
+				{#if copyFileOrFolder.items.length > 0}
 					<ContextMenu.Item class="gap-2" onclick={pasteFileOrFolder}>
 						<Clipboard class="h-4 w-4" />
 						Paste

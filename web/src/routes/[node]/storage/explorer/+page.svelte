@@ -15,9 +15,7 @@
 	import ListView from '$lib/components/custom/FileExplorer/ListView.svelte';
 	import RenameModal from '$lib/components/custom/FileExplorer/RenameModal.svelte';
 	import Toolbar from '$lib/components/custom/FileExplorer/Toolbar.svelte';
-	import { Button } from '$lib/components/ui/button';
 	import * as ContextMenu from '$lib/components/ui/context-menu/index.js';
-	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import { Input } from '$lib/components/ui/input';
@@ -303,6 +301,11 @@
 		modals.rename.newName = name;
 	}
 
+	async function handleBreadcrumbNavigate(path: string) {
+		currentPath = path;
+		await loadFolderData(path);
+	}
+
 	async function rename() {
 		if (!modals.rename.id || !modals.rename.newName) return;
 
@@ -321,7 +324,12 @@
 
 <div class="flex h-full">
 	<div class="flex flex-1 flex-col">
-		<Breadcrumb onBackClick={handleBackClick} {currentPath} items={breadcrumbItems} />
+		<Breadcrumb
+			onBackClick={handleBackClick}
+			{currentPath}
+			items={breadcrumbItems}
+			onNavigate={handleBreadcrumbNavigate}
+		/>
 
 		<Toolbar
 			{searchQuery}

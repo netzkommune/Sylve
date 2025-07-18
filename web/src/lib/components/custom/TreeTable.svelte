@@ -58,7 +58,9 @@
 				}));
 
 				if (hasRowsChanged(table, data.rows) && !aboutToClick) {
-					await table?.replaceData(pruneEmptyChildren(data.rows));
+					if (tableInitialized) {
+						await table?.replaceData(pruneEmptyChildren(data.rows));
+					}
 				}
 
 				selectedIds.forEach((id) => {

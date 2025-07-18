@@ -68,7 +68,9 @@
 	]);
 
 	let vms: VM[] = $derived($results[0].data ? $results[0].data : data.vms);
-	let vm: VM | null = $derived(vms ? (vms.find((v: VM) => v.vmId === data.vm.vmId) ?? null) : null);
+	let vm: VM | null = $derived(
+		vms && data.vm ? (vms.find((v: VM) => v.vmId === data.vm.vmId) ?? null) : null
+	);
 	let pciDevices: PCIDevice[] = $derived($results[1].data as PCIDevice[]);
 	let pptDevices: PPTDevice[] = $derived($results[2].data as PPTDevice[]);
 
@@ -96,6 +98,8 @@
 			value: data.vm.pciDevices
 		}
 	};
+
+	$inspect(vm);
 
 	let properties = $state(options);
 

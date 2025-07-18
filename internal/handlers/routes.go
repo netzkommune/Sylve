@@ -207,7 +207,10 @@ func RegisterRoutes(r *gin.Engine,
 	{
 		fileExplorer.GET("", systemHandlers.Files(systemService))
 		fileExplorer.POST("", systemHandlers.AddFileOrFolder(systemService))
+
+		fileExplorer.POST("/delete", systemHandlers.DeleteFilesOrFolders(systemService))
 		fileExplorer.DELETE("", systemHandlers.DeleteFileOrFolder(systemService))
+
 		fileExplorer.POST("/rename", systemHandlers.RenameFileOrFolder(systemService))
 		fileExplorer.GET("/download", systemHandlers.DownloadFile(systemService))
 		fileExplorer.POST("/copy-or-move", systemHandlers.CopyOrMoveFileOrFolder(systemService))

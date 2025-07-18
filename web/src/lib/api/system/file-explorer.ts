@@ -56,3 +56,11 @@ export async function copyOrMoveFileOrFolder(
 
 	return await apiRequest('/system/file-explorer/copy-or-move', APIResponseSchema, 'POST', body);
 }
+
+export async function deleteFilesOrFolders(paths: string[]): Promise<APIResponse> {
+	const body = {
+		paths
+	};
+
+	return await apiRequest('/system/file-explorer/delete', APIResponseSchema, 'POST', body);
+}

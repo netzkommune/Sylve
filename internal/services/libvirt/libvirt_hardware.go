@@ -472,12 +472,11 @@ func (s *Service) ModifyHardware(vmId int,
 			return fmt.Errorf("failed_to_update_passthrough_in_xml: %w", err)
 		}
 	} else {
-		// Remove any existing <memoryBacking> block
 		updatedXML, err = removeMemoryBacking(updatedXML)
 		if err != nil {
 			return fmt.Errorf("failed_to_remove_memory_backing: %w", err)
 		}
-		// Remove any lingering passthru args
+
 		updatedXML, err = cleanPassthrough(updatedXML)
 		if err != nil {
 			return fmt.Errorf("failed_to_clean_passthrough: %w", err)

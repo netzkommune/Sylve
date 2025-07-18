@@ -27,6 +27,10 @@ type CopyOrMoveFileOrFolderRequest struct {
 	Cut     *bool  `json:"cut" binding:"required"`
 }
 
+type DeleteFilesOrFoldersRequest struct {
+	Paths []string `json:"paths" binding:"required"`
+}
+
 // @Summary Find Files on System
 // @Description Find files on the system based on a search term
 // @Tags System
@@ -151,6 +155,60 @@ func DeleteFileOrFolder(systemService *system.Service) gin.HandlerFunc {
 		c.JSON(http.StatusOK, internal.APIResponse[any]{
 			Status:  "success",
 			Message: "file_or_folder_deleted",
+			Error:   "",
+			Data:    nil,
+		})
+	}
+}
+
+// @Summary Delete Files or Folders
+// @Description Delete multiple files or folders from the system
+// @Tags System
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Request body DeleteFilesOrFoldersRequest true "Delete Files or Folders Request"
+// @Success 200 {object} internal.APIResponse[any]
+// @Failure 400 {object} internal.APIResponse[any] "Bad Request"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /system/file-explorer/delete [post]
+func DeleteFilesOrFolders(systemService *system.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var request DeleteFilesOrFoldersRequest
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "bad_request",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		if len(request.Paths) == 0 {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "bad_request",
+				Error:   "no paths provided",
+				Data:    nil,
+			})
+			return
+		}
+
+		err := systemService.DeleteFilesOrFolders(request.Paths)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "files_or_folders_deleted",
 			Error:   "",
 			Data:    nil,
 		})

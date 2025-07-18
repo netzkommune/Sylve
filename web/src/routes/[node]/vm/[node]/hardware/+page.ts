@@ -9,7 +9,7 @@ export async function load({ params }) {
 
 	const cacheDuration = SEVEN_DAYS;
 	const [vms, ram, domain, pciDevices, pptDevices] = await Promise.all([
-		cachedFetch('vms', async () => await getVMs(), cacheDuration),
+		cachedFetch('vm-list', async () => await getVMs(), cacheDuration),
 		cachedFetch('ramInfo', async () => await getRAMInfo(), cacheDuration),
 		cachedFetch('vmDomain', async () => await getVMDomain(vmId), cacheDuration),
 		cachedFetch('pciDevices', async () => await getPCIDevices(), cacheDuration),
@@ -17,6 +17,8 @@ export async function load({ params }) {
 	]);
 
 	const vm = vms.find((vm) => vm.vmId === vmId);
+
+	console.log(vm);
 
 	return {
 		vm,

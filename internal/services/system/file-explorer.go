@@ -99,6 +99,40 @@ func (s *Service) DeleteFileOrFolder(path string) error {
 	return os.RemoveAll(path)
 }
 
+func (s *Service) DeleteFilesOrFolders(paths []string) error {
+	if len(paths) == 0 {
+		return fmt.Errorf("no paths provided")
+	}
+
+	for _, path := range paths {
+		if path == "" {
+			return fmt.Errorf("empty path provided")
+		}
+
+		absPath := path
+		if !filepath.IsAbs(absPath) {
+			absPath = "/" + absPath
+		}
+
+		if _, err := os.Stat(absPath); os.IsNotExist(err) {
+			return fmt.Errorf("file or folder does not exist: %s", absPath)
+		}
+	}
+
+	for _, path := range paths {
+		absPath := path
+		if !filepath.IsAbs(absPath) {
+			absPath = "/" + absPath
+		}
+
+		if err := os.RemoveAll(absPath); err != nil {
+			return fmt.Errorf("failed to delete %s: %w", absPath, err)
+		}
+	}
+
+	return nil
+}
+
 func (s *Service) RenameFileOrFolder(oldPath string, newName string) error {
 	if oldPath == "" || newName == "" {
 		return fmt.Errorf("old path and new name cannot be empty")

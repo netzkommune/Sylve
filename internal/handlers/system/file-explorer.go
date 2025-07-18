@@ -31,6 +31,11 @@ type DeleteFilesOrFoldersRequest struct {
 	Paths []string `json:"paths" binding:"required"`
 }
 
+type CopyOrMoveFilesOrFoldersRequest struct {
+	Pairs [][2]string `json:"pairs" binding:"required"` // Each pair is [source, destination]
+	Cut   *bool       `json:"cut" binding:"required"`   // true for move, false for copy
+}
+
 // @Summary Find Files on System
 // @Description Find files on the system based on a search term
 // @Tags System
@@ -363,6 +368,65 @@ func CopyOrMoveFileOrFolder(systemService *system.Service) gin.HandlerFunc {
 		c.JSON(http.StatusOK, internal.APIResponse[any]{
 			Status:  "success",
 			Message: "file_or_folder_copied_or_moved",
+			Error:   "",
+			Data:    nil,
+		})
+	}
+}
+
+// @Summary Copy or Move Files or Folders
+// @Description Copy or move multiple files or folders to new paths
+// @Tags System
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Request body CopyOrMoveFilesOrFoldersRequest true "Copy or Move Files or Folders Request"
+// @Success 200 {object} internal.APIResponse[any]
+// @Failure 400 {object} internal.APIResponse[any] "Bad Request"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /system/file-explorer/copy-or-move-batch [post]
+func CopyOrMoveFilesOrFolders(systemService *system.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var request CopyOrMoveFilesOrFoldersRequest
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "bad_request",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		if len(request.Pairs) == 0 {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "bad_request",
+				Error:   "no pairs provided",
+				Data:    nil,
+			})
+			return
+		}
+
+		move := false
+		if request.Cut != nil {
+			move = *request.Cut
+		}
+
+		err := systemService.CopyOrMoveFilesOrFolders(request.Pairs, move)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "files_or_folders_copied_or_moved",
 			Error:   "",
 			Data:    nil,
 		})

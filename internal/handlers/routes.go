@@ -213,7 +213,9 @@ func RegisterRoutes(r *gin.Engine,
 
 		fileExplorer.POST("/rename", systemHandlers.RenameFileOrFolder(systemService))
 		fileExplorer.GET("/download", systemHandlers.DownloadFile(systemService))
+
 		fileExplorer.POST("/copy-or-move", systemHandlers.CopyOrMoveFileOrFolder(systemService))
+		fileExplorer.POST("/copy-or-move-batch", systemHandlers.CopyOrMoveFilesOrFolders(systemService))
 	}
 
 	vm := api.Group("/vm")

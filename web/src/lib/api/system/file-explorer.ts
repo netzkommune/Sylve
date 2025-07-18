@@ -64,3 +64,20 @@ export async function deleteFilesOrFolders(paths: string[]): Promise<APIResponse
 
 	return await apiRequest('/system/file-explorer/delete', APIResponseSchema, 'POST', body);
 }
+
+export async function copyOrMoveFilesOrFolders(
+	pairs: [string, string][],
+	cut: boolean
+): Promise<APIResponse> {
+	const body = {
+		pairs,
+		cut
+	};
+
+	return await apiRequest(
+		'/system/file-explorer/copy-or-move-batch',
+		APIResponseSchema,
+		'POST',
+		body
+	);
+}

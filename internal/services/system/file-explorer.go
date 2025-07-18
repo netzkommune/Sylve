@@ -238,3 +238,57 @@ func (s *Service) CopyOrMoveFileOrFolder(source, destination string, move bool) 
 
 	return copyFile(source, destination, info.Mode())
 }
+
+func (s *Service) CopyOrMoveFilesOrFolders(pairs [][2]string, move bool) error {
+	if len(pairs) == 0 {
+		return fmt.Errorf("no source-destination pairs provided")
+	}
+
+	for _, pair := range pairs {
+		source := pair[0]
+		dest := pair[1]
+
+		if source == "" || dest == "" {
+			return fmt.Errorf("source and destination cannot be empty")
+		}
+		if !filepath.IsAbs(source) || !filepath.IsAbs(dest) {
+			return fmt.Errorf("both source and destination must be absolute paths")
+		}
+
+		if _, err := os.Stat(source); os.IsNotExist(err) {
+			return fmt.Errorf("source does not exist: %s", source)
+		} else if err != nil {
+			return fmt.Errorf("failed to stat source %s: %w", source, err)
+		}
+	}
+
+	for _, pair := range pairs {
+		source := pair[0]
+		dest := pair[1]
+
+		info, _ := os.Stat(source)
+
+		target := dest
+		if destInfo, err := os.Stat(dest); err == nil && destInfo.IsDir() {
+			target = filepath.Join(dest, filepath.Base(source))
+		}
+
+		if move {
+			if err := os.Rename(source, target); err != nil {
+				return fmt.Errorf("failed to move %s to %s: %w", source, target, err)
+			}
+		} else {
+			if info.IsDir() {
+				if err := copyDir(source, target); err != nil {
+					return fmt.Errorf("failed to copy directory %s to %s: %w", source, target, err)
+				}
+			} else {
+				if err := copyFile(source, target, info.Mode()); err != nil {
+					return fmt.Errorf("failed to copy file %s to %s: %w", source, target, err)
+				}
+			}
+		}
+	}
+
+	return nil
+}

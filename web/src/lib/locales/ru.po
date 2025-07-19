@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-19T13:24:18.682Z\n"
-"PO-Revision-Date: 2025-07-19T13:44:30.032Z\n"
+"PO-Revision-Date: 2025-07-19T14:59:07.087Z\n"
 "Last-Translator: \n"
 "Language: Russian\n"
 "Language-Team: \n"
@@ -2147,6 +2147,7 @@ msgstr "Не удалось изменить пул"
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/routes/[node]/vm/[node]/storage/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Shutoff"
 msgstr "Выключить"
 
@@ -2644,3 +2645,15 @@ msgstr "Русский (Русский)"
 #: src/lib/components/custom/Login.svelte
 msgid "Remember Me"
 msgstr "Запомнить меня"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Started {0}"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Stopped"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Stopped {0}"
+msgstr ""

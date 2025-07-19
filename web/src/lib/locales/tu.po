@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-19T13:45:12.198Z\n"
-"PO-Revision-Date: 2025-07-19T13:50:13.815Z\n"
+"PO-Revision-Date: 2025-07-19T14:59:07.115Z\n"
 "Last-Translator: \n"
 "Language: Türkçe\n"
 "Language-Team: \n"
@@ -2162,6 +2162,7 @@ msgstr "Havuz düzenleme başarısız"
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/routes/[node]/vm/[node]/storage/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Shutoff"
 msgstr "Kapat"
 
@@ -2607,3 +2608,15 @@ msgstr "Disk Bölümü GUID'si bulunamadı"
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "This will delete {0}. This action cannot be undone."
 msgstr "Bu, {0} öğesini silecektir. Bu işlem geri alınamaz."
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Started {0}"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Stopped"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Stopped {0}"
+msgstr ""

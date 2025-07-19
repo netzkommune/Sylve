@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: ykla\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-14T07:55:43.864Z\n"
-"PO-Revision-Date: 2025-07-19T13:43:30.250Z\n"
+"PO-Revision-Date: 2025-07-19T14:59:06.803Z\n"
 "Last-Translator: ykla <yklaxds@gmail.com>\n"
 "Language: 简体中文\n"
 "Language-Team: ykla <yklaxds@gmail.com>\n"
@@ -1247,6 +1247,7 @@ msgstr "存储池使用情况"
 #: src/routes/[node]/vm/[node]/storage/+page.svelte
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Shutoff"
 msgstr "关机"
 
@@ -2680,3 +2681,15 @@ msgstr "阿拉伯语 (العربية)"
 #: src/lib/components/custom/Login.svelte
 msgid "Russian (Русский)"
 msgstr "俄语（Русский）"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Started {0}"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Stopped"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Stopped {0}"
+msgstr ""

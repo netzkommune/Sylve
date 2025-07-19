@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-19T12:41:02.565Z\n"
-"PO-Revision-Date: 2025-07-19T13:44:01.486Z\n"
+"PO-Revision-Date: 2025-07-19T14:59:06.848Z\n"
 "Last-Translator: \n"
 "Language: Arabic\n"
 "Language-Team: \n"
@@ -1870,6 +1870,7 @@ msgstr "استخدام المجموعة"
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/routes/[node]/vm/[node]/storage/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Shutoff"
 msgstr "إيقاف التشغيل"
 
@@ -2644,3 +2645,15 @@ msgstr "العربية (العربية)"
 #: src/lib/components/custom/Login.svelte
 msgid "Russian (Русский)"
 msgstr "الروسية (Русский)"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Started {0}"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Stopped"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Stopped {0}"
+msgstr ""

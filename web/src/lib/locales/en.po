@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-08T09:39:56.780Z\n"
-"PO-Revision-Date: 2025-07-17T16:49:07.560Z\n"
+"PO-Revision-Date: 2025-07-19T12:27:15.938Z\n"
 "Last-Translator: \n"
 "Language: English\n"
 "Language-Team: \n"
@@ -60,6 +60,7 @@ msgid "Network"
 msgstr "Network"
 
 #: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Interfaces"
 msgstr "Interfaces"
 
@@ -255,6 +256,8 @@ msgstr "Minimize"
 #: src/lib/components/custom/VM/Hardware/BootOrder.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Dialog/SingleValue.svelte
 msgid "Close"
 msgstr "Close"
 
@@ -301,6 +304,7 @@ msgstr "Create Partitions"
 #: src/lib/components/custom/VM/Hardware/BootOrder.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/Samba/Create.svelte
 msgid "Reset"
 msgstr "Reset"
 
@@ -320,6 +324,8 @@ msgstr "Reset"
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/routes/[node]/settings/authentication/+page.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/lib/components/custom/Samba/Create.svelte
 msgid "Name"
 msgstr "Name"
 
@@ -420,6 +426,7 @@ msgstr "View Snapshot Jobs"
 #: src/lib/components/custom/VM/Hardware/BootOrder.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/routes/[node]/settings/authentication/+page.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
 msgid "ID"
 msgstr "ID"
 
@@ -429,6 +436,7 @@ msgstr "ID"
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
 #: src/lib/components/custom/VM/Hardware/BootOrder.svelte
+#: src/lib/components/custom/Samba/Create.svelte
 msgid "Dataset"
 msgstr "Dataset"
 
@@ -509,6 +517,7 @@ msgstr "Bulk Delete"
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
 msgid "New"
 msgstr "New"
 
@@ -535,6 +544,7 @@ msgstr "This is a note"
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/Dialog/SingleValue.svelte
 msgid "Save"
 msgstr "Save"
 
@@ -896,6 +906,7 @@ msgstr "Disable IPV6"
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/Samba/Create.svelte
 msgid "Create"
 msgstr "Create"
 
@@ -958,6 +969,7 @@ msgstr "Attribute"
 #: src/routes/[node]/storage/disks/+page.svelte
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/lib/components/custom/Charts/Area.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Value"
 msgstr "Value"
 
@@ -1108,6 +1120,7 @@ msgstr "Comments about the pool"
 
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
 msgid "Mount Point"
 msgstr "Mount Point"
 
@@ -1138,6 +1151,7 @@ msgstr "Auto Expand"
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/CreateVM/Advanced.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Yes"
 msgstr "Yes"
 
@@ -1147,6 +1161,7 @@ msgstr "Yes"
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/CreateVM/Advanced.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "No"
 msgstr "No"
 
@@ -2087,6 +2102,7 @@ msgid "Current: {0} ( {1} MB) | Max: {2} ( {3} MB)"
 msgstr "Current: {0} ( {1} MB) | Max: {2} ( {3} MB)"
 
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Property"
 msgstr "Property"
 
@@ -3024,3 +3040,133 @@ msgstr "Users"
 #: src/routes/[node]/+layout.svelte
 msgid "Groups"
 msgstr "Groups"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Delete Share"
+msgstr "Delete Share"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Samba share"
+msgstr "Samba share"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Failed to delete Samba share"
+msgstr "Failed to delete Samba share"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Samba share deleted"
+msgstr "Samba share deleted"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Read-Only Groups"
+msgstr "Read-Only Groups"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Writeable Groups"
+msgstr "Writeable Groups"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Created At"
+msgstr "Created At"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Create Samba Share"
+msgstr "Create Samba Share"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Select dataset"
+msgstr "Select dataset"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Select groups"
+msgstr "Select groups"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Create Mask"
+msgstr "Create Mask"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Directory Mask"
+msgstr "Directory Mask"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Share name already exists"
+msgstr "Share name already exists"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Name is required"
+msgstr "Name is required"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Dataset is required"
+msgstr "Dataset is required"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "No groups selected"
+msgstr "No groups selected"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Share cannot have overlapping groups"
+msgstr "Share cannot have overlapping groups"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Failed to create Samba share"
+msgstr "Failed to create Samba share"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Samba share created"
+msgstr "Samba share created"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Edit {0}"
+msgstr "Edit {0}"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Workgroup"
+msgstr "Workgroup"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Enter Workgroup"
+msgstr "Enter Workgroup"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Unix Charset"
+msgstr "Unix Charset"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Enter Unix Charset"
+msgstr "Enter Unix Charset"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Server String"
+msgstr "Server String"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Enter Server String"
+msgstr "Enter Server String"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Bind Interfaces Only"
+msgstr "Bind Interfaces Only"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Select Interfaces"
+msgstr "Select Interfaces"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Failed to update Samba configuration"
+msgstr "Failed to update Samba configuration"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Samba configuration updated"
+msgstr "Samba configuration updated"
+
+#: src/lib/components/custom/Dialog/SingleValue.svelte
+msgid "Enter value"
+msgstr "Enter value"
+
+#: src/lib/components/custom/Dialog/SingleValue.svelte
+msgid "Select an option"
+msgstr "Select an option"

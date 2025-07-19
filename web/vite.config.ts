@@ -5,10 +5,7 @@ import { wuchale } from 'wuchale';
 
 export default defineConfig({
 	plugins: [
-		wuchale({
-			localesDir: 'src/lib/locales',
-			otherLocales: ['mal']
-		}),
+		wuchale(),
 		tailwindcss(),
 		sveltekit()
 	],
@@ -20,5 +17,8 @@ export default defineConfig({
 	},
 	build: {
 		target: 'esnext'
+	},
+	server: {
+		allowedHosts: ["dxb-test-1.difusedns.com"]
 	}
 });

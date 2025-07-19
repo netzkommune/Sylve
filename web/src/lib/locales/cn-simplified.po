@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: ykla\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-14T07:55:43.864Z\n"
-"PO-Revision-Date: 2025-07-19T12:27:30.882Z\n"
+"PO-Revision-Date: 2025-07-19T13:43:30.250Z\n"
 "Last-Translator: ykla <yklaxds@gmail.com>\n"
 "Language: 简体中文\n"
 "Language-Team: ykla <yklaxds@gmail.com>\n"
@@ -37,6 +37,12 @@ msgstr ""
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
 #: src/lib/components/custom/Samba/Create.svelte
 #: src/lib/components/custom/Dialog/SingleValue.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
+#: src/lib/components/custom/FileExplorer/RenameModal.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
 msgid "Close"
 msgstr "关闭"
 
@@ -56,6 +62,7 @@ msgid "SYLVE"
 msgstr "SYLVE"
 
 #: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
 msgid "Username"
 msgstr "用户名"
 
@@ -65,6 +72,7 @@ msgstr "输入你的用户名"
 
 #: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
 msgid "Password"
 msgstr "密码"
 
@@ -172,6 +180,7 @@ msgid "Node"
 msgstr "节点"
 
 #: src/lib/components/skeleton/BottomPanel.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
 msgid "User"
 msgstr "用户"
 
@@ -248,6 +257,12 @@ msgstr "<0/> 创建虚拟机"
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
+#: src/lib/components/custom/FileExplorer/RenameModal.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
 msgid "Reset"
 msgstr "重置"
 
@@ -600,6 +615,8 @@ msgstr "查看"
 #: src/routes/[node]/network/switches/+page.svelte
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
 msgid "Delete"
 msgstr "删除"
 
@@ -626,6 +643,8 @@ msgstr "批量删除"
 #: src/routes/[node]/vm/[node]/storage/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
 msgid "New"
 msgstr "新"
 
@@ -645,6 +664,9 @@ msgstr "附注"
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/routes/[node]/storage/samba/shares/+page.svelte
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
 msgid "Name"
 msgstr "名称"
 
@@ -667,6 +689,7 @@ msgstr "这是一个附注"
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
 #: src/lib/components/custom/Dialog/SingleValue.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
 msgid "Save"
 msgstr "保存"
 
@@ -700,6 +723,8 @@ msgstr "附注创建失败"
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
 #: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
 msgid "ID"
 msgstr "ID"
 
@@ -744,120 +769,120 @@ msgstr "退出"
 
 #: src/routes/[node]/+layout.svelte
 msgid "Authentication"
-msgstr ""
+msgstr "身份验证"
 
 #: src/routes/[node]/utilities/downloader/+page.svelte
 msgid "Download"
-msgstr ""
+msgstr "下载"
 
 #: src/routes/[node]/utilities/downloader/+page.svelte
 msgid "Magnet"
-msgstr ""
+msgstr "Magnet"
 
 #: src/routes/[node]/utilities/downloader/+page.svelte
 msgid "HTTP"
-msgstr ""
+msgstr "HTTP"
 
 #: src/routes/[node]/utilities/downloader/+page.svelte
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: src/routes/[node]/utilities/downloader/+page.svelte
 msgid "Failed to delete download"
-msgstr ""
+msgstr "删除下载失败"
 
 #: src/routes/[node]/utilities/downloader/+page.svelte
 msgid "Failed to delete downloads"
-msgstr ""
+msgstr "删除下载失败"
 
 #: src/routes/[node]/utilities/downloader/+page.svelte
 msgid "Please enter a valid URL"
-msgstr ""
+msgstr "请输入有效的 URL"
 
 #: src/routes/[node]/utilities/downloader/+page.svelte
 msgid "Please enter a valid magnet or HTTP URL"
-msgstr ""
+msgstr "请输入有效的 magnet 或 HTTP URL"
 
 #: src/routes/[node]/utilities/downloader/+page.svelte
 msgid "Download started"
-msgstr ""
+msgstr "下载已开始"
 
 #: src/routes/[node]/utilities/downloader/+page.svelte
 msgid "Download failed"
-msgstr ""
+msgstr "下载失败"
 
 #: src/routes/[node]/utilities/downloader/+page.svelte
 msgid "Failed to get download link"
-msgstr ""
+msgstr "获取下载链接失败"
 
 #: src/routes/[node]/network/interfaces/+page.svelte
 msgid "Model"
-msgstr ""
+msgstr "型号"
 
 #: src/routes/[node]/network/interfaces/+page.svelte
 msgid "Metric"
-msgstr ""
+msgstr "度量"
 
 #: src/routes/[node]/network/interfaces/+page.svelte
 #: src/routes/[node]/network/switches/+page.svelte
 msgid "MTU"
-msgstr ""
+msgstr "MTU"
 
 #: src/routes/[node]/network/interfaces/+page.svelte
 msgid "Active"
-msgstr ""
+msgstr "活动"
 
 #: src/routes/[node]/network/interfaces/+page.svelte
 msgid "Details - {0}"
-msgstr ""
+msgstr "详细信息 - {0}"
 
 #: src/lib/components/custom/KVTableModal.svelte
 msgid "Object ({0} properties)"
-msgstr ""
+msgstr "对象（{0} 属性）"
 
 #: src/routes/[node]/network/switches/+page.svelte
 msgid "Edit Switch -"
-msgstr ""
+msgstr "编辑交换机 -"
 
 #: src/routes/[node]/network/switches/+page.svelte
 msgid "New Switch"
-msgstr ""
+msgstr "新建交换机"
 
 #: src/routes/[node]/network/switches/+page.svelte
 msgid "VLAN"
-msgstr ""
+msgstr "VLAN"
 
 #: src/routes/[node]/network/switches/+page.svelte
 msgid "IPv4"
-msgstr ""
+msgstr "IPv4"
 
 #: src/routes/[node]/network/switches/+page.svelte
 msgid "IPv6"
-msgstr ""
+msgstr "IPv6"
 
 #: src/routes/[node]/network/switches/+page.svelte
 msgid "Ports"
-msgstr ""
+msgstr "端口"
 
 #: src/routes/[node]/network/switches/+page.svelte
 msgid "Select ports"
-msgstr ""
+msgstr "选择端口"
 
 #: src/routes/[node]/network/switches/+page.svelte
 msgid "Private"
-msgstr ""
+msgstr "私有"
 
 #: src/routes/[node]/network/switches/+page.svelte
 msgid "DHCP"
-msgstr ""
+msgstr "DHCP"
 
 #: src/routes/[node]/network/switches/+page.svelte
 msgid "SLAAC"
-msgstr ""
+msgstr "SLAAC"
 
 #: src/routes/[node]/network/switches/+page.svelte
 msgid "Disable IPV6"
-msgstr ""
+msgstr "禁用 IPV6"
 
 #: src/routes/[node]/network/switches/+page.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
@@ -866,458 +891,462 @@ msgstr ""
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
 msgid "Create"
-msgstr ""
+msgstr "创建"
 
 #: src/routes/[node]/network/switches/+page.svelte
 msgid "Switch {0} deleted"
-msgstr ""
+msgstr "交换机 {0} 已删除"
 
 #: src/routes/[node]/network/switches/+page.svelte
 msgid "Switch is in use by a VM"
-msgstr ""
+msgstr "交换机正在被虚拟机使用"
 
 #: src/routes/[node]/network/switches/+page.svelte
 msgid "Error deleting switch"
-msgstr ""
+msgstr "删除交换机时出错"
 
 #: src/routes/[node]/network/switches/+page.svelte
 msgid "Invalid switch name"
-msgstr ""
+msgstr "无效的交换机名称"
 
 #: src/routes/[node]/network/switches/+page.svelte
 msgid "Invalid MTU"
-msgstr ""
+msgstr "无效的 MTU"
 
 #: src/routes/[node]/network/switches/+page.svelte
 msgid "Invalid VLAN"
-msgstr ""
+msgstr "无效的 VLAN"
 
 #: src/routes/[node]/network/switches/+page.svelte
 msgid "Invalid IPv4 CIDR"
-msgstr ""
+msgstr "无效的 IPv4 CIDR"
 
 #: src/routes/[node]/network/switches/+page.svelte
 msgid "Invalid IPv6 CIDR"
-msgstr ""
+msgstr "无效的 IPv6 CIDR"
 
 #: src/routes/[node]/network/switches/+page.svelte
 msgid "Switch {0} created"
-msgstr ""
+msgstr "交换机 {0} 已创建"
 
 #: src/routes/[node]/network/switches/+page.svelte
 msgid "Error creating switch"
-msgstr ""
+msgstr "创建交换机时出错"
 
 #: src/routes/[node]/network/switches/+page.svelte
 msgid "Switch {0} updated"
-msgstr ""
+msgstr "交换机 {0} 已更新"
 
 #: src/routes/[node]/network/switches/+page.svelte
 msgid "Error updating switch"
-msgstr ""
+msgstr "更新交换机时出错"
 
 #: src/routes/[node]/settings/device-passthrough/+page.svelte
 msgid "Enable Passthrough"
-msgstr ""
+msgstr "启用直通"
 
 #: src/routes/[node]/settings/device-passthrough/+page.svelte
 msgid "Disable Passthrough"
-msgstr ""
+msgstr "禁用直通"
 
 #: src/routes/[node]/settings/device-passthrough/+page.svelte
 msgid "Device added to passthrough"
-msgstr ""
+msgstr "设备已添加到直通"
 
 #: src/routes/[node]/settings/device-passthrough/+page.svelte
 msgid "Failed to add device to passthrough"
-msgstr ""
+msgstr "无法将设备添加到直通"
 
 #: src/routes/[node]/settings/device-passthrough/+page.svelte
 msgid "Device removed from passthrough"
-msgstr ""
+msgstr "设备已从直通中移除"
 
 #: src/routes/[node]/settings/device-passthrough/+page.svelte
 msgid "Device is in use by a VM, failed to remove"
-msgstr ""
+msgstr "设备正在被虚拟机使用，无法移除"
 
 #: src/routes/[node]/settings/device-passthrough/+page.svelte
 msgid "Failed to remove device from passthrough"
-msgstr ""
+msgstr "无法从直通中移除设备"
 
 #: src/routes/[node]/settings/device-passthrough/+page.svelte
 msgid "Are you sure you want to pass through <b>{0}</b> by <b>{1}</b>? This will make it unavailable to the host."
-msgstr ""
+msgstr "您确定要通过 <b>{1}</b> 直通 <b>{0}</b> 吗？这将使其对主机不可用。"
 
 #: src/routes/[node]/settings/device-passthrough/+page.svelte
 msgid "Are you sure you want to remove passthrough for <b>{0}</b> by <b>{1}</b>? This will make it available to the host again."
-msgstr ""
+msgstr "您确定要移除 <b>{1}</b> 对 <b>{0}</b> 的直通吗？这将使其再次对主机可用。"
 
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 msgid "Rollback To Snapshot"
-msgstr ""
+msgstr "回滚到快照"
 
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 msgid "Create Snapshot"
-msgstr ""
+msgstr "创建快照"
 
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "Delete Snapshot"
-msgstr ""
+msgstr "删除快照"
 
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 msgid "Edit Filesystem"
-msgstr ""
+msgstr "编辑文件系统"
 
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 msgid "Delete Filesystem"
-msgstr ""
+msgstr "删除文件系统"
 
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "Delete Datasets"
-msgstr ""
+msgstr "删除数据集"
 
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 msgid "Are you sure you want to rollback to the snapshot <b>{0}</b>? This action cannot be undone."
-msgstr ""
+msgstr "确定要回滚到快照 <b>{0}</b> 吗？此操作无法撤消。"
 
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 msgid "Rolled back to snapshot {0}"
-msgstr ""
+msgstr "已回滚到快照 {0}"
 
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 msgid "Failed to rollback to snapshot {0}"
-msgstr ""
+msgstr "回滚到快照 {0} 失败"
 
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
 msgid "Snapshot GUID not found"
-msgstr ""
+msgstr "未找到快照 GUID"
 
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 msgid "Deleted filesystem {0}"
-msgstr ""
+msgstr "已删除文件系统 {0}"
 
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 msgid "Failed to delete filesystem {0}"
-msgstr ""
+msgstr "删除文件系统 {0} 失败"
 
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 msgid "Filesystem GUID not found"
-msgstr ""
+msgstr "未找到文件系统 GUID"
 
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 msgid "Are you sure you want to delete {0}? This action cannot be undone."
-msgstr ""
+msgstr "确定要删除 {0} 吗？此操作无法撤消。"
 
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "Deleted {0} datasets"
-msgstr ""
+msgstr "已删除 {0} 个数据集"
 
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "Failed to delete datasets"
-msgstr ""
+msgstr "删除数据集失败```"
 
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 msgid "View Periodics"
-msgstr ""
+msgstr "查看周期性任务"
 
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 msgid "Are you sure you want to delete {0} snapshot{1}? This action cannot be undone."
-msgstr ""
+msgstr "确定要删除 {0} 个快照{1} 吗？此操作无法撤消。"
 
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 msgid "Deleted {0} snapshot{1}"
-msgstr ""
+msgstr "已删除 {0} 个快照{1}"
 
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 msgid "Failed to delete snapshots"
-msgstr ""
+msgstr "删除快照失败"
 
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "Flash File"
-msgstr ""
+msgstr "刷入文件"
 
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "Delete Volume"
-msgstr ""
+msgstr "删除卷"
 
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "Edit Volume"
-msgstr ""
+msgstr "编辑卷"
 
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "Deleted volume {0}"
-msgstr ""
+msgstr "已删除卷 {0}"
 
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "Failed to delete volume {0}"
-msgstr ""
+msgstr "删除卷 {0} 失败"
 
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "Volume GUID not found"
-msgstr ""
+msgstr "未找到卷 GUID"
 
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "This will delete {0}. This action cannot be undone."
-msgstr ""
+msgstr "这将删除 {0}。此操作无法撤消。"
 
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 msgid "Scrub started"
-msgstr ""
+msgstr "清理已开始"
 
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 msgid "Scrub"
-msgstr ""
+msgstr "清理"
 
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 msgid "Replace Device"
-msgstr ""
+msgstr "替换设备"
 
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 msgid "ZFS Pool"
-msgstr ""
+msgstr "ZFS 存储池"
 
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 msgid "Pool {0} deleted"
-msgstr ""
+msgstr "存储池 {0} 已删除"
 
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 msgid "Pool contains a mirror with devices of different sizes"
-msgstr ""
+msgstr "存储池包含大小不同的镜像设备"
 
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 msgid "Pool contains a RAIDZ vdev with devices of different sizes"
-msgstr ""
+msgstr "存储池包含大小不同的 RAIDZ vdev 设备"
 
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 msgid "Pool is busy"
-msgstr ""
+msgstr "存储池繁忙"
 
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 msgid "Pool has a dataset that is in use by a VM or Jail"
-msgstr ""
+msgstr "存储池具有正在被 VM 或 Jail 使用的数据集"
 
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 msgid "Spare device is too small"
-msgstr ""
+msgstr "备用设备太小"
 
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 msgid "Pool edit failed"
-msgstr ""
+msgstr "存储池编辑失败"
 
 #: src/routes/[node]/storage/disks/+page.svelte
 msgid "S.M.A.R.T Values"
-msgstr ""
+msgstr "S.M.A.R.T 值"
 
 #: src/routes/[node]/storage/disks/+page.svelte
 msgid "Initialize GPT"
-msgstr ""
+msgstr "初始化 GPT"
 
 #: src/routes/[node]/storage/disks/+page.svelte
 msgid "Wipe Disk"
-msgstr ""
+msgstr "擦除磁盘"
 
 #: src/routes/[node]/storage/disks/+page.svelte
 msgid "Delete Partition"
-msgstr ""
+msgstr "删除分区"
 
 #: src/routes/[node]/storage/disks/+page.svelte
 msgid "Create Partition"
-msgstr ""
+msgstr "创建分区"
 
 #: src/routes/[node]/storage/disks/+page.svelte
 msgid "Attribute"
-msgstr ""
+msgstr "属性"
 
 #: src/routes/[node]/storage/disks/+page.svelte
 msgid "Unable to wipe busy disk"
-msgstr ""
+msgstr "无法擦除繁忙的磁盘"
 
 #: src/routes/[node]/storage/disks/+page.svelte
 msgid "Unable to delete busy partition"
-msgstr ""
+msgstr "无法删除繁忙的分区"
 
 #: src/routes/[node]/storage/disks/+page.svelte
 msgid "Error {0}: {1}"
-msgstr ""
+msgstr "错误 {0}：{1}"
 
 #: src/routes/[node]/storage/disks/+page.svelte
 msgid "S.M.A.R.T Values ({0})"
-msgstr ""
+msgstr "S.M.A.R.T 值 ({0})"
 
 #: src/routes/[node]/storage/disks/+page.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "NVMe"
-msgstr ""
+msgstr "NVMe"
 
 #: src/routes/[node]/storage/disks/+page.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "HDD"
-msgstr ""
+msgstr "HDD"
 
 #: src/routes/[node]/storage/disks/+page.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "SSD"
-msgstr ""
+msgstr "SSD"
 
 #: src/routes/[node]/storage/disks/+page.svelte
 msgid "This action cannot be undone. This will permanently <b>delete</b> partition <b>{0}</b>."
-msgstr ""
+msgstr "此操作无法撤消。这将永久<b>删除</b>分区 <b>{0}</b>。"
 
 #: src/routes/[node]/storage/disks/+page.svelte
 msgid "This action cannot be undone. This will permanently <b>wipe</b> disk <b>{0}</b>."
-msgstr ""
+msgstr "此操作无法撤消。这将永久<b>擦除</b>磁盘 <b>{0}</b>。"
 
 #: src/routes/[node]/storage/disks/+page.svelte
 msgid "Disk {0} initialized with GPT"
-msgstr ""
+msgstr "磁盘 {0} 已使用 GPT 初始化"
 
 #: src/routes/[node]/storage/disks/+page.svelte
 msgid "Unused"
-msgstr ""
+msgstr "未使用"
 
 #: src/routes/[node]/storage/disks/+page.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Partitions"
-msgstr ""
+msgstr "分区"
 
 #: src/routes/[node]/storage/zfs/dashboard/+page.svelte
 msgid "Pool Stats"
-msgstr ""
+msgstr "存储池统计信息"
 
 #: src/routes/[node]/storage/zfs/dashboard/+page.svelte
 msgid "Select a stat type"
-msgstr ""
+msgstr "选择统计信息类型"
 
 #: src/routes/[node]/storage/zfs/dashboard/+page.svelte
 msgid "Select a interval"
-msgstr ""
+msgstr "选择时间间隔"
 
 #: src/routes/[node]/storage/zfs/dashboard/+page.svelte
 msgid "Dataset Compression"
-msgstr ""
+msgstr "数据集压缩"
 
 #: src/routes/[node]/storage/zfs/dashboard/+page.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 msgid "Select a pool"
-msgstr ""
+msgstr "选择存储池"
 
 #: src/routes/[node]/storage/zfs/dashboard/+page.svelte
 msgid "Pool Usage"
-msgstr ""
+msgstr "存储池使用情况"
 
 #: src/routes/[node]/vm/[node]/console/+page.svelte
 #: src/routes/[node]/vm/[node]/storage/+page.svelte
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 msgid "Shutoff"
-msgstr ""
+msgstr "关机"
 
 #: src/routes/[node]/vm/[node]/console/+page.svelte
 msgid "VM Console"
-msgstr ""
+msgstr "虚拟机控制台"
 
 #: src/routes/[node]/vm/[node]/console/+page.svelte
 msgid "The VM is currently powered off.<0/> Start the VM to access its console."
-msgstr ""
+msgstr "虚拟机当前已关闭。<0/> 启动虚拟机以访问其控制台。"
 
 #: src/routes/[node]/vm/[node]/storage/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 msgid "Detach"
-msgstr ""
+msgstr "分离"
 
 #: src/routes/[node]/vm/[node]/storage/+page.svelte
 msgid "This will detach the storage {0} from the VM {1}"
-msgstr ""
+msgstr "这将把存储 {0} 从虚拟机 {1} 中分离"
 
 #: src/routes/[node]/vm/[node]/storage/+page.svelte
 msgid "Failed to detach storage"
-msgstr ""
+msgstr "分离存储失败"
 
 #: src/routes/[node]/vm/[node]/storage/+page.svelte
 msgid "Storage detached"
-msgstr ""
+msgstr "存储已分离"
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Running"
-msgstr ""
+msgstr "正在运行"
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Start"
-msgstr ""
+msgstr "开始"
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Stop"
-msgstr ""
+msgstr "停止"
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Notes about VM"
-msgstr ""
+msgstr "关于虚拟机的备注"
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "VM"
-msgstr ""
+msgstr "虚拟机"
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Deleting Virtual Machine"
-msgstr ""
+msgstr "正在删除虚拟机"
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Please wait while VM <b>{0} ({1})</b> is being deleted"
-msgstr ""
+msgstr "请等待，虚拟机 <b>{0} ({1})</b> 正在被删除"
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Error deleting VM"
-msgstr ""
+msgstr "删除虚拟机出错"
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "VM deleted"
-msgstr ""
+msgstr "虚拟机已删除"
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Starting Virtual Machine"
-msgstr ""
+msgstr "正在启动虚拟机"
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Please wait while VM <b>{0} ({1})</b> is being started."
-msgstr ""
+msgstr "请等待，虚拟机 <b>{0} ({1})</b> 正在被启动。"
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Error starting VM"
-msgstr ""
+msgstr "启动虚拟机出错"
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "VM started"
-msgstr ""
+msgstr "虚拟机已启动"
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Stopping Virtual Machine"
-msgstr ""
+msgstr "正在停止虚拟机"
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Please wait while VM <b>{0} ({1})</b> is being stopped"
-msgstr ""
+msgstr "请等待，虚拟机 <b>{0} ({1})</b> 正在被停止"
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Error stopping VM"
-msgstr ""
+msgstr "停止虚拟机出错"
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "VM stopped"
-msgstr ""
+msgstr "虚拟机已停止```"
 
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
 msgid "RAM"
-msgstr ""
+msgstr "内存"
 
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 msgid "Edit RAM"
@@ -1334,846 +1363,853 @@ msgstr ""
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Property"
-msgstr ""
+msgstr "属性"
 
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 msgid "This will detach the VM <b>{0}</b> from the switch <b>{1}</b>"
-msgstr ""
+msgstr "这将把虚拟机 <b>{0}</b> 从交换机 <b>{1}</b> 中分离"
 
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 msgid "Failed to detach network"
-msgstr ""
+msgstr "分离网络失败"
 
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 msgid "Network detached"
-msgstr ""
+msgstr "网络已分离"
 
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 msgid "Emulation"
-msgstr ""
+msgstr "模拟"
 
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 msgid "Unknown Switch"
-msgstr ""
+msgstr "未知交换机"
 
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 msgid "Unknown"
-msgstr ""
+msgstr "未知"
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
 msgid "Snapshot - {0}"
-msgstr ""
+msgstr "快照 - {0}"
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
 msgid "Recursive"
-msgstr ""
+msgstr "递归"
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
 msgid "Invalid name"
-msgstr ""
+msgstr "无效的名称"
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
 msgid "This will delete the snapshot <0/>"
-msgstr ""
+msgstr "这将删除快照 <0/>"
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
 msgid "Deleted snapshot {0}"
-msgstr ""
+msgstr "已删除快照 {0}"
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
 msgid "Failed to delete snapshot {0}"
-msgstr ""
+msgstr "删除快照 {0} 失败"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 msgid "<0/>Create Filesystem"
-msgstr ""
+msgstr "<0/>创建文件系统"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 msgid "Parent"
-msgstr ""
+msgstr "父级"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 msgid "Select parent"
-msgstr ""
+msgstr "选择父级"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 msgid "ATime"
-msgstr ""
+msgstr "ATime"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 msgid "Select ATime"
-msgstr ""
+msgstr "选择 ATime"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 msgid "Checksum"
-msgstr ""
+msgstr "校验和"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 msgid "Select Checksum"
-msgstr ""
+msgstr "选择校验和"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 msgid "Compression"
-msgstr ""
+msgstr "压缩"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 msgid "Select Compression"
-msgstr ""
+msgstr "选择压缩"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 msgid "Deduplication"
-msgstr ""
+msgstr "去重"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 msgid "Select Deduplication"
-msgstr ""
+msgstr "选择去重"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 msgid "Encryption"
-msgstr ""
+msgstr "加密"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 msgid "Select Encryption"
-msgstr ""
+msgstr "选择加密"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 msgid "Passphrase"
-msgstr ""
+msgstr "密码"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 msgid "Quota"
-msgstr ""
+msgstr "配额"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 msgid "No parent selected"
-msgstr ""
+msgstr "未选择父级"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 msgid "Encryption key is required"
-msgstr ""
+msgstr "需要加密密钥"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 msgid "Invalid quota size"
-msgstr ""
+msgstr "无效的配额大小"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 msgid "Failed to create filesystem"
-msgstr ""
+msgstr "创建文件系统失败"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 msgid "File System {0} created"
-msgstr ""
+msgstr "文件系统 {0} 已创建"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 msgid "<0/>Edit Filesystem - {0}"
-msgstr ""
+msgstr "<0/>编辑文件系统 - {0}"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 msgid "Quota size is less than current used or reserved space"
-msgstr ""
+msgstr "配额大小小于当前已用或保留空间"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 msgid "Failed to edit filesystem"
-msgstr ""
+msgstr "编辑文件系统失败"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 msgid "File System {0} edited"
-msgstr ""
+msgstr "文件系统 {0} 已编辑"
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 msgid "Pool"
-msgstr ""
+msgstr "存储池"
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
 #: src/lib/components/custom/Samba/Create.svelte
 msgid "Dataset"
-msgstr ""
+msgstr "数据集"
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 msgid "Select a dataset"
-msgstr ""
+msgstr "选择一个数据集"
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
 msgid "Interval"
-msgstr ""
+msgstr "间隔"
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 msgid "Select an interval"
-msgstr ""
+msgstr "选择一个间隔"
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 msgid "Failed to create snapshot"
-msgstr ""
+msgstr "创建快照失败"
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 msgid "Snapshot {0}@{1} created"
-msgstr ""
+msgstr "快照 {0}@{1} 已创建"
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
 msgid "View Snapshot Jobs"
-msgstr ""
+msgstr "查看快照作业"
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
 msgid "Prefix"
-msgstr ""
+msgstr "前缀"
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
 msgid "Last Run"
-msgstr ""
+msgstr "上次运行"
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
 msgid "Jan 01, 0001"
-msgstr ""
+msgstr "0001 年 1 月 1 日"
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
 msgid "Never"
-msgstr ""
+msgstr "从不"
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
 msgid "Deleted"
-msgstr ""
+msgstr "已删除"
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
 msgid "No snapshot jobs"
-msgstr ""
+msgstr "没有快照作业"
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
 msgid "Save Snapshot Jobs"
-msgstr ""
+msgstr "保存快照作业"
 
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 msgid "Create Volume"
-msgstr ""
+msgstr "创建卷"
 
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
 #: src/lib/components/disk/CreatePartition.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
 msgid "Size"
-msgstr ""
+msgstr "大小"
 
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 msgid "Select Pool"
-msgstr ""
+msgstr "选择存储池"
 
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 msgid "Invalid volume name"
-msgstr ""
+msgstr "无效的卷名"
 
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 msgid "Please select a pool"
-msgstr ""
+msgstr "请选择一个存储池"
 
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
 msgid "Invalid volume size"
-msgstr ""
+msgstr "无效的卷大小"
 
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 msgid "Parent not found"
-msgstr ""
+msgstr "未找到父级"
 
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 msgid "Volume size is greater than available space"
-msgstr ""
+msgstr "卷大小大于可用空间"
 
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 msgid "Failed to create volume"
-msgstr ""
+msgstr "创建卷失败"
 
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 msgid "Volume {0} created"
-msgstr ""
+msgstr "卷 {0} 已创建"
 
 #: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
 msgid "<0/> Flash File to {0}"
-msgstr ""
+msgstr "<0/> 将文件刷入到 {0}"
 
 #: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
 msgid "Select File"
-msgstr ""
+msgstr "选择文件"
 
 #: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
 msgid "File"
-msgstr ""
+msgstr "文件"
 
 #: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
 msgid "Error flashing volume"
-msgstr ""
+msgstr "刷入卷时出错"
 
 #: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
 msgid "Flash"
-msgstr ""
+msgstr "刷入"
 
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 msgid "Edit ZFS Pool - {0}"
-msgstr ""
+msgstr "编辑 ZFS 池 - {0}"
 
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Auto Expand"
-msgstr ""
+msgstr "自动扩展"
 
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Select Auto Expand"
-msgstr ""
+msgstr "选择自动扩展"
 
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 #: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Yes"
-msgstr ""
+msgstr "是"
 
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 #: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "No"
-msgstr ""
+msgstr "否"
 
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Auto Trim"
-msgstr ""
+msgstr "自动 TRIM"
 
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Select Auto Trim"
-msgstr ""
+msgstr "选择自动 TRIM"
 
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Delegation"
-msgstr ""
+msgstr "委派"
 
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Select Delegation"
-msgstr ""
+msgstr "选择委派"
 
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Fail Mode"
-msgstr ""
+msgstr "故障模式"
 
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Select Fail Mode"
-msgstr ""
+msgstr "选择故障模式"
 
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Wait"
-msgstr ""
+msgstr "等待"
 
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Panic"
-msgstr ""
+msgstr "Panic"
 
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Status.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Spares"
-msgstr ""
+msgstr "备用盘"
 
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Select spares"
-msgstr ""
+msgstr "选择备用盘"
 
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Auto Replace"
-msgstr ""
+msgstr "自动替换"
 
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Select Auto Replace"
-msgstr ""
+msgstr "选择自动替换"
 
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Comment"
-msgstr ""
+msgstr "注释"
 
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Comments about the pool"
-msgstr ""
+msgstr "关于存储池的评论"
 
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 msgid "Pool edited"
-msgstr ""
+msgstr "存储池已编辑"
 
 #: src/lib/components/custom/ZFS/pools/Replace.svelte
 msgid "Replace {0} in {1}"
-msgstr ""
+msgstr "替换 {1} 中的 {0}"
 
 #: src/lib/components/custom/ZFS/pools/Replace.svelte
 msgid "Replace"
-msgstr ""
+msgstr "替换"
 
 #: src/lib/components/custom/ZFS/pools/Replace.svelte
 msgid "Replacement device not selected"
-msgstr ""
+msgstr "未选择替换设备"
 
 #: src/lib/components/custom/ZFS/pools/Replace.svelte
 msgid "New disk is smaller than old disk"
-msgstr ""
+msgstr "新磁盘比旧磁盘小"
 
 #: src/lib/components/custom/ZFS/pools/Replace.svelte
 msgid "New partition is smaller than old device"
-msgstr ""
+msgstr "新分区比旧设备小"
 
 #: src/lib/components/custom/ZFS/pools/Status.svelte
 msgid "Resilvering"
-msgstr ""
+msgstr "正在重构"
 
 #: src/lib/components/custom/ZFS/pools/Status.svelte
 msgid "READ: {0}"
-msgstr ""
+msgstr "读取: {0}"
 
 #: src/lib/components/custom/ZFS/pools/Status.svelte
 msgid "WRITE: {0}"
-msgstr ""
+msgstr "写入: {0}"
 
 #: src/lib/components/custom/ZFS/pools/Status.svelte
 msgid "CKSUM: {0}"
-msgstr ""
+msgstr "校验和: {0}"
 
 #: src/lib/components/custom/ZFS/pools/Status.svelte
 msgid "Pool Status"
-msgstr ""
+msgstr "存储池状态"
 
 #: src/lib/components/custom/ZFS/pools/Status.svelte
 msgid "Scan Activity"
-msgstr ""
+msgstr "扫描活动"
 
 #: src/lib/components/custom/ZFS/pools/Status.svelte
 msgid "No recent scan activity"
-msgstr ""
+msgstr "最近没有扫描活动"
 
 #: src/lib/components/custom/ZFS/pools/Status.svelte
 msgid "Device Topology"
-msgstr ""
+msgstr "设备拓扑"
 
 #: src/lib/components/custom/ZFS/pools/Status.svelte
 msgid "No devices found"
-msgstr ""
+msgstr "未找到设备"
 
 #: src/lib/components/custom/ZFS/pools/Status.svelte
 msgid "Error Status"
-msgstr ""
+msgstr "错误状态"
 
 #: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
 msgid "<0/>Edit Volume - {0}"
-msgstr ""
+msgstr "<0/>编辑卷 - {0}"
 
 #: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
 msgid "Size must be a multiple of volume block size ({0}K)"
-msgstr ""
+msgstr "大小必须是卷块大小 ({0}K) 的倍数"
 
 #: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
 msgid "Failed to edit volume"
-msgstr ""
+msgstr "编辑卷失败"
 
 #: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
 msgid "Volume edited successfully"
-msgstr ""
+msgstr "卷编辑成功"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "No available disks"
-msgstr ""
+msgstr "没有可用的磁盘"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "No available partitions"
-msgstr ""
+msgstr "没有可用的分区"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "<0/>Create ZFS Pool"
-msgstr ""
+msgstr "<0/>创建 ZFS 存储池"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Devices"
-msgstr ""
+msgstr "设备"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Options"
-msgstr ""
+msgstr "选项"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Virtual Devices"
-msgstr ""
+msgstr "虚拟设备"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Redundancy <0/>"
-msgstr ""
+msgstr "冗余 <0/>"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "VDEVs"
-msgstr ""
+msgstr "VDEV"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Drop disks here"
-msgstr ""
+msgstr "将磁盘拖放到这里"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 #: src/routes/[node]/storage/samba/shares/+page.svelte
 msgid "Mount Point"
-msgstr ""
+msgstr "挂载点"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Force Create"
-msgstr ""
+msgstr "强制创建"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Advanced"
-msgstr ""
+msgstr "高级"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "AShift"
-msgstr ""
+msgstr "AShift"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Select ASHIFT"
-msgstr ""
+msgstr "选择 ASHIFT"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Disks within a VDEV should ideally be the same type"
-msgstr ""
+msgstr "VDEV 中的磁盘最好是同一类型"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Disks within a VDEV should ideally be the same drive type"
-msgstr ""
+msgstr "VDEV 中的磁盘最好是同一驱动器类型"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Disks within a VDEV should ideally be the same size"
-msgstr ""
+msgstr "VDEV 中的磁盘最好是相同大小"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Partitions within a VDEV should ideally be the same size"
-msgstr ""
+msgstr "VDEV 中的分区最好是相同大小"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Disks/Partitions within a VDEV should ideally be the same drive type"
-msgstr ""
+msgstr "VDEV 中的磁盘/分区最好是同一驱动器类型"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "No available disks or partitions"
-msgstr ""
+msgstr "没有可用的磁盘或分区"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Invalid pool name"
-msgstr ""
+msgstr "无效的存储池名称"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "At least one VDEV containing disks is required"
-msgstr ""
+msgstr "至少需要一个包含磁盘的 VDEV"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Spares must be larger than the largest disk in the pool"
-msgstr ""
+msgstr "备用磁盘必须大于存储池中最大的磁盘"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "A pool with this name already exists"
-msgstr ""
+msgstr "已存在具有此名称的存储池"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Pool Created"
-msgstr ""
+msgstr "存储池已创建"
 
 #: src/lib/components/disk/CreatePartition.svelte
 msgid "Create Partitions"
-msgstr ""
+msgstr "创建分区"
 
 #: src/lib/components/disk/CreatePartition.svelte
 msgid "Usage"
-msgstr ""
+msgstr "用途"
 
 #: src/lib/components/disk/CreatePartition.svelte
 msgid "Actions"
-msgstr ""
+msgstr "操作"
 
 #: src/lib/components/disk/CreatePartition.svelte
 msgid "Existing"
-msgstr ""
+msgstr "现有"
 
 #: src/lib/components/disk/CreatePartition.svelte
 msgid "No partitions created yet"
-msgstr ""
+msgstr "尚未创建任何分区"
 
 #: src/lib/components/disk/CreatePartition.svelte
 msgid "Add Partition"
-msgstr ""
+msgstr "添加分区"
 
 #: src/lib/components/disk/CreatePartition.svelte
 msgid "No space left"
-msgstr ""
+msgstr "没有剩余空间"
 
 #: src/lib/components/disk/CreatePartition.svelte
 msgid "Size: {0}"
-msgstr ""
+msgstr "大小：{0}"
 
 #: src/lib/components/disk/CreatePartition.svelte
 msgid "Remaining space: {0}"
-msgstr ""
+msgstr "剩余空间：{0}"
 
 #: src/lib/components/disk/CreatePartition.svelte
 msgid "Save Partitions"
-msgstr ""
+msgstr "保存分区"
 
 #: src/lib/components/disk/CreatePartition.svelte
 msgid "Partition{0} created"
-msgstr ""
+msgstr "分区 {0} 已创建"
 
 #: src/lib/components/disk/CreatePartition.svelte
 msgid "Error creating {0}"
-msgstr ""
+msgstr "创建 {0} 时出错"
 
 #: src/lib/components/disk/CreatePartition.svelte
 msgid "New Partition {0}"
-msgstr ""
+msgstr "新分区 {0}"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "New Storage"
-msgstr ""
+msgstr "新建存储"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
 msgid "Type"
-msgstr ""
+msgstr "类型"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Select Type"
-msgstr ""
+msgstr "选择类型"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "CD-ROM"
-msgstr ""
+msgstr "CD-ROM"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Disk"
-msgstr ""
+msgstr "磁盘"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "ISO"
-msgstr ""
+msgstr "ISO"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Select ISO"
-msgstr ""
+msgstr "选择 ISO"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Select ZFS Volume"
-msgstr ""
+msgstr "选择 ZFS 卷"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "ZFS Filesystem"
-msgstr ""
+msgstr "ZFS 文件系统"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Select ZFS Filesystem"
-msgstr ""
+msgstr "选择 ZFS 文件系统"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 msgid "Select Emulation"
-msgstr ""
+msgstr "选择模拟"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "AHCI HD"
-msgstr ""
+msgstr "AHCI HD"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "VirtIO Block"
-msgstr ""
+msgstr "VirtIO Block"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Attach"
-msgstr ""
+msgstr "附加"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Please select a type and dataset"
-msgstr ""
+msgstr "请选择类型和数据集"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Failed to attach CD-ROM"
-msgstr ""
+msgstr "附加 CD-ROM 失败"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "CD-ROM attached"
-msgstr ""
+msgstr "CD-ROM 已附加"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Please select an emulation type"
-msgstr ""
+msgstr "请选择模拟类型"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Please select a {0}"
-msgstr ""
+msgstr "请选择一个 {0}"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Failed to attach ZFS Volume"
-msgstr ""
+msgstr "附加 ZFS 卷失败"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "ZFS Volume attached"
-msgstr ""
+msgstr "ZFS 卷已附加"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Name and size required"
-msgstr ""
+msgstr "名称和大小是必需的"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Invalid size"
-msgstr ""
+msgstr "无效的大小"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Failed to attach storage"
-msgstr ""
+msgstr "附加存储失败"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Storage attached"
-msgstr ""
+msgstr "存储已附加"
 
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 msgid "CPU"
-msgstr ""
+msgstr "CPU"
 
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 msgid "Sockets"
-msgstr ""
+msgstr "插槽"
 
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 msgid "Cores"
-msgstr ""
+msgstr "核心"
 
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 msgid "Threads"
-msgstr ""
+msgstr "线程"
 
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 msgid "CPU {0} is not pinned by this VM"
-msgstr ""
+msgstr "CPU {0} 未被此 VM 固定"
 
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 msgid "Failed to modify CPU"
-msgstr ""
+msgstr "修改 CPU 失败"
 
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
 msgid "VM not found"
-msgstr ""
+msgstr "未找到 VM"
 
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
 msgid "RAM value must be greater than 0"
-msgstr ""
+msgstr "RAM 值必须大于 0"
 
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
 msgid "RAM value exceeds available memory"
-msgstr ""
+msgstr "RAM 值超过可用内存"
 
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
 msgid "RAM value is too high, at least 1 GiB must be reserved for the host"
-msgstr ""
+msgstr "RAM 值太高，至少必须为主机保留 1 GiB"
 
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
 msgid "Failed to modify RAM"
-msgstr ""
+msgstr "修改 RAM 失败"
 
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
 msgid "RAM modified"
-msgstr ""
+msgstr "RAM 已修改"
 
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 msgid "New Network"
-msgstr ""
+msgstr "新建网络"
 
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 msgid "Select Switch"
-msgstr ""
+msgstr "选择交换机"
 
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 msgid "VirtIO"
-msgstr ""
+msgstr "VirtIO"
 
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 msgid "E1000"
-msgstr ""
+msgstr "E1000"
 
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 msgid "Switch is required"
-msgstr ""
+msgstr "交换机是必需的"
 
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 msgid "Emulation is required"
-msgstr ""
+msgstr "模拟是必需的"
 
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 msgid "Error attaching VM to switch"
-msgstr ""
+msgstr "将 VM 连接到交换机时出错"
 
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 msgid "VM attached to switch"
-msgstr ""
+msgstr "VM 已连接到交换机"
 
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
 msgid "Port"
-msgstr ""
+msgstr "端口"
 
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
 msgid "Enter or generate password"
-msgstr ""
+msgstr "输入或生成密码"
 
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
 msgid "Wait for VNC"
-msgstr ""
+msgstr "等待 VNC"
 
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
 msgid "Password too short"
-msgstr ""
+msgstr "密码太短"
 
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
 msgid "Port must be between 5900 and 65535"
-msgstr ""
+msgstr "端口必须在 5900 和 65535 之间"
 
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
 msgid "Invalid resolution selected"
-msgstr ""
+msgstr "选择了无效的分辨率"
 
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
 msgid "VNC port already in use"
-msgstr ""
+msgstr "VNC 端口已被使用"
 
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
 msgid "Failed to modify VNC"
-msgstr ""
+msgstr "修改 VNC 失败"
 
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
 msgid "VNC modified"
-msgstr ""
+msgstr "VNC 已修改"
 
 #: src/routes/[node]/storage/zfs/dashboard/+page.svelte
 msgid "Allocated"
@@ -2189,150 +2225,458 @@ msgstr ""
 
 #: src/routes/[node]/+layout.svelte
 msgid "Explorer"
-msgstr ""
+msgstr "浏览器"
 
 #: src/routes/[node]/+layout.svelte
 msgid "Samba"
-msgstr ""
+msgstr "Samba"
 
 #: src/routes/[node]/+layout.svelte
 msgid "Shares"
-msgstr ""
+msgstr "共享"
 
 #: src/routes/[node]/+layout.svelte
 msgid "Users"
-msgstr ""
+msgstr "用户"
 
 #: src/routes/[node]/+layout.svelte
 msgid "Groups"
-msgstr ""
+msgstr "群组"
 
 #: src/routes/[node]/storage/samba/shares/+page.svelte
 msgid "Delete Share"
-msgstr ""
+msgstr "删除共享"
 
 #: src/routes/[node]/storage/samba/shares/+page.svelte
 msgid "Samba share"
-msgstr ""
+msgstr "Samba 共享"
 
 #: src/routes/[node]/storage/samba/shares/+page.svelte
 msgid "Failed to delete Samba share"
-msgstr ""
+msgstr "删除 Samba 共享失败"
 
 #: src/routes/[node]/storage/samba/shares/+page.svelte
 msgid "Samba share deleted"
-msgstr ""
+msgstr "Samba 共享已删除"
 
 #: src/routes/[node]/storage/samba/shares/+page.svelte
 #: src/lib/components/custom/Samba/Create.svelte
 msgid "Read-Only Groups"
-msgstr ""
+msgstr "只读组"
 
 #: src/routes/[node]/storage/samba/shares/+page.svelte
 #: src/lib/components/custom/Samba/Create.svelte
 msgid "Writeable Groups"
-msgstr ""
+msgstr "可写组"
 
 #: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
 msgid "Created At"
-msgstr ""
+msgstr "创建于"
 
 #: src/lib/components/custom/Samba/Create.svelte
 msgid "Create Samba Share"
-msgstr ""
+msgstr "创建 Samba 共享"
 
 #: src/lib/components/custom/Samba/Create.svelte
 msgid "Select dataset"
-msgstr ""
+msgstr "选择数据集"
 
 #: src/lib/components/custom/Samba/Create.svelte
 msgid "Select groups"
-msgstr ""
+msgstr "选择组"
 
 #: src/lib/components/custom/Samba/Create.svelte
 msgid "Create Mask"
-msgstr ""
+msgstr "创建掩码"
 
 #: src/lib/components/custom/Samba/Create.svelte
 msgid "Directory Mask"
-msgstr ""
+msgstr "目录掩码"
 
 #: src/lib/components/custom/Samba/Create.svelte
 msgid "Share name already exists"
-msgstr ""
+msgstr "共享名称已存在"
 
 #: src/lib/components/custom/Samba/Create.svelte
 msgid "Name is required"
-msgstr ""
+msgstr "名称是必需的"
 
 #: src/lib/components/custom/Samba/Create.svelte
 msgid "Dataset is required"
-msgstr ""
+msgstr "数据集是必需的"
 
 #: src/lib/components/custom/Samba/Create.svelte
 msgid "No groups selected"
-msgstr ""
+msgstr "未选择任何组"
 
 #: src/lib/components/custom/Samba/Create.svelte
 msgid "Share cannot have overlapping groups"
-msgstr ""
+msgstr "共享不能有重叠的组"
 
 #: src/lib/components/custom/Samba/Create.svelte
 msgid "Failed to create Samba share"
-msgstr ""
+msgstr "创建 Samba 共享失败"
 
 #: src/lib/components/custom/Samba/Create.svelte
 msgid "Samba share created"
-msgstr ""
+msgstr "Samba 共享已创建"
 
 #: src/routes/[node]/storage/samba/settings/+page.svelte
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
 msgid "Edit {0}"
-msgstr ""
+msgstr "编辑 {0}"
 
 #: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Workgroup"
-msgstr ""
+msgstr "工作组"
 
 #: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Enter Workgroup"
-msgstr ""
+msgstr "输入工作组"
 
 #: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Unix Charset"
-msgstr ""
+msgstr "Unix 字符集"
 
 #: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Enter Unix Charset"
-msgstr ""
+msgstr "输入 Unix 字符集"
 
 #: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Server String"
-msgstr ""
+msgstr "服务器字符串"
 
 #: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Enter Server String"
-msgstr ""
+msgstr "输入服务器字符串"
 
 #: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Bind Interfaces Only"
-msgstr ""
+msgstr "仅绑定接口"
 
 #: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Select Interfaces"
-msgstr ""
+msgstr "选择接口"
 
 #: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Failed to update Samba configuration"
-msgstr ""
+msgstr "更新 Samba 配置失败"
 
 #: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Samba configuration updated"
-msgstr ""
+msgstr "Samba 配置已更新"
 
 #: src/lib/components/custom/Dialog/SingleValue.svelte
 msgid "Enter value"
-msgstr ""
+msgstr "输入值"
 
 #: src/lib/components/custom/Dialog/SingleValue.svelte
 msgid "Select an option"
-msgstr ""
+msgstr "选择一个选项"
+
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+msgid "PCI Devices"
+msgstr "PCI 设备"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "ACL Inherit"
+msgstr "ACL 继承"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Select ACL Inherit"
+msgstr "选择 ACL 继承"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "ACL Mode"
+msgstr "ACL 模式"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Select ACL Mode"
+msgstr "选择 ACL 模式"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "<0/>Create User"
+msgstr "<0/>创建用户"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+msgid "E-Mail"
+msgstr "电子邮件"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Admin"
+msgstr "管理员"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Username and password are required"
+msgstr "用户名和密码是必需的"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Invalid username"
+msgstr "无效的用户名"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Username already exists"
+msgstr "用户名已存在"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Invalid email address"
+msgstr "无效的电子邮件地址"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Password must be at least 8 characters long"
+msgstr "密码长度必须至少为 8 个字符"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Failed to create user"
+msgstr "创建用户失败"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "User created"
+msgstr "用户已创建"
+
+#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
+msgid "<0/> Create {0}"
+msgstr "<0/> 创建 {0}"
+
+#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
+msgid "Enter {0} name"
+msgstr "输入 {0} 名称"
+
+#: src/lib/components/custom/FileExplorer/GridView.svelte
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "<0/> Open"
+msgstr "<0/> 打开"
+
+#: src/lib/components/custom/FileExplorer/GridView.svelte
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "<0/> Download"
+msgstr "<0/> 下载"
+
+#: src/lib/components/custom/FileExplorer/GridView.svelte
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "<0/> Copy"
+msgstr "<0/> 复制"
+
+#: src/lib/components/custom/FileExplorer/GridView.svelte
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "<0/> Cut"
+msgstr "<0/> 剪切"
+
+#: src/lib/components/custom/FileExplorer/GridView.svelte
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+#: src/lib/components/custom/FileExplorer/RenameModal.svelte
+msgid "<0/> Rename"
+msgstr "<0/> 重命名"
+
+#: src/lib/components/custom/FileExplorer/GridView.svelte
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "<0/> Delete"
+msgstr "<0/> 删除"
+
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "Modified"
+msgstr "修改日期"
+
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "B"
+msgstr "字节"
+
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "Yesterday"
+msgstr "昨天"
+
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "MMM d"
+msgstr "MMM d"
+
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "MMM d, yyyy"
+msgstr "MMM d, yyyy"
+
+#: src/lib/components/custom/FileExplorer/RenameModal.svelte
+msgid "Enter new name"
+msgstr "输入新名称"
+
+#: src/lib/components/custom/FileExplorer/RenameModal.svelte
+msgid "Rename"
+msgstr "重命名"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "<0/> Add New"
+msgstr "<0/> 新增"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "New File"
+msgstr "新建文件"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "New Folder"
+msgstr "新建文件夹"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "Upload File"
+msgstr "上传文件"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "Search files..."
+msgstr "搜索文件..."
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "<0/> Sort"
+msgstr "<0/> 排序"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "A - Z"
+msgstr "A - Z"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "Z - A"
+msgstr "Z - A"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "Last Modified"
+msgstr "最近修改"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "First Modified"
+msgstr "最早修改"
+
+#: src/lib/components/ui/breadcrumb/breadcrumb-ellipsis.svelte
+msgid "More"
+msgstr "更多"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "<0/> Refresh"
+msgstr "<0/> 刷新"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "<0/> Paste"
+msgstr "<0/> 粘贴"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "<0/> New File"
+msgstr "<0/> 新建文件"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "<0/> New Folder"
+msgstr "<0/> 新建文件夹"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "<0/> Upload File"
+msgstr "<0/> 上传文件"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "{0} items"
+msgstr "{0} 个项目"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "{0} folders, {1} files"
+msgstr "{0} 个文件夹, {1} 个文件"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "Failed to delete {0}"
+msgstr "删除 {0} 失败"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "My Files"
+msgstr "我的文件"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "Failed to create {0} \"{1}\""
+msgstr "创建 {0} \"{1}\" 失败"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "Renamed successfully"
+msgstr "重命名成功"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "Failed to rename"
+msgstr "重命名失败"
+
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+msgid "Select PCI Devices"
+msgstr "选择 PCI 设备"
+
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+msgid "Failed to modify PCI devices"
+msgstr "修改 PCI 设备失败"
+
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+msgid "PCI devices modified"
+msgstr "PCI 设备已修改"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Add Users"
+msgstr "添加用户"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "New Group"
+msgstr "新建组"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Select users"
+msgstr "选择用户"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Failed to delete group"
+msgstr "删除组失败"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Group deleted"
+msgstr "组已删除"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Name and users are required"
+msgstr "需要名称和用户"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Group name already exists"
+msgstr "组名已存在"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Failed to create group"
+msgstr "创建组失败"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Group created"
+msgstr "组已创建"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "No users selected"
+msgstr "未选择用户"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Failed to add users to group"
+msgstr "添加用户到组失败"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Users added to group"
+msgstr "用户已添加到组"
+
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+msgid "Failed to delete user"
+msgstr "删除用户失败"
+
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+msgid "User deleted"
+msgstr "用户已删除"
+
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+msgid "Last Usage"
+msgstr "上次使用时间"
+
+#: src/lib/components/custom/Login.svelte
+msgid "Arabic (العربية)"
+msgstr "阿拉伯语 (العربية)"
+
+#: src/lib/components/custom/Login.svelte
+msgid "Russian (Русский)"
+msgstr "俄语（Русский）"

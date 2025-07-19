@@ -1,0 +1,2646 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-07-19T12:41:02.565Z\n"
+"PO-Revision-Date: 2025-07-19T13:44:01.486Z\n"
+"Last-Translator: \n"
+"Language: Arabic\n"
+"Language-Team: \n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n == 1 ? 0 : 1;\n"
+"MIME-Version: 1.0\n"
+
+#: src/routes/+layout.svelte
+msgid "Logged out"
+msgstr "تم تسجيل الخروج"
+
+#: src/routes/[node]/+layout.svelte
+#: src/lib/components/skeleton/LeftPanel.svelte
+msgid "Data Center"
+msgstr "مركز البيانات"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Help"
+msgstr "مساعدة"
+
+#: src/routes/[node]/+layout.svelte
+#: src/lib/components/skeleton/LeftPanel.svelte
+msgid "Difuse-sidebar"
+msgstr "الشريط الجانبي المنتشر"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Summary"
+msgstr "ملخص"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Console"
+msgstr "وحدة التحكم"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Storage"
+msgstr "التخزين"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Hardware"
+msgstr "المكونات الصلبة"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Network"
+msgstr "الشبكة"
+
+#: src/routes/[node]/+layout.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Notes"
+msgstr "ملاحظات"
+
+#: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Interfaces"
+msgstr "الواجهات"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Switches"
+msgstr "المحولات"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Explorer"
+msgstr "المستكشف"
+
+#: src/routes/[node]/+layout.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Disks"
+msgstr "الأقراص"
+
+#: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "ZFS"
+msgstr "ZFS"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Dashboard"
+msgstr "لوحة التحكم"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Pools"
+msgstr "المجمعات"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Datasets"
+msgstr "مجموعات البيانات"
+
+#: src/routes/[node]/+layout.svelte
+msgid "File Systems"
+msgstr "أنظمة الملفات"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Volumes"
+msgstr "وحدات التخزين"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Snapshots"
+msgstr "اللقطات"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Samba"
+msgstr "Samba"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Shares"
+msgstr "المشاركات"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Settings"
+msgstr "الإعدادات"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Utilities"
+msgstr "الأدوات"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Downloader"
+msgstr "أداة التنزيل"
+
+#: src/routes/[node]/+layout.svelte
+#: src/lib/components/custom/VM/Create/Hardware.svelte
+msgid "PCI Passthrough"
+msgstr "تمرير PCI"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Authentication"
+msgstr "المصادقة"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Users"
+msgstr "المستخدمون"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Groups"
+msgstr "المجموعات"
+
+#: src/lib/components/custom/Header.svelte
+#: src/lib/components/custom/Login.svelte
+msgid "Sylve Logo"
+msgstr "شعار Sylve"
+
+#: src/lib/components/custom/Header.svelte
+#: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/Throbber.svelte
+msgid "SYLVE"
+msgstr "SYLVE"
+
+#: src/lib/components/custom/Header.svelte
+msgid "Toggle navigation menu"
+msgstr "تبديل قائمة التنقل"
+
+#: src/lib/components/custom/Header.svelte
+msgid "Virtual Environment 0.0.1"
+msgstr "بيئة افتراضية 0.0.1"
+
+#: src/lib/components/custom/Header.svelte
+msgid "<0/> Create VM"
+msgstr "<0/> إنشاء آلة افتراضية"
+
+#: src/lib/components/custom/Header.svelte
+msgid "Toggle user menu"
+msgstr "تبديل قائمة المستخدم"
+
+#: src/lib/components/custom/Header.svelte
+msgid "Color Theme"
+msgstr "مظهر الألوان"
+
+#: src/lib/components/custom/Header.svelte
+msgid "Log out"
+msgstr "تسجيل الخروج"
+
+#: src/lib/components/custom/Header.svelte
+msgid "⌘⇧Q"
+msgstr "⌘⇧Q"
+
+#: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Username"
+msgstr "اسم المستخدم"
+
+#: src/lib/components/custom/Login.svelte
+msgid "Enter your username"
+msgstr "أدخل اسم المستخدم الخاص بك"
+
+#: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Password"
+msgstr "كلمة المرور"
+
+#: src/lib/components/custom/Login.svelte
+msgid "Realm"
+msgstr "النطاق"
+
+#: src/lib/components/custom/Login.svelte
+msgid "PAM"
+msgstr "PAM"
+
+#: src/lib/components/custom/Login.svelte
+msgid "Sylve"
+msgstr "Sylve"
+
+#: src/lib/components/custom/Login.svelte
+msgid "Language selection is disabled for now"
+msgstr "تحديد اللغة معطل حاليًا"
+
+#: src/lib/components/custom/Login.svelte
+msgid "Language"
+msgstr "اللغة"
+
+#: src/lib/components/custom/Login.svelte
+msgid "Select Language"
+msgstr "اختر اللغة"
+
+#: src/lib/components/custom/Login.svelte
+msgid "English"
+msgstr "الإنجليزية"
+
+#: src/lib/components/custom/Login.svelte
+msgid "Malayalam (മലയാളം)"
+msgstr "المالايالامية (മലയാളം)"
+
+#: src/lib/components/custom/Login.svelte
+msgid "Chinese (简体中文)"
+msgstr "الصينية (简体中文)"
+
+#: src/lib/components/custom/Login.svelte
+msgid "Remember Me"
+msgstr "تذكرني"
+
+#: src/lib/components/custom/Login.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Login"
+msgstr "تسجيل الدخول"
+
+#: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/Terminal.svelte
+#: src/lib/components/ui/custom-input/combobox.svelte
+msgid "Enter"
+msgstr "إدخال"
+
+#: src/lib/components/custom/Terminal.svelte
+msgid "Minimize"
+msgstr "تصغير"
+
+#: src/lib/components/custom/Terminal.svelte
+#: src/lib/components/ui/dialog/dialog-content.svelte
+#: src/lib/components/ui/sheet/sheet-content.svelte
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+#: src/routes/[node]/notes/+page.svelte
+#: src/lib/components/disk/CreatePartition.svelte
+#: src/lib/components/custom/Dialog/SingleValue.svelte
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
+#: src/lib/components/custom/FileExplorer/RenameModal.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Close"
+msgstr "إغلاق"
+
+#: src/lib/components/custom/Terminal.svelte
+msgid "Add new tab"
+msgstr "إضافة علامة تبويب جديدة"
+
+#: src/lib/components/custom/Terminal.svelte
+msgid "Session killed: {0}"
+msgstr "تم إنهاء الجلسة: {0}"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Start Time"
+msgstr "وقت البدء"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "End Time"
+msgstr "وقت الانتهاء"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Node"
+msgstr "العقدة"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+msgid "User"
+msgstr "المستخدم"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Action"
+msgstr "الإجراء"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Status"
+msgstr "الحالة"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "Switch"
+msgstr "تبديل"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+msgid "VNC"
+msgstr "VNC"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Disk - Initialize GPT"
+msgstr "القرص - تهيئة GPT"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Disk - Wipe"
+msgstr "القرص - مسح"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Login - Create"
+msgstr "تسجيل الدخول - إنشاء"
+
+#: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "CPU Usage"
+msgstr "استهلاك وحدة المعالجة المركزية"
+
+#: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "RAM Usage"
+msgstr "استهلاك ذاكرة الوصول العشوائي"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Disk Usage"
+msgstr "استهلاك القرص"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "I/O Delay"
+msgstr "تأخير الإدخال/الإخراج"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Swap Usage"
+msgstr "استهلاك المبادلة"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "CPU(s)"
+msgstr "وحدة (وحدات) المعالجة المركزية"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Operating System"
+msgstr "نظام التشغيل"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Uptime"
+msgstr "مدة التشغيل"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Load Average"
+msgstr "متوسط التحميل"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Boot Mode"
+msgstr "وضع الإقلاع"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Sylve Version"
+msgstr "إصدار Sylve"
+
+#: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Memory Usage"
+msgstr "استهلاك الذاكرة"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Network Usage"
+msgstr "استهلاك الشبكة"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Network RX"
+msgstr "استقبال الشبكة"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Network TX"
+msgstr "إرسال الشبكة"
+
+#: src/lib/components/custom/Charts/Area.svelte
+#: src/lib/components/custom/Charts/Bar.svelte
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "<0/> Reset zoom"
+msgstr "<0/> إعادة تعيين التكبير"
+
+#: src/lib/components/custom/Charts/Area.svelte
+msgid "HH:mm"
+msgstr "HH:mm"
+
+#: src/lib/components/custom/Charts/Area.svelte
+msgid "Date"
+msgstr "التاريخ"
+
+#: src/lib/components/custom/Charts/Area.svelte
+#: src/routes/[node]/storage/disks/+page.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+msgid "Value"
+msgstr "القيمة"
+
+#: src/lib/components/custom/Dialog/Alert.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
+msgid "Are you sure?"
+msgstr "هل أنت متأكد؟"
+
+#: src/lib/components/custom/Dialog/Alert.svelte
+msgid "This action cannot be undone. This will permanently delete "
+msgstr "لا يمكن التراجع عن هذا الإجراء. سيؤدي هذا إلى حذف دائم لـ"
+
+#: src/lib/components/custom/Dialog/Alert.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Cancel"
+msgstr "إلغاء"
+
+#: src/lib/components/custom/Dialog/Alert.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
+msgid "Continue"
+msgstr "متابعة"
+
+#: src/lib/components/ui/custom-input/combobox.svelte
+#: src/lib/components/custom/TreeTable/Search.svelte
+msgid "Search..."
+msgstr "بحث..."
+
+#: src/lib/components/ui/custom-input/combobox.svelte
+msgid "No data"
+msgstr "لا يوجد بيانات"
+
+#: src/lib/components/custom/VM/Create/Advanced.svelte
+msgid "VNC Port"
+msgstr "منفذ VNC"
+
+#: src/lib/components/custom/VM/Create/Advanced.svelte
+msgid "VNC Password"
+msgstr "كلمة مرور VNC"
+
+#: src/lib/components/custom/VM/Create/Advanced.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Enter or generate passphrase"
+msgstr "أدخل أو أنشئ عبارة مرور"
+
+#: src/lib/components/custom/VM/Create/Advanced.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "VNC Resolution"
+msgstr "دقة VNC"
+
+#: src/lib/components/custom/VM/Create/Advanced.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Select VNC resolution"
+msgstr "حدد دقة VNC"
+
+#: src/lib/components/custom/VM/Create/Advanced.svelte
+msgid "Startup/Shutdown Order"
+msgstr "ترتيب بدء التشغيل/إيقاف التشغيل"
+
+#: src/lib/components/custom/VM/Create/Advanced.svelte
+msgid "VNC Wait"
+msgstr "انتظار VNC"
+
+#: src/lib/components/custom/VM/Create/Advanced.svelte
+msgid "Start On Boot"
+msgstr "بدء التشغيل عند الإقلاع"
+
+#: src/lib/components/custom/VM/Create/Advanced.svelte
+msgid "TPM Emulation (Experimental)"
+msgstr "محاكاة TPM (تجريبية)"
+
+#: src/lib/components/custom/VM/Create/Basic.svelte
+msgid "VM Name"
+msgstr "اسم الآلة الافتراضية"
+
+#: src/lib/components/custom/VM/Create/Basic.svelte
+msgid "VM ID"
+msgstr "معرف الآلة الافتراضية"
+
+#: src/lib/components/custom/VM/Create/Basic.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
+msgid "Description"
+msgstr "الوصف"
+
+#: src/lib/components/custom/VM/Create/Basic.svelte
+msgid "Optional description for this virtual machine"
+msgstr "وصف اختياري لهذه الآلة الافتراضية"
+
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+msgid "<0/> Create Virtual Machine"
+msgstr "<0/> إنشاء آلة افتراضية"
+
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+#: src/routes/[node]/notes/+page.svelte
+#: src/lib/components/disk/CreatePartition.svelte
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
+#: src/lib/components/custom/FileExplorer/RenameModal.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Reset"
+msgstr "إعادة تعيين"
+
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+msgid "Create Virtual Machine"
+msgstr "إنشاء آلة افتراضية"
+
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+msgid "Created VM {0}"
+msgstr "تم إنشاء الآلة الافتراضية {0}"
+
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+msgid "Failed to create VM"
+msgstr "فشل إنشاء الآلة الافتراضية"
+
+#: src/lib/components/custom/VM/Create/Hardware.svelte
+msgid "CPU Sockets"
+msgstr "مآخذ وحدة المعالجة المركزية"
+
+#: src/lib/components/custom/VM/Create/Hardware.svelte
+msgid "CPU Cores"
+msgstr "نوى وحدة المعالجة المركزية"
+
+#: src/lib/components/custom/VM/Create/Hardware.svelte
+msgid "CPU Threads"
+msgstr "مسارات وحدة المعالجة المركزية"
+
+#: src/lib/components/custom/VM/Create/Hardware.svelte
+msgid "Memory Size"
+msgstr "حجم الذاكرة"
+
+#: src/lib/components/custom/VM/Create/Hardware.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "CPU Pinning"
+msgstr "تثبيت وحدة المعالجة المركزية"
+
+#: src/lib/components/custom/VM/Create/Hardware.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "You can only pin up to {0} vCPU{1}"
+msgstr "يمكنك فقط تثبيت ما يصل إلى {0} وحدة معالجة مركزية افتراضية{1}"
+
+#: src/lib/components/custom/VM/Create/Hardware.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "At least one CPU must be left unpinned"
+msgstr "يجب ترك وحدة معالجة مركزية واحدة على الأقل غير مثبتة"
+
+#: src/lib/components/custom/VM/Create/Network.svelte
+#: src/lib/components/custom/VM/Create/Storage.svelte
+msgid "Emulation Type"
+msgstr "نوع المحاكاة"
+
+#: src/lib/components/custom/VM/Create/Network.svelte
+#: src/lib/components/custom/VM/Create/Storage.svelte
+msgid "Select emulation type"
+msgstr "حدد نوع المحاكاة"
+
+#: src/lib/components/custom/VM/Create/Network.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "MAC Address"
+msgstr "عنوان MAC"
+
+#: src/lib/components/custom/VM/Create/Storage.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "ZFS Volume"
+msgstr "وحدة تخزين ZFS"
+
+#: src/lib/components/custom/VM/Create/Storage.svelte
+msgid "Select ZFS volume"
+msgstr "حدد وحدة تخزين ZFS"
+
+#: src/lib/components/custom/VM/Create/Storage.svelte
+msgid "Disk Size"
+msgstr "حجم القرص"
+
+#: src/lib/components/custom/VM/Create/Storage.svelte
+msgid "Filesystem Dataset"
+msgstr "مجموعة بيانات نظام الملفات"
+
+#: src/lib/components/custom/VM/Create/Storage.svelte
+msgid "Select filesystem"
+msgstr "حدد نظام الملفات"
+
+#: src/lib/components/custom/VM/Create/Storage.svelte
+msgid "Installation Media"
+msgstr "وسائط التثبيت"
+
+#: src/lib/components/custom/VM/Create/Storage.svelte
+msgid "Select installation media"
+msgstr "حدد وسائط التثبيت"
+
+#: src/lib/components/custom/VM/Create/Storage.svelte
+msgid "None"
+msgstr "لا شيء"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Running"
+msgstr "قيد التشغيل"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Start"
+msgstr "ابدأ"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+msgid "Delete"
+msgstr "حذف"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Stop"
+msgstr "إيقاف"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Notes about VM"
+msgstr "ملاحظات حول الآلة الافتراضية"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "VM"
+msgstr "الآلة الافتراضية"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Deleting Virtual Machine"
+msgstr "حذف الآلة الافتراضية"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Please wait while VM <b>{0} ({1})</b> is being deleted"
+msgstr "يرجى الانتظار بينما يتم حذف الآلة الافتراضية <b>{0} ({1})</b>"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Error deleting VM"
+msgstr "خطأ في حذف الآلة الافتراضية"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "VM deleted"
+msgstr "تم حذف الآلة الافتراضية"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Starting Virtual Machine"
+msgstr "بدء تشغيل الآلة الافتراضية"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Please wait while VM <b>{0} ({1})</b> is being started."
+msgstr "يرجى الانتظار بينما يتم بدء تشغيل الآلة الافتراضية <b>{0} ({1})</b>."
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Error starting VM"
+msgstr "خطأ في بدء تشغيل الآلة الافتراضية"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "VM started"
+msgstr "تم بدء تشغيل الآلة الافتراضية"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Stopping Virtual Machine"
+msgstr "إيقاف الآلة الافتراضية"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Please wait while VM <b>{0} ({1})</b> is being stopped"
+msgstr "يرجى الانتظار بينما يتم إيقاف الآلة الافتراضية <b>{0} ({1})</b>"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Error stopping VM"
+msgstr "خطأ في إيقاف الآلة الافتراضية"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "VM stopped"
+msgstr "تم إيقاف الآلة الافتراضية"
+
+#: src/lib/stores/terminal.svelte.ts
+msgid "Terminal"
+msgstr "طرفية```"
+
+#: src/lib/components/custom/TreeTable.svelte
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "No data available"
+msgstr "لا توجد بيانات متاحة"
+
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
+msgid "View"
+msgstr "عرض"
+
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+msgid "Edit"
+msgstr "تعديل"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Bulk Delete"
+msgstr "حذف جماعي"
+
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+msgid "New"
+msgstr "جديد"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Note"
+msgstr "ملاحظة"
+
+#: src/routes/[node]/notes/+page.svelte
+#: src/lib/components/disk/CreatePartition.svelte
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Name"
+msgstr "اسم"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Post Upgrade Summary"
+msgstr "ملخص ما بعد الترقية"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Content"
+msgstr "المحتوى"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "This is a note"
+msgstr "هذه ملاحظة"
+
+#: src/routes/[node]/notes/+page.svelte
+#: src/lib/components/custom/Dialog/SingleValue.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+msgid "Save"
+msgstr "حفظ"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Failed to delete note"
+msgstr "فشل حذف الملاحظة"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Failed to delete notes"
+msgstr "فشل حذف الملاحظات"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Note updated"
+msgstr "تم تحديث الملاحظة"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Failed to update note"
+msgstr "فشل تحديث الملاحظة"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Note created"
+msgstr "تم إنشاء الملاحظة"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Failed to create note"
+msgstr "فشل إنشاء الملاحظة"
+
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+msgid "ID"
+msgstr "المعرف"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Created"
+msgstr "أنشئت"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Updated"
+msgstr "تم التحديث"
+
+#: src/lib/components/custom/TreeTable/Search.svelte
+msgid "Escape"
+msgstr "هروب```"
+
+#: src/lib/components/custom/KVTableModal.svelte
+msgid "Object ({0} properties)"
+msgstr "كائن ({0} خصائص)"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Create Partitions"
+msgstr "إنشاء الأقسام"
+
+#: src/lib/components/disk/CreatePartition.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "Size"
+msgstr "الحجم"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Usage"
+msgstr "الاستخدام"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Actions"
+msgstr "الإجراءات"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Existing"
+msgstr "موجود"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "No partitions created yet"
+msgstr "لم يتم إنشاء أي أقسام حتى الآن"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Add Partition"
+msgstr "إضافة قسم"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "No space left"
+msgstr "لا توجد مساحة متبقية"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Size: {0}"
+msgstr "الحجم: {0}"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Remaining space: {0}"
+msgstr "المساحة المتبقية: {0}"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Save Partitions"
+msgstr "حفظ الأقسام"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Partition{0} created"
+msgstr "تم إنشاء القسم {0}"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Error creating {0}"
+msgstr "خطأ في إنشاء {0}"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "New Partition {0}"
+msgstr "قسم جديد {0}"
+
+#: src/lib/components/custom/Dialog/SingleValue.svelte
+msgid "Enter value"
+msgstr "أدخل القيمة"
+
+#: src/lib/components/custom/Dialog/SingleValue.svelte
+msgid "Select an option"
+msgstr "اختر خيارا"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Create Samba Share"
+msgstr "إنشاء مشاركة Samba"
+
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Dataset"
+msgstr "مجموعة البيانات"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Select dataset"
+msgstr "اختر مجموعة البيانات"
+
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Read-Only Groups"
+msgstr "مجموعات للقراءة فقط"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Select groups"
+msgstr "اختر المجموعات"
+
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Writeable Groups"
+msgstr "مجموعات قابلة للكتابة"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Create Mask"
+msgstr "إنشاء قناع"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Directory Mask"
+msgstr "قناع الدليل"
+
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Create"
+msgstr "إنشاء"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Share name already exists"
+msgstr "اسم المشاركة موجود بالفعل"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Name is required"
+msgstr "الاسم مطلوب"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Dataset is required"
+msgstr "مجموعة البيانات مطلوبة"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "No groups selected"
+msgstr "لم يتم تحديد أي مجموعات"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Share cannot have overlapping groups"
+msgstr "لا يمكن أن تحتوي المشاركة على مجموعات متداخلة"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Failed to create Samba share"
+msgstr "فشل إنشاء مشاركة Samba"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Samba share created"
+msgstr "تم إنشاء مشاركة Samba"
+
+#: src/routes/[node]/network/interfaces/+page.svelte
+msgid "Model"
+msgstr "النموذج"
+
+#: src/routes/[node]/network/interfaces/+page.svelte
+msgid "Metric"
+msgstr "المقياس"
+
+#: src/routes/[node]/network/interfaces/+page.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "MTU"
+msgstr "وحدة الإرسال القصوى"
+
+#: src/routes/[node]/network/interfaces/+page.svelte
+msgid "Active"
+msgstr "نشط"
+
+#: src/routes/[node]/network/interfaces/+page.svelte
+msgid "Details - {0}"
+msgstr "التفاصيل - {0}"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Edit Switch -"
+msgstr "تعديل المحول -"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "New Switch"
+msgstr "محول جديد"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "VLAN"
+msgstr "شبكة محلية ظاهرية"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "IPv4"
+msgstr "IPv4"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "IPv6"
+msgstr "IPv6"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Ports"
+msgstr "المنافذ"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Select ports"
+msgstr "اختر المنافذ"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Private"
+msgstr "خاص"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "DHCP"
+msgstr "بروتوكول التكوين الديناميكي للمضيف"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "SLAAC"
+msgstr "SLAAC"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Disable IPV6"
+msgstr "تعطيل IPV6"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Switch {0} deleted"
+msgstr "تم حذف المحول {0}"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Switch is in use by a VM"
+msgstr "المحول قيد الاستخدام بواسطة جهاز ظاهري"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Error deleting switch"
+msgstr "خطأ في حذف المحول"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Invalid switch name"
+msgstr "اسم محول غير صالح"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Invalid MTU"
+msgstr "وحدة الإرسال القصوى غير صالحة"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Invalid VLAN"
+msgstr "شبكة محلية ظاهرية غير صالحة"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Invalid IPv4 CIDR"
+msgstr "نطاق IPv4 CIDR غير صالح"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Invalid IPv6 CIDR"
+msgstr "نطاق IPv6 CIDR غير صالح"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Switch {0} created"
+msgstr "تم إنشاء المحول {0}"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Error creating switch"
+msgstr "خطأ في إنشاء المحول"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Switch {0} updated"
+msgstr "تم تحديث المحول {0}"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Error updating switch"
+msgstr "خطأ في تحديث المحول"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Enable Passthrough"
+msgstr "تمكين المرور المباشر"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Disable Passthrough"
+msgstr "تعطيل المرور المباشر"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Device added to passthrough"
+msgstr "تمت إضافة الجهاز إلى المرور المباشر"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Failed to add device to passthrough"
+msgstr "فشل إضافة الجهاز إلى المرور المباشر"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Device removed from passthrough"
+msgstr "تمت إزالة الجهاز من المرور المباشر"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Device is in use by a VM, failed to remove"
+msgstr "الجهاز قيد الاستخدام بواسطة جهاز ظاهري، فشلت الإزالة"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Failed to remove device from passthrough"
+msgstr "فشل إزالة الجهاز من المرور المباشر"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Are you sure you want to pass through <b>{0}</b> by <b>{1}</b>? This will make it unavailable to the host."
+msgstr "هل أنت متأكد من أنك تريد تمرير <b>{0}</b> بواسطة <b>{1}</b>؟ سيؤدي هذا إلى جعله غير متاح للمضيف."
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Are you sure you want to remove passthrough for <b>{0}</b> by <b>{1}</b>? This will make it available to the host again."
+msgstr "هل أنت متأكد من أنك تريد إزالة المرور المباشر لـ <b>{0}</b> بواسطة <b>{1}</b>؟ سيؤدي هذا إلى جعله متاحًا للمضيف مرة أخرى."
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "S.M.A.R.T Values"
+msgstr "قيم S.M.A.R.T"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Initialize GPT"
+msgstr "تهيئة GPT"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Wipe Disk"
+msgstr "مسح القرص"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Delete Partition"
+msgstr "حذف القسم"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Create Partition"
+msgstr "إنشاء قسم"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Attribute"
+msgstr "الخاصية"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Unable to wipe busy disk"
+msgstr "غير قادر على مسح قرص مشغول"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Unable to delete busy partition"
+msgstr "غير قادر على حذف قسم مشغول"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Error {0}: {1}"
+msgstr "خطأ {0}: {1}"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "S.M.A.R.T Values ({0})"
+msgstr "قيم S.M.A.R.T ({0})"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "NVMe"
+msgstr "NVMe"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "HDD"
+msgstr "HDD"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "SSD"
+msgstr "SSD"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "This action cannot be undone. This will permanently <b>delete</b> partition <b>{0}</b>."
+msgstr "لا يمكن التراجع عن هذا الإجراء. سيؤدي هذا إلى <b>حذف</b> القسم <b>{0}</b> نهائيًا."
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "This action cannot be undone. This will permanently <b>wipe</b> disk <b>{0}</b>."
+msgstr "لا يمكن التراجع عن هذا الإجراء. سيؤدي هذا إلى <b>مسح</b> القرص <b>{0}</b> نهائيًا."
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Disk {0} initialized with GPT"
+msgstr "تم تهيئة القرص {0} باستخدام GPT"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Unused"
+msgstr "غير مستخدم"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Partitions"
+msgstr "الأقسام"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Download"
+msgstr "تنزيل"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Magnet"
+msgstr "Magnet"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "HTTP"
+msgstr "HTTP"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "URL"
+msgstr "عنوان URL"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Failed to delete download"
+msgstr "فشل حذف التنزيل"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Failed to delete downloads"
+msgstr "فشل حذف التنزيلات"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Please enter a valid URL"
+msgstr "الرجاء إدخال عنوان URL صالح"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Please enter a valid magnet or HTTP URL"
+msgstr "الرجاء إدخال رابط Magnet أو HTTP صالح"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Download started"
+msgstr "بدأ التنزيل"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Download failed"
+msgstr "فشل التنزيل"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Failed to get download link"
+msgstr "فشل الحصول على رابط التنزيل"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "CPU"
+msgstr "وحدة المعالجة المركزية"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "Sockets"
+msgstr "المقابس"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "Cores"
+msgstr "النوى"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "Threads"
+msgstr "المسارات"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "CPU {0} is not pinned by this VM"
+msgstr "وحدة المعالجة المركزية {0} غير مثبتة بواسطة هذا الجهاز الظاهري"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "Failed to modify CPU"
+msgstr "فشل تعديل وحدة المعالجة المركزية"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "VM not found"
+msgstr "لم يتم العثور على الجهاز الظاهري"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "New Network"
+msgstr "شبكة جديدة"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "Select Switch"
+msgstr "اختر المحول"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "Emulation"
+msgstr "المحاكاة"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Select Emulation"
+msgstr "اختر المحاكاة"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "VirtIO"
+msgstr "VirtIO"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "E1000"
+msgstr "E1000"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "Switch is required"
+msgstr "المحول مطلوب"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "Emulation is required"
+msgstr "المحاكاة مطلوبة"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "Error attaching VM to switch"
+msgstr "خطأ في توصيل الجهاز الظاهري بالمحول"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "VM attached to switch"
+msgstr "تم توصيل الجهاز الظاهري بالمحول"
+
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+msgid "RAM"
+msgstr "ذاكرة الوصول العشوائي"
+
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "RAM value must be greater than 0"
+msgstr "يجب أن تكون قيمة ذاكرة الوصول العشوائي أكبر من 0"
+
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "RAM value exceeds available memory"
+msgstr "تتجاوز قيمة ذاكرة الوصول العشوائي الذاكرة المتاحة"
+
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "RAM value is too high, at least 1 GiB must be reserved for the host"
+msgstr "قيمة ذاكرة الوصول العشوائي مرتفعة للغاية، يجب حجز 1 غيغابايت على الأقل للمضيف"
+
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "Failed to modify RAM"
+msgstr "فشل تعديل ذاكرة الوصول العشوائي"
+
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "RAM modified"
+msgstr "تم تعديل ذاكرة الوصول العشوائي"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "New Storage"
+msgstr "وحدة تخزين جديدة"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "Type"
+msgstr "النوع"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Select Type"
+msgstr "اختر النوع"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "CD-ROM"
+msgstr "CD-ROM"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Disk"
+msgstr "قرص"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "ISO"
+msgstr "ISO"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Select ISO"
+msgstr "اختر ISO"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Select ZFS Volume"
+msgstr "اختر وحدة تخزين ZFS"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "ZFS Filesystem"
+msgstr "نظام ملفات ZFS"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Select ZFS Filesystem"
+msgstr "اختر نظام ملفات ZFS"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "AHCI HD"
+msgstr "AHCI HD"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "VirtIO Block"
+msgstr "VirtIO Block"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Attach"
+msgstr "إرفاق"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Please select a type and dataset"
+msgstr "الرجاء اختيار نوع ومجموعة بيانات"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Failed to attach CD-ROM"
+msgstr "فشل إرفاق CD-ROM"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "CD-ROM attached"
+msgstr "تم إرفاق CD-ROM"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Please select an emulation type"
+msgstr "الرجاء اختيار نوع المحاكاة"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Please select a {0}"
+msgstr "الرجاء اختيار {0}"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Failed to attach ZFS Volume"
+msgstr "فشل إرفاق وحدة تخزين ZFS"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "ZFS Volume attached"
+msgstr "تم إرفاق وحدة تخزين ZFS"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Name and size required"
+msgstr "الاسم والحجم مطلوبان"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Invalid size"
+msgstr "حجم غير صالح"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Invalid name"
+msgstr "اسم غير صالح"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Failed to attach storage"
+msgstr "فشل إرفاق وحدة التخزين"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Storage attached"
+msgstr "تم إرفاق وحدة التخزين"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Port"
+msgstr "المنفذ"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Enter or generate password"
+msgstr "أدخل كلمة المرور أو قم بإنشائها"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Wait for VNC"
+msgstr "انتظر VNC"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Password too short"
+msgstr "كلمة المرور قصيرة جدًا"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Port must be between 5900 and 65535"
+msgstr "يجب أن يكون المنفذ بين 5900 و 65535"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Invalid resolution selected"
+msgstr "تم تحديد دقة غير صالحة"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "VNC port already in use"
+msgstr "منفذ VNC قيد الاستخدام بالفعل"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Failed to modify VNC"
+msgstr "فشل تعديل VNC"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "VNC modified"
+msgstr "تم تعديل VNC"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+msgid "Edit ZFS Pool - {0}"
+msgstr "تعديل تجمع ZFS - {0}"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Auto Expand"
+msgstr "توسيع تلقائي"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Select Auto Expand"
+msgstr "اختر التوسيع التلقائي"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Yes"
+msgstr "نعم"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "No"
+msgstr "لا"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Auto Trim"
+msgstr "تقليم تلقائي"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Select Auto Trim"
+msgstr "اختر التقليم التلقائي"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Delegation"
+msgstr "التفويض"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Select Delegation"
+msgstr "اختر التفويض"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Fail Mode"
+msgstr "وضع الفشل"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Select Fail Mode"
+msgstr "اختر وضع الفشل"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Wait"
+msgstr "انتظار"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Panic"
+msgstr "ذعر"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "Spares"
+msgstr "قطع غيار"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Select spares"
+msgstr "حدد قطع غيار"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Auto Replace"
+msgstr "استبدال تلقائي"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Select Auto Replace"
+msgstr "حدد استبدال تلقائي"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Comment"
+msgstr "تعليق"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Comments about the pool"
+msgstr "تعليقات حول المجموعة"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+msgid "Pool edited"
+msgstr "تم تعديل المجموعة"
+
+#: src/lib/components/custom/ZFS/pools/Replace.svelte
+msgid "Replace {0} in {1}"
+msgstr "استبدال {0} في {1}"
+
+#: src/lib/components/custom/ZFS/pools/Replace.svelte
+msgid "Replace"
+msgstr "استبدال"
+
+#: src/lib/components/custom/ZFS/pools/Replace.svelte
+msgid "Replacement device not selected"
+msgstr "لم يتم تحديد جهاز الاستبدال"
+
+#: src/lib/components/custom/ZFS/pools/Replace.svelte
+msgid "New disk is smaller than old disk"
+msgstr "القرص الجديد أصغر من القرص القديم"
+
+#: src/lib/components/custom/ZFS/pools/Replace.svelte
+msgid "New partition is smaller than old device"
+msgstr "القسم الجديد أصغر من الجهاز القديم"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "No available disks"
+msgstr "لا توجد أقراص متاحة"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "No available partitions"
+msgstr "لا توجد أقسام متاحة"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "<0/>Create ZFS Pool"
+msgstr "<0/> إنشاء مجموعة ZFS"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Devices"
+msgstr "أجهزة"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Options"
+msgstr "خيارات"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Virtual Devices"
+msgstr "أجهزة افتراضية"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Redundancy <0/>"
+msgstr "التكرار <0/>"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "VDEVs"
+msgstr "VDEVs"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Drop disks here"
+msgstr "إسقاط الأقراص هنا"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Mount Point"
+msgstr "نقطة التركيب"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Force Create"
+msgstr "فرض الإنشاء"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Advanced"
+msgstr "متقدم"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "AShift"
+msgstr "AShift"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Select ASHIFT"
+msgstr "حدد ASHIFT"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Disks within a VDEV should ideally be the same type"
+msgstr "يجب أن تكون الأقراص داخل VDEV من نفس النوع بشكل مثالي"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Disks within a VDEV should ideally be the same drive type"
+msgstr "يجب أن تكون الأقراص داخل VDEV من نفس نوع محرك الأقراص بشكل مثالي"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Disks within a VDEV should ideally be the same size"
+msgstr "يجب أن تكون الأقراص داخل VDEV بنفس الحجم بشكل مثالي"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Partitions within a VDEV should ideally be the same size"
+msgstr "يجب أن تكون الأقسام داخل VDEV بنفس الحجم بشكل مثالي"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Disks/Partitions within a VDEV should ideally be the same drive type"
+msgstr "يجب أن تكون الأقراص/الأقسام داخل VDEV من نفس نوع محرك الأقراص بشكل مثالي"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "No available disks or partitions"
+msgstr "لا توجد أقراص أو أقسام متاحة"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Invalid pool name"
+msgstr "اسم المجموعة غير صالح"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "At least one VDEV containing disks is required"
+msgstr "مطلوب VDEV واحد على الأقل يحتوي على أقراص"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Spares must be larger than the largest disk in the pool"
+msgstr "يجب أن تكون قطع الغيار أكبر من أكبر قرص في المجموعة"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "A pool with this name already exists"
+msgstr "توجد مجموعة بهذا الاسم بالفعل"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Pool Created"
+msgstr "تم إنشاء المجموعة"
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "Resilvering"
+msgstr "إعادة بناء المرآة"
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "READ: {0}"
+msgstr "قراءة: {0}"
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "WRITE: {0}"
+msgstr "كتابة: {0}"
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "CKSUM: {0}"
+msgstr "CKSUM: {0}"
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "Pool Status"
+msgstr "حالة المجموعة"
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "Scan Activity"
+msgstr "نشاط الفحص"
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "No recent scan activity"
+msgstr "لا يوجد نشاط فحص حديث"
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "Device Topology"
+msgstr "هيكل الجهاز"
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "No devices found"
+msgstr "لم يتم العثور على أجهزة"
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "Error Status"
+msgstr "حالة الخطأ"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+msgid "Edit {0}"
+msgstr "تعديل {0}"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Workgroup"
+msgstr "مجموعة العمل"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Enter Workgroup"
+msgstr "أدخل مجموعة العمل"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Unix Charset"
+msgstr "مجموعة حروف يونكس"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Enter Unix Charset"
+msgstr "أدخل مجموعة حروف يونكس"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Server String"
+msgstr "سلسلة الخادم"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Enter Server String"
+msgstr "أدخل سلسلة الخادم"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Bind Interfaces Only"
+msgstr "ربط الواجهات فقط"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Select Interfaces"
+msgstr "حدد الواجهات"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+msgid "Property"
+msgstr "خاصية"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Failed to update Samba configuration"
+msgstr "فشل تحديث تكوين Samba"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Samba configuration updated"
+msgstr "تم تحديث تكوين Samba"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Delete Share"
+msgstr "حذف المشاركة"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Samba share"
+msgstr "مشاركة Samba"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Failed to delete Samba share"
+msgstr "فشل حذف مشاركة Samba"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Samba share deleted"
+msgstr "تم حذف مشاركة Samba"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+msgid "Created At"
+msgstr "أنشئت في"
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "Pool Stats"
+msgstr "إحصائيات المجموعة"
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "Select a stat type"
+msgstr "حدد نوع الإحصائية"
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "Select a interval"
+msgstr "حدد فاصل زمني"
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "Dataset Compression"
+msgstr "ضغط مجموعة البيانات"
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+msgid "Select a pool"
+msgstr "حدد مجموعة"
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "Pool Usage"
+msgstr "استخدام المجموعة"
+
+#: src/routes/[node]/vm/[node]/console/+page.svelte
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+msgid "Shutoff"
+msgstr "إيقاف التشغيل"
+
+#: src/routes/[node]/vm/[node]/console/+page.svelte
+msgid "VM Console"
+msgstr "وحدة تحكم الجهاز الظاهري"
+
+#: src/routes/[node]/vm/[node]/console/+page.svelte
+msgid "The VM is currently powered off.<0/> Start the VM to access its console."
+msgstr "الجهاز الظاهري متوقف حاليًا.<0/> ابدأ تشغيل الجهاز الظاهري للوصول إلى وحدة التحكم الخاصة به."
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Scrub started"
+msgstr "بدأ التنظيف"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Scrub"
+msgstr "تنظيف"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Replace Device"
+msgstr "استبدال الجهاز"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "ZFS Pool"
+msgstr "مجموعة ZFS"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Pool {0} deleted"
+msgstr "تم حذف المجموعة {0}"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Pool contains a mirror with devices of different sizes"
+msgstr "تحتوي المجموعة على مرآة بأجهزة ذات أحجام مختلفة"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Pool contains a RAIDZ vdev with devices of different sizes"
+msgstr "تحتوي المجموعة على RAIDZ vdev بأجهزة ذات أحجام مختلفة"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Pool is busy"
+msgstr "المجموعة مشغولة"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Pool has a dataset that is in use by a VM or Jail"
+msgstr "تحتوي المجموعة على مجموعة بيانات قيد الاستخدام بواسطة جهاز افتراضي أو سجن"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Spare device is too small"
+msgstr "جهاز الغيار صغير جدًا"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Pool edit failed"
+msgstr "فشل تعديل المجموعة"
+
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+msgid "PCI Devices"
+msgstr "أجهزة PCI"
+
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+msgid "Detach"
+msgstr "فصل"
+
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "This will detach the VM <b>{0}</b> from the switch <b>{1}</b>"
+msgstr "سيؤدي هذا إلى فصل الجهاز الظاهري <b>{0}</b> من المحول <b>{1}</b>"
+
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "Failed to detach network"
+msgstr "فشل فصل الشبكة"
+
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "Network detached"
+msgstr "تم فصل الشبكة"
+
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "Unknown Switch"
+msgstr "محول غير معروف"
+
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "Unknown"
+msgstr "غير معروف"
+
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+msgid "This will detach the storage {0} from the VM {1}"
+msgstr "سيؤدي هذا إلى فصل وحدة التخزين {0} من الجهاز الظاهري {1}"
+
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+msgid "Failed to detach storage"
+msgstr "فشل فصل وحدة التخزين"
+
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+msgid "Storage detached"
+msgstr "تم فصل وحدة التخزين"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "<0/>Edit Filesystem - {0}"
+msgstr "<0/>تعديل نظام الملفات - {0}"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "ATime"
+msgstr "وقت الوصول"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Select ATime"
+msgstr "اختر وقت الوصول"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Checksum"
+msgstr "المجموع الاختباري"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Select Checksum"
+msgstr "اختر المجموع الاختباري"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Compression"
+msgstr "الضغط"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Select Compression"
+msgstr "اختر الضغط"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Deduplication"
+msgstr "إزالة التكرار"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Select Deduplication"
+msgstr "اختر إزالة التكرار"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Quota"
+msgstr "الحصة"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "ACL Inherit"
+msgstr "توريث ACL"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Select ACL Inherit"
+msgstr "اختر توريث ACL"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "ACL Mode"
+msgstr "وضع ACL"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Select ACL Mode"
+msgstr "اختر وضع ACL"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Invalid quota size"
+msgstr "حجم الحصة غير صالح"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "Quota size is less than current used or reserved space"
+msgstr "حجم الحصة أقل من المساحة المستخدمة أو المحجوزة حاليًا"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "Failed to edit filesystem"
+msgstr "فشل تعديل نظام الملفات"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "File System {0} edited"
+msgstr "تم تعديل نظام الملفات {0}"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
+msgid "Snapshot - {0}"
+msgstr "لقطة - {0}"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
+msgid "Recursive"
+msgstr "تكراري"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Create Snapshot"
+msgstr "إنشاء لقطة"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Pool"
+msgstr "مجمع التخزين"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+msgid "Select a dataset"
+msgstr "اختر مجموعة بيانات"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Interval"
+msgstr "الفاصل الزمني"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+msgid "Select an interval"
+msgstr "اختر فاصل زمني"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+msgid "Failed to create snapshot"
+msgstr "فشل إنشاء اللقطة"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+msgid "Snapshot {0}@{1} created"
+msgstr "تم إنشاء اللقطة {0}@{1}"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
+msgid "This will delete the snapshot <0/>"
+msgstr "سيؤدي هذا إلى حذف اللقطة <0/>"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
+msgid "Deleted snapshot {0}"
+msgstr "تم حذف اللقطة {0}"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
+msgid "Failed to delete snapshot {0}"
+msgstr "فشل حذف اللقطة {0}"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Snapshot GUID not found"
+msgstr "لم يتم العثور على معرّف GUID الخاص باللقطة"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "View Snapshot Jobs"
+msgstr "عرض مهام اللقطة"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Prefix"
+msgstr "البادئة"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Last Run"
+msgstr "آخر تشغيل"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Jan 01, 0001"
+msgstr "01 يناير 0001"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Never"
+msgstr "أبدًا"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Deleted"
+msgstr "تم الحذف"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "No snapshot jobs"
+msgstr "لا توجد مهام لقطة"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Save Snapshot Jobs"
+msgstr "حفظ مهام اللقطة"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Create Volume"
+msgstr "إنشاء وحدة تخزين"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Select Pool"
+msgstr "اختر مجمع تخزين"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Passphrase"
+msgstr "عبارة المرور"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Invalid volume name"
+msgstr "اسم وحدة تخزين غير صالح"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Please select a pool"
+msgstr "الرجاء تحديد مجمع تخزين"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Encryption key is required"
+msgstr "مفتاح التشفير مطلوب"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+msgid "Invalid volume size"
+msgstr "حجم وحدة التخزين غير صالح"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Parent not found"
+msgstr "لم يتم العثور على الأصل"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Volume size is greater than available space"
+msgstr "حجم وحدة التخزين أكبر من المساحة المتاحة"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Failed to create volume"
+msgstr "فشل إنشاء وحدة التخزين"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Volume {0} created"
+msgstr "تم إنشاء وحدة التخزين {0}"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+msgid "<0/>Edit Volume - {0}"
+msgstr "<0/>تعديل وحدة التخزين - {0}"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+msgid "Size must be a multiple of volume block size ({0}K)"
+msgstr "يجب أن يكون الحجم من مضاعفات حجم كتلة وحدة التخزين ({0}K)"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+msgid "Failed to edit volume"
+msgstr "فشل تعديل وحدة التخزين"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+msgid "Volume edited successfully"
+msgstr "تم تعديل وحدة التخزين بنجاح"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+msgid "<0/> Flash File to {0}"
+msgstr "<0/>نقل الملف إلى {0}"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+msgid "Select File"
+msgstr "اختر ملفًا"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+msgid "File"
+msgstr "ملف"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+msgid "Error flashing volume"
+msgstr "خطأ في نقل الملف إلى وحدة التخزين"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+msgid "Flash"
+msgstr "نقل"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Rollback To Snapshot"
+msgstr "استعادة إلى لقطة"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Delete Snapshot"
+msgstr "حذف لقطة"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Edit Filesystem"
+msgstr "تعديل نظام الملفات"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Delete Filesystem"
+msgstr "حذف نظام الملفات"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Delete Datasets"
+msgstr "حذف مجموعات البيانات"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Are you sure you want to rollback to the snapshot <b>{0}</b>? This action cannot be undone."
+msgstr "هل أنت متأكد أنك تريد الاستعادة إلى اللقطة <b>{0}</b>؟ لا يمكن التراجع عن هذا الإجراء."
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Rolled back to snapshot {0}"
+msgstr "تمت الاستعادة إلى اللقطة {0}"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Failed to rollback to snapshot {0}"
+msgstr "فشل الاستعادة إلى اللقطة {0}"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Deleted filesystem {0}"
+msgstr "تم حذف نظام الملفات {0}"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Failed to delete filesystem {0}"
+msgstr "فشل حذف نظام الملفات {0}"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Filesystem GUID not found"
+msgstr "لم يتم العثور على معرّف GUID الخاص بنظام الملفات"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Are you sure you want to delete {0}? This action cannot be undone."
+msgstr "هل أنت متأكد أنك تريد حذف {0}؟ لا يمكن التراجع عن هذا الإجراء."
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Deleted {0} datasets"
+msgstr "تم حذف {0} من مجموعات البيانات"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Failed to delete datasets"
+msgstr "فشل حذف مجموعات البيانات```"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Flash File"
+msgstr "نقل ملف"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Delete Volume"
+msgstr "حذف وحدة تخزين"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Edit Volume"
+msgstr "تعديل وحدة تخزين"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Deleted volume {0}"
+msgstr "تم حذف وحدة التخزين {0}"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Failed to delete volume {0}"
+msgstr "فشل حذف وحدة التخزين {0}"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Volume GUID not found"
+msgstr "لم يتم العثور على معرّف GUID الخاص بوحدة التخزين"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "This will delete {0}. This action cannot be undone."
+msgstr "سيؤدي هذا إلى حذف {0}. لا يمكن التراجع عن هذا الإجراء."
+
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "View Periodics"
+msgstr "عرض الدوريات"
+
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "Are you sure you want to delete {0} snapshot{1}? This action cannot be undone."
+msgstr "هل أنت متأكد أنك تريد حذف {0} لقطة{1}؟ لا يمكن التراجع عن هذا الإجراء."
+
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "Deleted {0} snapshot{1}"
+msgstr "تم حذف {0} لقطة{1}"
+
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "Failed to delete snapshots"
+msgstr "فشل حذف اللقطات"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "<0/>Create User"
+msgstr "<0/>إنشاء مستخدم"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+msgid "E-Mail"
+msgstr "البريد الإلكتروني"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Admin"
+msgstr "مدير"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Username and password are required"
+msgstr "اسم المستخدم وكلمة المرور مطلوبان"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Invalid username"
+msgstr "اسم مستخدم غير صالح"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Username already exists"
+msgstr "اسم المستخدم موجود بالفعل"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Invalid email address"
+msgstr "عنوان بريد إلكتروني غير صالح"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Password must be at least 8 characters long"
+msgstr "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Failed to create user"
+msgstr "فشل إنشاء المستخدم"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "User created"
+msgstr "تم إنشاء المستخدم"
+
+#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
+msgid "<0/> Create {0}"
+msgstr "<0/> إنشاء {0}"
+
+#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
+msgid "Enter {0} name"
+msgstr "أدخل اسم {0}"
+
+#: src/lib/components/custom/FileExplorer/GridView.svelte
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "<0/> Open"
+msgstr "<0/> فتح"
+
+#: src/lib/components/custom/FileExplorer/GridView.svelte
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "<0/> Download"
+msgstr "<0/> تنزيل"
+
+#: src/lib/components/custom/FileExplorer/GridView.svelte
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "<0/> Copy"
+msgstr "<0/> نسخ"
+
+#: src/lib/components/custom/FileExplorer/GridView.svelte
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "<0/> Cut"
+msgstr "<0/> قص"
+
+#: src/lib/components/custom/FileExplorer/GridView.svelte
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+#: src/lib/components/custom/FileExplorer/RenameModal.svelte
+msgid "<0/> Rename"
+msgstr "<0/> إعادة تسمية"
+
+#: src/lib/components/custom/FileExplorer/GridView.svelte
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "<0/> Delete"
+msgstr "<0/> حذف"
+
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "Modified"
+msgstr "تم التعديل"
+
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "B"
+msgstr "بايت"
+
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "Yesterday"
+msgstr "أمس"
+
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "MMM d"
+msgstr "شهر يوم"
+
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "MMM d, yyyy"
+msgstr "شهر يوم، سنة"
+
+#: src/lib/components/custom/FileExplorer/RenameModal.svelte
+msgid "Enter new name"
+msgstr "أدخل اسماً جديداً"
+
+#: src/lib/components/custom/FileExplorer/RenameModal.svelte
+msgid "Rename"
+msgstr "إعادة تسمية"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "<0/> Add New"
+msgstr "<0/> إضافة جديد"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "New File"
+msgstr "ملف جديد"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "New Folder"
+msgstr "مجلد جديد"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "Upload File"
+msgstr "رفع ملف"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "Search files..."
+msgstr "البحث عن الملفات..."
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "<0/> Sort"
+msgstr "<0/> فرز"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "A - Z"
+msgstr "أ - ي"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "Z - A"
+msgstr "ي - أ"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "Last Modified"
+msgstr "آخر تعديل"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "First Modified"
+msgstr "أول تعديل"
+
+#: src/lib/components/ui/breadcrumb/breadcrumb-ellipsis.svelte
+msgid "More"
+msgstr "المزيد"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "<0/> Refresh"
+msgstr "<0/> تحديث"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "<0/> Paste"
+msgstr "<0/> لصق"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "<0/> New File"
+msgstr "<0/> ملف جديد"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "<0/> New Folder"
+msgstr "<0/> مجلد جديد"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "<0/> Upload File"
+msgstr "<0/> رفع ملف"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "{0} items"
+msgstr "{0} عناصر"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "{0} folders, {1} files"
+msgstr "{0} مجلدات، {1} ملفات"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "Failed to delete {0}"
+msgstr "فشل حذف {0}"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "My Files"
+msgstr "ملفاتي"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "Failed to create {0} \"{1}\""
+msgstr "فشل إنشاء {0} \"{1}\""
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "Renamed successfully"
+msgstr "تمت إعادة التسمية بنجاح"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "Failed to rename"
+msgstr "فشل في إعادة التسمية"
+
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+msgid "Select PCI Devices"
+msgstr "حدد أجهزة PCI"
+
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+msgid "Failed to modify PCI devices"
+msgstr "فشل تعديل أجهزة PCI"
+
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+msgid "PCI devices modified"
+msgstr "تم تعديل أجهزة PCI"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Add Users"
+msgstr "إضافة مستخدمين"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "New Group"
+msgstr "مجموعة جديدة"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Select users"
+msgstr "حدد المستخدمين"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Failed to delete group"
+msgstr "فشل حذف المجموعة"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Group deleted"
+msgstr "تم حذف المجموعة"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Name and users are required"
+msgstr "الاسم والمستخدمين مطلوبان"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Group name already exists"
+msgstr "اسم المجموعة موجود بالفعل"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Failed to create group"
+msgstr "فشل إنشاء المجموعة"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Group created"
+msgstr "تم إنشاء المجموعة"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "No users selected"
+msgstr "لم يتم تحديد أي مستخدمين"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Failed to add users to group"
+msgstr "فشل إضافة مستخدمين إلى المجموعة"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Users added to group"
+msgstr "تمت إضافة المستخدمين إلى المجموعة"
+
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+msgid "Failed to delete user"
+msgstr "فشل حذف المستخدم"
+
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+msgid "User deleted"
+msgstr "تم حذف المستخدم"
+
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+msgid "Last Usage"
+msgstr "آخر استخدام"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "<0/>Create Filesystem"
+msgstr "msgstr"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Parent"
+msgstr "الأصل"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Select parent"
+msgstr "اختر الأصل"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Encryption"
+msgstr "التشفير"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Select Encryption"
+msgstr "اختر التشفير"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "No parent selected"
+msgstr "لم يتم اختيار أصل"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Failed to create filesystem"
+msgstr "فشل إنشاء نظام الملفات"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "File System {0} created"
+msgstr "تم إنشاء نظام الملفات {0}```"
+
+#: src/lib/components/custom/Login.svelte
+msgid "Arabic (العربية)"
+msgstr "العربية (العربية)"
+
+#: src/lib/components/custom/Login.svelte
+msgid "Russian (Русский)"
+msgstr "الروسية (Русский)"

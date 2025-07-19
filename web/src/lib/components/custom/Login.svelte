@@ -63,7 +63,10 @@
 	let languageArr = [
 		{ value: 'en', label: 'English' },
 		{ value: 'mal', label: 'മലയാളം' },
-		{ value: 'cn-simplified', label: '简体中文' }
+		{ value: 'cn-simplified', label: '简体中文' },
+		{ value: 'ar', label: 'العربية' },
+		{ value: 'ru', label: 'Русский' },
+		{ value: 'tu', label: 'Türkçe' }
 	];
 </script>
 
@@ -119,6 +122,7 @@
 				</Select.Root>
 			</div>
 
+			<!-- @wc-ignore -->
 			<div class="flex items-center gap-2" title="Language selection is disabled for now">
 				<Label for="language" class="w-44">Language</Label>
 				<Select.Root type="single" bind:value={language}>
@@ -129,6 +133,9 @@
 						<Select.Item value="en">English</Select.Item>
 						<Select.Item value="mal">Malayalam (മലയാളം)</Select.Item>
 						<Select.Item value="cn-simplified">Chinese (简体中文)</Select.Item>
+						<Select.Item value="ar">Arabic (العربية)</Select.Item>
+						<Select.Item value="ru">Russian (Русский)</Select.Item>
+						<Select.Item value="tu">Turkish (Türkçe)</Select.Item>
 					</Select.Content>
 				</Select.Root>
 			</div>

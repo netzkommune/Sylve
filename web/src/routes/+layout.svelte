@@ -121,6 +121,7 @@
 </script>
 
 <svelte:head>
+	<!-- @wc-ignore -->
 	<title>Sylve</title>
 </svelte:head>
 

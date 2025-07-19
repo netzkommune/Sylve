@@ -3,6 +3,7 @@ package zfs
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"regexp"
 	"runtime"
@@ -63,10 +64,11 @@ func (d *Dataset) parseProps(out [][]string) error {
 	setString(&d.Origin, d.props["origin"])
 
 	if err = setUint(&d.Used, d.props["used"]); err != nil {
-		return err
+		// return err
+		return fmt.Errorf("failed to parse used: %w", err)
 	}
 	if err = setUint(&d.Avail, d.props["avail"]); err != nil {
-		return err
+		return fmt.Errorf("failed to parse avail: %w", err)
 	}
 
 	setString(&d.Mountpoint, d.props["mountpoint"])
@@ -74,20 +76,20 @@ func (d *Dataset) parseProps(out [][]string) error {
 	setString(&d.Type, d.props["type"])
 
 	if err = setUint(&d.Volsize, d.props["volsize"]); err != nil {
-		return err
+		return fmt.Errorf("failed to parse volsize: %w", err)
 	}
 
 	if d.props["volblock"] != "" && d.props["volblock"] != "-" {
 		if err = setUint(&d.VolBlockSize, d.props["volblock"]); err != nil {
-			return err
+			return fmt.Errorf("failed to parse volblock: %w", err)
 		}
 	}
 
 	if err = setUint(&d.Quota, d.props["quota"]); err != nil {
-		return err
+		return fmt.Errorf("failed to parse quota: %w", err)
 	}
 	if err = setUint(&d.Referenced, d.props["refer"]); err != nil {
-		return err
+		return fmt.Errorf("failed to parse refer: %w", err)
 	}
 
 	if runtime.GOOS == "solaris" {
@@ -95,13 +97,13 @@ func (d *Dataset) parseProps(out [][]string) error {
 	}
 
 	if err = setUint(&d.Written, d.props["written"]); err != nil {
-		return err
+		return fmt.Errorf("failed to parse written: %w", err)
 	}
 	if err = setUint(&d.Logicalused, d.props["lused"]); err != nil {
-		return err
+		return fmt.Errorf("failed to parse lused: %w", err)
 	}
 	if err = setUint(&d.Usedbydataset, d.props["usedds"]); err != nil {
-		return err
+		return fmt.Errorf("failed to parse usedds: %w", err)
 	}
 	return nil
 }

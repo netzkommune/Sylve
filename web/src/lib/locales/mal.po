@@ -354,7 +354,7 @@ msgstr "ഇൻസ്റ്റലേഷൻ മീഡിയ തിരഞ്ഞെ�
 
 #: src/lib/components/custom/VM/Create/Storage.svelte
 msgid "None"
-msgstr "ഒന്നുമില്ല```"
+msgstr "ഒന്നുമില്ല"
 
 #: src/lib/components/ui/custom-input/combobox.svelte
 msgid "No data"
@@ -848,7 +848,7 @@ msgstr "ഡിഫ്യൂസ്-സൈഡ്‌ബാർ"
 #: src/lib/components/skeleton/LeftPanel.svelte
 #: src/routes/[node]/+layout.svelte
 msgid "Data Center"
-msgstr "ഡാറ്റാ സെന്റർ```"
+msgstr "ഡാറ്റാ സെന്റർ"
 
 #: src/routes/[node]/+layout.svelte
 msgid "Help"
@@ -946,7 +946,7 @@ msgstr "ഉപയോക്താക്കൾ"
 
 #: src/routes/[node]/+layout.svelte
 msgid "Groups"
-msgstr "ഗ്രൂപ്പുകൾ```"
+msgstr "ഗ്രൂപ്പുകൾ"
 
 #: src/routes/[node]/summary/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
@@ -1009,7 +1009,7 @@ msgstr "നെറ്റ്‌വർക്ക് RX"
 
 #: src/routes/[node]/summary/+page.svelte
 msgid "Network TX"
-msgstr "നെറ്റ്‌വർക്ക് TX```"
+msgstr "നെറ്റ്‌വർക്ക് TX"
 
 #: src/lib/components/custom/Charts/Area.svelte
 #: src/lib/components/custom/Charts/Bar.svelte
@@ -1100,7 +1100,7 @@ msgstr "വി.എം നിർത്തുന്നതിൽ പിഴവ് �
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "VM stopped"
-msgstr "വി.എം നിർത്തി```"
+msgstr "വി.എം നിർത്തി"
 
 #: src/routes/[node]/notes/+page.svelte
 #: src/routes/[node]/network/interfaces/+page.svelte
@@ -2331,7 +2331,7 @@ msgstr "{0} സ്നാപ്ഷോട്ട്{1} നീക്കം ചെയ
 
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 msgid "Failed to delete snapshots"
-msgstr "സ്നാപ്ഷോട്ടുകൾ നീക്കം ചെയ്യാൻ കഴിഞ്ഞില്ല```"
+msgstr "സ്നാപ്ഷോട്ടുകൾ നീക്കം ചെയ്യാൻ കഴിഞ്ഞില്ല"
 
 #: src/lib/components/custom/Authentication/Create.svelte
 msgid "<0/>Create User"

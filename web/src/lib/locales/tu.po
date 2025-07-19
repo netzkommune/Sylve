@@ -895,11 +895,11 @@ msgstr "Ara..."
 
 #: src/lib/components/custom/TreeTable/Search.svelte
 msgid "Escape"
-msgstr "Çıkış```"
+msgstr "Çıkış"
 
 #: src/lib/components/ui/breadcrumb/breadcrumb-ellipsis.svelte
 msgid "More"
-msgstr "Daha Fazla```"
+msgstr "Daha Fazla"
 
 #: src/lib/components/ui/custom-input/combobox.svelte
 msgid "No data"
@@ -995,7 +995,7 @@ msgstr "İndirme başarısız oldu"
 
 #: src/routes/[node]/utilities/downloader/+page.svelte
 msgid "Failed to get download link"
-msgstr "İndirme bağlantısı alınamadı```"
+msgstr "İndirme bağlantısı alınamadı"
 
 #: src/lib/components/custom/VM/Create/Advanced.svelte
 msgid "VNC Port"
@@ -1150,7 +1150,7 @@ msgstr "Kurulum ortamını seçin"
 
 #: src/lib/components/custom/VM/Create/Storage.svelte
 msgid "None"
-msgstr "Yok```"
+msgstr "Yok"
 
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 msgid "CPU"
@@ -1369,7 +1369,7 @@ msgstr "Depolama eklenemedi"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Storage attached"
-msgstr "Depolama eklendi```"
+msgstr "Depolama eklendi"
 
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
 msgid "Port"
@@ -1762,7 +1762,7 @@ msgstr "VM silinirken hata oluştu"
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Notes about VM"
-msgstr "VM durduruldu```"
+msgstr "VM durduruldu"
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "VM"
@@ -1814,7 +1814,7 @@ msgstr "VM durdurulurken hata oluştu"
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "VM stopped"
-msgstr "VM durduruldu```"
+msgstr "VM durduruldu"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "No available disks"
@@ -2208,7 +2208,7 @@ msgstr "Depolama ayrılamadı"
 
 #: src/routes/[node]/vm/[node]/storage/+page.svelte
 msgid "Storage detached"
-msgstr "Depolama ayrıldı```"
+msgstr "Depolama ayrıldı"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 msgid "<0/>Create Filesystem"
@@ -2562,7 +2562,7 @@ msgstr "{0} veri kümesi silindi"
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "Failed to delete datasets"
-msgstr "Veri kümeleri silinemedi```"
+msgstr "Veri kümeleri silinemedi"
 
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 msgid "View Periodics"

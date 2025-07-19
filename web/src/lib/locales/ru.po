@@ -1164,7 +1164,7 @@ msgstr "Ошибка при остановке ВМ"
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "VM stopped"
-msgstr "ВМ остановлена```"
+msgstr "ВМ остановлена"
 
 #: src/lib/stores/terminal.svelte.ts
 msgid "Terminal"
@@ -1456,7 +1456,7 @@ msgstr "Не удалось изменить VNC"
 
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
 msgid "VNC modified"
-msgstr "VNC изменено```"
+msgstr "VNC изменено"
 
 #: src/lib/components/custom/Authentication/Create.svelte
 msgid "<0/>Create User"
@@ -2193,7 +2193,7 @@ msgstr "Не удалось отсоединить хранилище"
 
 #: src/routes/[node]/vm/[node]/storage/+page.svelte
 msgid "Storage detached"
-msgstr "Хранилище отсоединено```"
+msgstr "Хранилище отсоединено"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 msgid "<0/>Create Filesystem"
@@ -2305,7 +2305,7 @@ msgstr "Не удалось создать файловую систему"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 msgid "File System {0} created"
-msgstr "Файловая система {0} создана```"
+msgstr "Файловая система {0} создана"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 msgid "<0/>Edit Filesystem - {0}"
@@ -2547,7 +2547,7 @@ msgstr "Удалено {0} наборов данных"
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "Failed to delete datasets"
-msgstr "Не удалось удалить наборы данных```"
+msgstr "Не удалось удалить наборы данных"
 
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 msgid "View Periodics"
@@ -2643,4 +2643,4 @@ msgstr "Русский (Русский)"
 
 #: src/lib/components/custom/Login.svelte
 msgid "Remember Me"
-msgstr "Запомнить меня```"
+msgstr "Запомнить меня"

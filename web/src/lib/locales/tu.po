@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-19T13:45:12.198Z\n"
-"PO-Revision-Date: 2025-07-21T11:20:57.590Z\n"
+"PO-Revision-Date: 2025-07-21T14:26:16.053Z\n"
 "Last-Translator: \n"
 "Language: Türkçe\n"
 "Language-Team: \n"
@@ -2674,4 +2674,8 @@ msgstr ""
 
 #: src/lib/components/custom/Samba/Share.svelte
 msgid "Samba share {0}"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "No available/unused switches to attach to"
 msgstr ""

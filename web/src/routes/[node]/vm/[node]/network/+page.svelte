@@ -14,6 +14,7 @@
 	import { handleAPIError, updateCache } from '$lib/utils/http';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
+	import { untrack } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import type { CellComponent } from 'tabulator-tables';
 
@@ -127,6 +128,11 @@
 	let activeRows: Row[] | null = $state(null);
 	let activeRow: Row | null = $derived(activeRows ? (activeRows[0] as Row) : ({} as Row));
 	let query = $state('');
+	let usable = $derived.by(() => {
+		return switches.standard?.filter((s) => {
+			return !vm?.networks.some((n) => n.switchId === s.id);
+		});
+	});
 
 	let options = {
 		attach: {
@@ -170,7 +176,17 @@
 	<div class="flex h-10 w-full items-center gap-2 border p-2">
 		<Button
 			onclick={() => {
-				properties.attach.open = true;
+				if (vm) {
+					if (usable?.length === 0) {
+						toast.error('No available/unused switches to attach to', {
+							position: 'bottom-center'
+						});
+
+						return;
+					}
+
+					properties.attach.open = true;
+				}
 			}}
 			size="sm"
 			class="h-6"

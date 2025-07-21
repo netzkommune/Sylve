@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-19T13:45:12.198Z\n"
-"PO-Revision-Date: 2025-07-21T09:47:04.746Z\n"
+"PO-Revision-Date: 2025-07-21T11:20:57.590Z\n"
 "Last-Translator: \n"
 "Language: Türkçe\n"
 "Language-Team: \n"
@@ -249,6 +249,7 @@ msgstr "Küçült"
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Close"
 msgstr "MTU"
 
@@ -295,6 +296,7 @@ msgstr "Bölümler Oluştur"
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Reset"
 msgstr "Kapat"
 
@@ -312,6 +314,7 @@ msgstr "Kapat"
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Name"
 msgstr "VLAN"
 
@@ -447,6 +450,7 @@ msgstr "Sanal Makine Siliniyor"
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Edit"
 msgstr "Düzenle"
 
@@ -631,6 +635,7 @@ msgstr "Yönetici"
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Create"
 msgstr "Oluştur"
 
@@ -826,50 +831,61 @@ msgid "Type"
 msgstr "Tür"
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Create Samba Share"
 msgstr "Samba Paylaşımı Oluştur"
 
 #: src/lib/components/custom/Samba/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Dataset"
 msgstr "Veri Kümesi"
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Select dataset"
 msgstr "Veri kümesi seç"
 
 #: src/lib/components/custom/Samba/Create.svelte
 #: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Read-Only Groups"
 msgstr "Salt Okunur Gruplar"
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Select groups"
 msgstr "Grupları seç"
 
 #: src/lib/components/custom/Samba/Create.svelte
 #: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Writeable Groups"
 msgstr "Yazılabilir Gruplar"
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Create Mask"
 msgstr "Maske Oluştur"
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Directory Mask"
 msgstr "Dizin Maskesi"
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Share name already exists"
 msgstr "Paylaşım adı zaten var"
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Name is required"
 msgstr "Ad gerekli"
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Dataset is required"
 msgstr "Veri kümesi gerekli"
 
@@ -878,14 +894,17 @@ msgid "No groups selected"
 msgstr "Grup seçilmedi"
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Share cannot have overlapping groups"
 msgstr "Paylaşımın çakışan grupları olamaz"
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Failed to create Samba share"
 msgstr "Samba paylaşımı oluşturulamadı"
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Samba share created"
 msgstr "Samba paylaşımı oluşturuldu"
 
@@ -2623,10 +2642,12 @@ msgid "Stopped {0}"
 msgstr ""
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Guests"
 msgstr ""
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "No groups selected and guests are not allowed"
 msgstr ""
 
@@ -2635,5 +2656,22 @@ msgid "Read-Only"
 msgstr ""
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Read Only"
+msgstr ""
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Edit Share"
+msgstr ""
+
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Edit Samba Share"
+msgstr ""
+
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Failed to {0} Samba share"
+msgstr ""
+
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Samba share {0}"
 msgstr ""

@@ -182,12 +182,14 @@ func (s *Service) ShareConfig() (string, error) {
 
 		if share.ReadOnly {
 			config.WriteString("\tread only = yes\n")
-		} else {
-			config.WriteString("\tread only = no\n")
 		}
 
 		if share.GuestOk && !share.ReadOnly {
 			config.WriteString("\tforce user = root\n")
+		}
+
+		if len(rGroups) > 0 && len(wGroups) > 0 {
+			config.WriteString("\tread only = yes\n")
 		}
 
 		if len(wGroups) > 0 {

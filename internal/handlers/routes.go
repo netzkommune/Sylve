@@ -165,6 +165,7 @@ func RegisterRoutes(r *gin.Engine,
 
 		samba.GET("/shares", sambaHandlers.GetShares(sambaService))
 		samba.POST("/shares", sambaHandlers.CreateShare(sambaService))
+		samba.PUT("/shares", sambaHandlers.UpdateShare(sambaService))
 		samba.DELETE("/shares/:id", sambaHandlers.DeleteShare(sambaService))
 	}
 

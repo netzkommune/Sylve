@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-19T15:13:04.883Z\n"
-"PO-Revision-Date: 2025-07-21T10:06:17.857Z\n"
+"PO-Revision-Date: 2025-07-21T11:20:57.580Z\n"
 "Last-Translator: \n"
 "Language: Arabic\n"
 "Language-Team: \n"
@@ -32,6 +32,7 @@ msgstr "حذف"
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Edit"
 msgstr "تعديل"
 
@@ -83,6 +84,7 @@ msgstr "ملاحظة"
 #: src/routes/[node]/utilities/downloader/+page.svelte
 #: src/lib/components/custom/Authentication/Create.svelte
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Reset"
 msgstr "إعادة تعيين"
 
@@ -115,6 +117,7 @@ msgstr "إعادة تعيين"
 #: src/routes/[node]/utilities/downloader/+page.svelte
 #: src/lib/components/custom/Authentication/Create.svelte
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Close"
 msgstr "إغلاق"
 
@@ -132,6 +135,7 @@ msgstr "إغلاق"
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/routes/[node]/settings/authentication/users/+page.svelte
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Name"
 msgstr "اسم"
 
@@ -824,6 +828,7 @@ msgstr ""
 #: src/lib/components/custom/Samba/Create.svelte
 #: src/lib/components/custom/Authentication/Create.svelte
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Create"
 msgstr ""
 
@@ -1860,6 +1865,7 @@ msgstr ""
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Dataset"
 msgstr ""
 
@@ -2022,11 +2028,13 @@ msgstr ""
 
 #: src/routes/[node]/storage/samba/shares/+page.svelte
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Read-Only Groups"
 msgstr ""
 
 #: src/routes/[node]/storage/samba/shares/+page.svelte
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Writeable Groups"
 msgstr ""
 
@@ -2037,34 +2045,42 @@ msgid "Created At"
 msgstr ""
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Create Samba Share"
 msgstr ""
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Select dataset"
 msgstr ""
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Select groups"
 msgstr ""
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Create Mask"
 msgstr ""
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Directory Mask"
 msgstr ""
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Share name already exists"
 msgstr ""
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Name is required"
 msgstr ""
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Dataset is required"
 msgstr ""
 
@@ -2073,14 +2089,17 @@ msgid "No groups selected"
 msgstr ""
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Share cannot have overlapping groups"
 msgstr ""
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Failed to create Samba share"
 msgstr ""
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Samba share created"
 msgstr ""
 
@@ -2613,10 +2632,12 @@ msgid "Users added to group"
 msgstr ""
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Guests"
 msgstr ""
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "No groups selected and guests are not allowed"
 msgstr ""
 
@@ -2625,5 +2646,22 @@ msgid "Read-Only"
 msgstr ""
 
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Read Only"
+msgstr ""
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Edit Share"
+msgstr ""
+
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Edit Samba Share"
+msgstr ""
+
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Failed to {0} Samba share"
+msgstr ""
+
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Samba share {0}"
 msgstr ""

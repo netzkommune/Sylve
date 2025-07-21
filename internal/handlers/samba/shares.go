@@ -21,6 +21,18 @@ type CreateSambaShareRequest struct {
 	ReadOnly        *bool    `json:"readOnly"`
 }
 
+type UpdateSambaShareRequest struct {
+	ID              uint     `json:"id"`
+	Name            string   `json:"name"`
+	Dataset         string   `json:"dataset"`
+	ReadOnlyGroups  []string `json:"readOnlyGroups"`
+	WriteableGroups []string `json:"writeableGroups"`
+	CreateMask      string   `json:"createMask"`
+	DirectoryMask   string   `json:"directoryMask"`
+	GuestOk         *bool    `json:"guestOk"`
+	ReadOnly        *bool    `json:"readOnly"`
+}
+
 // @Summary Get Samba Shares
 // @Description Retrieve all Samba shares
 // @Tags Samba
@@ -108,6 +120,70 @@ func CreateShare(smbService *samba.Service) gin.HandlerFunc {
 		c.JSON(http.StatusOK, internal.APIResponse[any]{
 			Status:  "success",
 			Message: "Samba share created successfully",
+			Error:   "",
+			Data:    nil,
+		})
+	}
+}
+
+// @Summary Update Samba Share
+// @Description Update an existing Samba share with specified settings
+// @Tags Samba
+// @Accept json
+// @Produce json
+// @Param request body UpdateSambaShareRequest true "Update Samba Share Request"
+// @Success 200 {string} string "Samba share updated successfully"
+// @Failure 400 {string} string "Invalid request"
+// @Failure 500 {string} string "Internal server error"
+// @Router /samba/shares [put]
+func UpdateShare(smbService *samba.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var request UpdateSambaShareRequest
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		guestOk := false
+
+		if request.GuestOk != nil {
+			guestOk = *request.GuestOk
+		}
+
+		readOnly := false
+
+		if request.ReadOnly != nil {
+			readOnly = *request.ReadOnly
+		}
+
+		if err := smbService.UpdateShare(
+			request.ID,
+			request.Name,
+			request.Dataset,
+			request.ReadOnlyGroups,
+			request.WriteableGroups,
+			request.CreateMask,
+			request.DirectoryMask,
+			guestOk,
+			readOnly,
+		); err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "failed_to_update_share",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "Samba share updated successfully",
 			Error:   "",
 			Data:    nil,
 		})

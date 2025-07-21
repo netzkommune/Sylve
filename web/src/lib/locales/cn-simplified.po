@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-19T15:13:43.695Z\n"
-"PO-Revision-Date: 2025-07-21T09:00:17.948Z\n"
+"PO-Revision-Date: 2025-07-21T10:06:17.849Z\n"
 "Last-Translator: \n"
 "Language: 简体中文\n"
 "Language-Team: \n"
@@ -2532,6 +2532,7 @@ msgid "<0/>Create User"
 msgstr ""
 
 #: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/Samba/Create.svelte
 msgid "Admin"
 msgstr ""
 
@@ -2609,4 +2610,20 @@ msgstr ""
 
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
 msgid "Users added to group"
+msgstr ""
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Guests"
+msgstr ""
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "No groups selected and guests are not allowed"
+msgstr ""
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Read-Only"
+msgstr ""
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Read Only"
 msgstr ""

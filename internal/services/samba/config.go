@@ -151,7 +151,12 @@ func (s *Service) ShareConfig() (string, error) {
 
 		config.WriteString(fmt.Sprintf("[%s]\n", share.Name))
 		config.WriteString(fmt.Sprintf("\tpath = %s\n", dataset.Mountpoint))
-		config.WriteString(fmt.Sprintf("\tguest ok = no\n"))
+
+		if share.GuestOk {
+			config.WriteString(fmt.Sprintf("\tguest ok = yes\n"))
+		} else {
+			config.WriteString(fmt.Sprintf("\tguest ok = no\n"))
+		}
 
 		rGroups := make([]string, 0)
 		wGroups := make([]string, 0)
@@ -175,7 +180,15 @@ func (s *Service) ShareConfig() (string, error) {
 			config.WriteString(fmt.Sprintf("\tvalid users = %s\n", "@"+strings.Join(aGroups, " @")))
 		}
 
-		config.WriteString(fmt.Sprintf("\tread only = yes\n"))
+		if share.ReadOnly {
+			config.WriteString("\tread only = yes\n")
+		} else {
+			config.WriteString("\tread only = no\n")
+		}
+
+		if share.GuestOk && !share.ReadOnly {
+			config.WriteString("\tforce user = root\n")
+		}
 
 		if len(wGroups) > 0 {
 			config.WriteString(fmt.Sprintf("\twrite list = %s\n", writeList))

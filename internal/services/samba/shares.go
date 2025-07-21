@@ -22,9 +22,15 @@ func (s *Service) CreateShare(
 	readOnlyGroups []string,
 	writeableGroups []string,
 	createMask string,
-	directoryMask string) error {
+	directoryMask string,
+	guestOk bool,
+	readOnly bool) error {
 	if err := s.DB.Where("name = ?", name).First(&sambaModels.SambaShare{}).Error; err == nil {
 		return fmt.Errorf("share_with_name_exists")
+	}
+
+	if len(readOnlyGroups) > 0 && readOnly {
+		return fmt.Errorf("cannot_create_read_only_share_with_read_only_groups")
 	}
 
 	datasets, err := zfs.Datasets("")
@@ -56,8 +62,8 @@ func (s *Service) CreateShare(
 
 	allGroups := utils.JoinStringSlices(readOnlyGroups, writeableGroups)
 
-	if len(allGroups) == 0 {
-		return fmt.Errorf("no_groups_provided")
+	if len(allGroups) == 0 && !guestOk {
+		return fmt.Errorf("no_groups_selected_and_guests_not_allowed")
 	}
 
 	for _, group := range allGroups {
@@ -92,6 +98,8 @@ func (s *Service) CreateShare(
 		WriteableGroups: wrGroups,
 		CreateMask:      createMask,
 		DirectoryMask:   directoryMask,
+		GuestOk:         guestOk,
+		ReadOnly:        readOnly,
 	}
 
 	if err := s.DB.Create(&share).Error; err != nil {

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-19T13:45:12.198Z\n"
-"PO-Revision-Date: 2025-07-21T08:46:19.794Z\n"
+"PO-Revision-Date: 2025-07-21T09:47:04.746Z\n"
 "Last-Translator: \n"
 "Language: Türkçe\n"
 "Language-Team: \n"
@@ -616,6 +616,7 @@ msgid "Enter or generate password"
 msgstr "Şifre girin veya oluşturun"
 
 #: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/Samba/Create.svelte
 msgid "Admin"
 msgstr "Yönetici"
 
@@ -2619,4 +2620,20 @@ msgstr ""
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Stopped {0}"
+msgstr ""
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Guests"
+msgstr ""
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "No groups selected and guests are not allowed"
+msgstr ""
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Read-Only"
+msgstr ""
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Read Only"
 msgstr ""

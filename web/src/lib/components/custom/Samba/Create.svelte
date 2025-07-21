@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { createSambaShare } from '$lib/api/samba/share';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import CustomComboBox from '$lib/components/ui/custom-input/combobox.svelte';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import { Label } from '$lib/components/ui/label/index.js';
 	import type { Group } from '$lib/types/auth';
 	import type { SambaShare } from '$lib/types/samba/shares';
 	import type { Dataset } from '$lib/types/zfs/dataset';
@@ -61,7 +63,9 @@
 			}
 		},
 		createMask: '0664',
-		directoryMask: '2775'
+		directoryMask: '2775',
+		guestOk: false,
+		readOnly: false
 	};
 
 	let properties = $state(options);
@@ -79,9 +83,10 @@
 			error = 'Dataset is required';
 		} else if (
 			properties.readOnlyGroups.combobox.value.length === 0 &&
-			properties.writeableGroups.combobox.value.length === 0
+			properties.writeableGroups.combobox.value.length === 0 &&
+			!properties.guestOk
 		) {
-			error = 'No groups selected';
+			error = 'No groups selected and guests are not allowed';
 		}
 
 		if (
@@ -105,7 +110,8 @@
 			properties.readOnlyGroups.combobox.value,
 			properties.writeableGroups.combobox.value,
 			properties.createMask,
-			properties.directoryMask
+			properties.directoryMask,
+			properties.guestOk
 		);
 
 		if (response.status === 'error') {
@@ -122,6 +128,14 @@
 		open = false;
 		properties = options;
 	}
+
+	$effect(() => {
+		if (properties.readOnly) {
+			if (properties.readOnlyGroups.combobox.value.length > 0) {
+				properties.readOnlyGroups.combobox.value = [];
+			}
+		}
+	});
 </script>
 
 <Dialog.Root bind:open>
@@ -195,6 +209,7 @@
 				bind:open={properties.readOnlyGroups.combobox.open}
 				bind:value={properties.readOnlyGroups.combobox.value}
 				data={properties.readOnlyGroups.combobox.options}
+				disabled={properties.readOnly}
 				multiple={true}
 				width="w-full"
 			/>
@@ -224,6 +239,18 @@
 				bind:value={properties.directoryMask}
 				classes="flex-1 space-y-1.5"
 			/>
+		</div>
+
+		<div class="flex items-center space-x-4">
+			<div class="flex items-center space-x-2">
+				<Checkbox id="guests" bind:checked={properties.guestOk} />
+				<Label for="guests" class="text-sm font-medium">Guests</Label>
+			</div>
+
+			<div class="flex items-center space-x-2">
+				<Checkbox id="read-only" bind:checked={properties.readOnly} />
+				<Label for="read-only" class="text-sm font-medium">Read Only</Label>
+			</div>
 		</div>
 
 		<Dialog.Footer class="mt-4">

@@ -13,7 +13,8 @@ export async function createSambaShare(
 	readOnlyGroups: string[] = [],
 	writeableGroups: string[] = [],
 	createMask: string = '',
-	directoryMask: string = ''
+	directoryMask: string = '',
+	guestOk: boolean = false
 ): Promise<APIResponse> {
 	return await apiRequest('/samba/shares', APIResponseSchema, 'POST', {
 		name,
@@ -21,7 +22,8 @@ export async function createSambaShare(
 		readOnlyGroups,
 		writeableGroups,
 		createMask,
-		directoryMask
+		directoryMask,
+		guestOk
 	});
 }
 

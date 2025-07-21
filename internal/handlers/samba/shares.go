@@ -17,6 +17,8 @@ type CreateSambaShareRequest struct {
 	WriteableGroups []string `json:"writeableGroups"`
 	CreateMask      string   `json:"createMask"`
 	DirectoryMask   string   `json:"directoryMask"`
+	GuestOk         *bool    `json:"guestOk"`
+	ReadOnly        *bool    `json:"readOnly"`
 }
 
 // @Summary Get Samba Shares
@@ -72,6 +74,18 @@ func CreateShare(smbService *samba.Service) gin.HandlerFunc {
 			return
 		}
 
+		guestOk := false
+
+		if request.GuestOk != nil {
+			guestOk = *request.GuestOk
+		}
+
+		readOnly := false
+
+		if request.ReadOnly != nil {
+			readOnly = *request.ReadOnly
+		}
+
 		if err := smbService.CreateShare(
 			request.Name,
 			request.Dataset,
@@ -79,6 +93,8 @@ func CreateShare(smbService *samba.Service) gin.HandlerFunc {
 			request.WriteableGroups,
 			request.CreateMask,
 			request.DirectoryMask,
+			guestOk,
+			readOnly,
 		); err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 				Status:  "error",

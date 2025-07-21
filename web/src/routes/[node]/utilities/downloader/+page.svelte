@@ -130,14 +130,14 @@
 
 		if (activeRows && activeRows.length > 1) {
 			for (const row of activeRows) {
-				if (row.type !== '-') {
+				if (row.type !== 'http' && row.type !== 'torrent') {
 					modalState.isBulkDelete = false;
 					modalState.title = '';
 					return;
 				}
 			}
 			modalState.isBulkDelete = true;
-			modalState.title = `${activeRows.length} Downloads`;
+			modalState.title = `${activeRows.length} downloads`;
 		}
 	}
 
@@ -158,6 +158,8 @@
 			}
 		}
 	}
+
+	$inspect(modalState.isBulkDelete);
 </script>
 
 {#snippet button(type: string)}

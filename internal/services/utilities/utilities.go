@@ -32,7 +32,7 @@ type Service struct {
 }
 
 func NewUtilitiesService(db *gorm.DB) utilitiesServiceInterfaces.UtilitiesServiceInterface {
-	// torrent.DisableLogging()
+	torrent.DisableLogging()
 	cfg := torrent.DefaultConfig
 	cfg.Database = config.GetDownloadsPath("torrent.db")
 	cfg.DataDir = config.GetDownloadsPath("torrents")

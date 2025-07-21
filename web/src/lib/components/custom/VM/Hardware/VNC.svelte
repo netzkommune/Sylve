@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { modifyHardware } from '$lib/api/vm/hardware';
+	import { modifyHardware, modifyVNC } from '$lib/api/vm/hardware';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import CustomComboBox from '$lib/components/ui/custom-input/combobox.svelte';
@@ -71,19 +71,12 @@
 			return;
 		}
 
-		const cpuPinning = vm.cpuPinning ? vm.cpuPinning : [];
-		const response = await modifyHardware(
+		const response = await modifyVNC(
 			vm.vmId,
-			vm.cpuSockets,
-			vm.cpuCores,
-			vm.cpuThreads,
-			vm.ram,
-			cpuPinning,
 			Number(properties.port),
 			properties.resolution,
 			properties.password,
-			properties.wait ?? false,
-			vm.pciDevices || []
+			properties.wait ?? false
 		);
 
 		if (response.error) {

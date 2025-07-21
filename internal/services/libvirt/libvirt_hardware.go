@@ -144,7 +144,6 @@ func updateVNC(xml string, vncPort int, vncResolution string, vncPassword string
 		if valueAttr != nil {
 			value := valueAttr.Value
 			if value != "" && strings.Contains(value, "fbuf,tcp") {
-				fmt.Println("Found existing VNC argument:", value)
 				start := strings.Index(value, "-s")
 				end := strings.Index(value, ":")
 				if start != -1 && end != -1 && end > start {
@@ -457,8 +456,6 @@ func (s *Service) ModifyHardware(vmId int,
 	}
 
 	if len(pciDevices) > 0 {
-		fmt.Println("Updating PCI devices:", pciDevices)
-
 		vm.PCIDevices = pciDevices
 
 		if err := s.DB.Save(&vm).Error; err != nil {
@@ -487,6 +484,249 @@ func (s *Service) ModifyHardware(vmId int,
 		if err := s.DB.Save(&vm).Error; err != nil {
 			return fmt.Errorf("failed_to_update_vm_pci_devices_in_db: %w", err)
 		}
+	}
+
+	if err := s.Conn.DomainUndefineFlags(domain, 0); err != nil {
+		return fmt.Errorf("failed_to_undefine_domain: %w", err)
+	}
+
+	if _, err := s.Conn.DomainDefineXML(updatedXML); err != nil {
+		return fmt.Errorf("failed_to_define_domain_with_modified_xml: %w", err)
+	}
+
+	return nil
+}
+
+func (s *Service) ModifyCPU(
+	vmId int,
+	cpuSockets int,
+	cpuCores int,
+	cpuThreads int,
+	cpuPinning []int,
+) error {
+	vm, err := s.GetVmByVmId(vmId)
+
+	if err != nil {
+		return err
+	}
+
+	shutoff, err := s.IsDomainShutOff(vm.VmID)
+
+	if err != nil {
+		return err
+	}
+
+	if !shutoff {
+		return fmt.Errorf("domain_not_shutoff: %d", vm.VmID)
+	}
+
+	if vm.CPUCores == cpuCores &&
+		vm.CPUSockets == cpuSockets &&
+		vm.CPUsThreads == cpuThreads &&
+		len(vm.CPUPinning) == len(cpuPinning) {
+		for i, cpu := range vm.CPUPinning {
+			if i >= len(cpuPinning) || cpu != cpuPinning[i] {
+				return fmt.Errorf("no_changes_detected: %d", vmId)
+			}
+		}
+	}
+
+	domain, err := s.Conn.DomainLookupByName(strconv.Itoa(vmId))
+	if err != nil {
+		return fmt.Errorf("failed_to_lookup_domain_by_name: %w", err)
+	}
+
+	domainXML, err := s.Conn.DomainGetXMLDesc(domain, 0)
+	if err != nil {
+		return fmt.Errorf("failed_to_get_domain_xml_desc: %w", err)
+	}
+
+	xml := string(domainXML)
+	updatedXML := xml
+
+	vm.CPUCores = cpuCores
+	vm.CPUSockets = cpuSockets
+	vm.CPUsThreads = cpuThreads
+	vm.CPUPinning = cpuPinning
+
+	if err := s.DB.Save(&vm).Error; err != nil {
+		return fmt.Errorf("failed_to_update_vm_cpu_in_db: %w", err)
+	}
+
+	updatedXML, err = updateCPU(xml, cpuSockets, cpuCores, cpuThreads, cpuPinning)
+
+	if err != nil {
+		return fmt.Errorf("failed_to_update_cpu_in_xml: %w", err)
+	}
+
+	if err := s.Conn.DomainUndefineFlags(domain, 0); err != nil {
+		return fmt.Errorf("failed_to_undefine_domain: %w", err)
+	}
+
+	if _, err := s.Conn.DomainDefineXML(updatedXML); err != nil {
+		return fmt.Errorf("failed_to_define_domain_with_modified_xml: %w", err)
+	}
+
+	return nil
+}
+
+func (s *Service) ModifyRAM(vmId int, ram int) error {
+	vm, err := s.GetVmByVmId(vmId)
+
+	if err != nil {
+		return err
+	}
+
+	shutoff, err := s.IsDomainShutOff(vm.VmID)
+
+	if err != nil {
+		return err
+	}
+
+	if !shutoff {
+		return fmt.Errorf("domain_not_shutoff: %d", vm.VmID)
+	}
+
+	if vm.RAM == ram {
+		return fmt.Errorf("no_changes_detected: %d", vmId)
+	}
+
+	domain, err := s.Conn.DomainLookupByName(strconv.Itoa(vmId))
+	if err != nil {
+		return fmt.Errorf("failed_to_lookup_domain_by_name: %w", err)
+	}
+
+	domainXML, err := s.Conn.DomainGetXMLDesc(domain, 0)
+	if err != nil {
+		return fmt.Errorf("failed_to_get_domain_xml_desc: %w", err)
+	}
+
+	xml := string(domainXML)
+	updatedXML := xml
+
+	vm.RAM = ram
+	if err := s.DB.Save(&vm).Error; err != nil {
+		return fmt.Errorf("failed_to_update_vm_ram_in_db: %w", err)
+	}
+
+	updatedXML, err = updateMemory(xml, ram)
+	if err != nil {
+		return fmt.Errorf("failed_to_update_memory_in_xml: %w", err)
+	}
+
+	if err := s.Conn.DomainUndefineFlags(domain, 0); err != nil {
+		return fmt.Errorf("failed_to_undefine_domain: %w", err)
+	}
+
+	if _, err := s.Conn.DomainDefineXML(updatedXML); err != nil {
+		return fmt.Errorf("failed_to_define_domain_with_modified_xml: %w", err)
+	}
+
+	return nil
+}
+
+func (s *Service) ModifyVNC(vmId int, vncPort int, vncResolution string, vncPassword string, vncWait bool) error {
+	vm, err := s.GetVmByVmId(vmId)
+
+	if err != nil {
+		return err
+	}
+
+	shutoff, err := s.IsDomainShutOff(vm.VmID)
+
+	if err != nil {
+		return err
+	}
+
+	if !shutoff {
+		return fmt.Errorf("domain_not_shutoff: %d", vm.VmID)
+	}
+
+	if vm.VNCPort == vncPort &&
+		vm.VNCResolution == vncResolution &&
+		vm.VNCPassword == vncPassword &&
+		vm.VNCWait == vncWait {
+		return fmt.Errorf("no_changes_detected: %d", vmId)
+	}
+
+	domain, err := s.Conn.DomainLookupByName(strconv.Itoa(vmId))
+	if err != nil {
+		return fmt.Errorf("failed_to_lookup_domain_by_name: %w", err)
+	}
+
+	domainXML, err := s.Conn.DomainGetXMLDesc(domain, 0)
+	if err != nil {
+		return fmt.Errorf("failed_to_get_domain_xml_desc: %w", err)
+	}
+
+	xml := string(domainXML)
+	updatedXML := xml
+
+	vm.VNCPort = vncPort
+	vm.VNCResolution = vncResolution
+	vm.VNCPassword = vncPassword
+	vm.VNCWait = vncWait
+
+	if err := s.DB.Save(&vm).Error; err != nil {
+		return fmt.Errorf("failed_to_update_vm_vnc_in_db: %w", err)
+	}
+
+	updatedXML, err = updateVNC(xml, vncPort, vncResolution, vncPassword, vncWait)
+	if err != nil {
+		return fmt.Errorf("failed_to_update_vnc_in_xml: %w", err)
+	}
+
+	if err := s.Conn.DomainUndefineFlags(domain, 0); err != nil {
+		return fmt.Errorf("failed_to_undefine_domain: %w", err)
+	}
+
+	if _, err := s.Conn.DomainDefineXML(updatedXML); err != nil {
+		return fmt.Errorf("failed_to_define_domain_with_modified_xml: %w", err)
+	}
+
+	return nil
+}
+
+func (s *Service) ModifyPassthrough(vmId int, pciDevices []int) error {
+	vm, err := s.GetVmByVmId(vmId)
+
+	if err != nil {
+		return err
+	}
+
+	shutoff, err := s.IsDomainShutOff(vm.VmID)
+
+	if err != nil {
+		return err
+	}
+
+	if !shutoff {
+		return fmt.Errorf("domain_not_shutoff: %d", vm.VmID)
+	}
+
+	domain, err := s.Conn.DomainLookupByName(strconv.Itoa(vmId))
+	if err != nil {
+		return fmt.Errorf("failed_to_lookup_domain_by_name: %w", err)
+	}
+
+	domainXML, err := s.Conn.DomainGetXMLDesc(domain, 0)
+	if err != nil {
+		return fmt.Errorf("failed_to_get_domain_xml_desc: %w", err)
+	}
+
+	xml := string(domainXML)
+	updatedXML := xml
+
+	vm.PCIDevices = pciDevices
+
+	if err := s.DB.Save(&vm).Error; err != nil {
+		return fmt.Errorf("failed_to_update_vm_pci_devices_in_db: %w", err)
+	}
+
+	strSlice := utils.IntSliceToStrSlice(pciDevices)
+	updatedXML, err = updatePassthrough(xml, strSlice)
+	if err != nil {
+		return fmt.Errorf("failed_to_update_passthrough_in_xml: %w", err)
 	}
 
 	if err := s.Conn.DomainUndefineFlags(domain, 0); err != nil {

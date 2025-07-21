@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-19T15:12:48.250Z\n"
-"PO-Revision-Date: 2025-07-19T15:16:52.235Z\n"
+"PO-Revision-Date: 2025-07-21T08:15:33.969Z\n"
 "Last-Translator: \n"
 "Language: English\n"
 "Language-Team: \n"
@@ -20,6 +20,9 @@ msgstr "View"
 #: src/routes/[node]/notes/+page.svelte
 #: src/routes/[node]/network/switches/+page.svelte
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
 msgid "Delete"
 msgstr "Delete"
 
@@ -42,6 +45,12 @@ msgstr "Bulk Delete"
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
 msgid "New"
 msgstr "New"
 
@@ -64,6 +73,16 @@ msgstr "Note"
 #: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
 msgid "Reset"
 msgstr "Reset"
 
@@ -85,6 +104,17 @@ msgstr "Reset"
 #: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Dialog/SingleValue.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
 msgid "Close"
 msgstr "Close"
 
@@ -96,6 +126,12 @@ msgstr "Close"
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
 msgid "Name"
 msgstr "Name"
 
@@ -113,6 +149,12 @@ msgstr "This is a note"
 
 #: src/routes/[node]/notes/+page.svelte
 #: src/routes/[node]/network/switches/+page.svelte
+#: src/lib/components/custom/Dialog/SingleValue.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/VM/Hardware/Network.svelte
 msgid "Save"
 msgstr "Save"
 
@@ -143,6 +185,10 @@ msgstr "Failed to create note"
 #: src/routes/[node]/notes/+page.svelte
 #: src/routes/[node]/network/interfaces/+page.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
 msgid "ID"
 msgstr "ID"
 
@@ -230,6 +276,7 @@ msgid "Notes"
 msgstr "Notes"
 
 #: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Interfaces"
 msgstr "Interfaces"
 
@@ -313,10 +360,12 @@ msgid "Groups"
 msgstr "Groups"
 
 #: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "CPU Usage"
 msgstr "CPU Usage"
 
 #: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "RAM Usage"
 msgstr "RAM Usage"
 
@@ -357,6 +406,7 @@ msgid "Sylve Version"
 msgstr "Sylve Version"
 
 #: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Memory Usage"
 msgstr "Memory Usage"
 
@@ -442,6 +492,7 @@ msgid "Node"
 msgstr "Node"
 
 #: src/lib/components/skeleton/BottomPanel.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
 msgid "User"
 msgstr "User"
 
@@ -452,6 +503,7 @@ msgstr "Action"
 #: src/lib/components/skeleton/BottomPanel.svelte
 #: src/routes/[node]/network/interfaces/+page.svelte
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Status"
 msgstr "Status"
 
@@ -460,10 +512,13 @@ msgid "Login"
 msgstr "Login"
 
 #: src/lib/components/skeleton/BottomPanel.svelte
+#: src/lib/components/custom/VM/Hardware/Network.svelte
 msgid "Switch"
 msgstr "Switch"
 
 #: src/lib/components/skeleton/BottomPanel.svelte
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
 msgid "VNC"
 msgstr "VNC"
 
@@ -495,6 +550,8 @@ msgstr "Date"
 
 #: src/lib/components/custom/Charts/Area.svelte
 #: src/routes/[node]/storage/disks/+page.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
 msgid "Value"
 msgstr "Value"
 
@@ -533,10 +590,12 @@ msgid "Enter or generate passphrase"
 msgstr "Enter or generate passphrase"
 
 #: src/lib/components/custom/VM/Create/Advanced.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
 msgid "VNC Resolution"
 msgstr "VNC Resolution"
 
 #: src/lib/components/custom/VM/Create/Advanced.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
 msgid "Select VNC resolution"
 msgstr "Select VNC resolution"
 
@@ -566,6 +625,7 @@ msgstr "VM ID"
 
 #: src/lib/components/custom/VM/Create/Basic.svelte
 #: src/routes/[node]/network/interfaces/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Description"
 msgstr "Description"
 
@@ -590,14 +650,17 @@ msgid "Memory Size"
 msgstr "Memory Size"
 
 #: src/lib/components/custom/VM/Create/Hardware.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
 msgid "CPU Pinning"
 msgstr "CPU Pinning"
 
 #: src/lib/components/custom/VM/Create/Hardware.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
 msgid "You can only pin up to {0} vCPU{1}"
 msgstr "You can only pin up to {0} vCPU{1}"
 
 #: src/lib/components/custom/VM/Create/Hardware.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
 msgid "At least one CPU must be left unpinned"
 msgstr "At least one CPU must be left unpinned"
 
@@ -613,10 +676,13 @@ msgstr "Select emulation type"
 
 #: src/lib/components/custom/VM/Create/Network.svelte
 #: src/routes/[node]/network/interfaces/+page.svelte
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/lib/components/custom/VM/Hardware/Network.svelte
 msgid "MAC Address"
 msgstr "MAC Address"
 
 #: src/lib/components/custom/VM/Create/Storage.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "ZFS Volume"
 msgstr "ZFS Volume"
 
@@ -653,6 +719,7 @@ msgid "No data"
 msgstr "No data"
 
 #: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
 msgid "Username"
 msgstr "Username"
 
@@ -661,6 +728,8 @@ msgid "Enter your username"
 msgstr "Enter your username"
 
 #: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
 msgid "Password"
 msgstr "Password"
 
@@ -752,6 +821,9 @@ msgstr "Disable IPV6"
 #: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
 msgid "Create"
 msgstr "Create"
 
@@ -895,6 +967,7 @@ msgstr "<0/> Delete"
 #: src/lib/components/disk/CreatePartition.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Size"
 msgstr "Size"
 
@@ -967,6 +1040,7 @@ msgid "First Modified"
 msgstr "First Modified"
 
 #: src/lib/components/custom/FileExplorer/Toolbar.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Type"
 msgstr "Type"
 
@@ -1016,6 +1090,7 @@ msgstr "S.M.A.R.T Values ({0})"
 
 #: src/routes/[node]/storage/disks/+page.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "NVMe"
 msgstr "NVMe"
 
@@ -1218,6 +1293,7 @@ msgid "Comments about the pool"
 msgstr "Comments about the pool"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
 msgid "Mount Point"
 msgstr "Mount Point"
 
@@ -1249,11 +1325,13 @@ msgstr "Select Auto Expand"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Yes"
 msgstr "Yes"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "No"
 msgstr "No"
 
@@ -1593,6 +1671,7 @@ msgstr "Select ACL Mode"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Invalid name"
 msgstr "Invalid name"
 
@@ -1780,6 +1859,7 @@ msgstr "Failed to delete snapshots"
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+#: src/lib/components/custom/Samba/Create.svelte
 msgid "Dataset"
 msgstr "Dataset"
 
@@ -1835,3 +1915,698 @@ msgstr "No snapshot jobs"
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
 msgid "Save Snapshot Jobs"
 msgstr "Save Snapshot Jobs"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Running"
+msgstr "Running"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Start"
+msgstr "Start"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Stop"
+msgstr "Stop"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Notes about VM"
+msgstr "Notes about VM"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "VM"
+msgstr "VM"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Deleting Virtual Machine"
+msgstr "Deleting Virtual Machine"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Please wait while VM <b>{0} ({1})</b> is being deleted"
+msgstr "Please wait while VM <b>{0} ({1})</b> is being deleted"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Error deleting VM"
+msgstr "Error deleting VM"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "VM deleted"
+msgstr "VM deleted"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Starting Virtual Machine"
+msgstr "Starting Virtual Machine"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Please wait while VM <b>{0} ({1})</b> is being started."
+msgstr "Please wait while VM <b>{0} ({1})</b> is being started."
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Error starting VM"
+msgstr "Error starting VM"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "VM started"
+msgstr "VM started"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Stopping Virtual Machine"
+msgstr "Stopping Virtual Machine"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Please wait while VM <b>{0} ({1})</b> is being stopped"
+msgstr "Please wait while VM <b>{0} ({1})</b> is being stopped"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Error stopping VM"
+msgstr "Error stopping VM"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "VM stopped"
+msgstr "VM stopped"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Started {0}"
+msgstr "Started {0}"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Stopped"
+msgstr "Stopped"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+#: src/routes/[node]/vm/[node]/console/+page.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "Shutoff"
+msgstr "Shutoff"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Stopped {0}"
+msgstr "Stopped {0}"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Delete Share"
+msgstr "Delete Share"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Samba share"
+msgstr "Samba share"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Failed to delete Samba share"
+msgstr "Failed to delete Samba share"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Samba share deleted"
+msgstr "Samba share deleted"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Read-Only Groups"
+msgstr "Read-Only Groups"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Writeable Groups"
+msgstr "Writeable Groups"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Created At"
+msgstr "Created At"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Create Samba Share"
+msgstr "Create Samba Share"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Select dataset"
+msgstr "Select dataset"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Select groups"
+msgstr "Select groups"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Create Mask"
+msgstr "Create Mask"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Directory Mask"
+msgstr "Directory Mask"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Share name already exists"
+msgstr "Share name already exists"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Name is required"
+msgstr "Name is required"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Dataset is required"
+msgstr "Dataset is required"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "No groups selected"
+msgstr "No groups selected"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Share cannot have overlapping groups"
+msgstr "Share cannot have overlapping groups"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Failed to create Samba share"
+msgstr "Failed to create Samba share"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Samba share created"
+msgstr "Samba share created"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+msgid "Edit {0}"
+msgstr "Edit {0}"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Workgroup"
+msgstr "Workgroup"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Enter Workgroup"
+msgstr "Enter Workgroup"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Unix Charset"
+msgstr "Unix Charset"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Enter Unix Charset"
+msgstr "Enter Unix Charset"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Server String"
+msgstr "Server String"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Enter Server String"
+msgstr "Enter Server String"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Bind Interfaces Only"
+msgstr "Bind Interfaces Only"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Select Interfaces"
+msgstr "Select Interfaces"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+msgid "Property"
+msgstr "Property"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Failed to update Samba configuration"
+msgstr "Failed to update Samba configuration"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Samba configuration updated"
+msgstr "Samba configuration updated"
+
+#: src/lib/components/custom/Dialog/SingleValue.svelte
+msgid "Enter value"
+msgstr "Enter value"
+
+#: src/lib/components/custom/Dialog/SingleValue.svelte
+msgid "Select an option"
+msgstr "Select an option"
+
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "RAM"
+msgstr "RAM"
+
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+msgid "PCI Devices"
+msgstr "PCI Devices"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "CPU"
+msgstr "CPU"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "Sockets"
+msgstr "Sockets"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "Cores"
+msgstr "Cores"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "Threads"
+msgstr "Threads"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "CPU {0} is not pinned by this VM"
+msgstr "CPU {0} is not pinned by this VM"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "Failed to modify CPU"
+msgstr "Failed to modify CPU"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "VM not found"
+msgstr "VM not found"
+
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "RAM value must be greater than 0"
+msgstr "RAM value must be greater than 0"
+
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "RAM value exceeds available memory"
+msgstr "RAM value exceeds available memory"
+
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "RAM value is too high, at least 1 GiB must be reserved for the host"
+msgstr "RAM value is too high, at least 1 GiB must be reserved for the host"
+
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "Failed to modify RAM"
+msgstr "Failed to modify RAM"
+
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "RAM modified"
+msgstr "RAM modified"
+
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+msgid "Select PCI Devices"
+msgstr "Select PCI Devices"
+
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+msgid "Failed to modify PCI devices"
+msgstr "Failed to modify PCI devices"
+
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+msgid "PCI devices modified"
+msgstr "PCI devices modified"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Port"
+msgstr "Port"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Enter or generate password"
+msgstr "Enter or generate password"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Wait for VNC"
+msgstr "Wait for VNC"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Password too short"
+msgstr "Password too short"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Port must be between 5900 and 65535"
+msgstr "Port must be between 5900 and 65535"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Invalid resolution selected"
+msgstr "Invalid resolution selected"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "VNC port already in use"
+msgstr "VNC port already in use"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Failed to modify VNC"
+msgstr "Failed to modify VNC"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "VNC modified"
+msgstr "VNC modified"
+
+#: src/routes/[node]/vm/[node]/console/+page.svelte
+msgid "VM Console"
+msgstr "VM Console"
+
+#: src/routes/[node]/vm/[node]/console/+page.svelte
+msgid "The VM is currently powered off.<0/> Start the VM to access its console."
+msgstr "The VM is currently powered off.<0/> Start the VM to access its console."
+
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "Detach"
+msgstr "Detach"
+
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+msgid "This will detach the storage {0} from the VM {1}"
+msgstr "This will detach the storage {0} from the VM {1}"
+
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+msgid "Failed to detach storage"
+msgstr "Failed to detach storage"
+
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+msgid "Storage detached"
+msgstr "Storage detached"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "New Storage"
+msgstr "New Storage"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Select Type"
+msgstr "Select Type"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "CD-ROM"
+msgstr "CD-ROM"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Disk"
+msgstr "Disk"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "ISO"
+msgstr "ISO"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Select ISO"
+msgstr "Select ISO"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Select ZFS Volume"
+msgstr "Select ZFS Volume"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "ZFS Filesystem"
+msgstr "ZFS Filesystem"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Select ZFS Filesystem"
+msgstr "Select ZFS Filesystem"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "Emulation"
+msgstr "Emulation"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "Select Emulation"
+msgstr "Select Emulation"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "AHCI HD"
+msgstr "AHCI HD"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "VirtIO Block"
+msgstr "VirtIO Block"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Attach"
+msgstr "Attach"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Please select a type and dataset"
+msgstr "Please select a type and dataset"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Failed to attach CD-ROM"
+msgstr "Failed to attach CD-ROM"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "CD-ROM attached"
+msgstr "CD-ROM attached"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Please select an emulation type"
+msgstr "Please select an emulation type"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Please select a {0}"
+msgstr "Please select a {0}"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Failed to attach ZFS Volume"
+msgstr "Failed to attach ZFS Volume"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "ZFS Volume attached"
+msgstr "ZFS Volume attached"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Name and size required"
+msgstr "Name and size required"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Invalid size"
+msgstr "Invalid size"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Failed to attach storage"
+msgstr "Failed to attach storage"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Storage attached"
+msgstr "Storage attached"
+
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "This will detach the VM <b>{0}</b> from the switch <b>{1}</b>"
+msgstr "This will detach the VM <b>{0}</b> from the switch <b>{1}</b>"
+
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "Failed to detach network"
+msgstr "Failed to detach network"
+
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "Network detached"
+msgstr "Network detached"
+
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "Unknown Switch"
+msgstr "Unknown Switch"
+
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "Unknown"
+msgstr "Unknown"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "New Network"
+msgstr "New Network"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "Select Switch"
+msgstr "Select Switch"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "VirtIO"
+msgstr "VirtIO"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "E1000"
+msgstr "E1000"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "Switch is required"
+msgstr "Switch is required"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "Emulation is required"
+msgstr "Emulation is required"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "Error attaching VM to switch"
+msgstr "Error attaching VM to switch"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "VM attached to switch"
+msgstr "VM attached to switch"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Download"
+msgstr "Download"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Magnet"
+msgstr "Magnet"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "HTTP"
+msgstr "HTTP"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "URL"
+msgstr "URL"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Failed to delete download"
+msgstr "Failed to delete download"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Failed to delete downloads"
+msgstr "Failed to delete downloads"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Please enter a valid URL"
+msgstr "Please enter a valid URL"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Please enter a valid magnet or HTTP URL"
+msgstr "Please enter a valid magnet or HTTP URL"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Download started"
+msgstr "Download started"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Download failed"
+msgstr "Download failed"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Failed to get download link"
+msgstr "Failed to get download link"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Enable Passthrough"
+msgstr "Enable Passthrough"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Disable Passthrough"
+msgstr "Disable Passthrough"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Device added to passthrough"
+msgstr "Device added to passthrough"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Failed to add device to passthrough"
+msgstr "Failed to add device to passthrough"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Device removed from passthrough"
+msgstr "Device removed from passthrough"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Device is in use by a VM, failed to remove"
+msgstr "Device is in use by a VM, failed to remove"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Failed to remove device from passthrough"
+msgstr "Failed to remove device from passthrough"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Are you sure you want to pass through <b>{0}</b> by <b>{1}</b>? This will make it unavailable to the host."
+msgstr "Are you sure you want to pass through <b>{0}</b> by <b>{1}</b>? This will make it unavailable to the host."
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Are you sure you want to remove passthrough for <b>{0}</b> by <b>{1}</b>? This will make it available to the host again."
+msgstr "Are you sure you want to remove passthrough for <b>{0}</b> by <b>{1}</b>? This will make it available to the host again."
+
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+msgid "Failed to delete user"
+msgstr "Failed to delete user"
+
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+msgid "User deleted"
+msgstr "User deleted"
+
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "E-Mail"
+msgstr "E-Mail"
+
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+msgid "Last Usage"
+msgstr "Last Usage"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "<0/>Create User"
+msgstr "<0/>Create User"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Admin"
+msgstr "Admin"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Username and password are required"
+msgstr "Username and password are required"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Invalid username"
+msgstr "Invalid username"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Username already exists"
+msgstr "Username already exists"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Invalid email address"
+msgstr "Invalid email address"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Password must be at least 8 characters long"
+msgstr "Password must be at least 8 characters long"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Failed to create user"
+msgstr "Failed to create user"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "User created"
+msgstr "User created"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Add Users"
+msgstr "Add Users"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "New Group"
+msgstr "New Group"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Select users"
+msgstr "Select users"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Failed to delete group"
+msgstr "Failed to delete group"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Group deleted"
+msgstr "Group deleted"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Name and users are required"
+msgstr "Name and users are required"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Group name already exists"
+msgstr "Group name already exists"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Failed to create group"
+msgstr "Failed to create group"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Group created"
+msgstr "Group created"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "No users selected"
+msgstr "No users selected"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Failed to add users to group"
+msgstr "Failed to add users to group"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Users added to group"
+msgstr "Users added to group"

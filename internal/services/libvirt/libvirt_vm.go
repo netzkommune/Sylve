@@ -726,3 +726,32 @@ func (s *Service) IsDomainInactive(vmId int) (bool, error) {
 
 	return true, nil
 }
+
+func (s *Service) GetVmByVmId(vmId int) (vmModels.VM, error) {
+	var vm vmModels.VM
+
+	if err := s.DB.Preload("Storages").Preload("Networks").First(&vm, "vm_id = ?", vmId).Error; err != nil {
+		return vmModels.VM{}, fmt.Errorf("failed_to_get_vm_by_id: %w", err)
+	}
+
+	return vm, nil
+}
+
+func (s *Service) IsDomainShutOff(vmId int) (bool, error) {
+	domain, err := s.Conn.DomainLookupByName(strconv.Itoa(vmId))
+	if err != nil {
+		return false, fmt.Errorf("failed_to_lookup_domain_by_name: %w", err)
+	}
+
+	state, _, err := s.Conn.DomainGetState(domain, 0)
+
+	if err != nil {
+		return false, fmt.Errorf("failed_to_get_domain_state: %w", err)
+	}
+
+	if state == 5 {
+		return true, nil
+	}
+
+	return false, nil
+}

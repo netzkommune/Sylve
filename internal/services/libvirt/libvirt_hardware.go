@@ -334,7 +334,7 @@ func (s *Service) ModifyHardware(vmId int,
 			}
 
 			if !found {
-				return fmt.Errorf("pci_device_not_found: %s", pciDevice)
+				return fmt.Errorf("pci_device_not_found: %d", pciDevice)
 			}
 		}
 	}

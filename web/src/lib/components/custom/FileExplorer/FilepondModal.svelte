@@ -2,7 +2,13 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { store } from '$lib/stores/auth';
+	import { sha256 } from '$lib/utils/string';
 	import Icon from '@iconify/svelte';
+	import type { FilePond as FilePondType } from 'filepond';
+	import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
+	import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
+	import { onMount } from 'svelte';
+	import FilePond, { registerPlugin } from 'svelte-filepond';
 
 	interface Props {
 		isOpen: boolean;
@@ -20,25 +26,10 @@
 		onUploadComplete
 	}: Props = $props();
 
-	import FilePond, { registerPlugin, supported } from 'svelte-filepond';
-
-	// Import the Image EXIF Orientation and Image Preview plugins
-	// Note: These need to be installed separately
-	// `npm i filepond-plugin-image-preview filepond-plugin-image-exif-orientation --save`
-	import { sha256 } from '$lib/utils/string';
-	import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
-	import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
-	import { onMount } from 'svelte';
-
-	// Register the plugins
 	registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
 
-	// a reference to the component, used to call FilePond methods
-	let pond;
+	let pond: FilePondType;
 
-	// pond.getFiles() will return the active files
-
-	// the name to use for the internal file input
 	let name = 'filepond';
 	let hash = $state('');
 
@@ -46,11 +37,7 @@
 		hash = await sha256($store, 1);
 	});
 
-	// handle filepond events
 	function handleInit() {
-		console.log('FilePond has initialised');
-
-		// Add dropped files when FilePond is ready
 		if (pond && droppedFiles.length > 0) {
 			droppedFiles.forEach((file) => {
 				pond.addFile(file);
@@ -67,21 +54,20 @@
 			console.error('Upload failed:', error);
 			return;
 		}
-
-		console.log('File uploaded successfully:', file);
-
-		// Call the upload complete callback if provided
 		if (onUploadComplete) {
 			onUploadComplete();
 		}
 	}
 
-	// Watch for changes in droppedFiles and add them to FilePond
+	function handleRemoveFile() {
+		if (onUploadComplete) {
+			onUploadComplete();
+		}
+	}
+
 	$effect(() => {
 		if (pond && droppedFiles.length > 0 && isOpen) {
-			// Clear existing files first
 			pond.removeFiles();
-			// Add new dropped files
 			droppedFiles.forEach((file) => {
 				pond.addFile(file);
 			});
@@ -120,6 +106,7 @@
 				oninit={handleInit}
 				onaddfile={handleAddFile}
 				onprocessfile={handleProcessFile}
+				onremovefile={handleRemoveFile}
 				credits={false}
 			/>
 		</div>

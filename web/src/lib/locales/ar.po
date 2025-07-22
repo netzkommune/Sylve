@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-19T15:13:04.883Z\n"
-"PO-Revision-Date: 2025-07-22T13:04:41.220Z\n"
+"PO-Revision-Date: 2025-07-22T15:19:53.743Z\n"
 "Last-Translator: \n"
 "Language: Arabic\n"
 "Language-Team: \n"
@@ -52,6 +52,7 @@ msgstr "حذف جماعي"
 #: src/routes/[node]/utilities/downloader/+page.svelte
 #: src/routes/[node]/settings/authentication/users/+page.svelte
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/network/objects/+page.svelte
 msgid "New"
 msgstr "جديد"
 
@@ -85,6 +86,7 @@ msgstr "ملاحظة"
 #: src/lib/components/custom/Authentication/Create.svelte
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
 #: src/lib/components/custom/Samba/Share.svelte
+#: src/routes/[node]/network/objects/+page.svelte
 msgid "Reset"
 msgstr "إعادة تعيين"
 
@@ -119,6 +121,7 @@ msgstr "إعادة تعيين"
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
 #: src/lib/components/custom/Samba/Share.svelte
 #: src/lib/components/custom/FileExplorer/FilepondModal.svelte
+#: src/routes/[node]/network/objects/+page.svelte
 msgid "Close"
 msgstr "إغلاق"
 
@@ -137,6 +140,7 @@ msgstr "إغلاق"
 #: src/routes/[node]/settings/authentication/users/+page.svelte
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
 #: src/lib/components/custom/Samba/Share.svelte
+#: src/routes/[node]/network/objects/+page.svelte
 msgid "Name"
 msgstr "اسم"
 
@@ -236,6 +240,7 @@ msgid "Hardware"
 msgstr "المكونات المادية"
 
 #: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/network/objects/+page.svelte
 msgid "Network"
 msgstr "الشبكة"
 
@@ -935,6 +940,7 @@ msgid "<0/> Create {0}"
 msgstr ""
 
 #: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
+#: src/routes/[node]/network/objects/+page.svelte
 msgid "Enter {0} name"
 msgstr ""
 
@@ -1048,6 +1054,7 @@ msgstr ""
 
 #: src/lib/components/custom/FileExplorer/Toolbar.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/routes/[node]/network/objects/+page.svelte
 msgid "Type"
 msgstr ""
 
@@ -2235,6 +2242,7 @@ msgid "PCI devices modified"
 msgstr ""
 
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/routes/[node]/network/objects/+page.svelte
 msgid "Port"
 msgstr ""
 
@@ -2682,4 +2690,48 @@ msgstr ""
 
 #: src/lib/components/custom/FileExplorer/FilepondModal.svelte
 msgid "Submit"
+msgstr ""
+
+#: src/routes/[node]/+layout.svelte
+msgid "Objects"
+msgstr ""
+
+#: src/routes/[node]/network/objects/+page.svelte
+msgid "Open"
+msgstr ""
+
+#: src/routes/[node]/network/objects/+page.svelte
+msgid "Object"
+msgstr ""
+
+#: src/routes/[node]/network/objects/+page.svelte
+msgid "Object Name"
+msgstr ""
+
+#: src/routes/[node]/network/objects/+page.svelte
+msgid "Select type"
+msgstr ""
+
+#: src/routes/[node]/network/objects/+page.svelte
+msgid "Host"
+msgstr ""
+
+#: src/routes/[node]/network/objects/+page.svelte
+msgid "Port Number"
+msgstr ""
+
+#: src/routes/[node]/network/objects/+page.svelte
+msgid "Country"
+msgstr ""
+
+#: src/routes/[node]/network/objects/+page.svelte
+msgid "Option 1"
+msgstr ""
+
+#: src/routes/[node]/network/objects/+page.svelte
+msgid "List"
+msgstr ""
+
+#: src/routes/[node]/network/objects/+page.svelte
+msgid "Create New Object"
 msgstr ""

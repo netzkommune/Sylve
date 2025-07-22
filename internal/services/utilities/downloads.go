@@ -20,7 +20,7 @@ import (
 
 	valid "github.com/asaskevich/govalidator"
 	"github.com/cavaliergopher/grab/v3"
-	"github.com/cenkalti/rain/torrent"
+	"github.com/cenkalti/rain/v2/torrent"
 )
 
 func (s *Service) ListDownloads() ([]utilitiesModels.Downloads, error) {
@@ -203,6 +203,7 @@ func (s *Service) SyncDownloadProgress() error {
 
 			download.Size = torrent.Stats().Bytes.Total
 			download.Name = torrent.Stats().Name
+
 			files, err := torrent.Files()
 
 			if err != nil {
@@ -280,7 +281,7 @@ func (s *Service) DeleteDownload(id int) error {
 	if download.Type == "torrent" {
 		torrent := s.BTTClient.GetTorrent(download.UUID)
 		if torrent != nil {
-			if err := s.BTTClient.RemoveTorrent(download.UUID); err != nil {
+			if err := s.BTTClient.RemoveTorrent(download.UUID, false); err != nil {
 				logger.L.Debug().Msgf("Failed to remove torrent: %v", err)
 				return err
 			}
@@ -320,7 +321,7 @@ func (s *Service) BulkDeleteDownload(ids []int) error {
 		if download.Type == "torrent" {
 			torrent := s.BTTClient.GetTorrent(download.UUID)
 			if torrent != nil {
-				if err := s.BTTClient.RemoveTorrent(download.UUID); err != nil {
+				if err := s.BTTClient.RemoveTorrent(download.UUID, false); err != nil {
 					logger.L.Debug().Msgf("Failed to remove torrent: %v", err)
 					return err
 				}

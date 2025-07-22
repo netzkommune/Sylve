@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { modifyHardware } from '$lib/api/vm/hardware';
+	import { modifyHardware, modifyPPT } from '$lib/api/vm/hardware';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import CustomComboBox from '$lib/components/ui/custom-input/combobox.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
@@ -59,18 +59,8 @@
 
 	async function modify() {
 		if (vm) {
-			const cpuPinning = vm.cpuPinning ? vm.cpuPinning : [];
-			const response = await modifyHardware(
+			const response = await modifyPPT(
 				vm.vmId,
-				vm.cpuSockets,
-				vm.cpuCores,
-				vm.cpuThreads,
-				vm.ram,
-				cpuPinning,
-				Number(vm.vncPort),
-				vm.vncResolution,
-				vm.vncPassword,
-				vm.vncWait,
 				properties.combobox.value.map((id) => Number(id)) || []
 			);
 

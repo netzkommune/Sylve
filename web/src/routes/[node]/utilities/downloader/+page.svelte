@@ -16,7 +16,7 @@
 	import type { Row } from '$lib/types/components/tree-table';
 	import type { Download } from '$lib/types/utilities/downloader';
 	import { handleAPIError, isAPIResponse, updateCache } from '$lib/utils/http';
-	import { isDownloadURL } from '$lib/utils/string';
+	import { addTrackersToMagnet, isDownloadURL } from '$lib/utils/string';
 	import { generateTableData } from '$lib/utils/utilities/downloader';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
@@ -112,6 +112,10 @@
 			return;
 		}
 
+		if (isMagnet(modalState.url)) {
+			modalState.url = addTrackersToMagnet(modalState.url);
+		}
+
 		const result = await startDownload(modalState.url);
 		if (result) {
 			modalState.isOpen = false;
@@ -130,14 +134,14 @@
 
 		if (activeRows && activeRows.length > 1) {
 			for (const row of activeRows) {
-				if (row.type !== '-') {
+				if (row.type !== 'http' && row.type !== 'torrent') {
 					modalState.isBulkDelete = false;
 					modalState.title = '';
 					return;
 				}
 			}
 			modalState.isBulkDelete = true;
-			modalState.title = `${activeRows.length} Downloads`;
+			modalState.title = `${activeRows.length} downloads`;
 		}
 	}
 
@@ -158,6 +162,8 @@
 			}
 		}
 	}
+
+	$inspect(modalState.isBulkDelete);
 </script>
 
 {#snippet button(type: string)}

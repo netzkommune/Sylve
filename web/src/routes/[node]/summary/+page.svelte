@@ -3,7 +3,7 @@
 	import { getCPUInfo } from '$lib/api/info/cpu';
 	import { getNetworkInterfaceInfoHistorical } from '$lib/api/info/network';
 	import { getRAMInfo, getSwapInfo } from '$lib/api/info/ram';
-	import { getIODelay } from '$lib/api/zfs/pool';
+	import { getIODelay, getPoolsDiskUsage } from '$lib/api/zfs/pool';
 	import AreaChart from '$lib/components/custom/Charts/Area.svelte';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { Progress } from '$lib/components/ui/progress/index.js';
@@ -17,7 +17,6 @@
 	import { updateCache } from '$lib/utils/http';
 	import { bytesToHumanReadable, floatToNDecimals } from '$lib/utils/numbers';
 	import { formatUptime, secondsToHoursAgo } from '$lib/utils/time';
-	import { getTotalDiskUsage } from '$lib/utils/zfs';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
 
@@ -46,107 +45,129 @@
 			initialData: data.basicInfo,
 			onSuccess: (data: BasicInfo) => {
 				updateCache('basicInfo', data);
-			}
+			},
+			refetchOnMount: true,
+			refetchOnWindowFocus: true
 		},
 		{
 			queryKey: ['cpuInfo'],
 			queryFn: getCPUInfo,
-			refetchInterval: 1000,
+			refetchInterval: 5000,
 			keepPreviousData: true,
 			initialData: data.cpuInfo,
 			onSuccess: (data: CPUInfo | CPUInfoHistorical) => {
 				updateCache('cpuInfo', data as CPUInfo);
-			}
+			},
+			refetchOnMount: true,
+			refetchOnWindowFocus: true
 		},
 		{
 			queryKey: ['ramInfo'],
 			queryFn: getRAMInfo,
-			refetchInterval: 1000,
+			refetchInterval: 5000,
 			keepPreviousData: true,
 			initialData: data.ramInfo,
 			onSuccess: (data: RAMInfo | RAMInfoHistorical) => {
 				updateCache('ramInfo', data);
-			}
+			},
+			refetchOnMount: true,
+			refetchOnWindowFocus: true
 		},
 		{
 			queryKey: ['swapInfo'],
 			queryFn: getSwapInfo,
-			refetchInterval: 1000,
+			refetchInterval: 60000,
 			keepPreviousData: true,
 			initialData: data.swapInfo,
 			onSuccess: (data: RAMInfo | RAMInfoHistorical) => {
 				updateCache('swapInfo', data);
-			}
+			},
+			refetchOnMount: true,
+			refetchOnWindowFocus: true
 		},
 		{
 			queryKey: ['ioDelay'],
 			queryFn: getIODelay,
-			refetchInterval: 1000,
+			refetchInterval: 60000,
 			keepPreviousData: true,
 			initialData: data.ioDelay,
 			onSuccess: (data: IODelay | IODelayHistorical) => {
 				updateCache('ioDelay', data as IODelay);
-			}
+			},
+			refetchOnMount: true,
+			refetchOnWindowFocus: true
 		},
 		{
 			queryKey: ['totalDiskUsage'],
-			queryFn: getTotalDiskUsage,
-			refetchInterval: 1000,
+			queryFn: getPoolsDiskUsage,
+			refetchInterval: 120000,
 			keepPreviousData: true,
 			initialData: data.totalDiskUsage,
 			onSuccess: (data: number) => {
 				updateCache('totalDiskUsage', data);
-			}
+			},
+			refetchOnMount: true,
+			refetchOnWindowFocus: true
 		},
 		{
 			queryKey: ['cpuInfoHistorical'],
 			queryFn: getCPUInfo,
-			refetchInterval: 1000,
+			refetchInterval: 30000,
 			keepPreviousData: true,
 			initialData: data.cpuInfoHistorical,
 			onSuccess: (data: CPUInfo | CPUInfoHistorical) => {
 				updateCache('cpuInfoHistorical', data as CPUInfoHistorical);
-			}
+			},
+			refetchOnMount: true,
+			refetchOnWindowFocus: true
 		},
 		{
 			queryKey: ['ioDelayHistorical'],
 			queryFn: getIODelay,
-			refetchInterval: 1000,
+			refetchInterval: 30000,
 			keepPreviousData: true,
 			initialData: data.ioDelayHistorical,
 			onSuccess: (data: IODelay | IODelayHistorical) => {
 				updateCache('ioDelayHistorical', data as IODelayHistorical);
-			}
+			},
+			refetchOnMount: true,
+			refetchOnWindowFocus: true
 		},
 		{
 			queryKey: ['ramInfoHistorical'],
 			queryFn: getRAMInfo,
-			refetchInterval: 1000,
+			refetchInterval: 30000,
 			keepPreviousData: true,
 			initialData: data.ramInfoHistorical,
 			onSuccess: (data: RAMInfo | RAMInfoHistorical) => {
 				updateCache('ramInfoHistorical', data as RAMInfoHistorical);
-			}
+			},
+			refetchOnMount: true,
+			refetchOnWindowFocus: true
 		},
 		{
 			queryKey: ['swapInfoHistorical'],
 			queryFn: getSwapInfo,
-			refetchInterval: 1000,
+			refetchInterval: 30000,
 			keepPreviousData: true,
 			initialData: data.swapInfoHistorical,
 			onSuccess: (data: RAMInfo | RAMInfoHistorical) => {
 				updateCache('swapInfoHistorical', data as RAMInfoHistorical);
-			}
+			},
+			refetchOnMount: true,
+			refetchOnWindowFocus: true
 		},
 		{
 			queryKey: ['networkUsageHistorical'],
 			queryFn: getNetworkInterfaceInfoHistorical,
-			refetchInterval: 1000,
+			refetchInterval: 30000,
 			keepPreviousData: true,
 			initialData: data.networkUsageHistorical,
 			onSuccess: (data: HistoricalNetworkInterface[]) => {
 				updateCache('networkUsageHistorical', data);
-			}
+			},
+			refetchOnMount: true,
+			refetchOnWindowFocus: true
 		}
 	]);
 

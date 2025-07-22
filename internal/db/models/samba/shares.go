@@ -13,6 +13,8 @@ type SambaShare struct {
 	WriteableGroups []models.Group `json:"writeableGroups" gorm:"many2many:samba_share_writeable_groups;"`
 	CreateMask      string         `json:"createMask" gorm:"default:'0664'"`
 	DirectoryMask   string         `json:"directoryMask" gorm:"default:'2775'"`
+	GuestOk         bool           `json:"guestOk" gorm:"default:false"`
+	ReadOnly        bool           `json:"readOnly" gorm:"default:false"`
 	CreatedAt       time.Time      `json:"createdAt" gorm:"autoCreateTime"`
 	UpdatedAt       time.Time      `json:"updatedAt" gorm:"autoUpdateTime"`
 }

@@ -125,6 +125,7 @@ func RegisterRoutes(r *gin.Engine,
 		pools := zfs.Group("/pools")
 		{
 			pools.GET("", zfsHandlers.GetPools(zfsService))
+			pools.GET("/disks-usage", zfsHandlers.GetDisksUsage(zfsService))
 			pools.POST("", zfsHandlers.CreatePool(infoService, zfsService))
 			pools.PATCH("", zfsHandlers.EditPool(infoService, zfsService))
 			pools.POST("/:guid/scrub", zfsHandlers.ScrubPool(infoService, zfsService))
@@ -165,6 +166,7 @@ func RegisterRoutes(r *gin.Engine,
 
 		samba.GET("/shares", sambaHandlers.GetShares(sambaService))
 		samba.POST("/shares", sambaHandlers.CreateShare(sambaService))
+		samba.PUT("/shares", sambaHandlers.UpdateShare(sambaService))
 		samba.DELETE("/shares/:id", sambaHandlers.DeleteShare(sambaService))
 	}
 
@@ -216,6 +218,9 @@ func RegisterRoutes(r *gin.Engine,
 
 		fileExplorer.POST("/copy-or-move", systemHandlers.CopyOrMoveFileOrFolder(systemService))
 		fileExplorer.POST("/copy-or-move-batch", systemHandlers.CopyOrMoveFilesOrFolders(systemService))
+
+		fileExplorer.POST("/upload", systemHandlers.UploadFile(systemService))
+		fileExplorer.DELETE("/upload", systemHandlers.DeleteUpload(systemService))
 	}
 
 	vm := api.Group("/vm")
@@ -237,6 +242,10 @@ func RegisterRoutes(r *gin.Engine,
 		vm.POST("/network/attach", vmHandlers.NetworkAttach(libvirtService))
 
 		vm.PUT("/hardware/:vmid", vmHandlers.ModifyHardware(libvirtService))
+		vm.PUT("/hardware/cpu/:vmid", vmHandlers.ModifyCPU(libvirtService))
+		vm.PUT("/hardware/ram/:vmid", vmHandlers.ModifyRAM(libvirtService))
+		vm.PUT("/hardware/vnc/:vmid", vmHandlers.ModifyVNC(libvirtService))
+		vm.PUT("/hardware/ppt/:vmid", vmHandlers.ModifyPassthroughDevices(libvirtService))
 	}
 
 	utilities := api.Group("/utilities")

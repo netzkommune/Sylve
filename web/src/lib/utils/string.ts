@@ -11,6 +11,7 @@
 import { getIcon, loadIcon } from '@iconify/svelte';
 import isCidr from 'is-cidr';
 import { isIP, isIPv4 } from 'is-ip';
+import { decode as magnetDecode, encode as magnetEncode } from 'magnet-uri';
 import { customRandom, nanoid } from 'nanoid';
 import isEmail from 'validator/lib/isEmail';
 import isMACAddress from 'validator/lib/isMACAddress';
@@ -193,4 +194,28 @@ export function isValidEmail(email: string): boolean {
 		allow_utf8_local_part: true,
 		allow_display_name: false
 	});
+}
+
+export function addTrackersToMagnet(uri: string): string {
+	try {
+		const parsed = magnetDecode(uri);
+		if (!parsed.tr || parsed.tr.length === 0) {
+			const trackers = [
+				'udp://tracker.opentrackr.org:1337/announce',
+				'udp://tracker.coppersurfer.tk:6969/announce',
+				'udp://tracker.internetwarriors.net:1337/announce',
+				'udp://tracker.openbittorrent.com:80/announce',
+				'udp://tracker.publicbt.com:80/announce'
+			];
+
+			parsed.tr = trackers;
+			parsed.announce = trackers;
+		}
+
+		return magnetEncode(parsed);
+	} catch (e) {
+		console.error('Invalid magnet URI:', e);
+	}
+
+	return uri;
 }

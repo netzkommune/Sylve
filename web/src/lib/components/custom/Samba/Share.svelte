@@ -1,10 +1,13 @@
 <script lang="ts">
-	import { createSambaShare } from '$lib/api/samba/share';
+	import { createSambaShare, updateSambaShare } from '$lib/api/samba/share';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import CustomComboBox from '$lib/components/ui/custom-input/combobox.svelte';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import { Label } from '$lib/components/ui/label/index.js';
 	import type { Group } from '$lib/types/auth';
+	import type { APIResponse } from '$lib/types/common';
 	import type { SambaShare } from '$lib/types/samba/shares';
 	import type { Dataset } from '$lib/types/zfs/dataset';
 	import Icon from '@iconify/svelte';
@@ -15,16 +18,18 @@
 		shares: SambaShare[];
 		datasets: Dataset[];
 		groups: Group[];
+		share?: SambaShare | null;
+		edit?: boolean;
 	}
 
-	let { open = $bindable(), shares, datasets, groups }: Props = $props();
+	let { open = $bindable(), shares, datasets, groups, share, edit = false }: Props = $props();
 
 	let options = {
-		name: '',
+		name: share ? share.name : '',
 		dataset: {
 			combobox: {
 				open: false,
-				value: '',
+				value: share ? share.dataset : '',
 				options: datasets
 					.filter(
 						(dataset) =>
@@ -43,7 +48,7 @@
 		readOnlyGroups: {
 			combobox: {
 				open: false,
-				value: [] as string[],
+				value: share ? share.readOnlyGroups.map((group) => group.name) : ([] as string[]),
 				options: groups.map((group) => ({
 					label: group.name,
 					value: group.name
@@ -53,23 +58,25 @@
 		writeableGroups: {
 			combobox: {
 				open: false,
-				value: [] as string[],
+				value: share ? share.writeableGroups.map((group) => group.name) : ([] as string[]),
 				options: groups.map((group) => ({
 					label: group.name,
 					value: group.name
 				}))
 			}
 		},
-		createMask: '0664',
-		directoryMask: '2775'
+		createMask: share ? share.createMask : '0664',
+		directoryMask: share ? share.directoryMask : '2775',
+		guestOk: share ? share.guestOk : false,
+		readOnly: share ? share.readOnly : false
 	};
 
 	let properties = $state(options);
 
-	async function create() {
+	async function createOrEdit() {
 		let error = '';
 
-		if (shares.some((share) => share.name === properties.name)) {
+		if (shares.some((share) => share.name === properties.name) && share?.name !== properties.name) {
 			error = 'Share name already exists';
 		}
 
@@ -79,9 +86,10 @@
 			error = 'Dataset is required';
 		} else if (
 			properties.readOnlyGroups.combobox.value.length === 0 &&
-			properties.writeableGroups.combobox.value.length === 0
+			properties.writeableGroups.combobox.value.length === 0 &&
+			!properties.guestOk
 		) {
-			error = 'No groups selected';
+			error = 'No groups selected and guests are not allowed';
 		}
 
 		if (
@@ -99,29 +107,65 @@
 			return;
 		}
 
-		const response = await createSambaShare(
-			properties.name,
-			properties.dataset.combobox.value,
-			properties.readOnlyGroups.combobox.value,
-			properties.writeableGroups.combobox.value,
-			properties.createMask,
-			properties.directoryMask
-		);
+		// let func = edit ? updateSambaShare : createSambaShare;
+		let response: APIResponse;
+
+		// const response = await createSambaShare(
+		// 	properties.name,
+		// 	properties.dataset.combobox.value,
+		// 	properties.readOnlyGroups.combobox.value,
+		// 	properties.writeableGroups.combobox.value,
+		// 	properties.createMask,
+		// 	properties.directoryMask,
+		// 	properties.guestOk
+		// );
+
+		if (edit) {
+			response = await updateSambaShare(
+				share!.id,
+				properties.name,
+				properties.dataset.combobox.value,
+				properties.readOnlyGroups.combobox.value,
+				properties.writeableGroups.combobox.value,
+				properties.createMask,
+				properties.directoryMask,
+				properties.guestOk,
+				properties.readOnly
+			);
+		} else {
+			response = await createSambaShare(
+				properties.name,
+				properties.dataset.combobox.value,
+				properties.readOnlyGroups.combobox.value,
+				properties.writeableGroups.combobox.value,
+				properties.createMask,
+				properties.directoryMask,
+				properties.guestOk
+			);
+		}
 
 		if (response.status === 'error') {
-			toast.error('Failed to create Samba share', {
+			toast.error(`Failed to ${edit ? 'edit' : 'create'} Samba share`, {
 				position: 'bottom-center'
 			});
 			return;
 		}
 
-		toast.success('Samba share created', {
+		toast.success(`Samba share ${edit ? 'edited' : 'created'}`, {
 			position: 'bottom-center'
 		});
 
 		open = false;
 		properties = options;
 	}
+
+	$effect(() => {
+		if (properties.readOnly) {
+			if (properties.readOnlyGroups.combobox.value.length > 0) {
+				properties.readOnlyGroups.combobox.value = [];
+			}
+		}
+	});
 </script>
 
 <Dialog.Root bind:open>
@@ -136,7 +180,11 @@
 			<Dialog.Title class="flex justify-between gap-1 text-left">
 				<div class="flex items-center gap-2">
 					<Icon icon="mdi:folder-network" class="h-6 w-6" />
-					<span>Create Samba Share</span>
+					{#if edit}
+						<span>Edit Samba Share</span>
+					{:else}
+						<span>Create Samba Share</span>
+					{/if}
 				</div>
 
 				<div class="flex items-center gap-0.5">
@@ -195,6 +243,7 @@
 				bind:open={properties.readOnlyGroups.combobox.open}
 				bind:value={properties.readOnlyGroups.combobox.value}
 				data={properties.readOnlyGroups.combobox.options}
+				disabled={properties.readOnly}
 				multiple={true}
 				width="w-full"
 			/>
@@ -226,6 +275,18 @@
 			/>
 		</div>
 
+		<div class="flex items-center space-x-4">
+			<div class="flex items-center space-x-2">
+				<Checkbox id="guests" bind:checked={properties.guestOk} />
+				<Label for="guests" class="text-sm font-medium">Guests</Label>
+			</div>
+
+			<div class="flex items-center space-x-2">
+				<Checkbox id="read-only" bind:checked={properties.readOnly} />
+				<Label for="read-only" class="text-sm font-medium">Read Only</Label>
+			</div>
+		</div>
+
 		<Dialog.Footer class="mt-4">
 			<div class="flex items-center justify-end space-x-4">
 				<Button
@@ -233,10 +294,14 @@
 					type="button"
 					class="h-8 w-full lg:w-28"
 					onclick={() => {
-						create();
+						createOrEdit();
 					}}
 				>
-					Create
+					{#if edit}
+						Edit
+					{:else}
+						Create
+					{/if}
 				</Button>
 			</div>
 		</Dialog.Footer>

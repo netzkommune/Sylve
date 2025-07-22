@@ -110,8 +110,6 @@ export function generateTableData(data: Download[]): { rows: Row[]; columns: Col
 		rows.push(row);
 	}
 
-	console.log(rows);
-
 	return {
 		rows: rows,
 		columns: columns

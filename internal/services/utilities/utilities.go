@@ -14,9 +14,9 @@ import (
 	"sylve/internal/logger"
 
 	"github.com/cavaliergopher/grab/v3"
-	"github.com/cenkalti/rain/torrent"
+	"github.com/cenkalti/rain/v2/torrent"
 	"gorm.io/gorm"
-	
+
 	"sync"
 )
 
@@ -27,7 +27,7 @@ type Service struct {
 	BTTClient  *torrent.Session
 	GrabClient *grab.Client
 
-	httpRspMu    sync.Mutex
+	httpRspMu     sync.Mutex
 	httpResponses map[string]*grab.Response
 }
 
@@ -44,9 +44,9 @@ func NewUtilitiesService(db *gorm.DB) utilitiesServiceInterfaces.UtilitiesServic
 	}
 
 	return &Service{
-		DB:         db,
-		BTTClient:  session,
-		GrabClient: grab.NewClient(),
+		DB:            db,
+		BTTClient:     session,
+		GrabClient:    grab.NewClient(),
 		httpResponses: make(map[string]*grab.Response),
 	}
 }

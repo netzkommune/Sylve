@@ -6,7 +6,7 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/beevik/etree v1.5.1
 	github.com/cavaliergopher/grab/v3 v3.0.1
-	github.com/cenkalti/rain v1.13.0
+	github.com/cenkalti/rain/v2 v2.2.1
 	github.com/creack/pty v1.1.24
 	github.com/digitalocean/go-libvirt v0.0.0-20250417173424-a6a66ef779d6
 	github.com/gin-contrib/gzip v1.2.2
@@ -30,11 +30,11 @@ require (
 )
 
 require (
-	github.com/BurntSushi/toml v1.1.0 // indirect
+	github.com/BurntSushi/toml v1.4.0 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/bytedance/sonic v1.13.2 // indirect
 	github.com/bytedance/sonic/loader v0.2.4 // indirect
-	github.com/cenkalti/backoff/v3 v3.2.2 // indirect
+	github.com/cenkalti/backoff/v5 v5.0.2 // indirect
 	github.com/cenkalti/log v1.0.0 // indirect
 	github.com/cloudwego/base64x v0.1.5 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
@@ -85,7 +85,7 @@ require (
 	github.com/youtube/vitess v3.0.0-rc.3+incompatible // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	github.com/zeebo/bencode v1.0.0 // indirect
-	go.etcd.io/bbolt v1.3.11 // indirect
+	go.etcd.io/bbolt v1.4.0 // indirect
 	golang.org/x/arch v0.16.0 // indirect
 	golang.org/x/net v0.39.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect

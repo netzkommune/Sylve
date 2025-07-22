@@ -123,10 +123,5 @@
 				credits={false}
 			/>
 		</div>
-		<Dialog.Footer class="mt-1">
-			<div class="flex items-center justify-end space-x-4">
-				<Button size="sm" type="button" class="h-8 w-full lg:w-28">Submit</Button>
-			</div>
-		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

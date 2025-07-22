@@ -9,6 +9,8 @@ export const SambaShareSchema = z.object({
 	writeableGroups: z.preprocess((val) => (val == null ? [] : val), z.array(GroupSchema)),
 	createMask: z.string(),
 	directoryMask: z.string(),
+	guestOk: z.boolean(),
+	readOnly: z.boolean(),
 	createdAt: z.string(),
 	updatedAt: z.string()
 });

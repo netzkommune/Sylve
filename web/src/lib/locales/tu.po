@@ -1,0 +1,2681 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-07-19T13:45:12.198Z\n"
+"PO-Revision-Date: 2025-07-21T14:26:16.053Z\n"
+"Last-Translator: \n"
+"Language: Türkçe\n"
+"Language-Team: \n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n == 1 ? 0 : 1;\n"
+"MIME-Version: 1.0\n"
+
+#: src/routes/+layout.svelte
+msgid "Logged out"
+msgstr "Çıkış yapıldı"
+
+#: src/routes/[node]/+layout.svelte
+#: src/lib/components/skeleton/LeftPanel.svelte
+msgid "Data Center"
+msgstr "Veri Merkezi"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Help"
+msgstr "Yardım"
+
+#: src/routes/[node]/+layout.svelte
+#: src/lib/components/skeleton/LeftPanel.svelte
+msgid "Difuse-sidebar"
+msgstr "Difuse-kenar çubuğu"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Summary"
+msgstr "Özet"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Console"
+msgstr "Konsol"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Storage"
+msgstr "Depolama"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Hardware"
+msgstr "Donanım"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Network"
+msgstr "Ağ"
+
+#: src/routes/[node]/+layout.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Notes"
+msgstr "Notlar"
+
+#: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Interfaces"
+msgstr "Arayüzler"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Switches"
+msgstr "Anahtarlar"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Explorer"
+msgstr "Gezgin"
+
+#: src/routes/[node]/+layout.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Disks"
+msgstr "Diskler"
+
+#: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "ZFS"
+msgstr "RAM Kullanımı"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Dashboard"
+msgstr "Gösterge Paneli"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Pools"
+msgstr "Havuzlar"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Datasets"
+msgstr "Veri Kümeleri"
+
+#: src/routes/[node]/+layout.svelte
+msgid "File Systems"
+msgstr "Dosya Sistemleri"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Volumes"
+msgstr "Birimler"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Snapshots"
+msgstr "Anlık Görüntüler"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Samba"
+msgstr "Samba"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Shares"
+msgstr "Paylaşımlar"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Settings"
+msgstr "Ayarlar"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Utilities"
+msgstr "Araçlar"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Downloader"
+msgstr "İndirici"
+
+#: src/routes/[node]/+layout.svelte
+#: src/lib/components/custom/VM/Create/Hardware.svelte
+msgid "PCI Passthrough"
+msgstr "PCI Geçişi"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Authentication"
+msgstr "Kimlik Doğrulama"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Users"
+msgstr "Kullanıcılar"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Groups"
+msgstr "Gruplar"
+
+#: src/lib/components/custom/Header.svelte
+#: src/lib/components/custom/Login.svelte
+msgid "Sylve Logo"
+msgstr "Sylve Logosu"
+
+#: src/lib/components/custom/Header.svelte
+#: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/Throbber.svelte
+msgid "SYLVE"
+msgstr "SYLVE"
+
+#: src/lib/components/custom/Header.svelte
+msgid "Toggle navigation menu"
+msgstr "Gezinti menüsünü aç/kapat"
+
+#: src/lib/components/custom/Header.svelte
+msgid "Virtual Environment 0.0.1"
+msgstr "Sanal Ortam 0.0.1"
+
+#: src/lib/components/custom/Header.svelte
+msgid "<0/> Create VM"
+msgstr "<0/> VM Oluştur"
+
+#: src/lib/components/custom/Header.svelte
+msgid "Toggle user menu"
+msgstr "Kullanıcı menüsünü aç/kapat"
+
+#: src/lib/components/custom/Header.svelte
+msgid "Color Theme"
+msgstr "Renk Teması"
+
+#: src/lib/components/custom/Header.svelte
+msgid "Log out"
+msgstr "Oturumu kapat"
+
+#: src/lib/components/custom/Header.svelte
+msgid "⌘⇧Q"
+msgstr "⌘⇧Q"
+
+#: src/lib/components/custom/KVTableModal.svelte
+msgid "Object ({0} properties)"
+msgstr "Nesne ({0} özellik)"
+
+#: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Username"
+msgstr "Kullanıcı Adı"
+
+#: src/lib/components/custom/Login.svelte
+msgid "Enter your username"
+msgstr "Kullanıcı adınızı girin"
+
+#: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Password"
+msgstr "Şifre"
+
+#: src/lib/components/custom/Login.svelte
+msgid "Realm"
+msgstr "Alan"
+
+#: src/lib/components/custom/Login.svelte
+msgid "PAM"
+msgstr "PAM"
+
+#: src/lib/components/custom/Login.svelte
+msgid "Sylve"
+msgstr "Sylve"
+
+#: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/Terminal.svelte
+#: src/lib/components/ui/custom-input/combobox.svelte
+msgid "Enter"
+msgstr "Giriş"
+
+#: src/lib/components/custom/Terminal.svelte
+msgid "Minimize"
+msgstr "Küçült"
+
+#: src/lib/components/custom/Terminal.svelte
+#: src/lib/components/disk/CreatePartition.svelte
+#: src/routes/[node]/notes/+page.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/Dialog/SingleValue.svelte
+#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
+#: src/lib/components/custom/FileExplorer/RenameModal.svelte
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/ui/dialog/dialog-content.svelte
+#: src/lib/components/ui/sheet/sheet-content.svelte
+#: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Close"
+msgstr "MTU"
+
+#: src/lib/components/custom/Terminal.svelte
+msgid "Add new tab"
+msgstr "Yeni sekme ekle"
+
+#: src/lib/components/custom/Terminal.svelte
+msgid "Session killed: {0}"
+msgstr "Oturum sonlandırıldı: {0}"
+
+#: src/lib/components/custom/TreeTable.svelte
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "No data available"
+msgstr "Veri yok"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Create Partitions"
+msgstr "Bölümler Oluştur"
+
+#: src/lib/components/disk/CreatePartition.svelte
+#: src/routes/[node]/notes/+page.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
+#: src/lib/components/custom/FileExplorer/RenameModal.svelte
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Reset"
+msgstr "Kapat"
+
+#: src/lib/components/disk/CreatePartition.svelte
+#: src/routes/[node]/notes/+page.svelte
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Name"
+msgstr "VLAN"
+
+#: src/lib/components/disk/CreatePartition.svelte
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+msgid "Size"
+msgstr "Boyut"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Usage"
+msgstr "Kullanım"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Actions"
+msgstr "Eylemler"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Existing"
+msgstr "Mevcut"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "No partitions created yet"
+msgstr "Henüz bölüm oluşturulmadı"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Add Partition"
+msgstr "Bölüm Ekle"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "No space left"
+msgstr "Yer kalmadı"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Size: {0}"
+msgstr "Boyut: {0}"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Remaining space: {0}"
+msgstr "Kalan alan: {0}"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Save Partitions"
+msgstr "Bölümleri Kaydet"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Partition{0} created"
+msgstr "Bölüm{0} oluşturuldu"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "Error creating {0}"
+msgstr "{0} oluşturulurken hata oluştu"
+
+#: src/lib/components/disk/CreatePartition.svelte
+msgid "New Partition {0}"
+msgstr "Yeni Bölüm {0}"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Start Time"
+msgstr "Başlangıç Zamanı"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "End Time"
+msgstr "Bitiş Zamanı"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Node"
+msgstr "Düğüm"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+msgid "User"
+msgstr "Kullanıcı"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Action"
+msgstr "Eylem"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Status"
+msgstr "VM silindi"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Login"
+msgstr "Giriş"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "Switch"
+msgstr "Anahtar"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+msgid "VNC"
+msgstr "VNC"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Disk - Initialize GPT"
+msgstr "Disk - GPT'yi Başlat"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Disk - Wipe"
+msgstr "Disk - Sil"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Login - Create"
+msgstr "Giriş - Oluştur"
+
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
+msgid "View"
+msgstr "Görüntüle"
+
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Delete"
+msgstr "Sanal Makine Siliniyor"
+
+#: src/routes/[node]/notes/+page.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Edit"
+msgstr "Düzenle"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Bulk Delete"
+msgstr "Toplu Silme"
+
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "New"
+msgstr "Yeni"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Note"
+msgstr "Not"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Post Upgrade Summary"
+msgstr "Yükseltme Sonrası Özet"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Content"
+msgstr "İçerik"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "This is a note"
+msgstr "Bu bir nottur"
+
+#: src/routes/[node]/notes/+page.svelte
+#: src/lib/components/custom/Dialog/SingleValue.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Save"
+msgstr "Anahtar silinirken hata oluştu"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Failed to delete note"
+msgstr "Not silinemedi"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Failed to delete notes"
+msgstr "Notlar silinemedi"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Note updated"
+msgstr "Not güncellendi"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Failed to update note"
+msgstr "Not güncellenemedi"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Note created"
+msgstr "Not oluşturuldu"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Failed to create note"
+msgstr "Not oluşturulamadı"
+
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "ID"
+msgstr "ID"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Created"
+msgstr "Oluşturuldu"
+
+#: src/routes/[node]/notes/+page.svelte
+msgid "Updated"
+msgstr "Güncellendi"
+
+#: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "CPU Usage"
+msgstr "Sanal Makine Başlatılıyor"
+
+#: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "RAM Usage"
+msgstr "VM başlatıldı"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Disk Usage"
+msgstr "Disk Kullanımı"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "I/O Delay"
+msgstr "G/Ç Gecikmesi"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Swap Usage"
+msgstr "Takas Alanı Kullanımı"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "CPU(s)"
+msgstr "İşlemci(ler)"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Operating System"
+msgstr "İşletim Sistemi"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Uptime"
+msgstr "Çalışma Süresi"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Load Average"
+msgstr "Yük Ortalaması"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Boot Mode"
+msgstr "Önyükleme Modu"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Sylve Version"
+msgstr "Sylve Sürümü"
+
+#: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Memory Usage"
+msgstr "Bellek Kullanımı"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Network Usage"
+msgstr "Ağ Kullanımı"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Network RX"
+msgstr "Ağ RX"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Network TX"
+msgstr "Ağ TX"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "<0/>Create User"
+msgstr "<0/>Kullanıcı Oluştur"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+msgid "E-Mail"
+msgstr "E-Posta"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Enter or generate password"
+msgstr "Şifre girin veya oluşturun"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Admin"
+msgstr "Yönetici"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Create"
+msgstr "Oluştur"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Username and password are required"
+msgstr "Kullanıcı adı ve şifre gerekli"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Invalid username"
+msgstr "Geçersiz kullanıcı adı"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Username already exists"
+msgstr "Kullanıcı adı zaten mevcut"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Invalid email address"
+msgstr "Geçersiz e-posta adresi"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Password must be at least 8 characters long"
+msgstr "Şifre en az 8 karakter uzunluğunda olmalıdır"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Failed to create user"
+msgstr "Kullanıcı oluşturulamadı"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "User created"
+msgstr "Kullanıcı oluşturuldu"
+
+#: src/lib/components/custom/Charts/Area.svelte
+#: src/lib/components/custom/Charts/Bar.svelte
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "<0/> Reset zoom"
+msgstr "<0/> Yakınlaştırmayı Sıfırla"
+
+#: src/lib/components/custom/Charts/Area.svelte
+msgid "HH:mm"
+msgstr "SS:dd"
+
+#: src/lib/components/custom/Charts/Area.svelte
+msgid "Date"
+msgstr "Tarih"
+
+#: src/lib/components/custom/Charts/Area.svelte
+#: src/routes/[node]/storage/disks/+page.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+msgid "Value"
+msgstr "S.M.A.R.T Değerleri ({0})"
+
+#: src/lib/components/custom/Dialog/Alert.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
+msgid "Are you sure?"
+msgstr "Emin misiniz?"
+
+#: src/lib/components/custom/Dialog/Alert.svelte
+msgid "This action cannot be undone. This will permanently delete "
+msgstr "Bu işlem geri alınamaz. Bu işlem kalıcı olarak silinecek: "
+
+#: src/lib/components/custom/Dialog/Alert.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Cancel"
+msgstr "İptal"
+
+#: src/lib/components/custom/Dialog/Alert.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
+msgid "Continue"
+msgstr "Devam Et"
+
+#: src/lib/components/custom/Dialog/SingleValue.svelte
+msgid "Enter value"
+msgstr "Değer girin"
+
+#: src/lib/components/custom/Dialog/SingleValue.svelte
+msgid "Select an option"
+msgstr "Bir seçenek seçin"
+
+#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
+msgid "<0/> Create {0}"
+msgstr "<0/> {0} Oluştur"
+
+#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
+msgid "Enter {0} name"
+msgstr "{0} adını girin"
+
+#: src/lib/components/custom/FileExplorer/GridView.svelte
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "<0/> Open"
+msgstr "<0/> Aç"
+
+#: src/lib/components/custom/FileExplorer/GridView.svelte
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "<0/> Download"
+msgstr "<0/> İndir"
+
+#: src/lib/components/custom/FileExplorer/GridView.svelte
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "<0/> Copy"
+msgstr "<0/> Kopyala"
+
+#: src/lib/components/custom/FileExplorer/GridView.svelte
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "<0/> Cut"
+msgstr "<0/> Kes"
+
+#: src/lib/components/custom/FileExplorer/GridView.svelte
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+#: src/lib/components/custom/FileExplorer/RenameModal.svelte
+msgid "<0/> Rename"
+msgstr "<0/> Yeniden Adlandır"
+
+#: src/lib/components/custom/FileExplorer/GridView.svelte
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "<0/> Delete"
+msgstr "<0/> Sil"
+
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "Modified"
+msgstr "Değiştirilme"
+
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "B"
+msgstr "B"
+
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "Yesterday"
+msgstr "Dün"
+
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "MMM d"
+msgstr "MMM d"
+
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+msgid "MMM d, yyyy"
+msgstr "MMM d, yyyy"
+
+#: src/lib/components/custom/FileExplorer/RenameModal.svelte
+msgid "Enter new name"
+msgstr "Yeni adı girin"
+
+#: src/lib/components/custom/FileExplorer/RenameModal.svelte
+msgid "Rename"
+msgstr "Yeniden Adlandır"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "<0/> Add New"
+msgstr "<0/> Yeni Ekle"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "New File"
+msgstr "Yeni Dosya"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "New Folder"
+msgstr "Yeni Klasör"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "Upload File"
+msgstr "Dosya Yükle"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "Search files..."
+msgstr "Dosyaları ara..."
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "<0/> Sort"
+msgstr "<0/> Sırala"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "A - Z"
+msgstr "A - Z"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "Z - A"
+msgstr "Z - A"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "Last Modified"
+msgstr "Son Değiştirilen"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+msgid "First Modified"
+msgstr "İlk Değiştirilen"
+
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Type"
+msgstr "Tür"
+
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Create Samba Share"
+msgstr "Samba Paylaşımı Oluştur"
+
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Dataset"
+msgstr "Veri Kümesi"
+
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Select dataset"
+msgstr "Veri kümesi seç"
+
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Read-Only Groups"
+msgstr "Salt Okunur Gruplar"
+
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Select groups"
+msgstr "Grupları seç"
+
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Writeable Groups"
+msgstr "Yazılabilir Gruplar"
+
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Create Mask"
+msgstr "Maske Oluştur"
+
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Directory Mask"
+msgstr "Dizin Maskesi"
+
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Share name already exists"
+msgstr "Paylaşım adı zaten var"
+
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Name is required"
+msgstr "Ad gerekli"
+
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Dataset is required"
+msgstr "Veri kümesi gerekli"
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "No groups selected"
+msgstr "Grup seçilmedi"
+
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Share cannot have overlapping groups"
+msgstr "Paylaşımın çakışan grupları olamaz"
+
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Failed to create Samba share"
+msgstr "Samba paylaşımı oluşturulamadı"
+
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Samba share created"
+msgstr "Samba paylaşımı oluşturuldu"
+
+#: src/lib/components/custom/TreeTable/Search.svelte
+#: src/lib/components/ui/custom-input/combobox.svelte
+msgid "Search..."
+msgstr "Ara..."
+
+#: src/lib/components/custom/TreeTable/Search.svelte
+msgid "Escape"
+msgstr "Çıkış"
+
+#: src/lib/components/ui/breadcrumb/breadcrumb-ellipsis.svelte
+msgid "More"
+msgstr "Daha Fazla"
+
+#: src/lib/components/ui/custom-input/combobox.svelte
+msgid "No data"
+msgstr "Veri yok"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "<0/> Refresh"
+msgstr "<0/> Yenile"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "<0/> Paste"
+msgstr "<0/> Yapıştır"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "<0/> New File"
+msgstr "<0/> Yeni Dosya"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "<0/> New Folder"
+msgstr "<0/> Yeni Klasör"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "<0/> Upload File"
+msgstr "<0/> Dosya Yükle"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "{0} items"
+msgstr "{0} öğe"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "{0} folders, {1} files"
+msgstr "{0} klasör, {1} dosya"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "Failed to delete {0}"
+msgstr "{0} silinemedi"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "My Files"
+msgstr "Dosyalarım"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "Failed to create {0} \"{1}\""
+msgstr "{0} \"{1}\" oluşturulamadı"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "Renamed successfully"
+msgstr "Yeniden adlandırma başarılı"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "Failed to rename"
+msgstr "Yeniden adlandırma başarısız"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Download"
+msgstr "İndir"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Magnet"
+msgstr "Magnet"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "HTTP"
+msgstr "HTTP"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "URL"
+msgstr "URL"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Failed to delete download"
+msgstr "İndirme silinemedi"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Failed to delete downloads"
+msgstr "İndirmeler silinemedi"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Please enter a valid URL"
+msgstr "Lütfen geçerli bir URL girin"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Please enter a valid magnet or HTTP URL"
+msgstr "Lütfen geçerli bir magnet veya HTTP URL'si girin"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Download started"
+msgstr "İndirme başladı"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Download failed"
+msgstr "İndirme başarısız oldu"
+
+#: src/routes/[node]/utilities/downloader/+page.svelte
+msgid "Failed to get download link"
+msgstr "İndirme bağlantısı alınamadı"
+
+#: src/lib/components/custom/VM/Create/Advanced.svelte
+msgid "VNC Port"
+msgstr "VNC Portu"
+
+#: src/lib/components/custom/VM/Create/Advanced.svelte
+msgid "VNC Password"
+msgstr "VNC Şifresi"
+
+#: src/lib/components/custom/VM/Create/Advanced.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Enter or generate passphrase"
+msgstr "Parola girin veya oluşturun"
+
+#: src/lib/components/custom/VM/Create/Advanced.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "VNC Resolution"
+msgstr "VNC Çözünürlüğü"
+
+#: src/lib/components/custom/VM/Create/Advanced.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Select VNC resolution"
+msgstr "VNC çözünürlüğünü seçin"
+
+#: src/lib/components/custom/VM/Create/Advanced.svelte
+msgid "Startup/Shutdown Order"
+msgstr "Başlangıç/Kapanış Sırası"
+
+#: src/lib/components/custom/VM/Create/Advanced.svelte
+msgid "VNC Wait"
+msgstr "VNC Bekleme"
+
+#: src/lib/components/custom/VM/Create/Advanced.svelte
+msgid "Start On Boot"
+msgstr "Önyüklemede Başlat"
+
+#: src/lib/components/custom/VM/Create/Advanced.svelte
+msgid "TPM Emulation (Experimental)"
+msgstr "TPM Emülasyonu (Deneysel)"
+
+#: src/lib/components/custom/VM/Create/Basic.svelte
+msgid "VM Name"
+msgstr "VM Adı"
+
+#: src/lib/components/custom/VM/Create/Basic.svelte
+msgid "VM ID"
+msgstr "VM Kimliği"
+
+#: src/lib/components/custom/VM/Create/Basic.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Description"
+msgstr "VM durdurulurken hata oluştu"
+
+#: src/lib/components/custom/VM/Create/Basic.svelte
+msgid "Optional description for this virtual machine"
+msgstr "Bu sanal makine için isteğe bağlı açıklama"
+
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+msgid "<0/> Create Virtual Machine"
+msgstr "<0/> Sanal Makine Oluştur"
+
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+msgid "Create Virtual Machine"
+msgstr "Sanal Makine Oluştur"
+
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+msgid "Created VM {0}"
+msgstr "{0} Sanal Makinesi Oluşturuldu"
+
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+msgid "Failed to create VM"
+msgstr "Sanal makine oluşturulamadı"
+
+#: src/lib/components/custom/VM/Create/Hardware.svelte
+msgid "CPU Sockets"
+msgstr "CPU Yuvaları"
+
+#: src/lib/components/custom/VM/Create/Hardware.svelte
+msgid "CPU Cores"
+msgstr "CPU Çekirdekleri"
+
+#: src/lib/components/custom/VM/Create/Hardware.svelte
+msgid "CPU Threads"
+msgstr "CPU İş Parçacıkları"
+
+#: src/lib/components/custom/VM/Create/Hardware.svelte
+msgid "Memory Size"
+msgstr "Bellek Boyutu"
+
+#: src/lib/components/custom/VM/Create/Hardware.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "CPU Pinning"
+msgstr "CPU Sabitleme"
+
+#: src/lib/components/custom/VM/Create/Hardware.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "You can only pin up to {0} vCPU{1}"
+msgstr "En fazla {0} vCPU sabitleyebilirsiniz{1}"
+
+#: src/lib/components/custom/VM/Create/Hardware.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "At least one CPU must be left unpinned"
+msgstr "En az bir CPU sabitlenmemiş bırakılmalıdır"
+
+#: src/lib/components/custom/VM/Create/Network.svelte
+#: src/lib/components/custom/VM/Create/Storage.svelte
+msgid "Emulation Type"
+msgstr "Emülasyon Türü"
+
+#: src/lib/components/custom/VM/Create/Network.svelte
+#: src/lib/components/custom/VM/Create/Storage.svelte
+msgid "Select emulation type"
+msgstr "Emülasyon türünü seçin"
+
+#: src/lib/components/custom/VM/Create/Network.svelte
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "MAC Address"
+msgstr "MAC Adresi"
+
+#: src/lib/components/custom/VM/Create/Storage.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "ZFS Volume"
+msgstr "ZFS Birimi"
+
+#: src/lib/components/custom/VM/Create/Storage.svelte
+msgid "Select ZFS volume"
+msgstr "ZFS birimini seçin"
+
+#: src/lib/components/custom/VM/Create/Storage.svelte
+msgid "Disk Size"
+msgstr "Disk Boyutu"
+
+#: src/lib/components/custom/VM/Create/Storage.svelte
+msgid "Filesystem Dataset"
+msgstr "Dosya Sistemi Veri Kümesi"
+
+#: src/lib/components/custom/VM/Create/Storage.svelte
+msgid "Select filesystem"
+msgstr "Dosya sistemini seçin"
+
+#: src/lib/components/custom/VM/Create/Storage.svelte
+msgid "Installation Media"
+msgstr "Kurulum Ortamı"
+
+#: src/lib/components/custom/VM/Create/Storage.svelte
+msgid "Select installation media"
+msgstr "Kurulum ortamını seçin"
+
+#: src/lib/components/custom/VM/Create/Storage.svelte
+msgid "None"
+msgstr "Yok"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "CPU"
+msgstr "CPU"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "Sockets"
+msgstr "Soketler"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "Cores"
+msgstr "Çekirdekler"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "Threads"
+msgstr "İş parçacıkları"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "CPU {0} is not pinned by this VM"
+msgstr "CPU {0} bu VM tarafından sabitlenmemiş"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+msgid "Failed to modify CPU"
+msgstr "CPU değiştirilemedi"
+
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "VM not found"
+msgstr "VM bulunamadı"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "New Network"
+msgstr "Yeni Ağ"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "Select Switch"
+msgstr "Anahtar Seçin"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "Emulation"
+msgstr "Emülasyon"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Select Emulation"
+msgstr "Emülasyon Seçin"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "VirtIO"
+msgstr "VirtIO"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "E1000"
+msgstr "E1000"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "Switch is required"
+msgstr "Anahtar gereklidir"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "Emulation is required"
+msgstr "Emülasyon gereklidir"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "Error attaching VM to switch"
+msgstr "VM'yi anahtara bağlarken hata oluştu"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "VM attached to switch"
+msgstr "VM anahtara bağlandı"
+
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+msgid "PCI Devices"
+msgstr "PCI Aygıtları"
+
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+msgid "Select PCI Devices"
+msgstr "PCI Aygıtlarını Seçin"
+
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+msgid "Failed to modify PCI devices"
+msgstr "PCI aygıtları değiştirilemedi"
+
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+msgid "PCI devices modified"
+msgstr "PCI aygıtları değiştirildi"
+
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+msgid "RAM"
+msgstr "RAM"
+
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "RAM value must be greater than 0"
+msgstr "RAM değeri 0'dan büyük olmalıdır"
+
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "RAM value exceeds available memory"
+msgstr "RAM değeri mevcut belleği aşıyor"
+
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "RAM value is too high, at least 1 GiB must be reserved for the host"
+msgstr "RAM değeri çok yüksek, ana makine için en az 1 GiB ayrılmalıdır"
+
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "Failed to modify RAM"
+msgstr "RAM değiştirilemedi"
+
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+msgid "RAM modified"
+msgstr "RAM değiştirildi"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "New Storage"
+msgstr "Yeni Depolama"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Select Type"
+msgstr "Tür Seçin"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "CD-ROM"
+msgstr "CD-ROM"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Disk"
+msgstr "Disk"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "ISO"
+msgstr "ISO"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Select ISO"
+msgstr "ISO Seçin"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Select ZFS Volume"
+msgstr "ZFS Birimi Seçin"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "ZFS Filesystem"
+msgstr "ZFS Dosya Sistemi"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Select ZFS Filesystem"
+msgstr "ZFS Dosya Sistemi Seçin"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "AHCI HD"
+msgstr "AHCI HD"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "VirtIO Block"
+msgstr "VirtIO Blok"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/routes/[node]/storage/disks/+page.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "NVMe"
+msgstr "NVMe"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Attach"
+msgstr "Ekle"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Please select a type and dataset"
+msgstr "Lütfen bir tür ve veri kümesi seçin"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Failed to attach CD-ROM"
+msgstr "CD-ROM eklenemedi"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "CD-ROM attached"
+msgstr "CD-ROM eklendi"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Please select an emulation type"
+msgstr "Lütfen bir emülasyon türü seçin"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Please select a {0}"
+msgstr "Lütfen bir {0} seçin"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Failed to attach ZFS Volume"
+msgstr "ZFS Birimi eklenemedi"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "ZFS Volume attached"
+msgstr "ZFS Birimi eklendi"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Name and size required"
+msgstr "Ad ve boyut gerekli"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Invalid size"
+msgstr "Geçersiz boyut"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
+msgid "Invalid name"
+msgstr "Geçersiz ad"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Failed to attach storage"
+msgstr "Depolama eklenemedi"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Storage attached"
+msgstr "Depolama eklendi"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Port"
+msgstr "Port"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Wait for VNC"
+msgstr "VNC'yi bekleyin"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Password too short"
+msgstr "Şifre çok kısa"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Port must be between 5900 and 65535"
+msgstr "Port 5900 ile 65535 arasında olmalıdır"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Invalid resolution selected"
+msgstr "Geçersiz çözünürlük seçildi"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "VNC port already in use"
+msgstr "VNC portu zaten kullanımda"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "Failed to modify VNC"
+msgstr "VNC değiştirilemedi"
+
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+msgid "VNC modified"
+msgstr "VNC değiştirildi"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+msgid "Edit ZFS Pool - {0}"
+msgstr "ZFS Havuzunu Düzenle - {0}"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Auto Expand"
+msgstr "Otomatik Genişletme"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Select Auto Expand"
+msgstr "Otomatik Genişletmeyi Seçin"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Yes"
+msgstr "Evet"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "No"
+msgstr "Hayır"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Auto Trim"
+msgstr "Otomatik Kırpma"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Select Auto Trim"
+msgstr "Otomatik Kırpmayı Seçin"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Delegation"
+msgstr "Devretme"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Select Delegation"
+msgstr "Devretmeyi Seçin"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Fail Mode"
+msgstr "Arıza Modu"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Select Fail Mode"
+msgstr "Arıza Modunu Seçin"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Wait"
+msgstr "Bekle"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Panic"
+msgstr "Panik"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "Spares"
+msgstr "Yedekler"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Select spares"
+msgstr "Yedekleri seçin"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Auto Replace"
+msgstr "Otomatik Değiştirme"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Select Auto Replace"
+msgstr "Otomatik Değiştirmeyi Seçin"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Comment"
+msgstr "Yorum"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Comments about the pool"
+msgstr "Havuz hakkında yorumlar"
+
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+msgid "Pool edited"
+msgstr "Havuz düzenlendi"
+
+#: src/lib/components/custom/ZFS/pools/Replace.svelte
+msgid "Replace {0} in {1}"
+msgstr "{1} içinde {0} değiştir"
+
+#: src/lib/components/custom/ZFS/pools/Replace.svelte
+msgid "Replace"
+msgstr "Değiştir"
+
+#: src/lib/components/custom/ZFS/pools/Replace.svelte
+msgid "Replacement device not selected"
+msgstr "Değiştirme cihazı seçilmedi"
+
+#: src/lib/components/custom/ZFS/pools/Replace.svelte
+msgid "New disk is smaller than old disk"
+msgstr "Yeni disk eski diskten daha küçük"
+
+#: src/lib/components/custom/ZFS/pools/Replace.svelte
+msgid "New partition is smaller than old device"
+msgstr "Yeni bölüm eski cihazdan daha küçük"
+
+#: src/lib/stores/terminal.svelte.ts
+msgid "Terminal"
+msgstr "Terminal"
+
+#: src/routes/[node]/network/interfaces/+page.svelte
+msgid "Model"
+msgstr "Model"
+
+#: src/routes/[node]/network/interfaces/+page.svelte
+msgid "Metric"
+msgstr "Metrik"
+
+#: src/routes/[node]/network/interfaces/+page.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "MTU"
+msgstr "IPv4"
+
+#: src/routes/[node]/network/interfaces/+page.svelte
+msgid "Active"
+msgstr "Aktif"
+
+#: src/routes/[node]/network/interfaces/+page.svelte
+msgid "Details - {0}"
+msgstr "Detaylar - {0}"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Edit Switch -"
+msgstr "Anahtarı Düzenle -"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "New Switch"
+msgstr "Yeni Anahtar"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "VLAN"
+msgstr "IPv6"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "IPv4"
+msgstr "Portlar"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "IPv6"
+msgstr "Portları seçin"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Ports"
+msgstr "SLAAC"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Select ports"
+msgstr "IPV6'yı Devre Dışı Bırak"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Private"
+msgstr "Kaydet"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "DHCP"
+msgstr "Oluştur"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "SLAAC"
+msgstr "Anahtar {0} silindi"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Disable IPV6"
+msgstr "Anahtar bir VM tarafından kullanılıyor"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Switch {0} deleted"
+msgstr "Geçersiz MTU"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Switch is in use by a VM"
+msgstr "Geçersiz VLAN"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Error deleting switch"
+msgstr "Geçersiz IPv4 CIDR"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Invalid switch name"
+msgstr "Geçersiz IPv6 CIDR"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Invalid MTU"
+msgstr "Anahtar {0} oluşturuldu"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Invalid VLAN"
+msgstr "Anahtar oluşturulurken hata oluştu"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Invalid IPv4 CIDR"
+msgstr "Anahtar {0} güncellendi"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Invalid IPv6 CIDR"
+msgstr "Anahtar güncellenirken hata oluştu"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Switch {0} created"
+msgstr "Doğrudan Geçişi Etkinleştir"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Error creating switch"
+msgstr "Doğrudan Geçişi Devre Dışı Bırak"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Switch {0} updated"
+msgstr "Aygıt doğrudan geçişe eklendi"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Error updating switch"
+msgstr "Aygıt doğrudan geçişe eklenemedi"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Enable Passthrough"
+msgstr "Aygıt doğrudan geçişten kaldırıldı"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Disable Passthrough"
+msgstr "Aygıt bir VM tarafından kullanılıyor, kaldırılamadı"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Device added to passthrough"
+msgstr "Aygıt doğrudan geçişten kaldırılamadı"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Failed to add device to passthrough"
+msgstr "<b>{0}</b> aygıtını <b>{1}</b> tarafından doğrudan geçirmek istediğinizden emin misiniz? Bu, ana makine için kullanılamaz hale getirecektir."
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Device removed from passthrough"
+msgstr "<b>{0}</b> aygıtının <b>{1}</b> tarafından doğrudan geçişini kaldırmak istediğinizden emin misiniz? Bu, ana makine için tekrar kullanılabilir hale getirecektir."
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Device is in use by a VM, failed to remove"
+msgstr "S.M.A.R.T Değerleri"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Failed to remove device from passthrough"
+msgstr "GPT'yi Başlat"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Are you sure you want to pass through <b>{0}</b> by <b>{1}</b>? This will make it unavailable to the host."
+msgstr "Diski Sil"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Are you sure you want to remove passthrough for <b>{0}</b> by <b>{1}</b>? This will make it available to the host again."
+msgstr "Bölümü Sil"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "S.M.A.R.T Values"
+msgstr "Bölüm Oluştur"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Initialize GPT"
+msgstr "Özellik"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Wipe Disk"
+msgstr "Değer"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Delete Partition"
+msgstr "Meşgul disk silinemiyor"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Create Partition"
+msgstr "Meşgul bölüm silinemiyor"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Attribute"
+msgstr "Hata {0}: {1}"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Unable to wipe busy disk"
+msgstr "NVMe"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Unable to delete busy partition"
+msgstr "HDD"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Error {0}: {1}"
+msgstr "SSD"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "S.M.A.R.T Values ({0})"
+msgstr "Bu işlem geri alınamaz. Bu, <b>{0}</b> bölümünü kalıcı olarak <b>silecektir</b>."
+
+#: src/routes/[node]/storage/disks/+page.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "HDD"
+msgstr "HDD"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "SSD"
+msgstr "SSD"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "This action cannot be undone. This will permanently <b>delete</b> partition <b>{0}</b>."
+msgstr "Kullanılmayan"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "This action cannot be undone. This will permanently <b>wipe</b> disk <b>{0}</b>."
+msgstr "Bölümler"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Disk {0} initialized with GPT"
+msgstr "Çalışıyor"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Unused"
+msgstr "Durdur"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Partitions"
+msgstr "Bölümler"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Running"
+msgstr "Lütfen <b>{0} ({1})</b> Sanal Makinesi durdurulurken bekleyin"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Start"
+msgstr "Sanal Makine"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Stop"
+msgstr "VM silinirken hata oluştu"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Notes about VM"
+msgstr "VM durduruldu"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "VM"
+msgstr "VM"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Deleting Virtual Machine"
+msgstr "Sanal Makine Siliniyor"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Please wait while VM <b>{0} ({1})</b> is being deleted"
+msgstr "Lütfen VM <b>{0} ({1})</b> silinirken bekleyin"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Error deleting VM"
+msgstr "VM silinirken hata oluştu"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "VM deleted"
+msgstr "VM silindi"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Starting Virtual Machine"
+msgstr "Sanal Makine Başlatılıyor"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Please wait while VM <b>{0} ({1})</b> is being started."
+msgstr "Lütfen VM <b>{0} ({1})</b> başlatılırken bekleyin."
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Error starting VM"
+msgstr "VM başlatılırken hata oluştu"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "VM started"
+msgstr "VM başlatıldı"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Stopping Virtual Machine"
+msgstr "Sanal Makine Durduruluyor"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Please wait while VM <b>{0} ({1})</b> is being stopped"
+msgstr "Lütfen VM <b>{0} ({1})</b> durdurulurken bekleyin"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Error stopping VM"
+msgstr "VM durdurulurken hata oluştu"
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "VM stopped"
+msgstr "VM durduruldu"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "No available disks"
+msgstr "Kullanılabilir disk yok"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "No available partitions"
+msgstr "Kullanılabilir bölüm yok"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "<0/>Create ZFS Pool"
+msgstr "<0/>ZFS Havuzu Oluştur"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Devices"
+msgstr "Aygıtlar"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Options"
+msgstr "Seçenekler"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Virtual Devices"
+msgstr "Sanal Aygıtlar"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Redundancy <0/>"
+msgstr "Yedeklilik <0/>"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "VDEVs"
+msgstr "SAD'ler"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Drop disks here"
+msgstr "Diskleri buraya bırakın"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Mount Point"
+msgstr "Bağlama Noktası"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Force Create"
+msgstr "Oluşturmaya Zorla"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Advanced"
+msgstr "Gelişmiş"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "AShift"
+msgstr "AShift"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Select ASHIFT"
+msgstr "AShift Seçin"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Disks within a VDEV should ideally be the same type"
+msgstr "Bir VDEV içindeki diskler ideal olarak aynı türde olmalıdır"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Disks within a VDEV should ideally be the same drive type"
+msgstr "Bir VDEV içindeki diskler ideal olarak aynı sürücü türünde olmalıdır"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Disks within a VDEV should ideally be the same size"
+msgstr "Bir VDEV içindeki diskler ideal olarak aynı boyutta olmalıdır"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Partitions within a VDEV should ideally be the same size"
+msgstr "Bir VDEV içindeki bölümler ideal olarak aynı boyutta olmalıdır"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Disks/Partitions within a VDEV should ideally be the same drive type"
+msgstr "Bir VDEV içindeki Diskler/Bölümler ideal olarak aynı sürücü türünde olmalıdır"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "No available disks or partitions"
+msgstr "Kullanılabilir disk veya bölüm yok"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Invalid pool name"
+msgstr "Geçersiz havuz adı"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "At least one VDEV containing disks is required"
+msgstr "Disk içeren en az bir VDEV gereklidir"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Spares must be larger than the largest disk in the pool"
+msgstr "Yedekler, havuzdaki en büyük diskten daha büyük olmalıdır"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "A pool with this name already exists"
+msgstr "Bu ada sahip bir havuz zaten var"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+msgid "Pool Created"
+msgstr "Havuz Oluşturuldu"
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "Resilvering"
+msgstr "Yeniden Gümüşleme"
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "READ: {0}"
+msgstr "OKUMA: {0}"
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "WRITE: {0}"
+msgstr "YAZMA: {0}"
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "CKSUM: {0}"
+msgstr "TKS: {0}"
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "Pool Status"
+msgstr "Havuz Durumu"
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "Scan Activity"
+msgstr "Tarama Etkinliği"
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "No recent scan activity"
+msgstr "Son tarama etkinliği yok"
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "Device Topology"
+msgstr "Aygıt Topolojisi"
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "No devices found"
+msgstr "Aygıt bulunamadı"
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "Error Status"
+msgstr "Hata Durumu"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Add Users"
+msgstr "Kullanıcı Ekle"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "New Group"
+msgstr "Yeni Grup"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Select users"
+msgstr "Kullanıcıları seçin"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Failed to delete group"
+msgstr "Grup silinemedi"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Group deleted"
+msgstr "Grup silindi"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Name and users are required"
+msgstr "Ad ve kullanıcılar gerekli"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Group name already exists"
+msgstr "Grup adı zaten var"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Failed to create group"
+msgstr "Grup oluşturulamadı"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Group created"
+msgstr "Grup oluşturuldu"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "No users selected"
+msgstr "Kullanıcı seçilmedi"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Failed to add users to group"
+msgstr "Kullanıcılar gruba eklenemedi"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Users added to group"
+msgstr "Kullanıcılar gruba eklendi"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Created At"
+msgstr "Oluşturulma Zamanı"
+
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+msgid "Failed to delete user"
+msgstr "Kullanıcı silinemedi"
+
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+msgid "User deleted"
+msgstr "Kullanıcı silindi"
+
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+msgid "Last Usage"
+msgstr "Son Kullanım"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+msgid "Edit {0}"
+msgstr "{0} Düzenle"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Workgroup"
+msgstr "Çalışma Grubu"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Enter Workgroup"
+msgstr "Çalışma Grubunu Girin"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Unix Charset"
+msgstr "Unix Karakter Seti"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Enter Unix Charset"
+msgstr "Unix Karakter Setini Girin"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Server String"
+msgstr "Sunucu Dizisi"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Enter Server String"
+msgstr "Sunucu Dizesini Girin"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Bind Interfaces Only"
+msgstr "Sadece Arayüzleri Bağla"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Select Interfaces"
+msgstr "Arayüzleri Seçin"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+msgid "Property"
+msgstr "Özellik"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Failed to update Samba configuration"
+msgstr "Samba yapılandırması güncellenemedi"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Samba configuration updated"
+msgstr "Samba yapılandırması güncellendi"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Delete Share"
+msgstr "Paylaşımı Sil"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Samba share"
+msgstr "Samba paylaşımı"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Failed to delete Samba share"
+msgstr "Samba paylaşımı silinemedi"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Samba share deleted"
+msgstr "Samba paylaşımı silindi"
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "Pool Stats"
+msgstr "Havuz İstatistikleri"
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "Select a stat type"
+msgstr "Bir istatistik türü seçin"
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "Select a interval"
+msgstr "Bir aralık seçin"
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "Dataset Compression"
+msgstr "Veri Kümesi Sıkıştırması"
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+msgid "Select a pool"
+msgstr "Bir havuz seçin"
+
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+msgid "Pool Usage"
+msgstr "Havuz Kullanımı"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Scrub started"
+msgstr "Temizleme başlatıldı"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Scrub"
+msgstr "Temizle"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Replace Device"
+msgstr "Aygıtı Değiştir"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "ZFS Pool"
+msgstr "ZFS Havuzu"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Pool {0} deleted"
+msgstr "{0} havuzu silindi"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Pool contains a mirror with devices of different sizes"
+msgstr "Havuz, farklı boyutlarda aygıtlara sahip bir ayna içeriyor"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Pool contains a RAIDZ vdev with devices of different sizes"
+msgstr "Havuz, farklı boyutlarda aygıtlara sahip bir RAIDZ vdev içeriyor"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Pool is busy"
+msgstr "Havuz meşgul"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Pool has a dataset that is in use by a VM or Jail"
+msgstr "Havuz, bir VM veya Jail tarafından kullanılan bir veri kümesine sahip"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Spare device is too small"
+msgstr "Yedek aygıt çok küçük"
+
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+msgid "Pool edit failed"
+msgstr "Havuz düzenleme başarısız"
+
+#: src/routes/[node]/vm/[node]/console/+page.svelte
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Shutoff"
+msgstr "Kapat"
+
+#: src/routes/[node]/vm/[node]/console/+page.svelte
+msgid "VM Console"
+msgstr "VM Konsolu"
+
+#: src/routes/[node]/vm/[node]/console/+page.svelte
+msgid "The VM is currently powered off.<0/> Start the VM to access its console."
+msgstr "VM şu anda kapalı.<0/> Konsoluna erişmek için VM'yi başlatın."
+
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+msgid "Detach"
+msgstr "Ayır"
+
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "This will detach the VM <b>{0}</b> from the switch <b>{1}</b>"
+msgstr "Bu, <b>{0}</b> VM'sini <b>{1}</b> anahtarından ayıracak"
+
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "Failed to detach network"
+msgstr "Ağ ayrılamadı"
+
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "Network detached"
+msgstr "Ağ ayrıldı"
+
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "Unknown Switch"
+msgstr "Bilinmeyen Anahtar"
+
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "Unknown"
+msgstr "Bilinmeyen"
+
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+msgid "This will detach the storage {0} from the VM {1}"
+msgstr "Bu, {0} depolama alanını {1} VM'sinden ayıracak"
+
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+msgid "Failed to detach storage"
+msgstr "Depolama ayrılamadı"
+
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+msgid "Storage detached"
+msgstr "Depolama ayrıldı"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "<0/>Create Filesystem"
+msgstr "<0/>Dosya Sistemi Oluştur"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Parent"
+msgstr "Üst"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Select parent"
+msgstr "Üst öğe seçin"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "ATime"
+msgstr "Erişim Zamanı"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "Select ATime"
+msgstr "Erişim Zamanı Seçin"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "Checksum"
+msgstr "Sağlama Toplamı"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "Select Checksum"
+msgstr "Sağlama Toplamı Seçin"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "Compression"
+msgstr "Sıkıştırma"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "Select Compression"
+msgstr "Sıkıştırma Seçin"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "Deduplication"
+msgstr "Tekilleştirme"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "Select Deduplication"
+msgstr "Tekilleştirme Seçin"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Encryption"
+msgstr "Şifreleme"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Select Encryption"
+msgstr "Şifreleme Seçin"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Passphrase"
+msgstr "Parola"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "Quota"
+msgstr "Kota"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "ACL Inherit"
+msgstr "ACL Devralma"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "Select ACL Inherit"
+msgstr "ACL Devralmayı Seçin"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "ACL Mode"
+msgstr "ACL Modu"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "Select ACL Mode"
+msgstr "ACL Modunu Seçin"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "No parent selected"
+msgstr "Üst öğe seçilmedi"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Encryption key is required"
+msgstr "Şifreleme anahtarı gerekiyor"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "Invalid quota size"
+msgstr "Geçersiz kota boyutu"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "Failed to create filesystem"
+msgstr "Dosya sistemi oluşturulamadı"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+msgid "File System {0} created"
+msgstr "Dosya Sistemi {0} oluşturuldu"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "<0/>Edit Filesystem - {0}"
+msgstr "<0/>Dosya Sistemini Düzenle - {0}"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "Quota size is less than current used or reserved space"
+msgstr "Kota boyutu, mevcut kullanılan veya ayrılan alandan daha az"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "Failed to edit filesystem"
+msgstr "Dosya sistemi düzenlenemedi"
+
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+msgid "File System {0} edited"
+msgstr "Dosya Sistemi {0} düzenlendi"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
+msgid "Snapshot - {0}"
+msgstr "Anlık Görüntü - {0}"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
+msgid "Recursive"
+msgstr "Özyinelemeli"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Create Snapshot"
+msgstr "Anlık Görüntü Oluştur"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Pool"
+msgstr "Havuz"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+msgid "Select a dataset"
+msgstr "Bir veri kümesi seçin"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Interval"
+msgstr "Aralık"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+msgid "Select an interval"
+msgstr "Bir aralık seçin"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+msgid "Failed to create snapshot"
+msgstr "Anlık görüntü oluşturulamadı"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+msgid "Snapshot {0}@{1} created"
+msgstr "Anlık Görüntü {0}@{1} oluşturuldu"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
+msgid "This will delete the snapshot <0/>"
+msgstr "Bu, <0/> anlık görüntüsünü silecektir"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
+msgid "Deleted snapshot {0}"
+msgstr "Anlık görüntü {0} silindi"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
+msgid "Failed to delete snapshot {0}"
+msgstr "Anlık görüntü {0} silinemedi"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Snapshot GUID not found"
+msgstr "Anlık Görüntü GUID'si bulunamadı"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "View Snapshot Jobs"
+msgstr "Anlık Görüntü İşlerini Görüntüle"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Prefix"
+msgstr "Önek"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Last Run"
+msgstr "Son Çalıştırma"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Jan 01, 0001"
+msgstr "Oca 01, 0001"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Never"
+msgstr "Asla"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Deleted"
+msgstr "Silindi"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "No snapshot jobs"
+msgstr "Anlık görüntü işi yok"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+msgid "Save Snapshot Jobs"
+msgstr "Anlık Görüntü İşlerini Kaydet"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Create Volume"
+msgstr "Disk Bölümü Oluştur"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Select Pool"
+msgstr "Havuz Seçin"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Invalid volume name"
+msgstr "Geçersiz disk bölümü adı"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Please select a pool"
+msgstr "Lütfen bir havuz seçin"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+msgid "Invalid volume size"
+msgstr "Geçersiz disk bölümü boyutu"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Parent not found"
+msgstr "Üst öğe bulunamadı"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Volume size is greater than available space"
+msgstr "Disk bölümü boyutu, mevcut alandan daha büyük"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Failed to create volume"
+msgstr "Disk bölümü oluşturulamadı"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Volume {0} created"
+msgstr "Disk bölümü {0} oluşturuldu"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+msgid "<0/>Edit Volume - {0}"
+msgstr "<0/>Disk Bölümünü Düzenle - {0}"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+msgid "Size must be a multiple of volume block size ({0}K)"
+msgstr "Boyut, disk bölümü blok boyutunun katı olmalıdır ({0}K)"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+msgid "Failed to edit volume"
+msgstr "Disk bölümü düzenlenemedi"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+msgid "Volume edited successfully"
+msgstr "Disk bölümü başarıyla düzenlendi"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+msgid "<0/> Flash File to {0}"
+msgstr "<0/> Dosyayı {0} konumuna yaz"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+msgid "Select File"
+msgstr "Dosya Seçin"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+msgid "File"
+msgstr "Dosya"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+msgid "Error flashing volume"
+msgstr "Disk bölümünü yazarken hata oluştu"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+msgid "Flash"
+msgstr "Yaz"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Rollback To Snapshot"
+msgstr "Anlık Görüntüye Geri Al"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Delete Snapshot"
+msgstr "Anlık Görüntüyü Sil"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Edit Filesystem"
+msgstr "Dosya Sistemini Düzenle"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Delete Filesystem"
+msgstr "Dosya Sistemini Sil"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Delete Datasets"
+msgstr "Veri Kümelerini Sil"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Are you sure you want to rollback to the snapshot <b>{0}</b>? This action cannot be undone."
+msgstr "<b>{0}</b> anlık görüntüsüne geri dönmek istediğinizden emin misiniz? Bu işlem geri alınamaz."
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Rolled back to snapshot {0}"
+msgstr "{0} anlık görüntüsüne geri dönüldü"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Failed to rollback to snapshot {0}"
+msgstr "{0} anlık görüntüsüne geri dönülemedi"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Deleted filesystem {0}"
+msgstr "{0} dosya sistemi silindi"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Failed to delete filesystem {0}"
+msgstr "{0} dosya sistemi silinemedi"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Filesystem GUID not found"
+msgstr "Dosya Sistemi GUID'si bulunamadı"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+msgid "Are you sure you want to delete {0}? This action cannot be undone."
+msgstr "{0} öğesini silmek istediğinizden emin misiniz? Bu işlem geri alınamaz."
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Deleted {0} datasets"
+msgstr "{0} veri kümesi silindi"
+
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Failed to delete datasets"
+msgstr "Veri kümeleri silinemedi"
+
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "View Periodics"
+msgstr "Periyodikleri Görüntüle"
+
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "Are you sure you want to delete {0} snapshot{1}? This action cannot be undone."
+msgstr "{0} anlık görüntüsünü silmek istediğinizden emin misiniz{1}? Bu işlem geri alınamaz."
+
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "Deleted {0} snapshot{1}"
+msgstr "{0} anlık görüntü silindi{1}"
+
+#: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+msgid "Failed to delete snapshots"
+msgstr "Anlık görüntüler silinemedi"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Flash File"
+msgstr "Dosyayı Yaz"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Delete Volume"
+msgstr "Disk Bölümünü Sil"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Edit Volume"
+msgstr "Disk Bölümünü Düzenle"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Deleted volume {0}"
+msgstr "{0} disk bölümü silindi"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Failed to delete volume {0}"
+msgstr "{0} disk bölümü silinemedi"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Volume GUID not found"
+msgstr "Disk Bölümü GUID'si bulunamadı"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "This will delete {0}. This action cannot be undone."
+msgstr "Bu, {0} öğesini silecektir. Bu işlem geri alınamaz."
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Started {0}"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Stopped"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Stopped {0}"
+msgstr ""
+
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Guests"
+msgstr ""
+
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "No groups selected and guests are not allowed"
+msgstr ""
+
+#: src/lib/components/custom/Samba/Create.svelte
+msgid "Read-Only"
+msgstr ""
+
+#: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Read Only"
+msgstr ""
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Edit Share"
+msgstr ""
+
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Edit Samba Share"
+msgstr ""
+
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Failed to {0} Samba share"
+msgstr ""
+
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Samba share {0}"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "No available/unused switches to attach to"
+msgstr ""

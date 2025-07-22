@@ -2,7 +2,7 @@
 	import '@fontsource/noto-sans';
 	import '@fontsource/noto-sans/700.css';
 
-	import { goto, replaceState } from '$app/navigation';
+	import { goto, pushState, replaceState } from '$app/navigation';
 	import { page } from '$app/state';
 	import { isTokenValid, login } from '$lib/api/auth';
 	import Login from '$lib/components/custom/Login.svelte';
@@ -15,9 +15,9 @@
 	import { preloadIcons } from '$lib/utils/icons';
 	import { addTabulatorFilters } from '$lib/utils/table';
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
+	import { setCatalog } from '@wuchale/svelte/runtime.svelte.js';
 	import { ModeWatcher } from 'mode-watcher';
 	import { onMount, tick } from 'svelte';
-	import { setTranslations } from 'wuchale/runtime.svelte.js';
 
 	import type { Locales } from '$lib/types/common';
 	import { toast } from 'svelte-sonner';
@@ -26,7 +26,7 @@
 	async function setLocale(locale: Locales) {
 		const mod = await import(`$lib/locales/${locale}.svelte.js`);
 		if (mod) {
-			setTranslations(mod);
+			setCatalog(mod);
 		} else {
 			console.error('Failed to load locale:', locale);
 		}
@@ -47,14 +47,6 @@
 			if (path === '/' || !path.startsWith(`/${$hostname}`)) {
 				goto(`/${$hostname}/summary`, { replaceState: true });
 			}
-		}
-	});
-
-	$effect(() => {
-		if (page.state.hasOwnProperty('loggedOut')) {
-			toast.success('Logged out', {
-				position: 'bottom-center'
-			});
 		}
 	});
 
@@ -129,6 +121,7 @@
 </script>
 
 <svelte:head>
+	<!-- @wc-ignore -->
 	<title>Sylve</title>
 </svelte:head>
 

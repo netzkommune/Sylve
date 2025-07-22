@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { modifyHardware } from '$lib/api/vm/hardware';
+	import { modifyHardware, modifyRAM } from '$lib/api/vm/hardware';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
@@ -55,19 +55,7 @@
 		}
 
 		if (vm) {
-			const cpuPinning = vm.cpuPinning ? vm.cpuPinning : [];
-			const response = await modifyHardware(
-				vm.vmId,
-				vm.cpuSockets,
-				vm.cpuCores,
-				vm.cpuThreads,
-				bytes,
-				cpuPinning,
-				vm.vncPort,
-				vm.vncResolution,
-				vm.vncPassword,
-				vm.vncWait ?? false
-			);
+			const response = await modifyRAM(vm.vmId, bytes);
 
 			if (response.error) {
 				handleAPIError(response);

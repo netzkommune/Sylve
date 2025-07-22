@@ -13,7 +13,8 @@ export async function createSambaShare(
 	readOnlyGroups: string[] = [],
 	writeableGroups: string[] = [],
 	createMask: string = '',
-	directoryMask: string = ''
+	directoryMask: string = '',
+	guestOk: boolean = false
 ): Promise<APIResponse> {
 	return await apiRequest('/samba/shares', APIResponseSchema, 'POST', {
 		name,
@@ -21,7 +22,32 @@ export async function createSambaShare(
 		readOnlyGroups,
 		writeableGroups,
 		createMask,
-		directoryMask
+		directoryMask,
+		guestOk
+	});
+}
+
+export async function updateSambaShare(
+	id: number,
+	name: string,
+	dataset: string,
+	readOnlyGroups: string[] = [],
+	writeableGroups: string[] = [],
+	createMask: string = '',
+	directoryMask: string = '',
+	guestOk: boolean = false,
+	readOnly: boolean = false
+): Promise<APIResponse> {
+	return await apiRequest(`/samba/shares`, APIResponseSchema, 'PUT', {
+		id,
+		name,
+		dataset,
+		readOnlyGroups,
+		writeableGroups,
+		createMask,
+		directoryMask,
+		guestOk,
+		readOnly
 	});
 }
 

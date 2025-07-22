@@ -86,7 +86,7 @@
 		</Label>
 	{/if}
 	<Popover.Root bind:open>
-		<Popover.Trigger class={triggerWidth}>
+		<Popover.Trigger class={triggerWidth} {disabled}>
 			<Button
 				variant="outline"
 				role="combobox"

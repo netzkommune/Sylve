@@ -179,20 +179,18 @@
 		}
 	}
 
-	let udTime = $derived.by(
-		/* @wc-ignore */ () => {
-			if (domain.status === 'Running') {
-				if (vm.startedAt) {
-					return `Started ${dateToAgo(vm.startedAt)}`;
-				}
-			} else if (domain.status === 'Stopped' || domain.status === 'Shutoff') {
-				if (vm.stoppedAt) {
-					return `Stopped ${dateToAgo(vm.stoppedAt)}`;
-				}
+	let udTime = $derived.by(() => {
+		if (domain.status === 'Running') {
+			if (vm.startedAt) {
+				return `Started ${dateToAgo(vm.startedAt)}`;
 			}
-			return '';
+		} else if (domain.status === 'Stopped' || domain.status === 'Shutoff') {
+			if (vm.stoppedAt) {
+				return `Stopped ${dateToAgo(vm.stoppedAt)}`;
+			}
 		}
-	);
+		return '';
+	});
 
 	let cpuHistoricalData = $derived.by(() => {
 		return {

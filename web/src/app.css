@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
+@source not "./lib/locales";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -138,7 +139,11 @@
 }
 
 @layer components {
+<<<<<<< HEAD
 	@import './css/tabulator_simple.css';
 	@import 'filepond/dist/filepond.css';
 	@import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
+=======
+    @import './css/tabulator_simple.css';
+>>>>>>> 958231f83b1262768f8d2f0ae88005cd8721d234
 }

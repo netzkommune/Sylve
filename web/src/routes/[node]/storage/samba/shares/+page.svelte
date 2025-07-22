@@ -3,7 +3,7 @@
 	import { deleteSambaShare, getSambaShares } from '$lib/api/samba/share';
 	import { getDatasets } from '$lib/api/zfs/datasets';
 	import AlertDialog from '$lib/components/custom/Dialog/Alert.svelte';
-	import Create from '$lib/components/custom/Samba/Create.svelte';
+	import Share from '$lib/components/custom/Samba/Share.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import Search from '$lib/components/custom/TreeTable/Search.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
@@ -77,6 +77,10 @@
 		},
 		delete: {
 			open: false
+		},
+		edit: {
+			open: false,
+			share: null as SambaShare | null
 		}
 	};
 
@@ -162,6 +166,24 @@
 
 {#snippet button(type: string)}
 	{#if activeRows !== null && activeRows.length === 1}
+		{#if type === 'edit'}
+			<Button
+				onclick={() => {
+					properties.edit.open = true;
+					properties.edit.share =
+						shares.find((share) => share.id === Number(activeRow?.id)) || null;
+				}}
+				size="sm"
+				variant="outline"
+				class="h-6.5"
+			>
+				<div class="flex items-center">
+					<Icon icon="mdi:pencil" class="mr-1 h-4 w-4" />
+					<span>Edit Share</span>
+				</div>
+			</Button>
+		{/if}
+
 		{#if type === 'delete'}
 			<Button
 				onclick={() => {
@@ -197,6 +219,7 @@
 			</div>
 		</Button>
 
+		{@render button('edit')}
 		{@render button('delete')}
 	</div>
 
@@ -210,7 +233,18 @@
 </div>
 
 {#if properties.create.open}
-	<Create bind:open={properties.create.open} {shares} {datasets} {groups} />
+	<Share bind:open={properties.create.open} {shares} {datasets} {groups} />
+{/if}
+
+{#if properties.edit.open}
+	<Share
+		bind:open={properties.edit.open}
+		{shares}
+		{datasets}
+		{groups}
+		share={properties.edit.share}
+		edit={properties.edit.open}
+	/>
 {/if}
 
 <AlertDialog

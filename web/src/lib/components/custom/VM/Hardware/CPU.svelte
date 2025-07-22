@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { modifyHardware } from '$lib/api/vm/hardware';
+	import { modifyCPU, modifyHardware } from '$lib/api/vm/hardware';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
@@ -81,17 +81,12 @@
 
 	async function modify() {
 		if (vm) {
-			const response = await modifyHardware(
+			const response = await modifyCPU(
 				vm.vmId,
 				parseInt(properties.cpu.sockets.toString(), 10),
 				parseInt(properties.cpu.cores.toString(), 10),
 				parseInt(properties.cpu.threads.toString(), 10),
-				parseInt(vm.ram.toString(), 10),
-				properties.cpu.pinning.map((x) => parseInt(x.toString(), 10)),
-				vm.vncPort,
-				vm.vncResolution,
-				vm.vncPassword,
-				vm.vncWait ?? false
+				properties.cpu.pinning.map((x) => parseInt(x.toString(), 10))
 			);
 
 			if (response.error) {

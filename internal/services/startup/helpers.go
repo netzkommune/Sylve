@@ -88,7 +88,7 @@ func (s *Service) CheckPackageDependencies() error {
 		go func() {
 			defer wg.Done()
 			if !pkg.IsPackageInstalled(p) {
-				errCh <- fmt.Errorf("Required package %s is not installed", p)
+				errCh <- fmt.Errorf("Required package %s is not installed, run the command 'pkg install libvirt bhyve-firmware smartmontools tmux samba419' to install all required packages", p)
 			}
 		}()
 	}
@@ -156,25 +156,9 @@ func (s *Service) CheckKernelModules() error {
 		"cryptodev",
 	}
 
-	output, err := utils.RunCommand("kldstat", "-v")
-	if err != nil {
-		return fmt.Errorf("failed to run kldstat -v: %w", err)
-	}
-
 	for _, module := range requiredModules {
-		loaded := false
-		lines := strings.Split(output, "\n")
-		for _, line := range lines {
-			fields := strings.Fields(line)
-			if len(fields) > 0 && fields[len(fields)-1] == module {
-				loaded = true
-				break
-			}
-		}
-		if !loaded {
-			if _, err := utils.RunCommand("kldload", module); err != nil {
-				return fmt.Errorf("failed to load kernel module %s: %w", module, err)
-			}
+		if _, err := utils.RunCommand("kldload", "-n", module); err != nil {
+			return fmt.Errorf("failed to load kernel module %s: %w", module, err)
 		}
 	}
 

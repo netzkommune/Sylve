@@ -1,5 +1,6 @@
 <script lang="ts">
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
+	import Search from '$lib/components/custom/TreeTable/Search.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import CustomComboBox from '$lib/components/ui/custom-input/combobox.svelte';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
@@ -121,7 +122,13 @@
 
 <div class="flex h-full w-full flex-col">
 	<div class="flex h-10 w-full items-center gap-2 border-b p-2">
-		<Button size="sm" class="h-6" onclick={() => (modals.open = !modals.open)}>Open</Button>
+		<Search bind:query />
+		<Button size="sm" class="h-6" onclick={() => (modals.open = !modals.open)}>
+			<div class="flex items-center">
+				<Icon icon="gg:add" class="mr-1 h-4 w-4" />
+				<span>New</span>
+			</div>
+		</Button>
 	</div>
 
 	<TreeTable
@@ -138,7 +145,10 @@
 		<div class="flex items-center justify-between">
 			<Dialog.Header>
 				<Dialog.Title>
-					<div class="flex items-center">Object</div>
+					<div class="flex items-center">
+						<Icon icon="clarity:objects-solid" class="mr-2 h-6 w-6" />
+						<span class="text-lg font-semibold">Create New Object</span>
+					</div>
 				</Dialog.Title>
 			</Dialog.Header>
 
@@ -218,7 +228,7 @@
 			</div>
 		{/if}
 
-		<div class="flex gap-4">
+		<!-- <div class="flex gap-4">
 			<CustomComboBox
 				bind:open={comboBoxes.list.open}
 				label={'List'}
@@ -228,6 +238,6 @@
 				placeholder="Select type"
 				width="w-3/4"
 			></CustomComboBox>
-		</div>
+		</div> -->
 	</Dialog.Content>
 </Dialog.Root>

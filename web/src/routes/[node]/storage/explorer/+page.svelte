@@ -3,7 +3,6 @@
 	import { handleAPIResponse } from '$lib/api/common';
 	import {
 		addFileOrFolder,
-		copyOrMoveFileOrFolder,
 		copyOrMoveFilesOrFolders,
 		deleteFilesOrFolders,
 		getFiles,
@@ -20,7 +19,7 @@
 	import * as ContextMenu from '$lib/components/ui/context-menu/index.js';
 	import { explorerCurrentPath } from '$lib/stores/basic';
 	import type { FileNode } from '$lib/types/system/file-explorer';
-	import { sortFileItems, type SortBy } from '$lib/utils/explorer';
+	import { sortFileItems, type SortBy, generateBreadcrumbItems } from '$lib/utils/explorer';
 	import { Clipboard, FileText, Folder, RotateCcw, UploadIcon } from 'lucide-svelte';
 	import { get } from 'svelte/store';
 
@@ -77,23 +76,7 @@
 
 	let sortedItems = $derived(sortFileItems(filteredItems, sortBy));
 
-	let breadcrumbItems = $derived.by(() => {
-		const parts = currentPath.split('/').filter(Boolean);
-		const items = [];
-
-		items.push({ name: 'My Files', path: '/', isLast: parts.length === 0 });
-
-		let currentBreadcrumbPath = '';
-		for (let i = 0; i < parts.length; i++) {
-			currentBreadcrumbPath += '/' + parts[i];
-			items.push({
-				name: parts[i],
-				path: currentBreadcrumbPath,
-				isLast: i === parts.length - 1
-			});
-		}
-		return items;
-	});
+	let breadcrumbItems = $derived(generateBreadcrumbItems(currentPath));
 
 	async function handleItemClick(item: any) {
 		if (item.type === 'folder') {
@@ -150,10 +133,10 @@
 	async function loadFolderData(folderId: string) {
 		try {
 			const response = await getFiles(folderId);
-			folderData = { [folderId]: response };
+			folderData = { ...folderData, [folderId]: response };
 		} catch (error) {
 			console.error('Error loading folder data:', error);
-			folderData = { [folderId]: [] };
+			folderData = { ...folderData, [folderId]: [] };
 		}
 	}
 
@@ -257,8 +240,13 @@
 	}
 
 	async function handleBreadcrumbNavigate(path: string) {
+		searchQuery = '';
+		selectedItems = [];
 		currentPath = path;
-		await loadFolderData(path);
+
+		if (!folderData[path]) {
+			await loadFolderData(path);
+		}
 	}
 
 	async function rename() {

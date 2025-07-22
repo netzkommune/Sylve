@@ -2,6 +2,30 @@ import type { FileNode } from '$lib/types/system/file-explorer';
 
 export type SortBy = 'name-asc' | 'name-desc' | 'modified-asc' | 'modified-desc' | 'size-desc' | 'type';
 
+export interface BreadcrumbItem {
+    name: string;
+    path: string;
+    isLast: boolean;
+}
+
+export function generateBreadcrumbItems(currentPath: string): BreadcrumbItem[] {
+    const parts = currentPath.split('/').filter(Boolean);
+    const items: BreadcrumbItem[] = [];
+
+    items.push({ name: 'My Files', path: '/', isLast: parts.length === 0 });
+
+    let currentBreadcrumbPath = '';
+    for (let i = 0; i < parts.length; i++) {
+        currentBreadcrumbPath += '/' + parts[i];
+        items.push({
+            name: parts[i],
+            path: currentBreadcrumbPath,
+            isLast: i === parts.length - 1
+        });
+    }
+    return items;
+}
+
 export function sortFileItems(items: FileNode[], sortBy: SortBy): FileNode[] {
     const sortedItems = [...items];
 

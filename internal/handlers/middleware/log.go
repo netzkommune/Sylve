@@ -107,8 +107,6 @@ func RequestLoggerMiddleware(db *gorm.DB, authService *authService.Service) gin.
 		}
 
 		if strings.Contains(c.Request.URL.Path, "file-explorer/upload") {
-			// Skip logging for file uploads
-			fmt.Println("Skipping logging for file upload request:", c.Request.URL.Path)
 			c.Next()
 			return
 		}

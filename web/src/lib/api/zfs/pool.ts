@@ -2,6 +2,7 @@ import { APIResponseSchema, type APIResponse } from '$lib/types/common';
 import {
 	IODelayHistoricalSchema,
 	IODelaySchema,
+	PoolsDiskUsageSchema,
 	PoolStatPointsResponseSchema,
 	ZpoolSchema,
 	type CreateZpool,
@@ -33,6 +34,15 @@ export async function getIODelay(
 
 export async function getPools(): Promise<Zpool[]> {
 	return await apiRequest('/zfs/pools', ZpoolSchema.array(), 'GET');
+}
+
+export async function getPoolsDiskUsage(): Promise<number> {
+	try {
+		const response = await apiRequest('/zfs/pools/disks-usage', PoolsDiskUsageSchema, 'GET');
+		return response.usage;
+	} catch (error) {
+		return 0;
+	}
 }
 
 export async function createPool(data: CreateZpool) {

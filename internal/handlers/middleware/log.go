@@ -106,6 +106,13 @@ func RequestLoggerMiddleware(db *gorm.DB, authService *authService.Service) gin.
 			}
 		}
 
+		if strings.Contains(c.Request.URL.Path, "file-explorer/upload") {
+			// Skip logging for file uploads
+			fmt.Println("Skipping logging for file upload request:", c.Request.URL.Path)
+			c.Next()
+			return
+		}
+
 		if !utils.Contains(importantGetPaths, c.Request.URL.Path) && !strings.Contains(c.Request.URL.Path, "vnc") {
 			if c.Request.Method == "OPTIONS" || c.Request.Method == "HEAD" || c.Request.Method == "GET" {
 				c.Next()

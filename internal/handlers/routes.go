@@ -125,6 +125,7 @@ func RegisterRoutes(r *gin.Engine,
 		pools := zfs.Group("/pools")
 		{
 			pools.GET("", zfsHandlers.GetPools(zfsService))
+			pools.GET("/disks-usage", zfsHandlers.GetDisksUsage(zfsService))
 			pools.POST("", zfsHandlers.CreatePool(infoService, zfsService))
 			pools.PATCH("", zfsHandlers.EditPool(infoService, zfsService))
 			pools.POST("/:guid/scrub", zfsHandlers.ScrubPool(infoService, zfsService))
@@ -217,6 +218,9 @@ func RegisterRoutes(r *gin.Engine,
 
 		fileExplorer.POST("/copy-or-move", systemHandlers.CopyOrMoveFileOrFolder(systemService))
 		fileExplorer.POST("/copy-or-move-batch", systemHandlers.CopyOrMoveFilesOrFolders(systemService))
+
+		fileExplorer.POST("/upload", systemHandlers.UploadFile(systemService))
+		fileExplorer.DELETE("/upload", systemHandlers.DeleteUpload(systemService))
 	}
 
 	vm := api.Group("/vm")

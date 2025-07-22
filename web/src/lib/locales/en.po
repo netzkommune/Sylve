@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-19T15:12:48.250Z\n"
-"PO-Revision-Date: 2025-07-21T14:24:51.127Z\n"
+"PO-Revision-Date: 2025-07-22T09:20:29.269Z\n"
 "Last-Translator: \n"
 "Language: English\n"
 "Language-Team: \n"
@@ -118,6 +118,7 @@ msgstr "Reset"
 #: src/lib/components/custom/Authentication/Create.svelte
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
 #: src/lib/components/custom/Samba/Share.svelte
+#: src/lib/components/custom/FileExplorer/FilepondModal.svelte
 msgid "Close"
 msgstr "Close"
 
@@ -897,6 +898,7 @@ msgid "<0/> New Folder"
 msgstr "<0/> New Folder"
 
 #: src/routes/[node]/storage/explorer/+page.svelte
+#: src/lib/components/custom/FileExplorer/FilepondModal.svelte
 msgid "<0/> Upload File"
 msgstr "<0/> Upload File"
 
@@ -2669,3 +2671,15 @@ msgstr "Samba share {0}"
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 msgid "No available/unused switches to attach to"
 msgstr "No available/unused switches to attach to"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "Drop files here to upload"
+msgstr "Drop files here to upload"
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "Files will be uploaded to the current folder"
+msgstr "Files will be uploaded to the current folder"
+
+#: src/lib/components/custom/FileExplorer/FilepondModal.svelte
+msgid "Submit"
+msgstr "Submit"

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import { store } from '$lib/stores/auth';
 	import Icon from '@iconify/svelte';
 
 	interface Props {
@@ -24,8 +25,10 @@
 	// Import the Image EXIF Orientation and Image Preview plugins
 	// Note: These need to be installed separately
 	// `npm i filepond-plugin-image-preview filepond-plugin-image-exif-orientation --save`
+	import { sha256 } from '$lib/utils/string';
 	import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
 	import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
+	import { onMount } from 'svelte';
 
 	// Register the plugins
 	registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
@@ -37,6 +40,11 @@
 
 	// the name to use for the internal file input
 	let name = 'filepond';
+	let hash = $state('');
+
+	onMount(async () => {
+		hash = await sha256($store, 1);
+	});
 
 	// handle filepond events
 	function handleInit() {
@@ -104,7 +112,10 @@
 			<FilePond
 				bind:this={pond}
 				{name}
-				server="/api"
+				server={'/api/system/file-explorer/upload?path=' +
+					encodeURIComponent(currentPath) +
+					'&hash=' +
+					hash}
 				allowMultiple={true}
 				oninit={handleInit}
 				onaddfile={handleAddFile}

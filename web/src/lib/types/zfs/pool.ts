@@ -145,6 +145,10 @@ export const PoolStatPointsResponseSchema = z.object({
 	)
 });
 
+export const PoolsDiskUsageSchema = z.object({
+	usage: z.number().default(0)
+});
+
 export type IODelay = z.infer<typeof IODelaySchema>;
 export type IODelayHistorical = z.infer<typeof IODelayHistoricalSchema>;
 export type Zpool = z.infer<typeof ZpoolSchema>;
@@ -152,3 +156,4 @@ export type ReplaceDevice = z.infer<typeof ReplaceDeviceSchema>;
 export type CreateZpool = z.infer<typeof CreateZpoolSchema>;
 export type ZpoolRaidType = z.infer<typeof ZpoolRaidTypeSchema>;
 export type PoolStatPointsResponse = z.infer<typeof PoolStatPointsResponseSchema>;
+export type PoolsDiskUsage = z.infer<typeof PoolsDiskUsageSchema>;

@@ -1,11 +1,15 @@
 package systemHandlers
 
 import (
+	"mime/multipart"
 	"net/http"
+	"net/url"
+	"os"
 	"path/filepath"
 	"sylve/internal"
 	systemServiceInterfaces "sylve/internal/interfaces/services/system"
 	"sylve/internal/services/system"
+	"sylve/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -32,8 +36,14 @@ type DeleteFilesOrFoldersRequest struct {
 }
 
 type CopyOrMoveFilesOrFoldersRequest struct {
-	Pairs [][2]string `json:"pairs" binding:"required"` // Each pair is [source, destination]
-	Cut   *bool       `json:"cut" binding:"required"`   // true for move, false for copy
+	Pairs [][2]string `json:"pairs" binding:"required"`
+	Cut   *bool       `json:"cut" binding:"required"`
+}
+
+type DeleteUploadRequest struct {
+	Data struct {
+		Path string `json:"path"`
+	} `json:"data"`
 }
 
 // @Summary Find Files on System
@@ -427,6 +437,204 @@ func CopyOrMoveFilesOrFolders(systemService *system.Service) gin.HandlerFunc {
 		c.JSON(http.StatusOK, internal.APIResponse[any]{
 			Status:  "success",
 			Message: "files_or_folders_copied_or_moved",
+			Error:   "",
+			Data:    nil,
+		})
+	}
+}
+
+// @Summary Upload File (FilePond)
+// @Description Upload a file to a user-specified path via FilePond; fails if file exists
+// @Tags System
+// @Accept multipart/form-data
+// @Produce json
+// @Security BearerAuth
+// @Param path query string true "Destination folder path (e.g. /zroot/share)"
+// @Param filepond formData file true "File to upload"
+// @Success 200 {object} internal.APIResponse[map[string]string]
+// @Failure 400 {object} internal.APIResponse[any] "Bad Request"
+// @Failure 409 {object} internal.APIResponse[any] "Conflict - File Already Exists"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /system/file-explorer/upload [post]
+func UploadFile(systemService *system.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		rawDestPath := c.Query("path")
+		if rawDestPath == "" {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "missing_path",
+				Error:   "path query parameter is required",
+				Data:    nil,
+			})
+			return
+		}
+
+		destPath, err := url.PathUnescape(rawDestPath)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_path_encoding",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		if err := c.Request.ParseMultipartForm(100 << 20); err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "parse_failed",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		files := c.Request.MultipartForm.File["filepond"]
+		var fileHeader *multipart.FileHeader
+		for _, f := range files {
+			if f.Filename != "" {
+				fileHeader = f
+				break
+			}
+		}
+
+		if fileHeader == nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "missing_file",
+				Error:   "no file found in filepond field",
+				Data:    nil,
+			})
+			return
+		}
+
+		tempPath := filepath.Join(os.TempDir(), fileHeader.Filename)
+		if err := c.SaveUploadedFile(fileHeader, tempPath); err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "temp_save_failed",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+		defer os.Remove(tempPath)
+
+		finalPath := filepath.Join(destPath, filepath.Base(fileHeader.Filename))
+
+		if _, err := os.Stat(finalPath); err == nil {
+			c.JSON(http.StatusConflict, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "file_exists",
+				Error:   "file already exists at destination",
+				Data:    nil,
+			})
+			return
+		}
+
+		if err := utils.CopyFile(tempPath, finalPath); err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "copy_failed",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[map[string]string]{
+			Status:  "success",
+			Message: "file_uploaded",
+			Error:   "",
+			Data: map[string]string{
+				"path": finalPath,
+			},
+		})
+	}
+}
+
+// @Summary Delete Uploaded File
+// @Description Deletes a previously uploaded file using JSON body metadata
+// @Tags System
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param path query string true "Parent folder path (unused in deletion, just for consistency)"
+// @Param request body DeleteUploadRequest true "Delete Upload Request"
+// @Success 200 {object} internal.APIResponse[any]
+// @Failure 400 {object} internal.APIResponse[any] "Bad Request"
+// @Failure 404 {object} internal.APIResponse[any] "File Not Found"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /system/file-explorer/upload [delete]
+func DeleteUpload(systemService *system.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var req DeleteUploadRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_json",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		if req.Data.Path == "" {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "missing_file_path",
+				Error:   "data.path is required",
+				Data:    nil,
+			})
+			return
+		}
+
+		path := req.Data.Path
+
+		info, err := os.Stat(path)
+		if err != nil {
+			if os.IsNotExist(err) {
+				c.JSON(http.StatusNotFound, internal.APIResponse[any]{
+					Status:  "error",
+					Message: "file_not_found",
+					Error:   "file does not exist",
+					Data:    nil,
+				})
+				return
+			}
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "stat_failed",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		if info.IsDir() {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "not_a_file",
+				Error:   "cannot delete a directory",
+				Data:    nil,
+			})
+			return
+		}
+
+		if err := os.Remove(path); err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "delete_failed",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "file_deleted",
 			Error:   "",
 			Data:    nil,
 		})

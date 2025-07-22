@@ -28,6 +28,10 @@ type AvgIODelayResponse struct {
 	Delay float64 `json:"delay"`
 }
 
+type PoolDisksUsageResponse struct {
+	Usage float64 `json:"usage"`
+}
+
 type ZpoolListResponse struct {
 	Status  string            `json:"status"`
 	Message string            `json:"message"`
@@ -125,6 +129,57 @@ func GetPools(zfsService *zfs.Service) gin.HandlerFunc {
 			Message: "pools",
 			Error:   "",
 			Data:    pools,
+		})
+	}
+}
+
+// @Summary Get Disk Usage
+// @Description Get the overall disk usage percentage across all ZFS pools
+// @Tags ZFS
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} internal.APIResponse[PoolDisksUsageResponse] "Disk usage percentage"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /zfs/pools/disk-usage [get]
+func GetDisksUsage(zfsService *zfs.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		poolDisksUsageResponse := PoolDisksUsageResponse{
+			Usage: 0,
+		}
+
+		pools, err := zfsUtils.ListZpools()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    &poolDisksUsageResponse,
+			})
+			return
+		}
+
+		var totalSize uint64
+		var totalUsed uint64
+
+		for _, pool := range pools {
+			totalSize += pool.Size
+			totalUsed += pool.Allocated
+		}
+
+		var usage float64
+		if totalSize > 0 {
+			usage = (float64(totalUsed) / float64(totalSize)) * 100
+		} else {
+			usage = 0
+		}
+
+		poolDisksUsageResponse.Usage = usage
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "disk_usage",
+			Data:    poolDisksUsageResponse,
 		})
 	}
 }

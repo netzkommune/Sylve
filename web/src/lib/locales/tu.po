@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-19T13:45:12.198Z\n"
-"PO-Revision-Date: 2025-07-21T14:26:16.053Z\n"
+"PO-Revision-Date: 2025-07-22T11:13:22.764Z\n"
 "Last-Translator: \n"
 "Language: Türkçe\n"
 "Language-Team: \n"
@@ -250,6 +250,7 @@ msgstr "Küçült"
 #: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
 #: src/lib/components/custom/Samba/Share.svelte
+#: src/lib/components/custom/FileExplorer/FilepondModal.svelte
 msgid "Close"
 msgstr "MTU"
 
@@ -942,6 +943,7 @@ msgid "<0/> New Folder"
 msgstr "<0/> Yeni Klasör"
 
 #: src/routes/[node]/storage/explorer/+page.svelte
+#: src/lib/components/custom/FileExplorer/FilepondModal.svelte
 msgid "<0/> Upload File"
 msgstr "<0/> Dosya Yükle"
 
@@ -2678,4 +2680,16 @@ msgstr ""
 
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 msgid "No available/unused switches to attach to"
+msgstr ""
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "Drop files here to upload"
+msgstr ""
+
+#: src/routes/[node]/storage/explorer/+page.svelte
+msgid "Files will be uploaded to the current folder"
+msgstr ""
+
+#: src/lib/components/custom/FileExplorer/FilepondModal.svelte
+msgid "Submit"
 msgstr ""

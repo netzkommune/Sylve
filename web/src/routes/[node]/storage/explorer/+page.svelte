@@ -12,6 +12,7 @@
 	import AlertDialog from '$lib/components/custom/Dialog/Alert.svelte';
 	import Breadcrumb from '$lib/components/custom/FileExplorer/Breadcrumb.svelte';
 	import CreateFileOrFolderModal from '$lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte';
+	import FilepondModal from '$lib/components/custom/FileExplorer/FilepondModal.svelte';
 	import GridView from '$lib/components/custom/FileExplorer/GridView.svelte';
 	import ListView from '$lib/components/custom/FileExplorer/ListView.svelte';
 	import RenameModal from '$lib/components/custom/FileExplorer/RenameModal.svelte';
@@ -55,6 +56,9 @@
 			isOpen: false,
 			id: '',
 			newName: ''
+		},
+		filepond: {
+			isOpen: false
 		}
 	});
 
@@ -223,7 +227,6 @@
 	}
 
 	async function handleCopyFileOrFolder(item: FileNode, isCut: boolean) {
-		// Use selected items if multiple items are selected, otherwise use the single item
 		const itemsToCopy = selectedItems.length > 0 ? selectedItems : [item.id];
 		copyFileOrFolder.items = itemsToCopy;
 		copyFileOrFolder.isCut = isCut;
@@ -272,6 +275,53 @@
 		modals.rename.id = '';
 		modals.rename.newName = '';
 	}
+
+	let isDragOver = $state(false);
+	let dragCounter = $state(0);
+	let droppedFiles = $state<File[]>([]);
+
+	function handleDragEnter(e: DragEvent) {
+		e.preventDefault();
+		e.stopPropagation();
+
+		dragCounter++;
+		if (e.dataTransfer?.types.includes('Files')) {
+			isDragOver = true;
+		}
+	}
+
+	function handleDragLeave(e: DragEvent) {
+		e.preventDefault();
+		e.stopPropagation();
+
+		dragCounter--;
+		if (dragCounter === 0) {
+			isDragOver = false;
+		}
+	}
+
+	function handleDragOver(e: DragEvent) {
+		e.preventDefault();
+		e.stopPropagation();
+
+		if (e.dataTransfer) {
+			e.dataTransfer.dropEffect = 'copy';
+		}
+	}
+
+	function handleDrop(e: DragEvent) {
+		e.preventDefault();
+		e.stopPropagation();
+
+		isDragOver = false;
+		dragCounter = 0;
+
+		const files = e.dataTransfer?.files;
+		if (files && files.length > 0) {
+			droppedFiles = Array.from(files);
+			modals.filepond.isOpen = true;
+		}
+	}
 </script>
 
 <div class="flex h-full">
@@ -299,16 +349,33 @@
 				modals.create.isOpen = true;
 			}}
 			onUploadFile={() => {
-				// TODO: Implement upload functionality
+				modals.filepond.isOpen = true;
 			}}
 		/>
 
 		<ContextMenu.Root>
 			<ContextMenu.Trigger
-				class="file-explorer-container flex-1 overflow-y-auto"
+				class="file-explorer-container relative flex-1 overflow-y-auto {isDragOver
+					? 'drag-over'
+					: ''}"
 				onclick={handleEmptySpaceInteraction}
 				oncontextmenu={handleEmptySpaceInteraction}
+				ondragenter={handleDragEnter}
+				ondragleave={handleDragLeave}
+				ondragover={handleDragOver}
+				ondrop={handleDrop}
 			>
+				{#if isDragOver}
+					<div
+						class="drag-over-overlay bg-background border-muted absolute inset-0 z-50 flex items-center justify-center backdrop-blur-sm"
+					>
+						<div class="bg-background rounded-xl border p-8 text-center shadow-xl">
+							<UploadIcon class="mx-auto mb-4 h-16 w-16 " />
+							<p class="mb-2 text-xl font-semibold">Drop files here to upload</p>
+							<p class="text-sm">Files will be uploaded to the current folder</p>
+						</div>
+					</div>
+				{/if}
 				{#if viewMode === 'grid'}
 					<div class="grid-container h-full w-full">
 						<GridView
@@ -368,7 +435,12 @@
 					><Folder />
 					New Folder
 				</ContextMenu.Item>
-				<ContextMenu.Item class="gap-2">
+				<ContextMenu.Item
+					class="gap-2"
+					onclick={() => {
+						modals.filepond.isOpen = true;
+					}}
+				>
 					<UploadIcon />
 					Upload File</ContextMenu.Item
 				>
@@ -447,3 +519,16 @@
 		}
 	}}
 ></AlertDialog>
+
+<FilepondModal
+	bind:isOpen={modals.filepond.isOpen}
+	onClose={() => {
+		modals.filepond.isOpen = false;
+		droppedFiles = [];
+	}}
+	onUploadComplete={() => {
+		refreshCurrentFolder();
+	}}
+	{currentPath}
+	{droppedFiles}
+/>

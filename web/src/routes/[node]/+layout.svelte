@@ -72,6 +72,11 @@
 					icon: 'mdi:network',
 					children: [
 						{
+							label: 'Objects',
+							icon: 'clarity:objects-solid',
+							href: `/${node}/network/objects`
+						},
+						{
 							label: 'Interfaces',
 							icon: 'carbon:network-interface',
 							href: `/${node}/network/interfaces`

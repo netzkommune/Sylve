@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-19T15:13:04.883Z\n"
-"PO-Revision-Date: 2025-07-22T15:19:53.743Z\n"
+"PO-Revision-Date: 2025-07-23T09:29:02.074Z\n"
 "Last-Translator: \n"
 "Language: Arabic\n"
 "Language-Team: \n"
@@ -442,6 +442,7 @@ msgstr "تصغير"
 #: src/lib/components/custom/Terminal.svelte
 #: src/lib/components/ui/custom-input/combobox.svelte
 #: src/lib/components/custom/Login.svelte
+#: src/lib/components/ui/custom-input/combobox-bindable.svelte
 msgid "Enter"
 msgstr "أدخل"
 
@@ -690,10 +691,12 @@ msgstr "لا شيء"
 
 #: src/lib/components/ui/custom-input/combobox.svelte
 #: src/lib/components/custom/TreeTable/Search.svelte
+#: src/lib/components/ui/custom-input/combobox-bindable.svelte
 msgid "Search..."
 msgstr "بحث..."
 
 #: src/lib/components/ui/custom-input/combobox.svelte
+#: src/lib/components/ui/custom-input/combobox-bindable.svelte
 msgid "No data"
 msgstr "لا يوجد بيانات"
 
@@ -2734,4 +2737,8 @@ msgstr ""
 
 #: src/routes/[node]/network/objects/+page.svelte
 msgid "Create New Object"
+msgstr ""
+
+#: src/lib/components/ui/custom-input/combobox-bindable.svelte
+msgid "<0/> Add \"{0}\""
 msgstr ""

@@ -48,7 +48,6 @@
 
 	function selectItem(val: string) {
 		if (multiple) {
-			// start with a fresh array copy
 			const arr = Array.isArray(value) ? [...value] : [];
 			const idx = arr.indexOf(val);
 			if (idx >= 0) {
@@ -58,7 +57,6 @@
 			}
 			value = arr;
 			onValueChange(arr);
-			// keep open=true so you can pick more
 		} else {
 			if (value === val && !disallowEmpty) {
 				value = '';

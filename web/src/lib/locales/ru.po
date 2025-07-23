@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-19T15:13:09.713Z\n"
-"PO-Revision-Date: 2025-07-22T15:19:53.749Z\n"
+"PO-Revision-Date: 2025-07-23T09:29:02.081Z\n"
 "Last-Translator: \n"
 "Language: Russian\n"
 "Language-Team: \n"
@@ -442,6 +442,7 @@ msgstr "Свернуть"
 #: src/lib/components/custom/Terminal.svelte
 #: src/lib/components/ui/custom-input/combobox.svelte
 #: src/lib/components/custom/Login.svelte
+#: src/lib/components/ui/custom-input/combobox-bindable.svelte
 msgid "Enter"
 msgstr "Ввод"
 
@@ -690,10 +691,12 @@ msgstr "Нет"
 
 #: src/lib/components/ui/custom-input/combobox.svelte
 #: src/lib/components/custom/TreeTable/Search.svelte
+#: src/lib/components/ui/custom-input/combobox-bindable.svelte
 msgid "Search..."
 msgstr "Поиск..."
 
 #: src/lib/components/ui/custom-input/combobox.svelte
+#: src/lib/components/ui/custom-input/combobox-bindable.svelte
 msgid "No data"
 msgstr "Нет данных"
 
@@ -2734,4 +2737,8 @@ msgstr ""
 
 #: src/routes/[node]/network/objects/+page.svelte
 msgid "Create New Object"
+msgstr ""
+
+#: src/lib/components/ui/custom-input/combobox-bindable.svelte
+msgid "<0/> Add \"{0}\""
 msgstr ""

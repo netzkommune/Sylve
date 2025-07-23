@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-22T14:58:53.724Z\n"
-"PO-Revision-Date: 2025-07-22T15:19:53.756Z\n"
+"PO-Revision-Date: 2025-07-23T09:29:02.089Z\n"
 "Last-Translator: \n"
 "Language: Türkçe\n"
 "Language-Team: \n"
@@ -184,6 +184,8 @@ msgid "No data available"
 msgstr ""
 
 #: src/lib/components/custom/TreeTable/Search.svelte
+#: src/lib/components/ui/custom-input/combobox.svelte
+#: src/lib/components/ui/custom-input/combobox-bindable.svelte
 msgid "Search..."
 msgstr ""
 
@@ -228,6 +230,7 @@ msgstr ""
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 #: src/routes/[node]/network/switches/+page.svelte
 #: src/routes/[node]/network/objects/+page.svelte
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
 msgid "Reset"
 msgstr ""
 
@@ -253,6 +256,9 @@ msgstr ""
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 #: src/routes/[node]/network/switches/+page.svelte
 #: src/routes/[node]/network/objects/+page.svelte
+#: src/lib/components/custom/Terminal.svelte
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+#: src/lib/components/ui/dialog/dialog-content.svelte
 msgid "Close"
 msgstr ""
 
@@ -685,6 +691,7 @@ msgstr ""
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/network/interfaces/+page.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
 msgid "Status"
 msgstr ""
 
@@ -1593,6 +1600,7 @@ msgstr ""
 
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
 msgid "VNC"
 msgstr ""
 
@@ -1681,6 +1689,7 @@ msgid "Port"
 msgstr ""
 
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/Login.svelte
 msgid "Password"
 msgstr ""
 
@@ -1865,6 +1874,7 @@ msgid "New Network"
 msgstr ""
 
 #: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
 msgid "Switch"
 msgstr ""
 
@@ -2014,6 +2024,7 @@ msgid "Error updating switch"
 msgstr ""
 
 #: src/routes/[node]/+layout.svelte
+#: src/lib/components/skeleton/LeftPanel.svelte
 msgid "Data Center"
 msgstr ""
 
@@ -2022,6 +2033,7 @@ msgid "Help"
 msgstr ""
 
 #: src/routes/[node]/+layout.svelte
+#: src/lib/components/skeleton/LeftPanel.svelte
 msgid "Difuse-sidebar"
 msgstr ""
 
@@ -2047,6 +2059,7 @@ msgid "Network"
 msgstr ""
 
 #: src/routes/[node]/+layout.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
 msgid "Notes"
 msgstr ""
 
@@ -2160,4 +2173,147 @@ msgstr ""
 
 #: src/routes/[node]/network/objects/+page.svelte
 msgid "Create New Object"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/Header.svelte
+msgid "Sylve Logo"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/Throbber.svelte
+#: src/lib/components/custom/Header.svelte
+msgid "SYLVE"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+msgid "Username"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+msgid "Enter your username"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+msgid "Realm"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+msgid "PAM"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+msgid "Sylve"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/Terminal.svelte
+#: src/lib/components/ui/custom-input/combobox.svelte
+#: src/lib/components/ui/custom-input/combobox-bindable.svelte
+msgid "Enter"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "Toggle navigation menu"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "Virtual Environment 0.0.1"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "<0/> Create VM"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "Toggle user menu"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "Color Theme"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "Log out"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "⌘⇧Q"
+msgstr ""
+
+#: src/lib/components/custom/Terminal.svelte
+msgid "Minimize"
+msgstr ""
+
+#: src/lib/components/custom/Terminal.svelte
+msgid "Add new tab"
+msgstr ""
+
+#: src/lib/components/custom/Terminal.svelte
+msgid "Session killed: {0}"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Start Time"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "End Time"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Node"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "User"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Action"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Login"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Disk - Initialize GPT"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Disk - Wipe"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Login - Create"
+msgstr ""
+
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+msgid "<0/> Create Virtual Machine"
+msgstr ""
+
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+msgid "Create Virtual Machine"
+msgstr ""
+
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+msgid "Created VM {0}"
+msgstr ""
+
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+msgid "Failed to create VM"
+msgstr ""
+
+#: src/lib/stores/terminal.svelte.ts
+msgid "Terminal"
+msgstr ""
+
+#: src/lib/components/ui/custom-input/combobox.svelte
+#: src/lib/components/ui/custom-input/combobox-bindable.svelte
+msgid "No data"
+msgstr ""
+
+#: src/lib/components/ui/custom-input/combobox-bindable.svelte
+msgid "<0/> Add \"{0}\""
 msgstr ""

@@ -2,7 +2,8 @@
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import Search from '$lib/components/custom/TreeTable/Search.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import CustomComboBox from '$lib/components/ui/custom-input/combobox.svelte';
+	import ComboBoxBindable from '$lib/components/ui/custom-input/combobox-bindable.svelte';
+	import ComboBox from '$lib/components/ui/custom-input/combobox.svelte';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import type { Column, Row } from '$lib/types/components/tree-table';
@@ -24,6 +25,10 @@
 			open: false,
 			value: '',
 			types: ['List1', 'List2', 'List3']
+		},
+		host: {
+			open: false,
+			values: []
 		}
 	});
 
@@ -178,7 +183,7 @@
 				type="text"
 			/>
 
-			<CustomComboBox
+			<ComboBox
 				bind:open={comboBoxes.type.open}
 				label={'Type'}
 				bind:value={comboBoxes.type.value}
@@ -186,18 +191,28 @@
 				classes="flex-1 space-y-1"
 				placeholder="Select type"
 				width="w-3/4"
-			></CustomComboBox>
+			></ComboBox>
 		</div>
 
 		{#if comboBoxes.type.value !== ''}
 			<div class="flex gap-4">
 				{#if comboBoxes.type.value === 'Host' || comboBoxes.type.value === 'Network'}
-					<CustomValueInput
+					<!-- <CustomValueInput
 						placeholder={`Enter ${comboBoxes.type.value.toLowerCase()} name`}
 						bind:value={confirmModals.type}
 						classes="flex-1 space-y-1.5"
 						type="text"
-					/>
+					/> -->
+					<ComboBoxBindable
+						bind:open={comboBoxes.host.open}
+						label={'Host'}
+						bind:value={comboBoxes.host.values}
+						data={[]}
+						classes="flex-1 space-y-1"
+						placeholder="Select type"
+						width="w-3/4"
+						multiple={true}
+					></ComboBoxBindable>
 				{:else if comboBoxes.type.value === 'Port'}
 					<CustomValueInput
 						placeholder="Port Number"
@@ -206,7 +221,7 @@
 						type="number"
 					/>
 				{:else if comboBoxes.type.value === 'Country'}
-					<CustomComboBox
+					<!-- <CustomComboBox
 						bind:open={comboBoxes.type.open}
 						label={'Option 1'}
 						bind:value={comboBoxes.type.value}
@@ -223,7 +238,7 @@
 						classes="flex-1 space-y-1"
 						placeholder="Select type"
 						width="w-3/4"
-					></CustomComboBox>
+					></CustomComboBox> -->
 				{/if}
 			</div>
 		{/if}

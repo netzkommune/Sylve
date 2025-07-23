@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-19T15:13:23.412Z\n"
-"PO-Revision-Date: 2025-07-22T15:19:53.735Z\n"
+"PO-Revision-Date: 2025-07-23T09:29:01.995Z\n"
 "Last-Translator: \n"
 "Language: Malayalam\n"
 "Language-Team: \n"
@@ -264,16 +264,19 @@ msgstr "ഒന്നുമില്ല"
 
 #: src/lib/components/ui/custom-input/combobox.svelte
 #: src/lib/components/custom/TreeTable/Search.svelte
+#: src/lib/components/ui/custom-input/combobox-bindable.svelte
 msgid "Search..."
 msgstr "തിരയുക..."
 
 #: src/lib/components/ui/custom-input/combobox.svelte
+#: src/lib/components/ui/custom-input/combobox-bindable.svelte
 msgid "No data"
 msgstr "ഡാറ്റ ലഭ്യമല്ല"
 
 #: src/lib/components/ui/custom-input/combobox.svelte
 #: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/Terminal.svelte
+#: src/lib/components/ui/custom-input/combobox-bindable.svelte
 msgid "Enter"
 msgstr "Enter"
 
@@ -2734,4 +2737,8 @@ msgstr ""
 
 #: src/routes/[node]/network/objects/+page.svelte
 msgid "Create New Object"
+msgstr ""
+
+#: src/lib/components/ui/custom-input/combobox-bindable.svelte
+msgid "<0/> Add \"{0}\""
 msgstr ""

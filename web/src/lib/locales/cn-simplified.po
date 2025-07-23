@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-19T15:13:43.695Z\n"
-"PO-Revision-Date: 2025-07-22T15:19:53.738Z\n"
+"PO-Revision-Date: 2025-07-23T09:29:01.999Z\n"
 "Last-Translator: \n"
 "Language: 简体中文\n"
 "Language-Team: \n"
@@ -243,16 +243,19 @@ msgstr "无"
 
 #: src/lib/components/ui/custom-input/combobox.svelte
 #: src/lib/components/custom/TreeTable/Search.svelte
+#: src/lib/components/ui/custom-input/combobox-bindable.svelte
 msgid "Search..."
 msgstr "搜索..."
 
 #: src/lib/components/ui/custom-input/combobox.svelte
+#: src/lib/components/ui/custom-input/combobox-bindable.svelte
 msgid "No data"
 msgstr "没有数据"
 
 #: src/lib/components/ui/custom-input/combobox.svelte
 #: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/Terminal.svelte
+#: src/lib/components/ui/custom-input/combobox-bindable.svelte
 msgid "Enter"
 msgstr "进入"
 
@@ -2734,4 +2737,8 @@ msgstr ""
 
 #: src/routes/[node]/network/objects/+page.svelte
 msgid "Create New Object"
+msgstr ""
+
+#: src/lib/components/ui/custom-input/combobox-bindable.svelte
+msgid "<0/> Add \"{0}\""
 msgstr ""

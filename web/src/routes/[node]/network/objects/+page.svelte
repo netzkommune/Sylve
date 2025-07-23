@@ -195,7 +195,7 @@
 		</div>
 
 		{#if comboBoxes.type.value !== ''}
-			<div class="flex gap-4">
+			<div class="flex gap-4 overflow-auto">
 				{#if comboBoxes.type.value === 'Host' || comboBoxes.type.value === 'Network'}
 					<!-- <CustomValueInput
 						placeholder={`Enter ${comboBoxes.type.value.toLowerCase()} name`}
@@ -210,7 +210,7 @@
 						data={[]}
 						classes="flex-1 space-y-1"
 						placeholder="Select type"
-						width="w-3/4"
+						width="min-w-[200px] max-w-[450px] w-full "
 						multiple={true}
 					></ComboBoxBindable>
 				{:else if comboBoxes.type.value === 'Port'}

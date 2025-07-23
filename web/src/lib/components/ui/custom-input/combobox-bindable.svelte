@@ -91,35 +91,35 @@
 				variant="outline"
 				role="combobox"
 				aria-expanded={open}
-				class="w-full flex-nowrap justify-between gap-1 overflow-hidden"
+				class=" h-full max-h-28 w-full flex-wrap justify-start gap-1 overflow-y-auto"
 				{disabled}
 			>
-				<div class="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
-					{#if selectedLabels.length > 0}
-						{#each selectedLabels as lbl, i}
-							<span
-								class={multiple
-									? 'bg-secondary/100 truncate rounded px-2 py-0.5 text-sm'
-									: 'truncate rounded px-2 text-sm'}
-								title={lbl}
-							>
-								{lbl}
-							</span>
-						{/each}
-					{:else}
-						<span class="truncate opacity-50">{placeholder}</span>
-					{/if}
-				</div>
+				<!-- <div class="flex min-w-0 flex-1 items-center gap-1 overflow-hidden"> -->
+				{#if selectedLabels.length > 0}
+					{#each selectedLabels as lbl, i}
+						<span
+							class={multiple
+								? 'bg-secondary/100 truncate rounded px-2 py-0.5 text-sm'
+								: 'truncate rounded px-2 text-sm'}
+							title={lbl}
+						>
+							{lbl}
+						</span>
+					{/each}
+				{:else}
+					<span class="truncate opacity-50">{placeholder}</span>
+				{/if}
+				<!-- </div> -->
 
 				<Icon icon="lucide:chevrons-up-down" class="ml-auto h-4 w-4 shrink-0 opacity-50" />
 			</Button>
 		</Popover.Trigger>
 
-		<Popover.Content class="{width} mx-auto p-0">
+		<Popover.Content class="{width} mx-auto overflow-x-auto overflow-y-auto whitespace-nowrap !p-0">
 			<Command.Root shouldFilter={false}>
 				<Command.Input bind:value={search} placeholder={placeholder || 'Search...'} />
 				<Command.Empty>No data</Command.Empty>
-				<div class="max-h-64 overflow-y-auto">
+				<div class="max-h-64 overflow-auto">
 					<Command.Group>
 						{#each filteredData as element}
 							<Command.Item
@@ -142,7 +142,9 @@
 												: 'opacity-0'
 									)}
 								/>
-								{element.label}
+								<p class="truncate">
+									{element.label}
+								</p>
 								{#if !initialDataValues.includes(element.value)}
 									<Button
 										size="icon"
@@ -169,6 +171,7 @@
 						{/each}
 						{#if filteredData.length === 0 && search.trim() !== ''}
 							<Command.Item
+								class="flex items-center  "
 								onSelect={() => {
 									const newOption = { value: search.trim(), label: search.trim() };
 									if (multiple) {
@@ -182,7 +185,10 @@
 								}}
 							>
 								<Icon icon="lucide:plus" class="mr-2 h-4 w-4 opacity-100" />
-								Add "{search}"
+								<span>Add</span>
+								<p class="w-full break-words text-left text-sm">
+									"{search}"
+								</p>
 							</Command.Item>
 						{/if}
 					</Command.Group>

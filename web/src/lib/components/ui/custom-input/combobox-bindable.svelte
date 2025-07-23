@@ -38,6 +38,8 @@
 
 	let search = $state('');
 
+	const initialDataValues: string[] = $state(Array.isArray(data) ? data.map((d) => d.value) : []);
+
 	const filteredData = $derived.by(() => {
 		if (!search) return data;
 		const q = search.toLowerCase();
@@ -141,6 +143,28 @@
 									)}
 								/>
 								{element.label}
+								{#if !initialDataValues.includes(element.value)}
+									<Button
+										size="icon"
+										onclick={() => {
+											data = data.filter((d) => d.value !== element.value);
+											if (multiple) {
+												if (Array.isArray(value)) {
+													const arr = value.filter((v) => v !== element.value);
+													value = arr;
+													onValueChange(arr);
+												}
+											}
+										}}
+										variant="ghost"
+										class="hover:!bg-muted !m-0 !ml-auto !h-5 !w-5 !p-1 "
+									>
+										<Icon
+											icon="material-symbols:delete-outline"
+											class="text-foreground ml-auto h-4 w-4 transition-colors duration-200 "
+										/>
+									</Button>
+								{/if}
 							</Command.Item>
 						{/each}
 						{#if filteredData.length === 0 && search.trim() !== ''}

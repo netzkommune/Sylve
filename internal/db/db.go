@@ -132,12 +132,29 @@ func setupInitUsers(db *gorm.DB, cfg *internal.SylveConfig) error {
 				return result.Error
 			}
 		} else {
+			updates := make(map[string]interface{})
+
 			if !user.Admin {
-				if err := db.Model(&user).Update("admin", true).Error; err != nil {
-					logger.L.Error().Msgf("Failed to promote user %s to admin: %v", admin.Email, err)
+				updates["admin"] = true
+				logger.L.Info().Msgf("User %s promoted to admin", admin.Email)
+			}
+
+			passwordMatches := utils.CheckPasswordHash(admin.Password, user.Password)
+			if !passwordMatches {
+				hashed, err := utils.HashPassword(admin.Password)
+				if err != nil {
+					logger.L.Error().Msgf("Failed to hash updated password for user %s: %v", admin.Email, err)
 					return err
 				}
-				logger.L.Info().Msgf("User %s promoted to admin", admin.Email)
+				updates["password"] = hashed
+				logger.L.Info().Msgf("Password for admin user %s updated", admin.Email)
+			}
+
+			if len(updates) > 0 {
+				if err := db.Model(&user).Updates(updates).Error; err != nil {
+					logger.L.Error().Msgf("Failed to update user %s: %v", admin.Email, err)
+					return err
+				}
 			}
 		}
 

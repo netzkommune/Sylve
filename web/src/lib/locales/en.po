@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-22T11:34:22.984Z\n"
-"PO-Revision-Date: 2025-07-23T09:23:44.610Z\n"
+"PO-Revision-Date: 2025-07-24T08:29:30.205Z\n"
 "Last-Translator: \n"
 "Language: English\n"
 "Language-Team: \n"
@@ -44,6 +44,10 @@ msgstr "<0/> Upload File"
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 #: src/routes/[node]/network/switches/+page.svelte
 #: src/routes/[node]/network/objects/+page.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+#: src/lib/components/custom/Dialog/SingleValue.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
 msgid "Close"
 msgstr "Close"
 
@@ -59,6 +63,7 @@ msgid "SYLVE"
 msgstr "SYLVE"
 
 #: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
 msgid "Username"
 msgstr "Username"
 
@@ -68,6 +73,7 @@ msgstr "Enter your username"
 
 #: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
 msgid "Password"
 msgstr "Password"
 
@@ -131,6 +137,7 @@ msgid "Notes"
 msgstr "Notes"
 
 #: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Interfaces"
 msgstr "Interfaces"
 
@@ -314,6 +321,7 @@ msgid "Node"
 msgstr "Node"
 
 #: src/lib/components/skeleton/BottomPanel.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
 msgid "User"
 msgstr "User"
 
@@ -382,6 +390,9 @@ msgstr "<0/> Create Virtual Machine"
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 #: src/routes/[node]/network/switches/+page.svelte
 #: src/routes/[node]/network/objects/+page.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
 msgid "Reset"
 msgstr "Reset"
 
@@ -439,6 +450,9 @@ msgstr "Enter {0} name"
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 #: src/routes/[node]/network/switches/+page.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
 msgid "Create"
 msgstr "Create"
 
@@ -484,6 +498,10 @@ msgstr "<0/> Delete"
 #: src/routes/[node]/network/interfaces/+page.svelte
 #: src/routes/[node]/network/switches/+page.svelte
 #: src/routes/[node]/network/objects/+page.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
 msgid "Name"
 msgstr "Name"
 
@@ -733,6 +751,8 @@ msgstr "View"
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
 msgid "Delete"
 msgstr "Delete"
 
@@ -742,6 +762,7 @@ msgstr "Delete"
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
 #: src/routes/[node]/network/switches/+page.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Edit"
 msgstr "Edit"
 
@@ -759,6 +780,9 @@ msgstr "Bulk Delete"
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/routes/[node]/network/switches/+page.svelte
 #: src/routes/[node]/network/objects/+page.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
 msgid "New"
 msgstr "New"
 
@@ -785,6 +809,7 @@ msgstr "This is a note"
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 #: src/routes/[node]/network/switches/+page.svelte
+#: src/lib/components/custom/Dialog/SingleValue.svelte
 msgid "Save"
 msgstr "Save"
 
@@ -816,6 +841,9 @@ msgstr "Failed to create note"
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/routes/[node]/network/interfaces/+page.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
 msgid "ID"
 msgstr "ID"
 
@@ -907,6 +935,7 @@ msgstr "Attribute"
 #: src/routes/[node]/storage/disks/+page.svelte
 #: src/lib/components/custom/Charts/Area.svelte
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Value"
 msgstr "Value"
 
@@ -1148,6 +1177,7 @@ msgid "Comments about the pool"
 msgstr "Comments about the pool"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
 msgid "Mount Point"
 msgstr "Mount Point"
 
@@ -1179,11 +1209,13 @@ msgstr "Select Auto Expand"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Yes"
 msgstr "Yes"
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "No"
 msgstr "No"
 
@@ -1711,6 +1743,7 @@ msgstr "Failed to delete snapshots"
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Dataset"
 msgstr "Dataset"
 
@@ -1927,6 +1960,7 @@ msgid "The VM is currently powered off.<0/> Start the VM to access its console."
 msgstr "The VM is currently powered off.<0/> Start the VM to access its console."
 
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Edit {0}"
 msgstr "Edit {0}"
 
@@ -1941,6 +1975,7 @@ msgid "PCI Devices"
 msgstr "PCI Devices"
 
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Property"
 msgstr "Property"
 
@@ -2011,6 +2046,7 @@ msgid "Port"
 msgstr "Port"
 
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
 msgid "Enter or generate password"
 msgstr "Enter or generate password"
 
@@ -2378,3 +2414,284 @@ msgstr "Create New Object"
 #: src/lib/components/ui/custom-input/combobox-bindable.svelte
 msgid "<0/> Add \"{0}\""
 msgstr "<0/> Add \"{0}\""
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Edit Share"
+msgstr "Edit Share"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Delete Share"
+msgstr "Delete Share"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Samba share"
+msgstr "Samba share"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Failed to delete Samba share"
+msgstr "Failed to delete Samba share"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+msgid "Samba share deleted"
+msgstr "Samba share deleted"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Read-Only Groups"
+msgstr "Read-Only Groups"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Writeable Groups"
+msgstr "Writeable Groups"
+
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Created At"
+msgstr "Created At"
+
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Edit Samba Share"
+msgstr "Edit Samba Share"
+
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Create Samba Share"
+msgstr "Create Samba Share"
+
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Select dataset"
+msgstr "Select dataset"
+
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Select groups"
+msgstr "Select groups"
+
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Create Mask"
+msgstr "Create Mask"
+
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Directory Mask"
+msgstr "Directory Mask"
+
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Guests"
+msgstr "Guests"
+
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Read Only"
+msgstr "Read Only"
+
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Share name already exists"
+msgstr "Share name already exists"
+
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Name is required"
+msgstr "Name is required"
+
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Dataset is required"
+msgstr "Dataset is required"
+
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "No groups selected and guests are not allowed"
+msgstr "No groups selected and guests are not allowed"
+
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Share cannot have overlapping groups"
+msgstr "Share cannot have overlapping groups"
+
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Failed to {0} Samba share"
+msgstr "Failed to {0} Samba share"
+
+#: src/lib/components/custom/Samba/Share.svelte
+msgid "Samba share {0}"
+msgstr "Samba share {0}"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Workgroup"
+msgstr "Workgroup"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Enter Workgroup"
+msgstr "Enter Workgroup"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Unix Charset"
+msgstr "Unix Charset"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Enter Unix Charset"
+msgstr "Enter Unix Charset"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Server String"
+msgstr "Server String"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Enter Server String"
+msgstr "Enter Server String"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Bind Interfaces Only"
+msgstr "Bind Interfaces Only"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Select Interfaces"
+msgstr "Select Interfaces"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Failed to update Samba configuration"
+msgstr "Failed to update Samba configuration"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+msgid "Samba configuration updated"
+msgstr "Samba configuration updated"
+
+#: src/lib/components/custom/Dialog/SingleValue.svelte
+msgid "Enter value"
+msgstr "Enter value"
+
+#: src/lib/components/custom/Dialog/SingleValue.svelte
+msgid "Select an option"
+msgstr "Select an option"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Enable Passthrough"
+msgstr "Enable Passthrough"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Disable Passthrough"
+msgstr "Disable Passthrough"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Device added to passthrough"
+msgstr "Device added to passthrough"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Failed to add device to passthrough"
+msgstr "Failed to add device to passthrough"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Device removed from passthrough"
+msgstr "Device removed from passthrough"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Device is in use by a VM, failed to remove"
+msgstr "Device is in use by a VM, failed to remove"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Failed to remove device from passthrough"
+msgstr "Failed to remove device from passthrough"
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Are you sure you want to pass through <b>{0}</b> by <b>{1}</b>? This will make it unavailable to the host."
+msgstr "Are you sure you want to pass through <b>{0}</b> by <b>{1}</b>? This will make it unavailable to the host."
+
+#: src/routes/[node]/settings/device-passthrough/+page.svelte
+msgid "Are you sure you want to remove passthrough for <b>{0}</b> by <b>{1}</b>? This will make it available to the host again."
+msgstr "Are you sure you want to remove passthrough for <b>{0}</b> by <b>{1}</b>? This will make it available to the host again."
+
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+msgid "Failed to delete user"
+msgstr "Failed to delete user"
+
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+msgid "User deleted"
+msgstr "User deleted"
+
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "E-Mail"
+msgstr "E-Mail"
+
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+msgid "Last Usage"
+msgstr "Last Usage"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "<0/>Create User"
+msgstr "<0/>Create User"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Admin"
+msgstr "Admin"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Username and password are required"
+msgstr "Username and password are required"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Invalid username"
+msgstr "Invalid username"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Username already exists"
+msgstr "Username already exists"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Invalid email address"
+msgstr "Invalid email address"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Password must be at least 8 characters long"
+msgstr "Password must be at least 8 characters long"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "Failed to create user"
+msgstr "Failed to create user"
+
+#: src/lib/components/custom/Authentication/Create.svelte
+msgid "User created"
+msgstr "User created"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Add Users"
+msgstr "Add Users"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "New Group"
+msgstr "New Group"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Select users"
+msgstr "Select users"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Failed to delete group"
+msgstr "Failed to delete group"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Group deleted"
+msgstr "Group deleted"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Name and users are required"
+msgstr "Name and users are required"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Group name already exists"
+msgstr "Group name already exists"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Failed to create group"
+msgstr "Failed to create group"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Group created"
+msgstr "Group created"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "No users selected"
+msgstr "No users selected"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Failed to add users to group"
+msgstr "Failed to add users to group"
+
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+msgid "Users added to group"
+msgstr "Users added to group"

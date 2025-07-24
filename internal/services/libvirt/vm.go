@@ -15,6 +15,7 @@ import (
 	utilitiesModels "sylve/internal/db/models/utilities"
 	vmModels "sylve/internal/db/models/vm"
 	libvirtServiceInterfaces "sylve/internal/interfaces/services/libvirt"
+	"sylve/internal/logger"
 	"sylve/pkg/utils"
 	"sylve/pkg/zfs"
 
@@ -275,6 +276,7 @@ func validateCreate(data libvirtServiceInterfaces.CreateVMRequest, db *gorm.DB) 
 
 func (s *Service) CreateVM(data libvirtServiceInterfaces.CreateVMRequest) error {
 	if err := validateCreate(data, s.DB); err != nil {
+		logger.L.Debug().Err(err).Msg("create_vm: validation failed")
 		return err
 	}
 
@@ -374,26 +376,31 @@ func (s *Service) CreateVM(data libvirtServiceInterfaces.CreateVMRequest) error 
 	if err := s.DB.
 		Session(&gorm.Session{FullSaveAssociations: true}).
 		Create(vm).Error; err != nil {
+		logger.L.Debug().Err(err).Msg("create_vm: failed to create vm with associations")
 		return fmt.Errorf("failed_to_create_vm_with_associations: %w", err)
 	}
 
 	if err := s.CreateLvVm(int(vm.ID)); err != nil {
 		if err := s.DB.Delete(vm).Error; err != nil {
+			logger.L.Debug().Err(err).Msg("create_vm: failed to delete vm after creation failure")
 			return fmt.Errorf("failed_to_delete_vm_after_creation_failure: %w", err)
 		}
 
 		for _, storage := range storages {
 			if err := s.DB.Delete(&storage).Error; err != nil {
+				logger.L.Debug().Err(err).Msg("create_vm: failed to delete storage after creation failure")
 				return fmt.Errorf("failed_to_delete_storage_after_vm_creation_failure: %w", err)
 			}
 		}
 
 		for _, network := range networks {
 			if err := s.DB.Delete(&network).Error; err != nil {
+				logger.L.Debug().Err(err).Msg("create_vm: failed to delete network after creation failure")
 				return fmt.Errorf("failed_to_delete_network_after_vm_creation_failure: %w", err)
 			}
 		}
 
+		logger.L.Debug().Err(err).Msg("create_vm: failed to create lv vm")
 		return fmt.Errorf("failed_to_create_lv_vm: %w", err)
 	}
 

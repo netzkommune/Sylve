@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-19T15:13:23.412Z\n"
-"PO-Revision-Date: 2025-07-24T10:10:19.021Z\n"
+"PO-Revision-Date: 2025-07-24T13:04:21.836Z\n"
 "Last-Translator: \n"
 "Language: Malayalam\n"
 "Language-Team: \n"
@@ -65,6 +65,7 @@ msgstr "<0/> വെർച്വൽ മെഷീൻ ഉണ്ടാക്കു�
 #: src/lib/components/custom/Samba/Share.svelte
 #: src/routes/[node]/network/objects/+page.svelte
 #: src/lib/components/custom/Authentication/CreateOrEdit.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 msgid "Reset"
 msgstr "പുനഃക്രമീകരിക്കുക"
 
@@ -101,6 +102,7 @@ msgstr "പുനഃക്രമീകരിക്കുക"
 #: src/lib/components/custom/FileExplorer/FilepondModal.svelte
 #: src/routes/[node]/network/objects/+page.svelte
 #: src/lib/components/custom/Authentication/CreateOrEdit.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 msgid "Close"
 msgstr "അടയ്ക്കുക"
 
@@ -664,6 +666,7 @@ msgstr ""
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
 #: src/lib/components/custom/Samba/Share.svelte
 #: src/routes/[node]/network/objects/+page.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 msgid "Name"
 msgstr ""
 
@@ -689,6 +692,7 @@ msgstr ""
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 #: src/lib/components/custom/Authentication/Create.svelte
 #: src/lib/components/custom/Authentication/CreateOrEdit.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 msgid "Save"
 msgstr ""
 
@@ -846,6 +850,7 @@ msgstr ""
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
 #: src/lib/components/custom/Samba/Share.svelte
 #: src/lib/components/custom/Authentication/CreateOrEdit.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 msgid "Create"
 msgstr ""
 
@@ -1066,6 +1071,7 @@ msgstr ""
 #: src/lib/components/custom/FileExplorer/Toolbar.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/routes/[node]/network/objects/+page.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 msgid "Type"
 msgstr ""
 
@@ -2096,6 +2102,7 @@ msgstr ""
 
 #: src/lib/components/custom/Samba/Create.svelte
 #: src/lib/components/custom/Samba/Share.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 msgid "Name is required"
 msgstr ""
 
@@ -2726,10 +2733,12 @@ msgid "Object"
 msgstr ""
 
 #: src/routes/[node]/network/objects/+page.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 msgid "Object Name"
 msgstr ""
 
 #: src/routes/[node]/network/objects/+page.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 msgid "Select type"
 msgstr ""
 
@@ -2754,6 +2763,7 @@ msgid "List"
 msgstr ""
 
 #: src/routes/[node]/network/objects/+page.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 msgid "Create New Object"
 msgstr ""
 
@@ -2785,4 +2795,120 @@ msgstr ""
 
 #: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 msgid "Edit User - {0}"
+msgstr ""
+
+#: src/lib/components/ui/custom-input/combobox-bindable.svelte
+msgid "Add"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "Windows VM"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "Windows IP"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "Windows"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "Host(s)"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "Network(s)"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "Select host(s)"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "Hosts"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "Select hosts"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "Networks"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "Select networks"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "MAC(s)"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "MACs"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "Select MACs"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "Type is required"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "At least one host must be selected"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "At least one network must be selected"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "At least one MAC must be selected"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "Invalid host IP: {0}"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "Cannot mix IPv4 and IPv6 addresses"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "Invalid network CIDR: {0}"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "Cannot mix IPv4 and IPv6 networks"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "Invalid MAC address: {0}"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "Failed to create network object"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "Created {0} ({1})"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "Created object"
+msgstr ""
+
+#: src/lib/components/ui/custom-input/combobox-bindable.svelte
+msgid "No data, create your own by typing above"
+msgstr ""
+
+#: src/lib/components/ui/custom-input/combobox-bindable.svelte
+msgid "No data <0/> create your own by typing above"
+msgstr ""
+
+#: src/lib/components/ui/custom-input/combobox-bindable.svelte
+msgid "Type to create"
 msgstr ""

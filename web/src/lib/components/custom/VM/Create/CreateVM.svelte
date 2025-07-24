@@ -24,6 +24,7 @@
 	import Storage from './Storage.svelte';
 
 	import { type CreateData, type VM } from '$lib/types/vm/vm';
+	import { handleAPIError } from '$lib/utils/http';
 	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
 
@@ -187,6 +188,7 @@
 				});
 				open = false;
 			} else {
+				handleAPIError(response);
 				toast.error('Failed to create VM', {
 					duration: 3000,
 					position: 'bottom-center'

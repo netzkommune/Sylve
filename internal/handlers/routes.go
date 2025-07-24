@@ -185,6 +185,9 @@ func RegisterRoutes(r *gin.Engine,
 	network.Use(middleware.EnsureAuthenticated(authService))
 	network.Use(middleware.RequestLoggerMiddleware(db, authService))
 	{
+		network.GET("/object", networkHandlers.ListNetworkObjects(networkService))
+		network.POST("/object", networkHandlers.CreateNetworkObject(networkService))
+
 		network.GET("/interface", networkHandlers.ListInterfaces(networkService))
 
 		network.GET("/switch", networkHandlers.ListSwitches(networkService))

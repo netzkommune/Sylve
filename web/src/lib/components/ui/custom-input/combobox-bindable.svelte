@@ -109,8 +109,6 @@
 				{:else}
 					<span class="truncate opacity-50">{placeholder}</span>
 				{/if}
-				<!-- </div> -->
-
 				<Icon icon="lucide:chevrons-up-down" class="ml-auto h-4 w-4 shrink-0 opacity-50" />
 			</Button>
 		</Popover.Trigger>
@@ -118,7 +116,7 @@
 		<Popover.Content class="{width} mx-auto overflow-x-auto overflow-y-auto whitespace-nowrap !p-0">
 			<Command.Root shouldFilter={false}>
 				<Command.Input bind:value={search} placeholder={placeholder || 'Search...'} />
-				<Command.Empty>No data</Command.Empty>
+				<Command.Empty>Type to create</Command.Empty>
 				<div class="max-h-64 overflow-auto">
 					<Command.Group>
 						{#each filteredData as element}

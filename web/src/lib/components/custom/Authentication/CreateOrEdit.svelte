@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createUser } from '$lib/api/auth/local';
+	import { createUser, editUser } from '$lib/api/auth/local';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
@@ -15,14 +15,16 @@
 	interface Props {
 		open: boolean;
 		users: User[];
+		user?: User;
+		edit?: boolean;
 	}
 
-	let { open = $bindable(), users }: Props = $props();
+	let { open = $bindable(), users, user, edit = false }: Props = $props();
 	let options = {
-		username: '',
-		email: '',
+		username: edit && user ? user.username : '',
+		email: edit && user ? user.email : '',
 		password: '',
-		admin: false
+		admin: edit && user ? user.admin : false
 	};
 
 	let properties = $state(options);
@@ -69,6 +71,54 @@
 			properties = options;
 		}
 	}
+
+	async function change() {
+		if (!user) {
+			toast.error('No user selected for editing', {
+				position: 'bottom-center'
+			});
+			return;
+		}
+
+		let error = '';
+		if (!properties.username || !isValidUsername(properties.username)) {
+			error = 'Invalid username';
+		} else if (users.some((u) => u.id !== user?.id && u.username === properties.username)) {
+			error = 'Username already exists';
+		} else if (properties.email && !isValidEmail(properties.email)) {
+			error = 'Invalid email address';
+		} else if (properties.password && properties.password.length < 8) {
+			error = 'Password must be at least 8 characters long';
+		}
+
+		if (error) {
+			toast.error(error, {
+				position: 'bottom-center'
+			});
+			return;
+		}
+
+		const response = await editUser(
+			user.id,
+			properties.username,
+			properties.email,
+			properties.password,
+			properties.admin
+		);
+
+		if (response.error) {
+			handleAPIError(response);
+			toast.error('Failed to edit user', {
+				position: 'bottom-center'
+			});
+		} else {
+			toast.success('User edited', {
+				position: 'bottom-center'
+			});
+			open = false;
+			properties = options;
+		}
+	}
 </script>
 
 <Dialog.Root bind:open>
@@ -82,7 +132,13 @@
 		<Dialog.Header class="p-0">
 			<Dialog.Title class="flex  justify-between  text-left">
 				<div class="flex items-center gap-2">
-					<Icon icon="mdi:user" class="h-5 w-5 " />Create User
+					{#if !edit}
+						<Icon icon="mdi:user-plus" class="h-5 w-5" />
+						<span>Create User</span>
+					{:else}
+						<Icon icon="mdi:user-edit" class="h-5 w-5" />
+						<span>Edit User - {user?.username}</span>
+					{/if}
 				</div>
 				<div class="flex items-center gap-0.5">
 					<Button
@@ -163,7 +219,11 @@
 
 		<Dialog.Footer class="flex justify-end">
 			<div class="flex w-full items-center justify-end gap-2">
-				<Button onclick={create} type="submit" size="sm">{'Create'}</Button>
+				{#if !edit}
+					<Button onclick={create} type="submit" size="sm">Create</Button>
+				{:else}
+					<Button onclick={change} type="submit" size="sm">Save</Button>
+				{/if}
 			</div>
 		</Dialog.Footer>
 	</Dialog.Content>

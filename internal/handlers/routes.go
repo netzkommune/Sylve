@@ -273,6 +273,7 @@ func RegisterRoutes(r *gin.Engine,
 		users.GET("", authHandlers.ListUsersHandler(authService))
 		users.POST("", authHandlers.CreateUserHandler(authService))
 		users.DELETE("/:id", authHandlers.DeleteUserHandler(authService))
+		users.PUT("", authHandlers.EditUserHandler(authService))
 	}
 
 	groups := auth.Group("/groups")

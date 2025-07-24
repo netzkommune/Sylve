@@ -14,6 +14,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"reflect"
 	"sylve/internal"
 )
 
@@ -45,6 +46,10 @@ func ParseConfig(path string) *internal.SylveConfig {
 
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	if reflect.DeepEqual(ParsedConfig.Admin, internal.BaseConfigAdmin{}) {
+		log.Fatal("Admin configuration is missing or incomplete in the config file, please see config.example.json for reference")
 	}
 
 	return ParsedConfig

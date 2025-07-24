@@ -26,3 +26,21 @@ export async function createUser(
 export async function deleteUser(id: string): Promise<APIResponse> {
 	return await apiRequest(`/auth/users/${id}`, APIResponseSchema, 'DELETE');
 }
+
+export async function editUser(
+	id: number,
+	username: string,
+	email: string,
+	password: string,
+	admin: boolean
+): Promise<APIResponse> {
+	const body = {
+		id,
+		username,
+		email,
+		password,
+		admin
+	};
+
+	return await apiRequest('/auth/users', APIResponseSchema, 'PUT', body);
+}

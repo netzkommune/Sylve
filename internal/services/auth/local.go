@@ -75,13 +75,6 @@ func (s *Service) CreateUser(user *models.User) error {
 	return nil
 }
 
-func (s *Service) EditUser(user *models.User) error {
-	if err := s.DB.Save(user).Error; err != nil {
-		return fmt.Errorf("failed_to_edit_user: %w", err)
-	}
-	return nil
-}
-
 func (s *Service) DeleteUser(userID uint) error {
 	user, err := s.GetUserByID(userID)
 	if err != nil {
@@ -90,6 +83,10 @@ func (s *Service) DeleteUser(userID uint) error {
 
 	if user.Username == "" {
 		return fmt.Errorf("user_not_found: %d", userID)
+	}
+
+	if user.Username == "admin" {
+		return fmt.Errorf("cannot_delete_admin_user")
 	}
 
 	if err := samba.DeleteSambaUser(user.Username); err != nil {
@@ -106,6 +103,50 @@ func (s *Service) DeleteUser(userID uint) error {
 
 	if err := s.DB.Delete(user).Error; err != nil {
 		return fmt.Errorf("failed_to_delete_user: %w", err)
+	}
+
+	return nil
+}
+
+func (s *Service) EditUser(userID uint, username string, password string, email string, admin bool) error {
+	user, err := s.GetUserByID(userID)
+	if err != nil {
+		return fmt.Errorf("failed_to_get_user: %w", err)
+	}
+
+	if user.Username == "admin" {
+		if username != user.Username {
+			return fmt.Errorf("cannot_change_admin_username")
+		}
+	}
+
+	if !utils.IsValidUsername(username) {
+		return fmt.Errorf("invalid_username_format: %s", username)
+	}
+
+	if user.Username != username {
+		system.ChangeUsername(user.Username, username)
+		user.Username = username
+	}
+
+	if password != "" {
+		if len(password) < 8 || len(password) > 128 {
+			return fmt.Errorf("invalid_password_length: %s", password)
+		}
+		user.Password = password
+	}
+
+	if email != "" {
+		if !utils.IsValidEmail(email) {
+			return fmt.Errorf("invalid_email_format: %s", email)
+		}
+		user.Email = email
+	}
+
+	user.Admin = admin
+
+	if err := s.DB.Save(user).Error; err != nil {
+		return fmt.Errorf("failed_to_edit_user: %w", err)
 	}
 
 	return nil

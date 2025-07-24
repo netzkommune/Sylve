@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-19T15:13:43.695Z\n"
-"PO-Revision-Date: 2025-07-24T08:29:30.221Z\n"
+"PO-Revision-Date: 2025-07-24T10:10:19.024Z\n"
 "Last-Translator: \n"
 "Language: 简体中文\n"
 "Language-Team: \n"
@@ -43,6 +43,7 @@ msgstr "<0/> 创建虚拟机"
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
 #: src/lib/components/custom/Samba/Share.svelte
 #: src/routes/[node]/network/objects/+page.svelte
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 msgid "Reset"
 msgstr "重置"
 
@@ -78,6 +79,7 @@ msgstr "重置"
 #: src/lib/components/custom/Samba/Share.svelte
 #: src/lib/components/custom/FileExplorer/FilepondModal.svelte
 #: src/routes/[node]/network/objects/+page.svelte
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 msgid "Close"
 msgstr "关闭"
 
@@ -475,6 +477,7 @@ msgstr "SYLVE"
 
 #: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 msgid "Username"
 msgstr "用户名"
 
@@ -485,6 +488,7 @@ msgstr "输入您的用户名"
 #: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
 #: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 msgid "Password"
 msgstr "密码"
 
@@ -616,6 +620,7 @@ msgstr ""
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
 #: src/lib/components/custom/Samba/Share.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
 msgid "Edit"
 msgstr ""
 
@@ -682,6 +687,8 @@ msgstr ""
 #: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 msgid "Save"
 msgstr ""
 
@@ -838,6 +845,7 @@ msgstr ""
 #: src/lib/components/custom/Authentication/Create.svelte
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
 #: src/lib/components/custom/Samba/Share.svelte
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 msgid "Create"
 msgstr ""
 
@@ -2251,6 +2259,7 @@ msgstr ""
 
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
 #: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 msgid "Enter or generate password"
 msgstr ""
 
@@ -2552,6 +2561,7 @@ msgstr ""
 
 #: src/routes/[node]/settings/authentication/users/+page.svelte
 #: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 msgid "E-Mail"
 msgstr ""
 
@@ -2565,34 +2575,42 @@ msgstr ""
 
 #: src/lib/components/custom/Authentication/Create.svelte
 #: src/lib/components/custom/Samba/Create.svelte
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 msgid "Admin"
 msgstr ""
 
 #: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 msgid "Username and password are required"
 msgstr ""
 
 #: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 msgid "Invalid username"
 msgstr ""
 
 #: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 msgid "Username already exists"
 msgstr ""
 
 #: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 msgid "Invalid email address"
 msgstr ""
 
 #: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 msgid "Password must be at least 8 characters long"
 msgstr ""
 
 #: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 msgid "Failed to create user"
 msgstr ""
 
 #: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 msgid "User created"
 msgstr ""
 
@@ -2741,4 +2759,30 @@ msgstr ""
 
 #: src/lib/components/ui/custom-input/combobox-bindable.svelte
 msgid "<0/> Add \"{0}\""
+msgstr ""
+
+#: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
+msgid "Create User"
+msgstr ""
+
+#: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
+msgid "Edit User"
+msgstr ""
+
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
+msgid "No user selected for editing"
+msgstr ""
+
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
+msgid "Failed to edit user"
+msgstr ""
+
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
+msgid "User edited"
+msgstr ""
+
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
+msgid "Edit User - {0}"
 msgstr ""

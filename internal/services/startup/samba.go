@@ -61,19 +61,23 @@ func (s *Service) InitSambaAdmins() error {
 		return nil
 	}
 
-	for _, admin := range cfg.Admins {
-		smbExists, err := sambaUtils.SambaUserExists(admin.Username)
+	smbExists, err := sambaUtils.SambaUserExists("admin")
+	if err != nil {
+		logger.L.Error().Msgf("Error checking if Samba user 'admin' exists: %v", err)
+		return err
+	}
+
+	if !smbExists {
+		err = sambaUtils.CreateSambaUser("admin", cfg.Admin.Password)
 		if err != nil {
-			logger.L.Error().Msgf("Error checking if Samba user %s exists: %v", admin.Username, err)
+			logger.L.Error().Msgf("Failed to create Samba user 'admin': %v", err)
 			return err
 		}
-
-		if !smbExists {
-			err = sambaUtils.CreateSambaUser(admin.Username, admin.Password)
-			if err != nil {
-				logger.L.Error().Msgf("Failed to create Samba user %s: %v", admin.Username, err)
-				return err
-			}
+	} else {
+		err = sambaUtils.EditSambaUser("admin", cfg.Admin.Password)
+		if err != nil {
+			logger.L.Error().Msgf("Failed to update Samba user 'admin': %v", err)
+			return err
 		}
 	}
 

@@ -161,7 +161,7 @@
 				oType = 'Network';
 				break;
 			case 'MAC(s)':
-				oType = 'MAC';
+				oType = 'Mac';
 				break;
 			default:
 				oType = properties.type.combobox.value;

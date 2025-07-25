@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-24T08:42:55.306Z\n"
-"PO-Revision-Date: 2025-07-24T13:04:21.888Z\n"
+"PO-Revision-Date: 2025-07-25T14:32:51.415Z\n"
 "Last-Translator: \n"
 "Language: Türkçe\n"
 "Language-Team: \n"
@@ -78,6 +78,8 @@ msgstr ""
 #: src/lib/components/custom/Dialog/SingleValue.svelte
 #: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/lib/components/custom/Terminal.svelte
+#: src/lib/components/ui/sheet/sheet-content.svelte
 msgid "Close"
 msgstr ""
 
@@ -253,6 +255,8 @@ msgstr ""
 
 #: src/lib/components/ui/custom-input/combobox.svelte
 #: src/lib/components/ui/custom-input/combobox-bindable.svelte
+#: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/Terminal.svelte
 msgid "Enter"
 msgstr ""
 
@@ -267,6 +271,7 @@ msgstr ""
 #: src/routes/[node]/network/switches/+page.svelte
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/network/objects/+page.svelte
 msgid "Delete"
 msgstr ""
 
@@ -460,6 +465,7 @@ msgid "Are you sure you want to remove passthrough for <b>{0}</b> by <b>{1}</b>?
 msgstr ""
 
 #: src/routes/[node]/settings/authentication/users/+page.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
 msgid "User"
 msgstr ""
 
@@ -493,12 +499,14 @@ msgstr ""
 
 #: src/lib/components/custom/Authentication/Create.svelte
 #: src/lib/components/custom/Authentication/CreateOrEdit.svelte
+#: src/lib/components/custom/Login.svelte
 msgid "Username"
 msgstr ""
 
 #: src/lib/components/custom/Authentication/Create.svelte
 #: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/Login.svelte
 msgid "Password"
 msgstr ""
 
@@ -700,6 +708,7 @@ msgstr ""
 #: src/routes/[node]/network/interfaces/+page.svelte
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
 msgid "Status"
 msgstr ""
 
@@ -760,14 +769,17 @@ msgid "Disable IPV6"
 msgstr ""
 
 #: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/network/objects/+page.svelte
 msgid "Switch {0} deleted"
 msgstr ""
 
 #: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/network/objects/+page.svelte
 msgid "Switch is in use by a VM"
 msgstr ""
 
 #: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/network/objects/+page.svelte
 msgid "Error deleting switch"
 msgstr ""
 
@@ -834,6 +846,7 @@ msgstr ""
 #: src/routes/[node]/storage/disks/+page.svelte
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/routes/[node]/storage/samba/settings/+page.svelte
+#: src/lib/components/custom/Charts/Area.svelte
 msgid "Value"
 msgstr ""
 
@@ -1129,6 +1142,7 @@ msgstr ""
 
 #: src/routes/[node]/storage/zfs/dashboard/+page.svelte
 #: src/lib/components/custom/Charts/Bar.svelte
+#: src/lib/components/custom/Charts/Area.svelte
 msgid "<0/> Reset zoom"
 msgstr ""
 
@@ -1876,10 +1890,12 @@ msgid "Stop"
 msgstr ""
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/summary/+page.svelte
 msgid "CPU Usage"
 msgstr ""
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/summary/+page.svelte
 msgid "RAM Usage"
 msgstr ""
 
@@ -1888,6 +1904,7 @@ msgid "Notes about VM"
 msgstr ""
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/summary/+page.svelte
 msgid "Memory Usage"
 msgstr ""
 
@@ -2095,6 +2112,7 @@ msgstr ""
 
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
 msgid "VNC"
 msgstr ""
 
@@ -2226,6 +2244,7 @@ msgid "New Network"
 msgstr ""
 
 #: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
 msgid "Switch"
 msgstr ""
 
@@ -2562,4 +2581,220 @@ msgstr ""
 
 #: src/lib/components/ui/custom-input/combobox-bindable.svelte
 msgid "Type to create"
+msgstr ""
+
+#: src/routes/[node]/network/objects/+page.svelte
+msgid "Object {0} deleted"
+msgstr ""
+
+#: src/routes/[node]/network/objects/+page.svelte
+msgid "Error deleting object {0}"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "Cache"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "Cache Devices"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/Header.svelte
+msgid "Sylve Logo"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/Throbber.svelte
+#: src/lib/components/custom/Header.svelte
+msgid "SYLVE"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+msgid "Enter your username"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+msgid "Realm"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+msgid "PAM"
+msgstr ""
+
+#: src/lib/components/custom/Login.svelte
+msgid "Sylve"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "Toggle navigation menu"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "Virtual Environment 0.0.1"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "<0/> Create VM"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "Toggle user menu"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "Color Theme"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "Log out"
+msgstr ""
+
+#: src/lib/components/custom/Header.svelte
+msgid "⌘⇧Q"
+msgstr ""
+
+#: src/lib/components/custom/Terminal.svelte
+msgid "Minimize"
+msgstr ""
+
+#: src/lib/components/custom/Terminal.svelte
+msgid "Add new tab"
+msgstr ""
+
+#: src/lib/components/custom/Terminal.svelte
+msgid "Session killed: {0}"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Start Time"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "End Time"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Node"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Action"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Login"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Notes"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Disk - Initialize GPT"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Disk - Wipe"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Login - Create"
+msgstr ""
+
+#: src/lib/components/skeleton/LeftPanel.svelte
+msgid "Difuse-sidebar"
+msgstr ""
+
+#: src/lib/components/skeleton/LeftPanel.svelte
+msgid "Data Center"
+msgstr ""
+
+#: src/lib/components/custom/Charts/Area.svelte
+msgid "HH:mm"
+msgstr ""
+
+#: src/lib/components/custom/Charts/Area.svelte
+msgid "Date"
+msgstr ""
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Disk Usage"
+msgstr ""
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "I/O Delay"
+msgstr ""
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Swap Usage"
+msgstr ""
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "CPU(s)"
+msgstr ""
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Operating System"
+msgstr ""
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Uptime"
+msgstr ""
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Load Average"
+msgstr ""
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Boot Mode"
+msgstr ""
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Sylve Version"
+msgstr ""
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Network Usage"
+msgstr ""
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Network RX"
+msgstr ""
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Network TX"
+msgstr ""
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Select IPv4"
+msgstr ""
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Select IPv6"
+msgstr ""
+
+#: src/routes/[node]/network/objects/+page.svelte
+msgid "Object {0} is in use"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "Unknown MAC"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "MAC"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "Select MAC"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Create/Network.svelte
+msgid "Mac"
+msgstr ""
+
+#: src/lib/components/custom/VM/Create/Network.svelte
+msgid "Select MAC address"
 msgstr ""

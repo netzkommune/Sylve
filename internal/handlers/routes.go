@@ -187,6 +187,7 @@ func RegisterRoutes(r *gin.Engine,
 	{
 		network.GET("/object", networkHandlers.ListNetworkObjects(networkService))
 		network.POST("/object", networkHandlers.CreateNetworkObject(networkService))
+		network.DELETE("/object/:id", networkHandlers.DeleteNetworkObject(networkService))
 
 		network.GET("/interface", networkHandlers.ListInterfaces(networkService))
 

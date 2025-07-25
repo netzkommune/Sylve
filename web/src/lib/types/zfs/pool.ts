@@ -91,7 +91,8 @@ export const ZpoolSchema = z.object({
 	vdevs: z.array(VdevSchema),
 	properties: z.array(ZpoolPropertySchema).optional().default([]),
 	status: ZpoolStatusSchema,
-	spares: z.array(ZpoolSpareSchema).optional().default([])
+	spares: z.array(ZpoolSpareSchema).optional().default([]),
+	cache: z.array(ZpoolSpareSchema).optional().default([])
 });
 
 export const CreateVdevSchema = z.object({

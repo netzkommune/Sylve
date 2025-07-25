@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getInterfaces } from '$lib/api/network/iface';
+	import { getNetworkObjects } from '$lib/api/network/object';
 	import { createSwitch, deleteSwitch, getSwitches, updateSwitch } from '$lib/api/network/switch';
 	import AlertDialog from '$lib/components/custom/Dialog/Alert.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
@@ -11,9 +12,11 @@
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import type { Row } from '$lib/types/components/tree-table';
 	import type { Iface } from '$lib/types/network/iface';
+	import type { NetworkObject } from '$lib/types/network/object';
 	import type { SwitchList } from '$lib/types/network/switch';
 	import { isAPIResponse, updateCache } from '$lib/utils/http';
 	import { generateComboboxOptions } from '$lib/utils/input';
+	import { generateIPOptions } from '$lib/utils/network/object';
 	import { generateTableData } from '$lib/utils/network/switch';
 	import { isValidMTU, isValidVLAN } from '$lib/utils/numbers';
 	import { isValidIPv4, isValidIPv6, isValidSwitchName } from '$lib/utils/string';
@@ -24,6 +27,7 @@
 	interface Data {
 		interfaces: Iface[];
 		switches: SwitchList;
+		objects: NetworkObject[];
 	}
 
 	let { data }: { data: Data } = $props();
@@ -52,11 +56,24 @@
 			onSuccess: (data: SwitchList) => {
 				updateCache('networkSwitches', data);
 			}
+		},
+		{
+			queryKey: ['networkObjects'],
+			queryFn: async () => {
+				return await getNetworkObjects();
+			},
+			refetchInterval: 1000,
+			keepPreviousData: true,
+			initialData: data.objects,
+			onSuccess: (data: NetworkObject[]) => {
+				updateCache('networkObjects', data);
+			}
 		}
 	]);
 
 	const interfaces = $derived($results[0].data);
 	const switches = $derived($results[1].data);
+	const networkObjects = $derived($results[2].data);
 
 	let query: string = $state('');
 	let useablePorts = $derived.by(() => {
@@ -94,8 +111,8 @@
 			name: '',
 			mtu: '',
 			vlan: '',
-			address: '',
-			address6: '',
+			address: '0',
+			address6: '0',
 			disableIPv6: false,
 			private: false,
 			ports: [] as string[],
@@ -108,8 +125,8 @@
 			name: '',
 			mtu: '',
 			vlan: '',
-			address: '',
-			address6: '',
+			address: '0',
+			address6: '0',
 			disableIPv6: false,
 			private: false,
 			ports: [] as string[],
@@ -124,6 +141,14 @@
 	});
 
 	let comboBoxes = $state({
+		ipv4: {
+			open: false,
+			value: ''
+		},
+		ipv6: {
+			open: false,
+			value: ''
+		},
 		ports: {
 			open: false,
 			value: []
@@ -165,27 +190,16 @@
 				return;
 			}
 
-			if (activeModal.address !== '' && !isValidIPv4(activeModal.address, true)) {
-				toast.error('Invalid IPv4 CIDR', {
-					position: 'bottom-center'
-				});
-				return;
-			}
-
-			if (activeModal.address6 !== '' && !isValidIPv6(activeModal.address6, true)) {
-				toast.error('Invalid IPv6 CIDR', {
-					position: 'bottom-center'
-				});
-				return;
-			}
+			activeModal.address = comboBoxes.ipv4.value;
+			activeModal.address6 = comboBoxes.ipv6.value;
 
 			if (confirmModals.active === 'newSwitch') {
 				const created = await createSwitch(
 					activeModal.name,
 					parseInt(activeModal.mtu),
 					parseInt(activeModal.vlan),
-					activeModal.address,
-					activeModal.address6,
+					Number(activeModal.address),
+					Number(activeModal.address6),
 					activeModal.private,
 					activeModal.dhcp,
 					comboBoxes.ports.value,
@@ -203,12 +217,15 @@
 					});
 				}
 			} else {
+				activeModal.address = comboBoxes.ipv4.value;
+				activeModal.address6 = comboBoxes.ipv6.value;
+
 				const edited = await updateSwitch(
 					activeRow?.id as number,
 					parseInt(activeModal.mtu),
 					parseInt(activeModal.vlan),
-					activeModal.address,
-					activeModal.address6,
+					Number(activeModal.address),
+					Number(activeModal.address6),
 					activeModal.private,
 					comboBoxes.ports.value,
 					activeModal.disableIPv6,
@@ -252,8 +269,19 @@
 			confirmModals.editSwitch.name = activeRow.name;
 			confirmModals.editSwitch.mtu = activeRow.mtu as string;
 			confirmModals.editSwitch.vlan = activeRow.vlan === '-' ? '' : (activeRow.vlan as string);
-			confirmModals.editSwitch.address = activeRow.ipv4 === '-' ? '' : activeRow.ipv4;
-			confirmModals.editSwitch.address6 = activeRow.ipv6 === '-' ? '' : activeRow.ipv6;
+
+			if (activeRow.addressObj) {
+				if (activeRow.addressObj.id) {
+					comboBoxes.ipv4.value = activeRow.addressObj.id.toString();
+				}
+			}
+
+			if (activeRow.address6Obj) {
+				if (activeRow.address6Obj.id) {
+					comboBoxes.ipv6.value = activeRow.address6Obj.id.toString();
+				}
+			}
+
 			confirmModals.editSwitch.disableIPv6 = (activeRow.disableIPv6 as boolean) || false;
 			confirmModals.editSwitch.private = (activeRow.private as boolean) || false;
 			confirmModals.editSwitch.dhcp = (activeRow.dhcp as boolean) || false;
@@ -273,8 +301,8 @@
 		confirmModals.newSwitch.name = '';
 		confirmModals.newSwitch.mtu = '';
 		confirmModals.newSwitch.vlan = '';
-		confirmModals.newSwitch.address = '';
-		confirmModals.newSwitch.address6 = '';
+		confirmModals.newSwitch.address = '0';
+		confirmModals.newSwitch.address6 = '0';
 		confirmModals.newSwitch.disableIPv6 = false;
 		confirmModals.newSwitch.private = false;
 		confirmModals.newSwitch.dhcp = false;
@@ -283,14 +311,16 @@
 		confirmModals.editSwitch.name = '';
 		confirmModals.editSwitch.mtu = '';
 		confirmModals.editSwitch.vlan = '';
-		confirmModals.editSwitch.address = '';
-		confirmModals.editSwitch.address6 = '';
+		confirmModals.editSwitch.address = '0';
+		confirmModals.editSwitch.address6 = '0';
 		confirmModals.editSwitch.disableIPv6 = false;
 		confirmModals.editSwitch.private = false;
 		confirmModals.editSwitch.dhcp = false;
 		confirmModals.editSwitch.slaac = false;
 
 		comboBoxes.ports.value = [];
+
+		activeRows = null;
 	}
 
 	$effect(() => {
@@ -310,6 +340,30 @@
 
 		if (confirmModals.editSwitch.disableIPv6) {
 			confirmModals.editSwitch.slaac = false;
+		}
+	});
+
+	$effect(() => {
+		if (confirmModals.newSwitch.dhcp) {
+			comboBoxes.ipv4.value = '';
+		}
+	});
+
+	$effect(() => {
+		if (confirmModals.newSwitch.slaac) {
+			comboBoxes.ipv6.value = '';
+		}
+	});
+
+	$effect(() => {
+		if (confirmModals.editSwitch.dhcp) {
+			comboBoxes.ipv4.value = '';
+		}
+	});
+
+	$effect(() => {
+		if (confirmModals.editSwitch.slaac) {
+			comboBoxes.ipv6.value = '';
 		}
 	});
 </script>
@@ -436,24 +490,32 @@
 			</div>
 
 			<div class="flex gap-4">
-				<CustomValueInput
+				<CustomComboBox
+					bind:open={comboBoxes.ipv4.open}
 					label={'IPv4'}
-					placeholder="10.0.0.1/24"
-					bind:value={confirmModals[confirmModals.active].address}
-					classes="flex-1 space-y-1.5"
+					bind:value={comboBoxes.ipv4.value}
+					data={generateIPOptions(networkObjects, 'IPv4')}
+					classes="flex-1 space-y-1"
+					placeholder="Select IPv4"
+					width="w-3/4"
 					disabled={confirmModals[confirmModals.active].dhcp ? true : false}
-				/>
+					multiple={false}
+				></CustomComboBox>
 
-				<CustomValueInput
+				<CustomComboBox
+					bind:open={comboBoxes.ipv6.open}
 					label={'IPv6'}
-					placeholder="fdcb:cafe::beef/56"
-					bind:value={confirmModals[confirmModals.active].address6}
-					classes="flex-1 space-y-1.5"
+					bind:value={comboBoxes.ipv6.value}
+					data={generateIPOptions(networkObjects, 'IPv6')}
+					classes="flex-1 space-y-1"
+					placeholder="Select IPv6"
+					width="w-3/4"
 					disabled={confirmModals[confirmModals.active].disableIPv6 ||
 					confirmModals[confirmModals.active].slaac
 						? true
 						: false}
-				/>
+					multiple={false}
+				></CustomComboBox>
 			</div>
 
 			{#if confirmModals.active === 'newSwitch'}

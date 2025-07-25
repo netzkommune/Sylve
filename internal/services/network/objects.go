@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	networkModels "sylve/internal/db/models/network"
+	vmModels "sylve/internal/db/models/vm"
 	utils "sylve/pkg/utils"
 )
 
@@ -29,6 +30,7 @@ func validateType(oType string) error {
 		"Port":    true,
 		"Country": true,
 		"List":    true,
+		"Mac":     true,
 		"FQDN":    true,
 	}
 
@@ -104,7 +106,7 @@ func validateValues(oType string, values []string) error {
 			}
 		}
 
-		if oType == "MAC" {
+		if oType == "Mac" {
 			if !utils.IsValidMAC(value) {
 				return fmt.Errorf("invalid MAC address: %s", value)
 			}
@@ -138,6 +140,53 @@ func (s *Service) CreateObject(name string, oType string, values []string) error
 
 	if err := s.DB.Create(&object).Error; err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (s *Service) DeleteObject(id uint) error {
+	var switches []networkModels.StandardSwitch
+
+	if err := s.DB.
+		Preload("AddressObj.Entries").
+		Preload("Address6Obj.Entries").Find(&switches).Error; err != nil {
+		return err
+	}
+
+	for _, sw := range switches {
+		if sw.AddressObj != nil {
+			if sw.AddressObj.ID == id {
+				return fmt.Errorf("cannot delete object %d, it is used by switch %s", id, sw.Name)
+			}
+		}
+
+		if sw.Address6Obj != nil {
+			if sw.Address6Obj.ID == id {
+				return fmt.Errorf("cannot delete object %d, it is used by switch %s", id, sw.Name)
+			}
+		}
+	}
+
+	var vmNetworks []vmModels.Network
+	if err := s.DB.Where("mac_id = ?", id).Find(&vmNetworks).Error; err != nil {
+		return fmt.Errorf("failed to find VM networks using object %d: %w", id, err)
+	}
+
+	if len(vmNetworks) > 0 {
+		return fmt.Errorf("cannot delete object %d, it is used by %d VM networks", id, len(vmNetworks))
+	}
+
+	if err := s.DB.Where("object_id = ?", id).Delete(&networkModels.ObjectResolution{}).Error; err != nil {
+		return fmt.Errorf("failed to delete resolutions for object %d: %w", id, err)
+	}
+
+	if err := s.DB.Where("object_id = ?", id).Delete(&networkModels.ObjectEntry{}).Error; err != nil {
+		return fmt.Errorf("failed to delete entries for object %d: %w", id, err)
+	}
+
+	if err := s.DB.Delete(&networkModels.Object{}, id).Error; err != nil {
+		return fmt.Errorf("failed to delete object %d: %w", id, err)
 	}
 
 	return nil

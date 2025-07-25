@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-19T15:13:09.713Z\n"
-"PO-Revision-Date: 2025-07-24T13:04:21.883Z\n"
+"PO-Revision-Date: 2025-07-25T14:32:51.409Z\n"
 "Last-Translator: \n"
 "Language: Russian\n"
 "Language-Team: \n"
@@ -23,6 +23,7 @@ msgstr "Просмотр"
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/settings/authentication/users/+page.svelte
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/network/objects/+page.svelte
 msgid "Delete"
 msgstr "Удалить"
 
@@ -855,14 +856,17 @@ msgid "Create"
 msgstr ""
 
 #: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/network/objects/+page.svelte
 msgid "Switch {0} deleted"
 msgstr ""
 
 #: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/network/objects/+page.svelte
 msgid "Switch is in use by a VM"
 msgstr ""
 
 #: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/network/objects/+page.svelte
 msgid "Error deleting switch"
 msgstr ""
 
@@ -2911,4 +2915,53 @@ msgstr ""
 
 #: src/lib/components/ui/custom-input/combobox-bindable.svelte
 msgid "Type to create"
+msgstr ""
+
+#: src/routes/[node]/network/objects/+page.svelte
+msgid "Object {0} deleted"
+msgstr ""
+
+#: src/routes/[node]/network/objects/+page.svelte
+msgid "Error deleting object {0}"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "Cache"
+msgstr ""
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "Cache Devices"
+msgstr ""
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Select IPv4"
+msgstr ""
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Select IPv6"
+msgstr ""
+
+#: src/routes/[node]/network/objects/+page.svelte
+msgid "Object {0} is in use"
+msgstr ""
+
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "Unknown MAC"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "MAC"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "Select MAC"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Create/Network.svelte
+msgid "Mac"
+msgstr ""
+
+#: src/lib/components/custom/VM/Create/Network.svelte
+msgid "Select MAC address"
 msgstr ""

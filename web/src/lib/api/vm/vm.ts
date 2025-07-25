@@ -26,7 +26,7 @@ export async function newVM(data: CreateData): Promise<APIResponse> {
 		storageEmulationType: data.storage.emulation,
 		switchId: data.network.switch,
 		switchEmulationType: data.network.emulation,
-		macAddress: data.network.mac,
+		macId: Number(data.network.mac) || 0,
 		cpuSockets: parseInt(data.hardware.sockets.toString(), 10),
 		cpuCores: parseInt(data.hardware.cores.toString(), 10),
 		cpuThreads: parseInt(data.hardware.threads.toString(), 10),

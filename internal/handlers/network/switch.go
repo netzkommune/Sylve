@@ -26,8 +26,8 @@ type CreateStandardSwitchRequest struct {
 	Name        string   `json:"name" binding:"required"`
 	MTU         *int     `json:"mtu"`
 	VLAN        *int     `json:"vlan"`
-	Address     string   `json:"address"`
-	Address6    string   `json:"address6"`
+	Address     *uint    `json:"address"`
+	Address6    *uint    `json:"address6"`
 	DisableIPv6 *bool    `json:"disableIPv6"`
 	SLAAC       *bool    `json:"slaac"`
 	Private     *bool    `json:"private" binding:"required"`
@@ -39,8 +39,8 @@ type UpdateStandardSwitchRequest struct {
 	ID          int      `json:"id" binding:"required"`
 	MTU         *int     `json:"mtu"`
 	VLAN        *int     `json:"vlan"`
-	Address     string   `json:"address"`
-	Address6    string   `json:"address6"`
+	Address     *uint    `json:"address"`
+	Address6    *uint    `json:"address6"`
 	DisableIPv6 *bool    `json:"disableIPv6"`
 	SLAAC       *bool    `json:"slaac"`
 	Private     *bool    `json:"private" binding:"required"`
@@ -147,17 +147,21 @@ func CreateStandardSwitch(networkService *network.Service) gin.HandlerFunc {
 		}
 
 		if *request.DHCP == true {
-			request.Address = ""
+			request.Address = new(uint)
+			*request.Address = 0
 		}
 
 		if *request.DisableIPv6 == true {
-			request.Address6 = ""
+			request.Address6 = new(uint)
+			*request.Address6 = 0
+
 			request.SLAAC = new(bool)
 			*request.SLAAC = false
 		}
 
 		if *request.SLAAC == true {
-			request.Address6 = ""
+			request.Address6 = new(uint)
+			*request.Address6 = 0
 
 			if request.DisableIPv6 == nil {
 				request.DisableIPv6 = new(bool)
@@ -166,11 +170,25 @@ func CreateStandardSwitch(networkService *network.Service) gin.HandlerFunc {
 			*request.DisableIPv6 = false
 		}
 
+		var address uint
+		if request.Address != nil {
+			address = *request.Address
+		} else {
+			address = 0
+		}
+
+		var address6 uint
+		if request.Address6 != nil {
+			address6 = *request.Address6
+		} else {
+			address6 = 0
+		}
+
 		err := networkService.NewStandardSwitch(request.Name,
 			mtu,
 			vlan,
-			request.Address,
-			request.Address6,
+			address,
+			address6,
 			request.Ports,
 			*request.Private,
 			*request.DHCP,
@@ -311,7 +329,8 @@ func UpdateStandardSwitch(networkService *network.Service) gin.HandlerFunc {
 		}
 
 		if *request.SLAAC == true {
-			request.Address6 = ""
+			request.Address6 = new(uint)
+			*request.Address6 = 0
 			if request.DisableIPv6 == nil {
 				request.DisableIPv6 = new(bool)
 			}
@@ -320,7 +339,8 @@ func UpdateStandardSwitch(networkService *network.Service) gin.HandlerFunc {
 		}
 
 		if *request.DisableIPv6 == true {
-			request.Address6 = ""
+			request.Address6 = new(uint)
+			*request.Address6 = 0
 			if request.SLAAC == nil {
 				request.SLAAC = new(bool)
 			}
@@ -328,12 +348,26 @@ func UpdateStandardSwitch(networkService *network.Service) gin.HandlerFunc {
 			*request.SLAAC = false
 		}
 
+		var address uint
+		if request.Address != nil {
+			address = *request.Address
+		} else {
+			address = 0
+		}
+
+		var address6 uint
+		if request.Address6 != nil {
+			address6 = *request.Address6
+		} else {
+			address6 = 0
+		}
+
 		err := networkService.EditStandardSwitch(
 			request.ID,
 			mtu,
 			vlan,
-			request.Address,
-			request.Address6,
+			address,
+			address6,
 			request.Ports,
 			*request.Private,
 			*request.DHCP,

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-22T11:34:22.984Z\n"
-"PO-Revision-Date: 2025-07-24T13:03:58.028Z\n"
+"PO-Revision-Date: 2025-07-25T12:23:28.699Z\n"
 "Last-Translator: \n"
 "Language: English\n"
 "Language-Team: \n"
@@ -763,6 +763,7 @@ msgstr "View"
 #: src/routes/[node]/network/switches/+page.svelte
 #: src/routes/[node]/settings/authentication/users/+page.svelte
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/network/objects/+page.svelte
 msgid "Delete"
 msgstr "Delete"
 
@@ -2336,14 +2337,17 @@ msgid "Disable IPV6"
 msgstr "Disable IPV6"
 
 #: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/network/objects/+page.svelte
 msgid "Switch {0} deleted"
 msgstr "Switch {0} deleted"
 
 #: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/network/objects/+page.svelte
 msgid "Switch is in use by a VM"
 msgstr "Switch is in use by a VM"
 
 #: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/network/objects/+page.svelte
 msgid "Error deleting switch"
 msgstr "Error deleting switch"
 
@@ -2866,3 +2870,52 @@ msgstr "No data <0/> create your own by typing above"
 #: src/lib/components/ui/custom-input/combobox-bindable.svelte
 msgid "Type to create"
 msgstr "Type to create"
+
+#: src/routes/[node]/network/objects/+page.svelte
+msgid "Object {0} deleted"
+msgstr "Object {0} deleted"
+
+#: src/routes/[node]/network/objects/+page.svelte
+msgid "Error deleting object {0}"
+msgstr "Error deleting object {0}"
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "Cache"
+msgstr "Cache"
+
+#: src/lib/components/custom/ZFS/pools/Status.svelte
+msgid "Cache Devices"
+msgstr "Cache Devices"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Select IPv4"
+msgstr "Select IPv4"
+
+#: src/routes/[node]/network/switches/+page.svelte
+msgid "Select IPv6"
+msgstr "Select IPv6"
+
+#: src/routes/[node]/network/objects/+page.svelte
+msgid "Object {0} is in use"
+msgstr "Object {0} is in use"
+
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+msgid "Unknown MAC"
+msgstr "Unknown MAC"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "MAC"
+msgstr "MAC"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+msgid "Select MAC"
+msgstr "Select MAC"
+
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Create/Network.svelte
+msgid "Mac"
+msgstr "Mac"
+
+#: src/lib/components/custom/VM/Create/Network.svelte
+msgid "Select MAC address"
+msgstr "Select MAC address"

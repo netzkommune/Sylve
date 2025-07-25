@@ -23,6 +23,8 @@
 	import Network from './Network.svelte';
 	import Storage from './Storage.svelte';
 
+	import { getNetworkObjects } from '$lib/api/network/object';
+	import type { NetworkObject } from '$lib/types/network/object';
 	import { type CreateData, type VM } from '$lib/types/vm/vm';
 	import { handleAPIError } from '$lib/utils/http';
 	import { onMount } from 'svelte';
@@ -115,6 +117,16 @@
 			keepPreviousData: true,
 			initialData: [],
 			refetchOnMount: 'always'
+		},
+		{
+			queryKey: ['network-objects-svm'],
+			queryFn: async () => {
+				return await getNetworkObjects();
+			},
+			refetchInterval: 1000,
+			keepPreviousData: true,
+			initialData: [],
+			refetchOnMount: 'always'
 		}
 	]);
 
@@ -128,6 +140,7 @@
 	let networkSwitches: SwitchList = $derived($results[3].data as SwitchList);
 	let pciDevices: PCIDevice[] = $derived($results[4].data as PCIDevice[]);
 	let pptDevices: PPTDevice[] = $derived($results[5].data as PPTDevice[]);
+	let networkObjects = $derived($results[8].data as NetworkObject[]);
 	let passablePci: PCIDevice[] = $derived(
 		pciDevices.filter((device) => device.name.startsWith('ppt'))
 	);
@@ -211,7 +224,7 @@
 			},
 			network: {
 				switch: 0,
-				mac: '',
+				mac: '0',
 				emulation: 'e1000'
 			},
 			hardware: {
@@ -295,6 +308,8 @@
 							{:else if value === 'network'}
 								<Network
 									switches={networkSwitches}
+									{vms}
+									{networkObjects}
 									bind:switch={modal.network.switch}
 									bind:mac={modal.network.mac}
 									bind:emulation={modal.network.emulation}

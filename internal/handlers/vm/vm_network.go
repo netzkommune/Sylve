@@ -24,7 +24,7 @@ type NetworkAttachRequest struct {
 	VMID      int    `json:"vmId" binding:"required"`
 	SwitchId  int    `json:"switchId" binding:"required"`
 	Emulation string `json:"emulation" binding:"required"`
-	MAC       string `json:"mac"`
+	MacId     *uint  `json:"macId"`
 }
 
 // @Summary Detach Network from a Virtual Machine
@@ -92,7 +92,12 @@ func NetworkAttach(libvirtService *libvirt.Service) gin.HandlerFunc {
 			return
 		}
 
-		if err := libvirtService.NetworkAttach(req.VMID, req.SwitchId, req.Emulation, req.MAC); err != nil {
+		macId := uint(0)
+		if req.MacId != nil {
+			macId = *req.MacId
+		}
+
+		if err := libvirtService.NetworkAttach(req.VMID, req.SwitchId, req.Emulation, macId); err != nil {
 			c.JSON(500, internal.APIResponse[any]{
 				Status:  "error",
 				Message: "internal_server_error",

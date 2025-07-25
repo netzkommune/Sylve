@@ -100,7 +100,7 @@ func (s *Service) NetworkDetach(vmId int, networkId int) error {
 	return nil
 }
 
-func (s *Service) NetworkAttach(vmId int, switchId int, emulation, macAddress string) error {
+func (s *Service) NetworkAttach(vmId int, switchId int, emulation string, macObjId uint) error {
 	inactive, err := s.IsDomainInactive(vmId)
 	if err != nil {
 		return fmt.Errorf("failed_to_check_vm_inactive: %w", err)
@@ -137,19 +137,71 @@ func (s *Service) NetworkAttach(vmId int, switchId int, emulation, macAddress st
 		return fmt.Errorf("network_already_attached_to_vm: %s", existingNetwork.MAC)
 	}
 
-	if macAddress == "" {
-		macAddress = utils.GenerateRandomMAC()
+	if macObjId == 0 {
+		macAddress := utils.GenerateRandomMAC()
+
+		macObj := networkModels.Object{
+			Name: fmt.Sprintf("vm-%d-mac-%s", vm.VmID, macAddress),
+			Type: "Mac",
+		}
+
+		if err := s.DB.Create(&macObj).Error; err != nil {
+			return fmt.Errorf("failed_to_create_mac_object: %w", err)
+		}
+
+		macEntry := networkModels.ObjectEntry{
+			ObjectID: macObj.ID,
+			Value:    macAddress,
+		}
+
+		if err := s.DB.Create(&macEntry).Error; err != nil {
+			return fmt.Errorf("failed_to_create_mac_entry: %w", err)
+		}
+
+		macObjId = macObj.ID
+	} else {
+		var macObj networkModels.Object
+		if err := s.DB.Preload("Entries").First(&macObj, macObjId).Error; err != nil {
+			return fmt.Errorf("failed_to_find_mac_object: %w", err)
+		}
+
+		if macObj.Type != "Mac" {
+			return fmt.Errorf("invalid_mac_object_type: %s", macObj.Type)
+		}
+
+		if len(macObj.Entries) == 0 {
+			return fmt.Errorf("mac_object_has_no_entries: %d", macObjId)
+		}
+
+		var otherNetworks []vmModels.Network
+		if err := s.DB.Where("mac_id = ? AND vm_id != ?", macObjId, vm.ID).
+			Find(&otherNetworks).Error; err != nil {
+			return fmt.Errorf("failed_to_find_other_networks_using_mac_object: %w", err)
+		}
 	}
 
 	network := vmModels.Network{
 		VMID:      vm.ID,
 		SwitchID:  uint(switchId),
-		MAC:       macAddress,
+		MacID:     &macObjId,
 		Emulation: emulation,
 	}
 
 	if err := s.DB.Create(&network).Error; err != nil {
 		return fmt.Errorf("failed_to_create_network_record: %w", err)
+	}
+
+	var macAddress string
+
+	if macObjId != 0 {
+		var macObj networkModels.Object
+		if err := s.DB.Preload("Entries").First(&macObj, macObjId).Error; err != nil {
+			return fmt.Errorf("failed_to_find_mac_object: %w", err)
+		}
+		if len(macObj.Entries) == 0 {
+			return fmt.Errorf("mac_object_has_no_entries: %d", macObjId)
+		}
+		macAddress = macObj.Entries[0].Value
 	}
 
 	xmlDesc, err := s.GetVMXML(vmId)
@@ -177,7 +229,7 @@ func (s *Service) NetworkAttach(vmId int, switchId int, emulation, macAddress st
 	ifaceEl.CreateAttr("type", "bridge")
 
 	macEl := etree.NewElement("mac")
-	macEl.CreateAttr("address", network.MAC)
+	macEl.CreateAttr("address", macAddress)
 	ifaceEl.AddChild(macEl)
 
 	sourceEl := etree.NewElement("source")

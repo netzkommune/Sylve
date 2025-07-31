@@ -24,3 +24,4 @@ vite.config.ts.timestamp-*
 
 src/lib/locales/*.json
 src/lib/locales/*.js
+!src/lib/locales/loader.svelte.js

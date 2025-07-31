@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-22T11:34:22.984Z\n"
-"PO-Revision-Date: 2025-07-25T12:23:28.699Z\n"
+"PO-Revision-Date: 2025-07-25T15:28:06.368Z\n"
 "Last-Translator: \n"
 "Language: English\n"
 "Language-Team: \n"
@@ -775,6 +775,7 @@ msgstr "Delete"
 #: src/routes/[node]/network/switches/+page.svelte
 #: src/lib/components/custom/Samba/Share.svelte
 #: src/routes/[node]/settings/authentication/users/+page.svelte
+#: src/routes/[node]/network/objects/+page.svelte
 msgid "Edit"
 msgstr "Edit"
 
@@ -2919,3 +2920,11 @@ msgstr "Mac"
 #: src/lib/components/custom/VM/Create/Network.svelte
 msgid "Select MAC address"
 msgstr "Select MAC address"
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "Edit Object"
+msgstr "Edit Object"
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "Create Object"
+msgstr "Create Object"

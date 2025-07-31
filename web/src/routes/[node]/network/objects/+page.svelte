@@ -39,6 +39,10 @@
 		create: {
 			open: false
 		},
+		edit: {
+			open: false,
+			id: 0
+		},
 		delete: {
 			open: false,
 			id: 0
@@ -123,20 +127,37 @@
 
 {#snippet button(type: string)}
 	{#if activeRows && activeRows.length == 1}
-		<Button
-			onclick={() => {
-				modals.delete.open = !modals.delete.open;
-				modals.delete.id = Number(activeRow?.id);
-			}}
-			size="sm"
-			variant="outline"
-			class="h-6.5"
-		>
-			<div class="flex items-center">
-				<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
-				<span>Delete</span>
-			</div>
-		</Button>
+		{#if type === 'delete'}
+			<Button
+				onclick={() => {
+					modals.delete.open = !modals.delete.open;
+					modals.delete.id = Number(activeRow?.id);
+				}}
+				size="sm"
+				variant="outline"
+				class="h-6.5"
+			>
+				<div class="flex items-center">
+					<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
+					<span>Delete</span>
+				</div>
+			</Button>
+		{:else if type === 'edit'}
+			<Button
+				onclick={() => {
+					modals.edit.open = !modals.edit.open;
+					modals.edit.id = Number(activeRow?.id);
+				}}
+				size="sm"
+				variant="outline"
+				class="h-6.5"
+			>
+				<div class="flex items-center">
+					<Icon icon="mdi:pencil" class="mr-1 h-4 w-4" />
+					<span>Edit</span>
+				</div>
+			</Button>
+		{/if}
 	{/if}
 {/snippet}
 
@@ -150,6 +171,7 @@
 			</div>
 		</Button>
 
+		{@render button('edit')}
 		{@render button('delete')}
 	</div>
 
@@ -163,7 +185,16 @@
 </div>
 
 {#if modals.create.open}
-	<CreateOrEdit bind:open={modals.create.open} />
+	<CreateOrEdit bind:open={modals.create.open} networkObjects={objects} edit={false} />
+{/if}
+
+{#if modals.edit.open}
+	<CreateOrEdit
+		bind:open={modals.edit.open}
+		networkObjects={objects}
+		edit={true}
+		id={Number(modals.edit.id)}
+	/>
 {/if}
 
 <AlertDialog

@@ -5,6 +5,7 @@
 	import ComboBox from '$lib/components/ui/custom-input/combobox.svelte';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import type { NetworkObject } from '$lib/types/network/object';
 	import { handleAPIError } from '$lib/utils/http';
 	import { generateComboboxOptions } from '$lib/utils/input';
 	import { isValidIPv4, isValidIPv6, isValidMACAddress } from '$lib/utils/string';
@@ -13,23 +14,65 @@
 
 	interface Props {
 		open: boolean;
+		edit: boolean;
+		id?: number;
+		networkObjects: NetworkObject[];
 	}
 
-	let { open = $bindable() }: Props = $props();
+	let { open = $bindable(), edit = false, id, networkObjects }: Props = $props();
+	let editingObject: NetworkObject | null = $derived.by(() => {
+		if (edit && id) {
+			const obj = networkObjects.find((o) => o.id === id);
+			if (obj) {
+				return obj;
+			}
+		}
+
+		return null;
+	});
+
+	let oType = $derived.by(() => {
+		if (editingObject) {
+			switch (editingObject.type) {
+				case 'Host':
+					return 'Host(s)';
+				case 'Network':
+					return 'Network(s)';
+				case 'Mac':
+					return 'MAC(s)';
+				default:
+					return '';
+			}
+		}
+		return '';
+	});
+
+	let hostsSelected = $derived.by(() => {
+		if (editingObject && editingObject.entries && editingObject.entries.length > 0) {
+			return editingObject.entries.map((e) => e.value);
+		}
+
+		return [];
+	});
+
+	$inspect(hostsSelected, 'hostsSelected');
+
 	let options = {
 		name: '',
 		type: {
 			combobox: {
 				open: false,
-				value: '',
+				value: editingObject ? oType : '',
 				options: generateComboboxOptions(['Host(s)', 'Network(s)', 'MAC(s)'])
 			}
 		},
 		hosts: {
 			combobox: {
 				open: false,
-				value: [] as string[],
-				options: [] as { label: string; value: string }[]
+				value: editingObject ? hostsSelected : ([] as string[]),
+				options: editingObject
+					? [...generateComboboxOptions(hostsSelected)]
+					: ([] as { label: string; value: string }[])
 			}
 		},
 		networks: {
@@ -192,7 +235,12 @@
 				<Dialog.Title>
 					<div class="flex items-center">
 						<Icon icon="clarity:objects-solid" class="mr-2 h-6 w-6" />
-						<span class="text-lg font-semibold">Create New Object</span>
+
+						{#if editingObject}
+							<span class="text-lg font-semibold">Edit Object</span>
+						{:else}
+							<span class="text-lg font-semibold">Create Object</span>
+						{/if}
 					</div>
 				</Dialog.Title>
 			</Dialog.Header>

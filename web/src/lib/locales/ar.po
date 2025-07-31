@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-19T15:13:04.883Z\n"
-"PO-Revision-Date: 2025-07-25T14:32:51.339Z\n"
+"PO-Revision-Date: 2025-07-31T11:03:04.148Z\n"
 "Last-Translator: \n"
 "Language: Arabic\n"
 "Language-Team: \n"
@@ -35,6 +35,7 @@ msgstr "حذف"
 #: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
 #: src/lib/components/custom/Samba/Share.svelte
 #: src/routes/[node]/settings/authentication/users/+page.svelte
+#: src/routes/[node]/network/objects/+page.svelte
 msgid "Edit"
 msgstr "تعديل"
 
@@ -2964,4 +2965,12 @@ msgstr ""
 
 #: src/lib/components/custom/VM/Create/Network.svelte
 msgid "Select MAC address"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "Edit Object"
+msgstr ""
+
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+msgid "Create Object"
 msgstr ""

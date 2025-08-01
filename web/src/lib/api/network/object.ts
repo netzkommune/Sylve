@@ -20,6 +20,21 @@ export async function createNetworkObject(
 	return await apiRequest('/network/object', APIResponseSchema, 'POST', body);
 }
 
+export async function updateNetworkObject(
+	id: number,
+	name: string,
+	type: string,
+	values: string[]
+): Promise<APIResponse> {
+	const body = {
+		name,
+		type,
+		values
+	};
+
+	return await apiRequest(`/network/object/${id}`, APIResponseSchema, 'PUT', body);
+}
+
 export async function deleteNetworkObject(id: number): Promise<APIResponse> {
 	return await apiRequest(`/network/object/${id}`, APIResponseSchema, 'DELETE');
 }

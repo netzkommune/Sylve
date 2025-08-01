@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createNetworkObject } from '$lib/api/network/object';
+	import { createNetworkObject, updateNetworkObject } from '$lib/api/network/object';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import ComboBoxBindable from '$lib/components/ui/custom-input/combobox-bindable.svelte';
 	import ComboBox from '$lib/components/ui/custom-input/combobox.svelte';
@@ -47,7 +47,7 @@
 		return '';
 	});
 
-	let hostsSelected = $derived.by(() => {
+	let optionsSelected = $derived.by(() => {
 		if (editingObject && editingObject.entries && editingObject.entries.length > 0) {
 			return editingObject.entries.map((e) => e.value);
 		}
@@ -55,10 +55,8 @@
 		return [];
 	});
 
-	$inspect(hostsSelected, 'hostsSelected');
-
-	let options = {
-		name: '',
+	let options = $derived({
+		name: editingObject ? editingObject.name : '',
 		type: {
 			combobox: {
 				open: false,
@@ -69,31 +67,36 @@
 		hosts: {
 			combobox: {
 				open: false,
-				value: editingObject ? hostsSelected : ([] as string[]),
+				value: editingObject ? optionsSelected : ([] as string[]),
 				options: editingObject
-					? [...generateComboboxOptions(hostsSelected)]
+					? [...generateComboboxOptions(optionsSelected)]
 					: ([] as { label: string; value: string }[])
 			}
 		},
 		networks: {
 			combobox: {
 				open: false,
-				value: [] as string[],
-				options: [] as { label: string; value: string }[]
+				value: editingObject ? optionsSelected : ([] as string[]),
+				options: editingObject
+					? [...generateComboboxOptions(optionsSelected)]
+					: ([] as { label: string; value: string }[])
 			}
 		},
 		macs: {
 			combobox: {
 				open: false,
-				value: [] as string[],
-				options: [] as { label: string; value: string }[]
+				value: editingObject ? optionsSelected : ([] as string[]),
+				options: editingObject
+					? [...generateComboboxOptions(optionsSelected)]
+					: ([] as { label: string; value: string }[])
 			}
 		}
-	};
+	});
 
+	/* svelte-ignore state_referenced_locally */
 	let properties = $state(options);
 
-	async function create() {
+	async function basicTests() {
 		let error = '';
 
 		if (properties.name === '') {
@@ -146,6 +149,7 @@
 			}
 
 			values = hosts;
+			return values;
 		}
 
 		if (properties.type.combobox.value === 'Network(s)') {
@@ -171,6 +175,7 @@
 			}
 
 			values = networks;
+			return values;
 		}
 
 		if (properties.type.combobox.value === 'MAC(s)') {
@@ -185,6 +190,7 @@
 			}
 
 			values = macs;
+			return values;
 		}
 
 		if (error) {
@@ -194,6 +200,10 @@
 			return;
 		}
 
+		return true;
+	}
+
+	function getOType() {
 		let oType = '';
 
 		switch (properties.type.combobox.value) {
@@ -210,10 +220,28 @@
 				oType = properties.type.combobox.value;
 		}
 
-		const response = await createNetworkObject(properties.name, oType, values);
+		return oType;
+	}
+
+	async function create() {
+		const values = await basicTests();
+		if (!values) {
+			return;
+		}
+
+		let oType = getOType();
+
+		const response = await createNetworkObject(properties.name, oType, values as string[]);
 		if (response.error) {
 			handleAPIError(response);
-			toast.error('Failed to create network object', {
+
+			let message = 'Failed to create network object';
+
+			if (response.error.startsWith('object_with_name_already')) {
+				message = 'Object with this name already exists';
+			}
+
+			toast.error(message, {
 				position: 'bottom-center'
 			});
 
@@ -222,6 +250,53 @@
 			toast.success('Created object', {
 				position: 'bottom-center'
 			});
+
+			open = false;
+		}
+	}
+
+	async function editObject() {
+		const values = await basicTests();
+		if (!values) {
+			return;
+		}
+
+		let oType = getOType();
+
+		const response = await updateNetworkObject(
+			editingObject?.id || 0,
+			properties.name,
+			oType,
+			values as string[]
+		);
+
+		if (response.error) {
+			handleAPIError(response);
+			let error = '';
+
+			if (response.error.startsWith('object_with_name_already')) {
+				error = 'Object with this name already exists';
+			} else if (response.error.includes('please ensure only one IP is provided')) {
+				error = 'Host object used in switch, only one IP is allowed';
+			} else if (response.error.includes('no_detected_changes')) {
+				error = 'No changes detected';
+			} else if (response.error.includes('cannot_change_object_type')) {
+				error = 'Cannot change type of object that is in use';
+			} else if (response.error.includes('cannot_change_object_of_active_vm')) {
+				error = 'Cannot change object of active VM';
+			} else {
+				error = 'Failed to update network object';
+			}
+
+			if (error) {
+				toast.error(error, {
+					position: 'bottom-center'
+				});
+			} else {
+				toast.success('Updated object', {
+					position: 'bottom-center'
+				});
+			}
 
 			open = false;
 		}
@@ -237,7 +312,7 @@
 						<Icon icon="clarity:objects-solid" class="mr-2 h-6 w-6" />
 
 						{#if editingObject}
-							<span class="text-lg font-semibold">Edit Object</span>
+							<span class="text-lg font-semibold">Edit Object - {editingObject.name}</span>
 						{:else}
 							<span class="text-lg font-semibold">Create Object</span>
 						{/if}
@@ -326,7 +401,11 @@
 
 		<Dialog.Footer class="flex justify-end">
 			<div class="flex w-full items-center justify-end gap-2">
-				<Button onclick={create} type="submit" size="sm">Create</Button>
+				{#if edit}
+					<Button onclick={editObject} type="submit" size="sm">Save</Button>
+				{:else}
+					<Button onclick={create} type="submit" size="sm">Create</Button>
+				{/if}
 			</div>
 		</Dialog.Footer>
 	</Dialog.Content>

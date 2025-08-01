@@ -116,6 +116,52 @@ func validateValues(oType string, values []string) error {
 	return nil
 }
 
+func (s *Service) IsObjectUsed(id uint) (bool, error) {
+	var object networkModels.Object
+
+	if err := s.DB.First(&object, id).Error; err != nil {
+		return false, fmt.Errorf("failed to find object with ID %d: %w", id, err)
+	}
+
+	if object.Type == "Host" {
+		var switches []networkModels.StandardSwitch
+
+		if err := s.DB.
+			Preload("AddressObj.Entries").
+			Preload("Address6Obj.Entries").Find(&switches).Error; err != nil {
+			return true, err
+		}
+
+		for _, sw := range switches {
+			if sw.AddressObj != nil {
+				if sw.AddressObj.ID == id {
+					return true, nil
+				}
+			}
+
+			if sw.Address6Obj != nil {
+				if sw.Address6Obj.ID == id {
+					return true, nil
+				}
+			}
+		}
+	}
+
+	if object.Type == "Mac" {
+		var vmNetworks []vmModels.Network
+		if err := s.DB.Where("mac_id = ?", id).Find(&vmNetworks).Error; err != nil {
+			return true, fmt.Errorf("failed to find VM networks using object %d: %w", id, err)
+		}
+
+		if len(vmNetworks) > 0 {
+			return true, nil
+		}
+
+	}
+
+	return false, nil
+}
+
 func (s *Service) CreateObject(name string, oType string, values []string) error {
 	if err := validateType(oType); err != nil {
 		return err
@@ -123,6 +169,18 @@ func (s *Service) CreateObject(name string, oType string, values []string) error
 
 	if err := validateValues(oType, values); err != nil {
 		return err
+	}
+
+	var count int64
+	if err := s.DB.
+		Model(&networkModels.Object{}).
+		Where("name = ?", name).
+		Count(&count).Error; err != nil {
+		return err
+	}
+
+	if count > 0 {
+		return fmt.Errorf("object_with_name_already_exists: %s", name)
 	}
 
 	entries := make([]networkModels.ObjectEntry, len(values))
@@ -146,35 +204,13 @@ func (s *Service) CreateObject(name string, oType string, values []string) error
 }
 
 func (s *Service) DeleteObject(id uint) error {
-	var switches []networkModels.StandardSwitch
-
-	if err := s.DB.
-		Preload("AddressObj.Entries").
-		Preload("Address6Obj.Entries").Find(&switches).Error; err != nil {
-		return err
+	used, err := s.IsObjectUsed(id)
+	if err != nil {
+		return fmt.Errorf("failed to check if object %d is used: %w", id, err)
 	}
 
-	for _, sw := range switches {
-		if sw.AddressObj != nil {
-			if sw.AddressObj.ID == id {
-				return fmt.Errorf("cannot delete object %d, it is used by switch %s", id, sw.Name)
-			}
-		}
-
-		if sw.Address6Obj != nil {
-			if sw.Address6Obj.ID == id {
-				return fmt.Errorf("cannot delete object %d, it is used by switch %s", id, sw.Name)
-			}
-		}
-	}
-
-	var vmNetworks []vmModels.Network
-	if err := s.DB.Where("mac_id = ?", id).Find(&vmNetworks).Error; err != nil {
-		return fmt.Errorf("failed to find VM networks using object %d: %w", id, err)
-	}
-
-	if len(vmNetworks) > 0 {
-		return fmt.Errorf("cannot delete object %d, it is used by %d VM networks", id, len(vmNetworks))
+	if used {
+		return fmt.Errorf("object %d is currently in use and cannot be deleted", id)
 	}
 
 	if err := s.DB.Where("object_id = ?", id).Delete(&networkModels.ObjectResolution{}).Error; err != nil {
@@ -187,6 +223,217 @@ func (s *Service) DeleteObject(id uint) error {
 
 	if err := s.DB.Delete(&networkModels.Object{}, id).Error; err != nil {
 		return fmt.Errorf("failed to delete object %d: %w", id, err)
+	}
+
+	return nil
+}
+
+func (s *Service) EditObject(id uint, name string, oType string, values []string) error {
+	if err := validateType(oType); err != nil {
+		return err
+	}
+
+	if err := validateValues(oType, values); err != nil {
+		return err
+	}
+
+	var count int64
+	if err := s.DB.
+		Model(&networkModels.Object{}).
+		Where("name = ? AND id != ?", name, id).
+		Count(&count).Error; err != nil {
+		return err
+	}
+
+	if count > 0 {
+		return fmt.Errorf("object_with_name_already_exists: %s", name)
+	}
+
+	used, err := s.IsObjectUsed(id)
+	if err != nil {
+		return fmt.Errorf("failed to check if object %d is used: %w", id, err)
+	}
+
+	var object networkModels.Object
+	if err := s.DB.Preload("Entries").
+		Preload("Resolutions").
+		First(&object, id).Error; err != nil {
+		return fmt.Errorf("failed to find object with ID %d: %w", id, err)
+	}
+
+	/* This object isn't used anywhere, yay! It's going to be an easy edit */
+	if !used {
+		object.Name = name
+		object.Type = oType
+
+		if err := s.DB.Save(&object).Error; err != nil {
+			return fmt.Errorf("failed to update object %d: %w", id, err)
+		}
+
+		if err := s.DB.Where("object_id = ?", id).Delete(&networkModels.ObjectEntry{}).Error; err != nil {
+			return fmt.Errorf("failed to delete existing entries for object %d: %w", id, err)
+		}
+
+		if err := s.DB.Where("object_id = ?", id).Delete(&networkModels.ObjectResolution{}).Error; err != nil {
+			return fmt.Errorf("failed to delete resolutions for object %d: %w", id, err)
+		}
+
+		for _, value := range values {
+			entry := networkModels.ObjectEntry{
+				ObjectID: id,
+				Value:    value,
+			}
+
+			if err := s.DB.Create(&entry).Error; err != nil {
+				return fmt.Errorf("failed to create entry for object %d: %w", id, err)
+			}
+		}
+	} else {
+		if object.Type == "Host" {
+			var switches []networkModels.StandardSwitch
+			if err := s.DB.
+				Preload("AddressObj.Entries").
+				Preload("Address6Obj.Entries").
+				Find(&switches).Error; err != nil {
+				return fmt.Errorf("failed to find standard switches using object %d: %w", id, err)
+			}
+
+			/* IP Used in a switch */
+			if len(switches) > 0 && oType == "Host" {
+				if len(values) != 1 {
+					return fmt.Errorf("cannot edit object %d, it is used by %d standard switches, please ensure only one IP is provided", id, len(switches))
+				}
+
+				hasChange := false
+
+				object.Name = name
+				object.Type = oType
+
+				if object.Name != name || object.Type != oType {
+					hasChange = true
+				}
+
+				for _, value := range values {
+					for _, entry := range object.Entries {
+						if entry.Value == value && !hasChange {
+							return fmt.Errorf("no_detected_changes")
+						}
+					}
+				}
+
+				if err := s.DB.Save(&object).Error; err != nil {
+					return fmt.Errorf("failed to update object %d: %w", id, err)
+				}
+
+				if err := s.DB.Where("object_id = ?", id).Delete(&networkModels.ObjectEntry{}).Error; err != nil {
+					return fmt.Errorf("failed to delete existing entries for object %d: %w", id, err)
+				}
+
+				for _, value := range values {
+					entry := networkModels.ObjectEntry{
+						ObjectID: id,
+						Value:    value,
+					}
+
+					if err := s.DB.Create(&entry).Error; err != nil {
+						return fmt.Errorf("failed to create entry for object %d: %w", id, err)
+					}
+				}
+
+				err := s.SyncStandardSwitches(nil, "sync")
+				if err != nil {
+					return fmt.Errorf("failed to sync standard switches after editing object %d: %w", id, err)
+				}
+			}
+
+			/* Object Was used in a switch, but now we're changing it to something else, we can't do that */
+			if len(switches) > 0 && oType != "Host" {
+				return fmt.Errorf("cannot_change_object_type_host")
+			}
+		}
+
+		if object.Type == "Mac" {
+			var vmNetworks []vmModels.Network
+			if err := s.DB.Where("mac_id = ?", id).Find(&vmNetworks).Error; err != nil {
+				return fmt.Errorf("failed to find VM networks using object %d: %w", id, err)
+			}
+
+			var vm vmModels.VM
+			if len(vmNetworks) > 0 {
+				if err := s.DB.First(&vm, vmNetworks[0].VMID).Error; err != nil {
+					return fmt.Errorf("failed to find VM for network %d: %w", vmNetworks[0].ID, err)
+				}
+			}
+
+			/* MAC Used in a VM */
+			if len(vmNetworks) > 0 && oType == "Mac" {
+				// emulation := vmNetworks[0].Emulation
+
+				if len(values) != 1 {
+					return fmt.Errorf("cannot edit object %d, it is used by %d VM networks, please ensure only one MAC is provided", id, len(vmNetworks))
+				}
+
+				hasChange := false
+
+				if object.Name != name || object.Type != oType {
+					hasChange = true
+				}
+
+				object.Name = name
+				object.Type = oType
+
+				for _, value := range values {
+					for _, entry := range object.Entries {
+						if entry.Value == value && !hasChange {
+							return fmt.Errorf("no_detected_changes")
+						}
+					}
+				}
+
+				active, err := s.LibVirt.IsDomainInactive(int(vm.VmID))
+
+				if err != nil {
+					return fmt.Errorf("failed to check if VM %d is inactive: %w", vm.VmID, err)
+				}
+
+				if !active {
+					return fmt.Errorf("cannot_change_object_of_active_vm")
+				}
+
+				if err := s.DB.Save(&object).Error; err != nil {
+					return fmt.Errorf("failed to update object %d: %w", id, err)
+				}
+
+				if object.Name != name || object.Type != oType {
+					hasChange = true
+				}
+
+				if err := s.DB.Where("object_id = ?", id).Delete(&networkModels.ObjectEntry{}).Error; err != nil {
+					return fmt.Errorf("failed to delete existing entries for object %d: %w", id, err)
+				}
+
+				for _, value := range values {
+					entry := networkModels.ObjectEntry{
+						ObjectID: id,
+						Value:    value,
+					}
+
+					if err := s.DB.Create(&entry).Error; err != nil {
+						return fmt.Errorf("failed to create entry for object %d: %w", id, err)
+					}
+				}
+
+				err = s.LibVirt.FindAndChangeMAC(int(vm.VmID), object.Entries[0].Value, values[0])
+				if err != nil {
+					return fmt.Errorf("failed to change MAC address in VM %d: %w", vm.VmID, err)
+				}
+			}
+
+			/* Object was used in a VM, but now we're changing it to something else, we can't do that */
+			if len(vmNetworks) > 0 && oType != "Mac" {
+				return fmt.Errorf("cannot_change_object_type_vm")
+			}
+		}
 	}
 
 	return nil

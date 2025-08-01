@@ -68,7 +68,7 @@ func NewService[T any](db *gorm.DB, dependencies ...interface{}) interface{} {
 	case *disk.Service:
 		return disk.NewDiskService(db, dependencies[0].(zfsServiceInterfaces.ZfsServiceInterface))
 	case *network.Service:
-		return network.NewNetworkService(db)
+		return network.NewNetworkService(db, dependencies[0].(libvirtServiceInterfaces.LibvirtServiceInterface))
 	case *libvirt.Service:
 		return libvirt.NewLibvirtService(db)
 	case *utilities.Service:
@@ -85,12 +85,12 @@ func NewService[T any](db *gorm.DB, dependencies ...interface{}) interface{} {
 func NewServiceRegistry(db *gorm.DB) *ServiceRegistry {
 	authService := NewService[auth.Service](db)
 	infoService := NewService[info.Service](db)
-	networkService := NewService[network.Service](db)
 	libvirtService := NewService[libvirt.Service](db)
 	zfsService := NewService[zfs.Service](db, libvirtService)
 	utilitiesService := NewService[utilities.Service](db)
 	systemService := NewService[system.Service](db)
 	sambaService := NewService[samba.Service](db, zfsService)
+	networkService := NewService[network.Service](db, libvirtService)
 
 	return &ServiceRegistry{
 		AuthService:      authService.(serviceInterfaces.AuthServiceInterface),
@@ -98,7 +98,7 @@ func NewServiceRegistry(db *gorm.DB) *ServiceRegistry {
 		InfoService:      infoService.(infoServiceInterfaces.InfoServiceInterface),
 		ZfsService:       zfsService.(*zfs.Service),
 		DiskService:      NewService[disk.Service](db, zfsService).(*disk.Service),
-		NetworkService:   networkService.(networkServiceInterfaces.NetworkServiceInterface),
+		NetworkService:   NewService[network.Service](db, libvirtService).(*network.Service),
 		LibvirtService:   libvirtService.(libvirtServiceInterfaces.LibvirtServiceInterface),
 		UtilitiesService: utilitiesService.(utilitiesServiceInterfaces.UtilitiesServiceInterface),
 		SystemService:    systemService.(systemServiceInterfaces.SystemServiceInterface),

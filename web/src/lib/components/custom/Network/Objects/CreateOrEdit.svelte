@@ -292,11 +292,13 @@
 				toast.error(error, {
 					position: 'bottom-center'
 				});
-			} else {
-				toast.success('Updated object', {
-					position: 'bottom-center'
-				});
 			}
+
+			open = false;
+		} else {
+			toast.success('Updated object', {
+				position: 'bottom-center'
+			});
 
 			open = false;
 		}

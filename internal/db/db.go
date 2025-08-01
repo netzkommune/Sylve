@@ -23,12 +23,12 @@ import (
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	// gormLogger "gorm.io/gorm/logger"
+	gormLogger "gorm.io/gorm/logger"
 )
 
 func SetupDatabase(cfg *internal.SylveConfig, isTest bool) *gorm.DB {
 	ormConfig := &gorm.Config{
-		// Logger:         gormLogger.Default.LogMode(gormLogger.Silent),
+		Logger:         gormLogger.Default.LogMode(gormLogger.Silent),
 		TranslateError: true,
 	}
 

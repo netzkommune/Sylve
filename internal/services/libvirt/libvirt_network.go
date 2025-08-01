@@ -36,11 +36,16 @@ func (s *Service) NetworkDetach(vmId int, networkId int) error {
 	}
 
 	var network vmModels.Network
-	if err := s.DB.Preload("Switch").
+	if err := s.DB.Preload("Switch").Preload("AddressObj").Preload("AddressObj.Entries").
 		First(&network, "id = ?", networkId).
 		Error; err != nil {
 		return fmt.Errorf("failed_to_find_network: %w", err)
 	}
+
+	if network.AddressObj == nil || len(network.AddressObj.Entries) == 0 {
+		return fmt.Errorf("network_mac_address_missing")
+	}
+	mac := strings.TrimSpace(strings.ToLower(network.AddressObj.Entries[0].Value))
 
 	doc := etree.NewDocument()
 	if err := doc.ReadFromString(xmlDesc); err != nil {
@@ -58,20 +63,19 @@ func (s *Service) NetworkDetach(vmId int, networkId int) error {
 			continue
 		}
 
-		if strings.EqualFold(addrAttr.Value, network.MAC) {
-			parent := iface.Parent()
-			parent.RemoveChild(iface)
+		if strings.EqualFold(strings.TrimSpace(addrAttr.Value), mac) {
+			iface.Parent().RemoveChild(iface)
 			found = true
+			logger.L.Debug().Msgf("Removed interface with MAC: %s", addrAttr.Value)
 			break
 		}
 	}
 
 	if !found {
-		logger.L.Debug().Msgf("Network detach: network_interface_not_found_in_xml: %s", network.MAC)
+		logger.L.Debug().Msgf("Network detach: network_interface_not_found_in_xml: %s", mac)
 		if err := s.DB.Delete(&network).Error; err != nil {
 			return fmt.Errorf("failed_to_delete_network_record: %w", err)
 		}
-
 		return nil
 	}
 
@@ -100,7 +104,7 @@ func (s *Service) NetworkDetach(vmId int, networkId int) error {
 	return nil
 }
 
-func (s *Service) NetworkAttach(vmId int, switchId int, emulation, macAddress string) error {
+func (s *Service) NetworkAttach(vmId int, switchId int, emulation string, macObjId uint) error {
 	inactive, err := s.IsDomainInactive(vmId)
 	if err != nil {
 		return fmt.Errorf("failed_to_check_vm_inactive: %w", err)
@@ -137,19 +141,71 @@ func (s *Service) NetworkAttach(vmId int, switchId int, emulation, macAddress st
 		return fmt.Errorf("network_already_attached_to_vm: %s", existingNetwork.MAC)
 	}
 
-	if macAddress == "" {
-		macAddress = utils.GenerateRandomMAC()
+	if macObjId == 0 {
+		macAddress := utils.GenerateRandomMAC()
+
+		macObj := networkModels.Object{
+			Name: fmt.Sprintf("vm-%d-mac-%s", vm.VmID, macAddress),
+			Type: "Mac",
+		}
+
+		if err := s.DB.Create(&macObj).Error; err != nil {
+			return fmt.Errorf("failed_to_create_mac_object: %w", err)
+		}
+
+		macEntry := networkModels.ObjectEntry{
+			ObjectID: macObj.ID,
+			Value:    macAddress,
+		}
+
+		if err := s.DB.Create(&macEntry).Error; err != nil {
+			return fmt.Errorf("failed_to_create_mac_entry: %w", err)
+		}
+
+		macObjId = macObj.ID
+	} else {
+		var macObj networkModels.Object
+		if err := s.DB.Preload("Entries").First(&macObj, macObjId).Error; err != nil {
+			return fmt.Errorf("failed_to_find_mac_object: %w", err)
+		}
+
+		if macObj.Type != "Mac" {
+			return fmt.Errorf("invalid_mac_object_type: %s", macObj.Type)
+		}
+
+		if len(macObj.Entries) == 0 {
+			return fmt.Errorf("mac_object_has_no_entries: %d", macObjId)
+		}
+
+		var otherNetworks []vmModels.Network
+		if err := s.DB.Where("mac_id = ? AND vm_id != ?", macObjId, vm.ID).
+			Find(&otherNetworks).Error; err != nil {
+			return fmt.Errorf("failed_to_find_other_networks_using_mac_object: %w", err)
+		}
 	}
 
 	network := vmModels.Network{
 		VMID:      vm.ID,
 		SwitchID:  uint(switchId),
-		MAC:       macAddress,
+		MacID:     &macObjId,
 		Emulation: emulation,
 	}
 
 	if err := s.DB.Create(&network).Error; err != nil {
 		return fmt.Errorf("failed_to_create_network_record: %w", err)
+	}
+
+	var macAddress string
+
+	if macObjId != 0 {
+		var macObj networkModels.Object
+		if err := s.DB.Preload("Entries").First(&macObj, macObjId).Error; err != nil {
+			return fmt.Errorf("failed_to_find_mac_object: %w", err)
+		}
+		if len(macObj.Entries) == 0 {
+			return fmt.Errorf("mac_object_has_no_entries: %d", macObjId)
+		}
+		macAddress = macObj.Entries[0].Value
 	}
 
 	xmlDesc, err := s.GetVMXML(vmId)
@@ -177,7 +233,7 @@ func (s *Service) NetworkAttach(vmId int, switchId int, emulation, macAddress st
 	ifaceEl.CreateAttr("type", "bridge")
 
 	macEl := etree.NewElement("mac")
-	macEl.CreateAttr("address", network.MAC)
+	macEl.CreateAttr("address", macAddress)
 	ifaceEl.AddChild(macEl)
 
 	sourceEl := etree.NewElement("source")
@@ -205,6 +261,53 @@ func (s *Service) NetworkAttach(vmId int, switchId int, emulation, macAddress st
 	}
 
 	if _, err := s.Conn.DomainDefineXML(newXML); err != nil {
+		return fmt.Errorf("failed_to_define_domain_with_modified_xml: %w", err)
+	}
+
+	return nil
+}
+
+func (s *Service) FindAndChangeMAC(vmId int, oldMac string, newMac string) error {
+	domain, err := s.Conn.DomainLookupByName(strconv.Itoa(vmId))
+	if err != nil {
+		return fmt.Errorf("failed_to_lookup_domain_by_name: %w", err)
+	}
+
+	xml, err := s.Conn.DomainGetXMLDesc(domain, 0)
+	if err != nil {
+		return fmt.Errorf("failed_to_get_domain_xml_desc: %w", err)
+	}
+
+	doc := etree.NewDocument()
+	if err := doc.ReadFromString(xml); err != nil {
+		return fmt.Errorf("failed_to_parse_domain_xml: %w", err)
+	}
+
+	oldMac = strings.ToLower(oldMac)
+	newMac = strings.ToLower(newMac)
+
+	macEl := doc.FindElement("//mac[@address='" + oldMac + "']")
+	if macEl == nil {
+		return fmt.Errorf("mac_address_not_found_in_xml: %s", oldMac)
+	}
+
+	addrAttr := macEl.SelectAttr("address")
+	if addrAttr != nil {
+		addrAttr.Value = newMac
+	} else {
+		macEl.CreateAttr("address", newMac)
+	}
+
+	out, err := doc.WriteToString()
+	if err != nil {
+		return fmt.Errorf("failed to serialize XML: %w", err)
+	}
+
+	if err := s.Conn.DomainUndefineFlags(domain, 0); err != nil {
+		return fmt.Errorf("failed_to_undefine_domain: %w", err)
+	}
+
+	if _, err := s.Conn.DomainDefineXML(out); err != nil {
 		return fmt.Errorf("failed_to_define_domain_with_modified_xml: %w", err)
 	}
 

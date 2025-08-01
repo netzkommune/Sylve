@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { createNetworkObject } from '$lib/api/network/object';
+	import { createNetworkObject, updateNetworkObject } from '$lib/api/network/object';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import ComboBoxBindable from '$lib/components/ui/custom-input/combobox-bindable.svelte';
 	import ComboBox from '$lib/components/ui/custom-input/combobox.svelte';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import type { NetworkObject } from '$lib/types/network/object';
 	import { handleAPIError } from '$lib/utils/http';
 	import { generateComboboxOptions } from '$lib/utils/input';
 	import { isValidIPv4, isValidIPv6, isValidMACAddress } from '$lib/utils/string';
@@ -13,44 +14,89 @@
 
 	interface Props {
 		open: boolean;
+		edit: boolean;
+		id?: number;
+		networkObjects: NetworkObject[];
 	}
 
-	let { open = $bindable() }: Props = $props();
-	let options = {
-		name: '',
+	let { open = $bindable(), edit = false, id, networkObjects }: Props = $props();
+	let editingObject: NetworkObject | null = $derived.by(() => {
+		if (edit && id) {
+			const obj = networkObjects.find((o) => o.id === id);
+			if (obj) {
+				return obj;
+			}
+		}
+
+		return null;
+	});
+
+	let oType = $derived.by(() => {
+		if (editingObject) {
+			switch (editingObject.type) {
+				case 'Host':
+					return 'Host(s)';
+				case 'Network':
+					return 'Network(s)';
+				case 'Mac':
+					return 'MAC(s)';
+				default:
+					return '';
+			}
+		}
+		return '';
+	});
+
+	let optionsSelected = $derived.by(() => {
+		if (editingObject && editingObject.entries && editingObject.entries.length > 0) {
+			return editingObject.entries.map((e) => e.value);
+		}
+
+		return [];
+	});
+
+	let options = $derived({
+		name: editingObject ? editingObject.name : '',
 		type: {
 			combobox: {
 				open: false,
-				value: '',
+				value: editingObject ? oType : '',
 				options: generateComboboxOptions(['Host(s)', 'Network(s)', 'MAC(s)'])
 			}
 		},
 		hosts: {
 			combobox: {
 				open: false,
-				value: [] as string[],
-				options: [] as { label: string; value: string }[]
+				value: editingObject ? optionsSelected : ([] as string[]),
+				options: editingObject
+					? [...generateComboboxOptions(optionsSelected)]
+					: ([] as { label: string; value: string }[])
 			}
 		},
 		networks: {
 			combobox: {
 				open: false,
-				value: [] as string[],
-				options: [] as { label: string; value: string }[]
+				value: editingObject ? optionsSelected : ([] as string[]),
+				options: editingObject
+					? [...generateComboboxOptions(optionsSelected)]
+					: ([] as { label: string; value: string }[])
 			}
 		},
 		macs: {
 			combobox: {
 				open: false,
-				value: [] as string[],
-				options: [] as { label: string; value: string }[]
+				value: editingObject ? optionsSelected : ([] as string[]),
+				options: editingObject
+					? [...generateComboboxOptions(optionsSelected)]
+					: ([] as { label: string; value: string }[])
 			}
 		}
-	};
+	});
 
+	/* svelte-ignore state_referenced_locally */
 	let properties = $state(options);
 
-	async function create() {
+	async function basicTests() {
 		let error = '';
 
 		if (properties.name === '') {
@@ -103,6 +149,7 @@
 			}
 
 			values = hosts;
+			return values;
 		}
 
 		if (properties.type.combobox.value === 'Network(s)') {
@@ -128,6 +175,7 @@
 			}
 
 			values = networks;
+			return values;
 		}
 
 		if (properties.type.combobox.value === 'MAC(s)') {
@@ -142,6 +190,7 @@
 			}
 
 			values = macs;
+			return values;
 		}
 
 		if (error) {
@@ -151,6 +200,10 @@
 			return;
 		}
 
+		return true;
+	}
+
+	function getOType() {
 		let oType = '';
 
 		switch (properties.type.combobox.value) {
@@ -161,22 +214,89 @@
 				oType = 'Network';
 				break;
 			case 'MAC(s)':
-				oType = 'MAC';
+				oType = 'Mac';
 				break;
 			default:
 				oType = properties.type.combobox.value;
 		}
 
-		const response = await createNetworkObject(properties.name, oType, values);
+		return oType;
+	}
+
+	async function create() {
+		const values = await basicTests();
+		if (!values) {
+			return;
+		}
+
+		let oType = getOType();
+
+		const response = await createNetworkObject(properties.name, oType, values as string[]);
 		if (response.error) {
 			handleAPIError(response);
-			toast.error('Failed to create network object', {
+
+			let message = 'Failed to create network object';
+
+			if (response.error.startsWith('object_with_name_already')) {
+				message = 'Object with this name already exists';
+			}
+
+			toast.error(message, {
 				position: 'bottom-center'
 			});
 
 			return;
 		} else {
 			toast.success('Created object', {
+				position: 'bottom-center'
+			});
+
+			open = false;
+		}
+	}
+
+	async function editObject() {
+		const values = await basicTests();
+		if (!values) {
+			return;
+		}
+
+		let oType = getOType();
+
+		const response = await updateNetworkObject(
+			editingObject?.id || 0,
+			properties.name,
+			oType,
+			values as string[]
+		);
+
+		if (response.error) {
+			handleAPIError(response);
+			let error = '';
+
+			if (response.error.startsWith('object_with_name_already')) {
+				error = 'Object with this name already exists';
+			} else if (response.error.includes('please ensure only one IP is provided')) {
+				error = 'Host object used in switch, only one IP is allowed';
+			} else if (response.error.includes('no_detected_changes')) {
+				error = 'No changes detected';
+			} else if (response.error.includes('cannot_change_object_type')) {
+				error = 'Cannot change type of object that is in use';
+			} else if (response.error.includes('cannot_change_object_of_active_vm')) {
+				error = 'Cannot change object of active VM';
+			} else {
+				error = 'Failed to update network object';
+			}
+
+			if (error) {
+				toast.error(error, {
+					position: 'bottom-center'
+				});
+			}
+
+			open = false;
+		} else {
+			toast.success('Updated object', {
 				position: 'bottom-center'
 			});
 
@@ -192,7 +312,12 @@
 				<Dialog.Title>
 					<div class="flex items-center">
 						<Icon icon="clarity:objects-solid" class="mr-2 h-6 w-6" />
-						<span class="text-lg font-semibold">Create New Object</span>
+
+						{#if editingObject}
+							<span class="text-lg font-semibold">Edit Object - {editingObject.name}</span>
+						{:else}
+							<span class="text-lg font-semibold">Create Object</span>
+						{/if}
 					</div>
 				</Dialog.Title>
 			</Dialog.Header>
@@ -278,7 +403,11 @@
 
 		<Dialog.Footer class="flex justify-end">
 			<div class="flex w-full items-center justify-end gap-2">
-				<Button onclick={create} type="submit" size="sm">Create</Button>
+				{#if edit}
+					<Button onclick={editObject} type="submit" size="sm">Save</Button>
+				{:else}
+					<Button onclick={create} type="submit" size="sm">Create</Button>
+				{/if}
 			</div>
 		</Dialog.Footer>
 	</Dialog.Content>

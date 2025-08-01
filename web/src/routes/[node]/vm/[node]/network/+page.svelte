@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getInterfaces } from '$lib/api/network/iface';
+	import { getNetworkObjects } from '$lib/api/network/object';
 	import { getSwitches } from '$lib/api/network/switch';
 	import { detachNetwork } from '$lib/api/vm/network';
 	import { getVMDomain, getVMs } from '$lib/api/vm/vm';
@@ -9,6 +10,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import type { Column, Row } from '$lib/types/components/tree-table';
 	import type { Iface } from '$lib/types/network/iface';
+	import type { NetworkObject } from '$lib/types/network/object';
 	import type { SwitchList } from '$lib/types/network/switch';
 	import type { VM, VMDomain } from '$lib/types/vm/vm';
 	import { handleAPIError, updateCache } from '$lib/utils/http';
@@ -25,6 +27,7 @@
 		interfaces: Iface[];
 		switches: SwitchList;
 		node: string;
+		networkObjects: NetworkObject[];
 	}
 
 	let { data }: { data: Data } = $props();
@@ -76,6 +79,18 @@
 			onSuccess: (uData: VMDomain) => {
 				updateCache(`vm-domain-${data.vm.vmId}`, uData);
 			}
+		},
+		{
+			queryKey: ['networkObjects'],
+			queryFn: async () => {
+				return await getNetworkObjects();
+			},
+			refetchInterval: 1000,
+			keepPreviousData: true,
+			initialData: data.networkObjects,
+			onSuccess: (data: NetworkObject[]) => {
+				updateCache('networkObjects', data);
+			}
 		}
 	]);
 
@@ -84,6 +99,7 @@
 	let vms = $derived($results[2].data || []);
 	let vm = $derived(vms.find((vm) => vm.vmId === Number(data.node)));
 	let domain = $derived(($results[3].data as VMDomain) || {});
+	let networkObjects = $derived($results[4].data || []);
 
 	function generateTableData() {
 		const rows: Row[] = [];
@@ -110,10 +126,19 @@
 		if (vm?.networks) {
 			for (const network of vm.networks) {
 				const sw = switches.standard?.find((s) => s.id === network.switchId);
+				const macObj = networkObjects.find((obj) => obj.id === network.macId);
+				const mac =
+					macObj && macObj.entries && macObj.entries.length > 0
+						? macObj.entries[0].value
+						: undefined;
+
+				console.log(mac);
+
 				const row: Row = {
 					id: network.id,
 					name: sw?.name || 'Unknown Switch',
-					mac: network.mac,
+					mac: `${macObj?.name} (${mac})` || 'Unknown MAC',
+					macObject: macObj || null,
 					emulation: network.emulation || 'Unknown'
 				};
 
@@ -240,4 +265,4 @@
 	}}
 />
 
-<Network bind:open={properties.attach.open} {switches} vm={vm ?? null} />
+<Network bind:open={properties.attach.open} {switches} {vms} {networkObjects} vm={vm ?? null} />

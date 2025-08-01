@@ -46,6 +46,12 @@ type SpareDevice struct {
 	Health string `json:"health"`
 }
 
+type CacheDevice struct {
+	Name   string `json:"name"`
+	Size   uint64 `json:"size"`
+	Health string `json:"health"`
+}
+
 type ZpoolProperty struct {
 	Property string `json:"property"`
 	Value    string `json:"value"`
@@ -69,6 +75,7 @@ type Zpool struct {
 	Vdevs         []Vdev          `json:"vdevs"`
 	Status        ZpoolStatus     `json:"status"`
 	Spares        []SpareDevice   `json:"spares"`
+	CacheDevices  []CacheDevice   `json:"cache"`
 	Properties    []ZpoolProperty `json:"properties"`
 }
 
@@ -165,7 +172,7 @@ func (z *zfs) GetZpool(name string) (*Zpool, error) {
 		return nil, err
 	}
 
-	pool := &Zpool{z: z, Name: name, Spares: []SpareDevice{}}
+	pool := &Zpool{z: z, Name: name, Spares: []SpareDevice{}, CacheDevices: []CacheDevice{}}
 	for _, line := range out {
 		if err := pool.parseLine(line); err != nil {
 			return nil, err
@@ -180,7 +187,8 @@ func (z *zfs) GetZpool(name string) (*Zpool, error) {
 	var vdevPtrs []*Vdev
 	var currentVdev *Vdev
 	var currentReplacing *ReplacingDevice
-	var potentialSpares map[string]string = make(map[string]string) // Store potential spares with their health
+	var potentialSpares map[string]string = make(map[string]string)       // Store potential spares with their health
+	var potentialCacheDevices map[string]string = make(map[string]string) // Store potential cache devices with their health
 
 	for i, line := range vdevOut {
 		if len(line) < 10 {
@@ -214,12 +222,14 @@ func (z *zfs) GetZpool(name string) (*Zpool, error) {
 			}
 			vdevPtrs = append(vdevPtrs, currentVdev)
 			currentReplacing = nil
-		} else if vdevName == "spare" {
+		} else if vdevName == "spare" || vdevName == "cache" {
 			// The next devices are spares, store their names and health
 			currentVdev = &Vdev{Name: vdevName} // Treat "spare" as a temporary vdev
 			// We explicitly do NOT append currentVdev to vdevPtrs here for "spare"
 		} else if currentVdev != nil && currentVdev.Name == "spare" && strings.HasPrefix(vdevName, "/dev/") {
 			potentialSpares[vdevName] = line[9]
+		} else if currentVdev != nil && currentVdev.Name == "cache" && strings.HasPrefix(vdevName, "/dev/") {
+			potentialCacheDevices[vdevName] = line[9]
 		} else if strings.HasPrefix(vdevName, "replacing") {
 			// This is a replacing vdev
 			if currentVdev != nil {
@@ -313,8 +323,7 @@ func (z *zfs) GetZpool(name string) (*Zpool, error) {
 
 	var vdevs []Vdev
 	for _, v := range vdevPtrs {
-		// Skip adding the "spare" vdev to the list of vdevs
-		if v.Name != "spare" {
+		if v.Name != "spare" && v.Name != "cache" {
 			vdevs = append(vdevs, *v)
 		}
 	}
@@ -338,6 +347,15 @@ func (z *zfs) GetZpool(name string) (*Zpool, error) {
 					Health: health,
 				})
 				delete(potentialSpares, deviceName)
+			}
+
+			if health, ok := potentialCacheDevices[deviceName]; ok {
+				pool.CacheDevices = append(pool.CacheDevices, CacheDevice{
+					Name:   deviceName,
+					Size:   size,
+					Health: health,
+				})
+				delete(potentialCacheDevices, deviceName)
 			}
 		}
 	}
@@ -393,7 +411,6 @@ func (z *zfs) GetZpoolStatus(name string) (ZpoolStatus, error) {
 		if len(line) == 0 {
 			continue
 		}
-
 		lineStr := strings.Join(line, " ")
 
 		switch {
@@ -424,18 +441,44 @@ func (z *zfs) GetZpoolStatus(name string) (ZpoolStatus, error) {
 					status.Status += " "
 				}
 				status.Status += strings.TrimSpace(lineStr)
+
 			case "action":
 				if status.Action != "" {
 					status.Action += " "
 				}
 				status.Action += strings.TrimSpace(lineStr)
+
 			case "scan":
 				if status.Scan != "" {
 					status.Scan += " "
 				}
 				status.Scan += strings.TrimSpace(lineStr)
+
 			case "config":
+				// skip the header
 				if strings.HasPrefix(lineStr, "NAME") {
+					continue
+				}
+
+				trimmed := strings.TrimSpace(lineStr)
+
+				// 1) Aux‐vdev sections: cache, spares, log, special, dedup
+				switch trimmed {
+				case "cache", "spares", "log", "special", "dedup":
+					aux := &ZpoolDevice{
+						Name:     trimmed,
+						State:    "",
+						Read:     0,
+						Write:    0,
+						Cksum:    0,
+						Children: []*ZpoolDevice{},
+					}
+					if topDevice != nil {
+						topDevice.Children = append(topDevice.Children, aux)
+					}
+					// now any /dev/... lines attach to this aux
+					currentVdev = aux
+					replacingDevice = nil
 					continue
 				}
 
@@ -444,6 +487,7 @@ func (z *zfs) GetZpoolStatus(name string) (ZpoolStatus, error) {
 					continue
 				}
 
+				// 2) Parse a “real” vdev or disk line
 				dev := &ZpoolDevice{
 					Name:     fields[0],
 					State:    fields[1],
@@ -452,33 +496,40 @@ func (z *zfs) GetZpoolStatus(name string) (ZpoolStatus, error) {
 					Cksum:    int64(utils.StringToUint64(fields[4])),
 					Children: []*ZpoolDevice{},
 				}
-
+				// optional “(note)”
 				if len(fields) > 5 {
-					noteFields := fields[5:]
-					note := strings.Join(noteFields, " ")
+					note := strings.Join(fields[5:], " ")
 					if strings.HasPrefix(note, "(") && strings.HasSuffix(note, ")") {
 						dev.Note = note
 					}
 				}
 
+				// 3) Where to attach it?
 				switch {
+				// pool root
 				case dev.Name == name:
 					topDevice = dev
 					status.Devices = append(status.Devices, dev)
-				case strings.HasPrefix(dev.Name, "mirror-") ||
-					strings.HasPrefix(dev.Name, "raidz1-") ||
-					strings.HasPrefix(dev.Name, "raidz2-") ||
+
+				// mirror/raidz groups
+				case strings.HasPrefix(dev.Name, "mirror-"),
+					strings.HasPrefix(dev.Name, "raidz1-"),
+					strings.HasPrefix(dev.Name, "raidz2-"),
 					strings.HasPrefix(dev.Name, "raidz3-"):
 					currentVdev = dev
 					replacingDevice = nil
 					if topDevice != nil {
 						topDevice.Children = append(topDevice.Children, dev)
 					}
+
+				// replacing‑ devices
 				case strings.HasPrefix(dev.Name, "replacing-"):
 					replacingDevice = dev
 					if currentVdev != nil {
 						currentVdev.Children = append(currentVdev.Children, dev)
 					}
+
+				// actual disks (/dev/…)
 				case strings.HasPrefix(dev.Name, "/dev/"):
 					if replacingDevice != nil {
 						replacingDevice.Children = append(replacingDevice.Children, dev)

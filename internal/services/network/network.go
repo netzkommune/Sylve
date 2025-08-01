@@ -9,6 +9,7 @@
 package network
 
 import (
+	libvirtServiceInterfaces "sylve/internal/interfaces/services/libvirt"
 	networkServiceInterfaces "sylve/internal/interfaces/services/network"
 	"sync"
 
@@ -20,10 +21,13 @@ var _ networkServiceInterfaces.NetworkServiceInterface = (*Service)(nil)
 type Service struct {
 	DB        *gorm.DB
 	syncMutex sync.Mutex
+
+	LibVirt libvirtServiceInterfaces.LibvirtServiceInterface
 }
 
-func NewNetworkService(db *gorm.DB) networkServiceInterfaces.NetworkServiceInterface {
+func NewNetworkService(db *gorm.DB, libvirt libvirtServiceInterfaces.LibvirtServiceInterface) networkServiceInterfaces.NetworkServiceInterface {
 	return &Service{
-		DB: db,
+		DB:      db,
+		LibVirt: libvirt,
 	}
 }

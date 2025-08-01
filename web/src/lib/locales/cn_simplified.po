@@ -2,41 +2,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-19T15:13:23.412Z\n"
-"PO-Revision-Date: 2025-08-01T17:00:03.569Z\n"
+"POT-Creation-Date: 2025-07-19T15:13:43.695Z\n"
+"PO-Revision-Date: 2025-08-01T17:00:03.572Z\n"
 "Last-Translator: \n"
-"Language: Malayalam\n"
+"Language: 简体中文\n"
 "Language-Team: \n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n == 1 ? 0 : 1;\n"
 "MIME-Version: 1.0\n"
 
-#: src/lib/components/custom/Charts/Bar.svelte
-#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
-#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
-#: src/lib/components/custom/Charts/Area.svelte
-msgid "<0/> Reset zoom"
-msgstr "<0/> സൂം പുനഃസജ്ജമാക്കുക"
-
-#: src/lib/components/custom/Charts/Area.svelte
-msgid "HH:mm"
-msgstr "HH:mm"
-
-#: src/lib/components/custom/Charts/Area.svelte
-msgid "Date"
-msgstr "തിയ്യതി"
-
-#: src/routes/[node]/storage/disks/+page.svelte
-#: src/routes/[node]/storage/samba/settings/+page.svelte
-#: src/lib/components/custom/Charts/Area.svelte
-#: src/routes/[node]/vm/[node]/hardware/+page.svelte
-msgid "Value"
-msgstr "മൂല്യം"
-
 #: src/lib/components/custom/VM/Create/CreateVM.svelte
 msgid "<0/> Create Virtual Machine"
-msgstr "<0/> വെർച്വൽ മെഷീൻ ഉണ്ടാക്കുക"
+msgstr "<0/> 创建虚拟机"
 
 #: src/lib/components/custom/Samba/Create.svelte
 #: src/lib/components/custom/Authentication/Create.svelte
@@ -97,7 +75,7 @@ msgstr "<0/> വെർച്വൽ മെഷീൻ ഉണ്ടാക്കു�
 #: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 #: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 msgid "Reset"
-msgstr "പുനഃക്രമീകരിക്കുക"
+msgstr "重置"
 
 #: src/lib/components/custom/Samba/Create.svelte
 #: src/lib/components/custom/Authentication/Create.svelte
@@ -165,185 +143,411 @@ msgstr "പുനഃക്രമീകരിക്കുക"
 #: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 #: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 msgid "Close"
-msgstr "അടയ്ക്കുക"
+msgstr "关闭"
 
 #: src/lib/components/custom/VM/Create/CreateVM.svelte
 msgid "Create Virtual Machine"
-msgstr "വെർച്വൽ മെഷീൻ ഉണ്ടാക്കുക"
+msgstr "创建虚拟机"
 
 #: src/lib/components/custom/VM/Create/CreateVM.svelte
 msgid "Created VM {0}"
-msgstr "{0} VM ഉണ്ടാക്കിയിരിക്കുന്നു"
+msgstr "已创建虚拟机 {0}"
 
 #: src/lib/components/custom/VM/Create/CreateVM.svelte
 msgid "Failed to create VM"
-msgstr "VM ഉണ്ടാക്കാൻ സാധിച്ചില്ല"
+msgstr "创建虚拟机失败"
 
 #: src/lib/stores/terminal.svelte.ts
 msgid "Terminal"
-msgstr "ടെർമിനൽ"
+msgstr "终端"
 
 #: src/lib/components/custom/VM/Create/Advanced.svelte
 msgid "VNC Port"
-msgstr "VNC പോർട്ട്"
+msgstr "VNC 端口"
 
 #: src/lib/components/custom/VM/Create/Advanced.svelte
 msgid "VNC Password"
-msgstr "VNC പാസ്‌വേഡ്"
+msgstr "VNC 密码"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 #: src/lib/components/custom/VM/Create/Advanced.svelte
 msgid "Enter or generate passphrase"
-msgstr "പാസ്‌ഫ്രെയ്‌സ് നൽകുക അല്ലെങ്കിൽ സൃഷ്ടിക്കുക"
+msgstr "输入或生成密码"
 
 #: src/lib/components/custom/VM/Create/Advanced.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
 msgid "VNC Resolution"
-msgstr "VNC റെസല്യൂഷൻ"
+msgstr "VNC 分辨率"
 
 #: src/lib/components/custom/VM/Create/Advanced.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
 msgid "Select VNC resolution"
-msgstr "VNC റെസല്യൂഷൻ തിരഞ്ഞെടുക്കുക"
+msgstr "选择 VNC 分辨率"
 
 #: src/lib/components/custom/VM/Create/Advanced.svelte
 msgid "Startup/Shutdown Order"
-msgstr "ആരംഭിക്കുന്ന/ഷട്ട്ഡൗൺ ചെയ്യുന്ന ക്രമം"
+msgstr "启动/关闭顺序"
 
 #: src/lib/components/custom/VM/Create/Advanced.svelte
 msgid "VNC Wait"
-msgstr "VNC കാത്തിരിപ്പ്"
+msgstr "VNC 等待"
 
 #: src/lib/components/custom/VM/Create/Advanced.svelte
 msgid "Start On Boot"
-msgstr "ബൂട്ട് ചെയ്യുമ്പോൾ ആരംഭിക്കുക"
+msgstr "开机启动"
 
 #: src/lib/components/custom/VM/Create/Advanced.svelte
 msgid "TPM Emulation (Experimental)"
-msgstr "TPM എമുലേഷൻ (പരീക്ഷണാത്മകം)"
+msgstr "TPM 模拟 (实验性)"
 
 #: src/lib/components/custom/VM/Create/Basic.svelte
 msgid "VM Name"
-msgstr "VM-ൻ്റെ പേര്"
+msgstr "虚拟机名称"
 
 #: src/lib/components/custom/VM/Create/Basic.svelte
 msgid "VM ID"
-msgstr "VM ഐഡി"
+msgstr "虚拟机 ID"
 
 #: src/lib/components/custom/VM/Create/Basic.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/network/interfaces/+page.svelte
 msgid "Description"
-msgstr "വിവരണം"
+msgstr "描述"
 
 #: src/lib/components/custom/VM/Create/Basic.svelte
 msgid "Optional description for this virtual machine"
-msgstr "ഈ വെർച്വൽ മെഷീനുള്ള ഒരു ഓപ്ഷണൽ വിവരണം"
+msgstr "此虚拟机的可选描述"
 
 #: src/lib/components/custom/VM/Create/Hardware.svelte
 msgid "CPU Sockets"
-msgstr "CPU സോക്കറ്റുകൾ"
+msgstr "CPU 插槽数"
 
 #: src/lib/components/custom/VM/Create/Hardware.svelte
 msgid "CPU Cores"
-msgstr "CPU കോറുകൾ"
+msgstr "CPU 核心数"
 
 #: src/lib/components/custom/VM/Create/Hardware.svelte
 msgid "CPU Threads"
-msgstr "CPU ത്രെഡുകൾ"
+msgstr "CPU 线程数"
 
 #: src/lib/components/custom/VM/Create/Hardware.svelte
 msgid "Memory Size"
-msgstr "മെമ്മറി വലുപ്പം"
+msgstr "内存大小"
 
 #: src/lib/components/custom/VM/Create/Hardware.svelte
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 msgid "CPU Pinning"
-msgstr "CPU പിന്നിംഗ്"
+msgstr "CPU 绑定"
 
 #: src/lib/components/custom/VM/Create/Hardware.svelte
 #: src/routes/[node]/+layout.svelte
 msgid "PCI Passthrough"
-msgstr "PCI പാസ്‌ത്രൂ"
+msgstr "PCI 直通"
 
 #: src/lib/components/custom/VM/Create/Hardware.svelte
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 msgid "You can only pin up to {0} vCPU{1}"
-msgstr "നിങ്ങൾക്ക് {0} vCPU വരെ മാത്രമേ പിൻ ചെയ്യാൻ കഴിയൂ{1}"
+msgstr "您最多可以绑定 {0} 个 vCPU{1}"
 
 #: src/lib/components/custom/VM/Create/Hardware.svelte
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 msgid "At least one CPU must be left unpinned"
-msgstr "കുറഞ്ഞത് ഒരു CPU എങ്കിലും പിൻ ചെയ്യാതെ വെക്കണം"
+msgstr "必须至少保留一个未绑定的 CPU"
 
 #: src/lib/components/custom/VM/Create/Network.svelte
 #: src/lib/components/custom/VM/Create/Storage.svelte
 msgid "Emulation Type"
-msgstr "എമുലേഷൻ തരം"
+msgstr "仿真类型"
 
 #: src/lib/components/custom/VM/Create/Network.svelte
 #: src/lib/components/custom/VM/Create/Storage.svelte
 msgid "Select emulation type"
-msgstr "എമുലേഷൻ തരം തിരഞ്ഞെടുക്കുക"
+msgstr "选择仿真类型"
 
 #: src/lib/components/custom/VM/Create/Network.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/routes/[node]/network/interfaces/+page.svelte
 msgid "MAC Address"
-msgstr "MAC വിലാസം"
+msgstr "MAC 地址"
 
 #: src/lib/components/custom/VM/Create/Storage.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "ZFS Volume"
-msgstr "ZFS വോളിയം"
+msgstr "ZFS 卷"
 
 #: src/lib/components/custom/VM/Create/Storage.svelte
 msgid "Select ZFS volume"
-msgstr "ZFS വോളിയം തിരഞ്ഞെടുക്കുക"
+msgstr "选择 ZFS 卷"
 
 #: src/lib/components/custom/VM/Create/Storage.svelte
 msgid "Disk Size"
-msgstr "ഡിസ്ക് വലുപ്പം"
+msgstr "磁盘大小"
 
 #: src/lib/components/custom/VM/Create/Storage.svelte
 msgid "Filesystem Dataset"
-msgstr "ഫയൽസിസ്റ്റം ഡാറ്റാസെറ്റ്"
+msgstr "文件系统数据集"
 
 #: src/lib/components/custom/VM/Create/Storage.svelte
 msgid "Select filesystem"
-msgstr "ഫയൽസിസ്റ്റം തിരഞ്ഞെടുക്കുക"
+msgstr "选择文件系统"
 
 #: src/lib/components/custom/VM/Create/Storage.svelte
 msgid "Installation Media"
-msgstr "ഇൻസ്റ്റലേഷൻ മീഡിയ"
+msgstr "安装介质"
 
 #: src/lib/components/custom/VM/Create/Storage.svelte
 msgid "Select installation media"
-msgstr "ഇൻസ്റ്റലേഷൻ മീഡിയ തിരഞ്ഞെടുക്കുക"
+msgstr "选择安装介质"
 
 #: src/lib/components/custom/VM/Create/Storage.svelte
 #: src/lib/components/custom/VM/Create/Storage.svelte
 msgid "None"
-msgstr "ഒന്നുമില്ല"
+msgstr "无"
 
 #: src/lib/components/ui/custom-input/combobox.svelte
 #: src/lib/components/custom/TreeTable/Search.svelte
 #: src/lib/components/ui/custom-input/combobox-bindable.svelte
 msgid "Search..."
-msgstr "തിരയുക..."
+msgstr "搜索..."
 
 #: src/lib/components/ui/custom-input/combobox.svelte
 msgid "No data"
-msgstr "ഡാറ്റ ലഭ്യമല്ല"
+msgstr "没有数据"
 
 #: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/Terminal.svelte
 #: src/lib/components/ui/custom-input/combobox.svelte
 #: src/lib/components/ui/custom-input/combobox-bindable.svelte
 msgid "Enter"
-msgstr "Enter"
+msgstr "进入"
+
+#: src/lib/components/skeleton/LeftPanel.svelte
+#: src/routes/[node]/+layout.svelte
+msgid "Data Center"
+msgstr "数据中心"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Help"
+msgstr "帮助"
+
+#: src/lib/components/skeleton/LeftPanel.svelte
+#: src/routes/[node]/+layout.svelte
+msgid "Difuse-sidebar"
+msgstr "Difuse-侧边栏"
+
+#: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/+layout.svelte
+msgid "Summary"
+msgstr "概览"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Console"
+msgstr "控制台"
+
+#: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/+layout.svelte
+msgid "Storage"
+msgstr "存储"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Hardware"
+msgstr "硬件"
+
+#: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/+layout.svelte
+msgid "Network"
+msgstr "网络"
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+#: src/routes/[node]/+layout.svelte
+msgid "Notes"
+msgstr "笔记"
+
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+#: src/routes/[node]/+layout.svelte
+msgid "Interfaces"
+msgstr "接口"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Switches"
+msgstr "交换机"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Explorer"
+msgstr "资源管理器"
+
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/routes/[node]/+layout.svelte
+msgid "Disks"
+msgstr "磁盘"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+#: src/routes/[node]/storage/disks/+page.svelte
+#: src/routes/[node]/+layout.svelte
+msgid "ZFS"
+msgstr "ZFS"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Dashboard"
+msgstr "仪表盘"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Pools"
+msgstr "存储池"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Datasets"
+msgstr "数据集"
+
+#: src/routes/[node]/+layout.svelte
+msgid "File Systems"
+msgstr "文件系统"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Volumes"
+msgstr "卷"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Snapshots"
+msgstr "快照"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Samba"
+msgstr "Samba"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Shares"
+msgstr "共享"
+
+#: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/+layout.svelte
+msgid "Settings"
+msgstr "设置"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Utilities"
+msgstr "实用工具"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Downloader"
+msgstr "下载器"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Authentication"
+msgstr "身份验证"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Users"
+msgstr "用户"
+
+#: src/routes/[node]/+layout.svelte
+msgid "Groups"
+msgstr "用户组"
+
+#: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "CPU Usage"
+msgstr "CPU 使用率"
+
+#: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "RAM Usage"
+msgstr "内存使用率"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Disk Usage"
+msgstr "磁盘使用率"
+
+#: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/summary/+page.svelte
+msgid "I/O Delay"
+msgstr "I/O 延迟"
+
+#: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/summary/+page.svelte
+msgid "Swap Usage"
+msgstr "交换空间使用率"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "CPU(s)"
+msgstr "CPU(s)"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Operating System"
+msgstr "操作系统"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Uptime"
+msgstr "运行时间"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Load Average"
+msgstr "平均负载"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Boot Mode"
+msgstr "启动模式"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Sylve Version"
+msgstr "Sylve 版本"
+
+#: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+msgid "Memory Usage"
+msgstr "内存使用率"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Network Usage"
+msgstr "网络使用率"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Network RX"
+msgstr "网络接收"
+
+#: src/routes/[node]/summary/+page.svelte
+msgid "Network TX"
+msgstr "网络发送"
+
+#: src/lib/components/custom/Charts/Bar.svelte
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+#: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+#: src/lib/components/custom/Charts/Area.svelte
+msgid "<0/> Reset zoom"
+msgstr "<0/> 重置缩放"
+
+#: src/lib/components/custom/Charts/Area.svelte
+msgid "HH:mm"
+msgstr "HH:mm"
+
+#: src/lib/components/custom/Charts/Area.svelte
+msgid "Date"
+msgstr "日期"
+
+#: src/routes/[node]/storage/disks/+page.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+#: src/lib/components/custom/Charts/Area.svelte
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
+msgid "Value"
+msgstr "值"
+
+#: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/Header.svelte
+#: src/lib/components/custom/Header.svelte
+#: src/lib/components/custom/Header.svelte
+msgid "Sylve Logo"
+msgstr "Sylve 标志"
 
 #: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/Throbber.svelte
@@ -352,34 +556,26 @@ msgstr "Enter"
 msgid "SYLVE"
 msgstr "SYLVE"
 
-#: src/lib/components/custom/Login.svelte
-#: src/lib/components/custom/Login.svelte
-#: src/lib/components/custom/Header.svelte
-#: src/lib/components/custom/Header.svelte
-#: src/lib/components/custom/Header.svelte
-msgid "Sylve Logo"
-msgstr "സിൽവെ ലോഗോ"
-
 #: src/lib/components/custom/Authentication/Create.svelte
 #: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 #: src/lib/components/custom/Login.svelte
 msgid "Username"
-msgstr "ഉപയോക്തൃനാമം"
+msgstr "用户名"
 
 #: src/lib/components/custom/Login.svelte
 msgid "Enter your username"
-msgstr "നിങ്ങളുടെ ഉപയോക്തൃനാമം നൽകുക"
+msgstr "输入您的用户名"
 
 #: src/lib/components/custom/Authentication/Create.svelte
 #: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 #: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
 msgid "Password"
-msgstr "രഹസ്യവാക്ക്"
+msgstr "密码"
 
 #: src/lib/components/custom/Login.svelte
 msgid "Realm"
-msgstr "Realm"
+msgstr "领域"
 
 #: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/Login.svelte
@@ -389,31 +585,31 @@ msgstr "PAM"
 #: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/Login.svelte
 msgid "Sylve"
-msgstr "സിൽവെ"
+msgstr "Sylve"
 
 #: src/lib/components/custom/Header.svelte
 msgid "Toggle navigation menu"
-msgstr "നാവിഗേഷൻ മെനു ടോഗിൾ ചെയ്യുക"
+msgstr "切换导航菜单"
 
 #: src/lib/components/custom/Header.svelte
 msgid "Virtual Environment 0.0.1"
-msgstr "വെർച്വൽ എൻവയോൺമെന്റ് 0.0.1"
+msgstr "虚拟环境 0.0.1"
 
 #: src/lib/components/custom/Header.svelte
 msgid "<0/> Create VM"
-msgstr "<0/> VM ഉണ്ടാക്കുക"
+msgstr "<0/> 创建虚拟机"
 
 #: src/lib/components/custom/Header.svelte
 msgid "Toggle user menu"
-msgstr "ഉപയോക്തൃ മെനു ടോഗിൾ ചെയ്യുക"
+msgstr "切换用户菜单"
 
 #: src/lib/components/custom/Header.svelte
 msgid "Color Theme"
-msgstr "വർണ്ണ തീം"
+msgstr "颜色主题"
 
 #: src/lib/components/custom/Header.svelte
 msgid "Log out"
-msgstr "ലോഗ് ഔട്ട്"
+msgstr "登出"
 
 #: src/lib/components/custom/Header.svelte
 msgid "⌘⇧Q"
@@ -421,58 +617,53 @@ msgstr "⌘⇧Q"
 
 #: src/lib/components/custom/Terminal.svelte
 msgid "Minimize"
-msgstr "ചെറുതാക്കുക"
+msgstr "最小化"
 
 #: src/lib/components/custom/Terminal.svelte
 msgid "Add new tab"
-msgstr "പുതിയ ടാബ് ചേർക്കുക"
+msgstr "添加新标签页"
 
 #: src/lib/components/custom/Terminal.svelte
 msgid "Session killed: {0}"
-msgstr "സെഷൻ നിർത്തി: {0}"
+msgstr "会话已终止: {0}"
 
 #: src/lib/components/skeleton/BottomPanel.svelte
 msgid "Start Time"
-msgstr "ആരംഭ സമയം"
+msgstr "开始时间"
 
 #: src/lib/components/skeleton/BottomPanel.svelte
 msgid "End Time"
-msgstr "അവസാന സമയം"
+msgstr "结束时间"
 
 #: src/lib/components/skeleton/BottomPanel.svelte
 msgid "Node"
-msgstr "നോഡ്"
+msgstr "节点"
 
 #: src/routes/[node]/settings/authentication/users/+page.svelte
 #: src/lib/components/skeleton/BottomPanel.svelte
 msgid "User"
-msgstr "ഉപയോക്താവ്"
+msgstr "用户"
 
 #: src/lib/components/skeleton/BottomPanel.svelte
 msgid "Action"
-msgstr "പ്രവർത്തനം"
+msgstr "操作"
 
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 #: src/lib/components/skeleton/BottomPanel.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/network/interfaces/+page.svelte
 msgid "Status"
-msgstr "സ്ഥിതി"
+msgstr "状态"
 
 #: src/lib/components/skeleton/BottomPanel.svelte
 #: src/lib/components/skeleton/BottomPanel.svelte
 msgid "Login"
-msgstr "ലോഗിൻ"
-
-#: src/lib/components/skeleton/BottomPanel.svelte
-#: src/routes/[node]/+layout.svelte
-msgid "Notes"
-msgstr "കുറിപ്പുകൾ"
+msgstr "登录"
 
 #: src/lib/components/skeleton/BottomPanel.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 msgid "Switch"
-msgstr "മാറുക"
+msgstr "切换"
 
 #: src/lib/components/skeleton/BottomPanel.svelte
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
@@ -483,206 +674,15 @@ msgstr "VNC"
 
 #: src/lib/components/skeleton/BottomPanel.svelte
 msgid "Disk - Initialize GPT"
-msgstr "ഡിസ്ക് - GPT ആരംഭിക്കുക"
+msgstr "磁盘 - 初始化 GPT"
 
 #: src/lib/components/skeleton/BottomPanel.svelte
 msgid "Disk - Wipe"
-msgstr "ഡിസ്ക് - തുടച്ചുനീക്കുക"
+msgstr "磁盘 - 擦除"
 
 #: src/lib/components/skeleton/BottomPanel.svelte
 msgid "Login - Create"
-msgstr "ലോഗിൻ - ഉണ്ടാക്കുക"
-
-#: src/lib/components/skeleton/LeftPanel.svelte
-#: src/routes/[node]/+layout.svelte
-msgid "Difuse-sidebar"
-msgstr "ഡിഫ്യൂസ്-സൈഡ്ബാർ"
-
-#: src/lib/components/skeleton/LeftPanel.svelte
-#: src/routes/[node]/+layout.svelte
-msgid "Data Center"
-msgstr "ഡാറ്റാ സെന്റർ"
-
-#: src/routes/[node]/+layout.svelte
-msgid "Help"
-msgstr "സഹായം"
-
-#: src/routes/[node]/+layout.svelte
-#: src/routes/[node]/+layout.svelte
-msgid "Summary"
-msgstr "സംഗ്രഹം"
-
-#: src/routes/[node]/+layout.svelte
-msgid "Console"
-msgstr "കൺസോൾ"
-
-#: src/routes/[node]/+layout.svelte
-#: src/routes/[node]/+layout.svelte
-msgid "Storage"
-msgstr "സംഭരണം"
-
-#: src/routes/[node]/+layout.svelte
-msgid "Hardware"
-msgstr "ഹാർഡ്‌വെയർ"
-
-#: src/routes/[node]/+layout.svelte
-#: src/routes/[node]/+layout.svelte
-msgid "Network"
-msgstr "നെറ്റ്‌വർക്ക്"
-
-#: src/routes/[node]/storage/samba/settings/+page.svelte
-#: src/routes/[node]/storage/samba/settings/+page.svelte
-#: src/routes/[node]/storage/samba/settings/+page.svelte
-#: src/routes/[node]/+layout.svelte
-msgid "Interfaces"
-msgstr "ഇന്റർഫേസുകൾ"
-
-#: src/routes/[node]/+layout.svelte
-msgid "Switches"
-msgstr "സ്വിച്ചുകൾ"
-
-#: src/routes/[node]/+layout.svelte
-msgid "Explorer"
-msgstr "എക്സ്പ്ലോറർ"
-
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-#: src/routes/[node]/+layout.svelte
-msgid "Disks"
-msgstr "ഡിസ്കുകൾ"
-
-#: src/routes/[node]/storage/disks/+page.svelte
-#: src/routes/[node]/storage/disks/+page.svelte
-#: src/routes/[node]/+layout.svelte
-msgid "ZFS"
-msgstr "ZFS"
-
-#: src/routes/[node]/+layout.svelte
-msgid "Dashboard"
-msgstr "ഡാഷ്ബോർഡ്"
-
-#: src/routes/[node]/+layout.svelte
-msgid "Pools"
-msgstr "പൂളുകൾ"
-
-#: src/routes/[node]/+layout.svelte
-msgid "Datasets"
-msgstr "ഡാറ്റാ സെറ്റുകൾ"
-
-#: src/routes/[node]/+layout.svelte
-msgid "File Systems"
-msgstr "ഫയൽ സിസ്റ്റങ്ങൾ"
-
-#: src/routes/[node]/+layout.svelte
-msgid "Volumes"
-msgstr "വോള്യങ്ങൾ"
-
-#: src/routes/[node]/+layout.svelte
-msgid "Snapshots"
-msgstr "സ്നാപ്ഷോട്ടുകൾ"
-
-#: src/routes/[node]/+layout.svelte
-msgid "Samba"
-msgstr "സാംബ"
-
-#: src/routes/[node]/+layout.svelte
-msgid "Shares"
-msgstr "ഷെയറുകൾ"
-
-#: src/routes/[node]/+layout.svelte
-#: src/routes/[node]/+layout.svelte
-msgid "Settings"
-msgstr "ക്രമീകരണങ്ങൾ"
-
-#: src/routes/[node]/+layout.svelte
-msgid "Utilities"
-msgstr "ഉപകരണങ്ങൾ"
-
-#: src/routes/[node]/+layout.svelte
-msgid "Downloader"
-msgstr "ഡൗൺലോഡർ"
-
-#: src/routes/[node]/+layout.svelte
-msgid "Authentication"
-msgstr "ആധികാരികത"
-
-#: src/routes/[node]/+layout.svelte
-msgid "Users"
-msgstr "ഉപയോക്താക്കൾ"
-
-#: src/routes/[node]/+layout.svelte
-msgid "Groups"
-msgstr "ഗ്രൂപ്പുകൾ"
-
-#: src/routes/[node]/summary/+page.svelte
-#: src/routes/[node]/summary/+page.svelte
-#: src/routes/[node]/summary/+page.svelte
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
-msgid "CPU Usage"
-msgstr "CPU ഉപയോഗം"
-
-#: src/routes/[node]/summary/+page.svelte
-#: src/routes/[node]/summary/+page.svelte
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
-msgid "RAM Usage"
-msgstr "RAM ഉപയോഗം"
-
-#: src/routes/[node]/summary/+page.svelte
-msgid "Disk Usage"
-msgstr "ഡിസ്ക് ഉപയോഗം"
-
-#: src/routes/[node]/summary/+page.svelte
-#: src/routes/[node]/summary/+page.svelte
-msgid "I/O Delay"
-msgstr "I/O കാലതാമസം"
-
-#: src/routes/[node]/summary/+page.svelte
-#: src/routes/[node]/summary/+page.svelte
-msgid "Swap Usage"
-msgstr "Swap ഉപയോഗം"
-
-#: src/routes/[node]/summary/+page.svelte
-msgid "CPU(s)"
-msgstr "CPU(കൾ)"
-
-#: src/routes/[node]/summary/+page.svelte
-msgid "Operating System"
-msgstr "ഓപ്പറേറ്റിംഗ് സിസ്റ്റം"
-
-#: src/routes/[node]/summary/+page.svelte
-msgid "Uptime"
-msgstr "പ്രവർത്തന സമയം"
-
-#: src/routes/[node]/summary/+page.svelte
-msgid "Load Average"
-msgstr "ശരാശരി ലോഡ്"
-
-#: src/routes/[node]/summary/+page.svelte
-msgid "Boot Mode"
-msgstr "ബൂട്ട് മോഡ്"
-
-#: src/routes/[node]/summary/+page.svelte
-msgid "Sylve Version"
-msgstr "സിൽവെ പതിപ്പ്"
-
-#: src/routes/[node]/summary/+page.svelte
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
-msgid "Memory Usage"
-msgstr "മെമ്മറി ഉപയോഗം"
-
-#: src/routes/[node]/summary/+page.svelte
-msgid "Network Usage"
-msgstr "നെറ്റ്‌വർക്ക് ഉപയോഗം"
-
-#: src/routes/[node]/summary/+page.svelte
-msgid "Network RX"
-msgstr "നെറ്റ്‌വർക്ക് RX"
-
-#: src/routes/[node]/summary/+page.svelte
-msgid "Network TX"
-msgstr "നെറ്റ്‌വർക്ക് TX"
+msgstr "登录 - 创建"
 
 #: src/routes/[node]/network/interfaces/+page.svelte
 #: src/routes/[node]/notes/+page.svelte

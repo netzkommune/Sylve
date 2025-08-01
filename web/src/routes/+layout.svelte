@@ -15,7 +15,7 @@
 	import { preloadIcons } from '$lib/utils/icons';
 	import { addTabulatorFilters } from '$lib/utils/table';
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
-	import { setCatalog } from '@wuchale/svelte/runtime.svelte.js';
+    import { loadLocale } from 'wuchale/run-client'
 	import { ModeWatcher } from 'mode-watcher';
 	import { onMount, tick } from 'svelte';
 
@@ -23,17 +23,8 @@
 	import { toast } from 'svelte-sonner';
 	import '../app.css';
 
-	async function setLocale(locale: Locales) {
-		const mod = await import(`$lib/locales/${locale}.svelte.js`);
-		if (mod) {
-			setCatalog(mod);
-		} else {
-			console.error('Failed to load locale:', locale);
-		}
-	}
-
 	$effect.pre(() => {
-		setLocale($language as Locales);
+		loadLocale($language as Locales);
 	});
 
 	const queryClient = new QueryClient();
@@ -94,7 +85,7 @@
 		let isError = false;
 
 		try {
-			setLocale(language as Locales);
+			loadLocale(language as Locales);
 			if (await login(username, password, type, remember, language)) {
 				isLoading = true;
 				isLoggedIn = true;

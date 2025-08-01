@@ -12,12 +12,12 @@ export async function attachNetwork(
 	vmId: number,
 	switchId: number,
 	emulation: string,
-	mac: string
+	macId: number
 ): Promise<APIResponse> {
 	return await apiRequest(`/vm/network/attach`, APIResponseSchema, 'POST', {
 		vmId,
 		switchId,
 		emulation,
-		mac
+		macId
 	});
 }

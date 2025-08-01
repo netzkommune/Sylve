@@ -45,7 +45,7 @@ func SetupDatabase(cfg *internal.SylveConfig, isTest bool) *gorm.DB {
 		logger.L.Fatal().Msgf("Error connecting to database: %v", err)
 	}
 
-	db.Exec("PRAGMA foreign_keys = ON")
+	db.Exec("PRAGMA foreign_keys = OFF")
 	db.Exec("PRAGMA journal_mode = WAL")
 	db.Exec("PRAGMA synchronous = NORMAL")
 
@@ -93,6 +93,8 @@ func SetupDatabase(cfg *internal.SylveConfig, isTest bool) *gorm.DB {
 		logger.L.Fatal().Msgf("Error migrating database: %v", err)
 	}
 
+	db.Exec("PRAGMA foreign_keys = ON")
+
 	err = setupInitUsers(db, cfg)
 
 	if err != nil {
@@ -103,6 +105,12 @@ func SetupDatabase(cfg *internal.SylveConfig, isTest bool) *gorm.DB {
 		if err := db.Exec("VACUUM").Error; err != nil {
 			logger.L.Warn().Msgf("VACUUM failed: %v", err)
 		}
+	}
+
+	err = Fixups(db)
+
+	if err != nil {
+		logger.L.Fatal().Msgf("Error applying database fixups: %v", err)
 	}
 
 	return db

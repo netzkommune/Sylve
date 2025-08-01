@@ -1,4 +1,5 @@
 import { z } from 'zod/v4';
+import { NetworkObjectSchema } from '../network/object';
 
 export interface CreateData {
 	name: string;
@@ -50,6 +51,8 @@ export const VMStorageSchema = z.object({
 export const VMNetworkSchema = z.object({
 	id: z.number().int(),
 	mac: z.string(),
+	macId: z.number().int().optional(),
+	macObject: NetworkObjectSchema.optional(),
 	switchId: z.number().int(),
 	emulation: z.string(),
 	vmId: z.number().int().optional()

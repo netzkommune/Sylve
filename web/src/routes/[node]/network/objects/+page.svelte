@@ -1,14 +1,16 @@
 <script lang="ts">
-	import { getNetworkObjects } from '$lib/api/network/object';
+	import { deleteNetworkObject, getNetworkObjects } from '$lib/api/network/object';
+	import AlertDialog from '$lib/components/custom/Dialog/Alert.svelte';
 	import CreateOrEdit from '$lib/components/custom/Network/Objects/CreateOrEdit.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import Search from '$lib/components/custom/TreeTable/Search.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import type { Column, Row } from '$lib/types/components/tree-table';
 	import type { NetworkObject } from '$lib/types/network/object';
-	import { updateCache } from '$lib/utils/http';
+	import { handleAPIError, isAPIResponse, updateCache } from '$lib/utils/http';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
+	import { toast } from 'svelte-sonner';
 	import type { CellComponent } from 'tabulator-tables';
 
 	interface Data {
@@ -36,6 +38,14 @@
 	let modals = $state({
 		create: {
 			open: false
+		},
+		edit: {
+			open: false,
+			id: 0
+		},
+		delete: {
+			open: false,
+			id: 0
 		}
 	});
 
@@ -63,7 +73,7 @@
 						return 'Host(s)';
 					case 'Network':
 						return 'Network(s)';
-					case 'MAC':
+					case 'Mac':
 						return 'MAC(s)';
 					default:
 						return value || '-';
@@ -96,7 +106,7 @@
 		}
 	]);
 
-	const tableData: { rows: Row[]; columns: Column[] } = {
+	const tableData: { rows: Row[]; columns: Column[] } = $derived({
 		columns,
 		rows: objects.map((object) => {
 			return {
@@ -107,11 +117,49 @@
 				updatedAt: object.updatedAt
 			};
 		})
-	};
+	});
 
-	let activeRow: Row[] | null = $state(null);
+	let activeRows: Row[] | null = $state(null);
+	let activeRow: Row | null = $derived(activeRows ? (activeRows[0] as Row) : ({} as Row));
+
 	let query: string = $state('');
 </script>
+
+{#snippet button(type: string)}
+	{#if activeRows && activeRows.length == 1}
+		{#if type === 'delete'}
+			<Button
+				onclick={() => {
+					modals.delete.open = !modals.delete.open;
+					modals.delete.id = Number(activeRow?.id);
+				}}
+				size="sm"
+				variant="outline"
+				class="h-6.5"
+			>
+				<div class="flex items-center">
+					<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
+					<span>Delete</span>
+				</div>
+			</Button>
+		{:else if type === 'edit'}
+			<Button
+				onclick={() => {
+					modals.edit.open = !modals.edit.open;
+					modals.edit.id = Number(activeRow?.id);
+				}}
+				size="sm"
+				variant="outline"
+				class="h-6.5"
+			>
+				<div class="flex items-center">
+					<Icon icon="mdi:pencil" class="mr-1 h-4 w-4" />
+					<span>Edit</span>
+				</div>
+			</Button>
+		{/if}
+	{/if}
+{/snippet}
 
 <div class="flex h-full w-full flex-col">
 	<div class="flex h-10 w-full items-center gap-2 border-b p-2">
@@ -122,17 +170,63 @@
 				<span>New</span>
 			</div>
 		</Button>
+
+		{@render button('edit')}
+		{@render button('delete')}
 	</div>
 
 	<TreeTable
 		data={tableData}
 		name="tt-network-objects"
 		multipleSelect={false}
-		bind:parentActiveRow={activeRow}
+		bind:parentActiveRow={activeRows}
 		bind:query
 	/>
 </div>
 
 {#if modals.create.open}
-	<CreateOrEdit bind:open={modals.create.open} />
+	<CreateOrEdit bind:open={modals.create.open} networkObjects={objects} edit={false} />
 {/if}
+
+{#if modals.edit.open}
+	<CreateOrEdit
+		bind:open={modals.edit.open}
+		networkObjects={objects}
+		edit={true}
+		id={Number(modals.edit.id)}
+	/>
+{/if}
+
+<AlertDialog
+	open={modals.delete.open}
+	names={{ parent: 'network object', element: activeRow?.name || 'unknown' }}
+	actions={{
+		onConfirm: async () => {
+			let active = $state.snapshot(activeRow);
+			const result = await deleteNetworkObject(modals.delete.id);
+			if (isAPIResponse(result) && result.status === 'success') {
+				toast.success(`Object ${active?.name} deleted`, {
+					position: 'bottom-center'
+				});
+			} else {
+				handleAPIError(result);
+				if (result.error?.includes('used')) {
+					toast.error(`Object ${active?.name} is in use`, {
+						position: 'bottom-center'
+					});
+				} else {
+					toast.error(`Error deleting object ${active?.name}`, {
+						position: 'bottom-center'
+					});
+				}
+			}
+
+			activeRows = null;
+			modals.delete.open = false;
+		},
+		onCancel: () => {
+			activeRows = null;
+			modals.delete.open = false;
+		}
+	}}
+></AlertDialog>

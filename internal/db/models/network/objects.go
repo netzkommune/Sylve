@@ -5,7 +5,7 @@ import "time"
 type Object struct {
 	ID        uint      `json:"id" gorm:"primaryKey"`
 	Name      string    `json:"name" gorm:"uniqueIndex;not null"`
-	Type      string    `json:"type" gorm:"not null"` // "Host", "Network", "Port", "Country", "List"
+	Type      string    `json:"type" gorm:"not null"` // "Host", "Mac", "Network", "Port", "Country", "List"
 	Comment   string    `json:"description"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`

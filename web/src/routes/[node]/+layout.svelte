@@ -152,6 +152,11 @@
 									label: 'Settings',
 									icon: 'mdi:folder-settings-variant',
 									href: `/${node}/storage/samba/settings`
+								},
+								{
+									label: 'Audit Logs',
+									icon: 'tabler:logs',
+									href: `/${node}/storage/samba/audit-logs`
 								}
 							]
 						}

@@ -3,17 +3,18 @@ package samba
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
 	"path/filepath"
 	"strings"
 	sambaModels "sylve/internal/db/models/samba"
+	sambaServiceInterfaces "sylve/internal/interfaces/services/samba"
 	"time"
 )
 
 func (s *Service) ParseAuditLogs() error {
 	const logPath = "/var/log/samba4/audit.log"
 
-	// which ops we care about
 	validActions := map[string]bool{
 		"connect":     true,
 		"disconnect":  true,
@@ -23,7 +24,6 @@ func (s *Service) ParseAuditLogs() error {
 		"create_file": true,
 	}
 
-	// dedupe maps
 	seenCreates := make(map[string]bool)
 
 	f, err := os.Open(logPath)
@@ -79,7 +79,6 @@ func (s *Service) ParseAuditLogs() error {
 			}
 
 		case "create_file":
-			// only log the real create, not every open
 			if len(args) >= 2 && args[len(args)-2] == "create" {
 				p := args[len(args)-1]
 				if !seenCreates[p] {
@@ -92,7 +91,6 @@ func (s *Service) ParseAuditLogs() error {
 		if entry.Path != "" {
 			entry.Folder = filepath.Base(entry.Path)
 
-			// ——— SKIP create_file if a mkdirat on the same path happened ≤5s ago ———
 			if action == "create_file" {
 				var cnt int64
 				cutoff := time.Now().Add(-5 * time.Second)
@@ -103,7 +101,6 @@ func (s *Service) ParseAuditLogs() error {
 					return fmt.Errorf("failed to check recent mkdirat: %w", err)
 				}
 				if cnt > 0 {
-					// skip this create_file entry
 					continue
 				}
 			}
@@ -117,9 +114,68 @@ func (s *Service) ParseAuditLogs() error {
 		return fmt.Errorf("error scanning audit log: %w", err)
 	}
 
-	// clear so next run only sees new lines
 	if err := os.Truncate(logPath, 0); err != nil {
 		return fmt.Errorf("failed to clear audit log: %w", err)
 	}
+
 	return nil
+}
+
+func (s *Service) GetAuditLogs(
+	page int,
+	size int,
+	sortField, sortDir string,
+) (*sambaServiceInterfaces.AuditLogsResponse, error) {
+	if size <= 0 {
+		size = 100
+	}
+	if page <= 0 {
+		page = 1
+	}
+
+	var total int64
+	if err := s.DB.
+		Model(&sambaModels.SambaAuditLog{}).
+		Count(&total).Error; err != nil {
+		return nil, fmt.Errorf("failed to count audit logs: %w", err)
+	}
+
+	lastPage := int(math.Ceil(float64(total) / float64(size)))
+
+	allowed := map[string]bool{
+		"id":         true,
+		"action":     true,
+		"share":      true,
+		"path":       true,
+		"created_at": true,
+	}
+
+	field := "id"
+	direction := "DESC"
+	if allowed[sortField] {
+		field = sortField
+		dir := strings.ToUpper(sortDir)
+		if dir == "ASC" || dir == "DESC" {
+			direction = dir
+		} else {
+			direction = "ASC"
+		}
+	}
+
+	orderExpr := fmt.Sprintf("%s %s", field, direction)
+	offset := (page - 1) * size
+
+	var logs []sambaModels.SambaAuditLog
+	if err := s.DB.
+		Order(orderExpr).
+		Offset(offset).
+		Limit(size).
+		Find(&logs).Error; err != nil {
+		return nil, fmt.Errorf("failed to fetch audit logs: %w", err)
+	}
+
+	return &sambaServiceInterfaces.AuditLogsResponse{
+		LastPage: lastPage,
+		Data:     logs,
+	}, nil
 }

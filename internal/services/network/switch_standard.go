@@ -707,8 +707,11 @@ func addBridgeMember(br, portName string, mtu, vlan int) error {
 		}
 	}
 
+	targetPort := portName
 	if vlan > 0 {
 		vif := fmt.Sprintf("%s.%d", portName, vlan)
+		targetPort = vif
+
 		if _, err := utils.RunCommand("ifconfig", vif); err != nil {
 			args := []string{
 				"vlan", "create",
@@ -723,22 +726,26 @@ func addBridgeMember(br, portName string, mtu, vlan int) error {
 				return fmt.Errorf("create vlan %s: %v", vif, err)
 			}
 		}
+	}
 
-		if _, err := utils.RunCommand("ifconfig", br, "addm", vif, "up"); err != nil {
-			return fmt.Errorf("add vlan %s to bridge %s: %v", vif, br, err)
+	portsToClear := map[string]bool{portName: true}
+	if targetPort != portName {
+		portsToClear[targetPort] = true
+	}
+	for port := range portsToClear {
+		if _, err := utils.RunCommand("ifconfig", port, "inet", "-alias"); err != nil {
+			return fmt.Errorf("clear inet on %s: %v", port, err)
 		}
+		if _, err := utils.RunCommand("ifconfig", port, "inet6", "-alias"); err != nil {
+			return fmt.Errorf("clear inet6 on %s: %v", port, err)
+		}
+	}
 
-		if _, err := utils.RunCommand("ifconfig", vif, "up"); err != nil {
-			return fmt.Errorf("bring up vlan %s: %v", vif, err)
-		}
-	} else {
-		if _, err := utils.RunCommand("ifconfig", br, "addm", portName, "up"); err != nil {
-			return fmt.Errorf("add port %s to bridge %s: %v", portName, br, err)
-		}
-
-		if _, err := utils.RunCommand("ifconfig", portName, "up"); err != nil {
-			return fmt.Errorf("bring up port %s: %v", portName, err)
-		}
+	if _, err := utils.RunCommand("ifconfig", br, "addm", targetPort, "up"); err != nil {
+		return fmt.Errorf("add %s to bridge %s: %v", targetPort, br, err)
+	}
+	if _, err := utils.RunCommand("ifconfig", targetPort, "up"); err != nil {
+		return fmt.Errorf("bring up %s: %v", targetPort, err)
 	}
 
 	return nil

@@ -18,3 +18,16 @@ type SambaShare struct {
 	CreatedAt       time.Time      `json:"createdAt" gorm:"autoCreateTime"`
 	UpdatedAt       time.Time      `json:"updatedAt" gorm:"autoUpdateTime"`
 }
+
+type SambaAuditLog struct {
+	ID        int       `json:"id" gorm:"primaryKey"`
+	Share     string    `json:"share"`
+	User      string    `json:"user"`
+	IP        string    `json:"ip"`
+	Action    string    `json:"action"`
+	Result    string    `json:"result"`
+	Path      string    `json:"path"`
+	Target    string    `json:"target"`
+	Folder    string    `json:"folder"`
+	CreatedAt time.Time `json:"createdAt" gorm:"autoCreateTime"`
+}

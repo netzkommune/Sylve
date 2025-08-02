@@ -18,18 +18,20 @@ func (s *Service) InitSamba() error {
 	backupPath := "/usr/local/etc/smb4.conf.pre-sylve"
 
 	data, err := os.ReadFile(cfgPath)
-	if err != nil && !os.IsNotExist(err) {
-		return err
-	}
-
-	if !strings.Contains(string(data), marker) {
-		exists, err := utils.FileExists(backupPath)
-		if err != nil {
+	if err != nil {
+		if !os.IsNotExist(err) {
 			return err
 		}
-		if !exists {
-			if err := utils.CopyFile(cfgPath, backupPath); err != nil {
+	} else {
+		if !strings.Contains(string(data), marker) {
+			exists, err := utils.FileExists(backupPath)
+			if err != nil {
 				return err
+			}
+			if !exists {
+				if err := utils.CopyFile(cfgPath, backupPath); err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -50,6 +52,17 @@ func (s *Service) InitSamba() error {
 
 	if err := s.Samba.WriteConfig(false); err != nil {
 		return err
+	}
+
+	if exists, err := utils.FileExists("/var/log/samba4/audit.log"); err != nil {
+		return err
+	} else if !exists {
+		if err := os.MkdirAll("/var/log/samba4", 0755); err != nil {
+			return err
+		}
+		if _, err := os.Create("/var/log/samba4/audit.log"); err != nil {
+			return err
+		}
 	}
 
 	return system.ServiceAction("samba_server", "restart")

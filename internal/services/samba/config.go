@@ -111,7 +111,7 @@ func (s *Service) GlobalConfig() (string, error) {
 		config += "bind interfaces only = no\n"
 	}
 
-	config += "vfs objects = zfsacl\n"
+	config += "vfs objects = full_audit zfsacl\n"
 	config += "inherit acls = yes\n"
 
 	return config, nil
@@ -198,6 +198,14 @@ func (s *Service) ShareConfig() (string, error) {
 
 		config.WriteString(fmt.Sprintf("\tcreate mask = %s\n", share.CreateMask))
 		config.WriteString(fmt.Sprintf("\tdirectory mask = %s\n", share.DirectoryMask))
+		config.WriteString("\tfull_audit:prefix = sylve-smb-al|%u|%I|%m|%S|%P\n")
+		config.WriteString("\tfull_audit:success = openat close read write renameat unlinkat mkdirat create_file connect disconnect\n")
+		config.WriteString("\tfull_audit:failure = all !getwd !get_real_filename !fgetxattr !fget_dos_attributes\n")
+		config.WriteString("\tfull_audit:facility = LOCAL7\n")
+		config.WriteString("\tfull_audit:priority = ALERT\n")
+		config.WriteString("\tfull_audit:syslog = true\n")
+		config.WriteString("\tfull_audit:log_secdesc = true\n")
+
 		config.WriteString("\n\n")
 
 		_, err := utils.RunCommand("setfacl", "-b", dataset.Mountpoint)

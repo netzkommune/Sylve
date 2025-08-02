@@ -89,6 +89,10 @@ func (s *Service) PreFlightChecklist() error {
 		return err
 	}
 
+	if err := s.CheckSyslogConfig(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -152,6 +156,15 @@ func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface)
 		for {
 			if err := s.Libvirt.StoreVMUsage(); err != nil {
 				logger.L.Error().Msgf("Failed to store VM usage: %v", err)
+			}
+			time.Sleep(5 * time.Second)
+		}
+	}()
+
+	go func() {
+		for {
+			if err := s.Samba.ParseAuditLogs(); err != nil {
+				logger.L.Error().Msgf("Failed to parse Samba audit logs: %v", err)
 			}
 			time.Sleep(5 * time.Second)
 		}

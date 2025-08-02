@@ -732,11 +732,13 @@ func addBridgeMember(br, portName string, mtu, vlan int) error {
 	if targetPort != portName {
 		portsToClear[targetPort] = true
 	}
+
 	for port := range portsToClear {
 		if _, err := utils.RunCommand("ifconfig", port, "inet", "-alias"); err != nil {
 			return fmt.Errorf("clear inet on %s: %v", port, err)
 		}
-		if _, err := utils.RunCommand("ifconfig", port, "inet6", "-alias"); err != nil {
+		if _, err := utils.RunCommand("ifconfig", port, "inet6", "-alias"); err != nil &&
+			!strings.Contains(err.Error(), "Can't assign requested address") {
 			return fmt.Errorf("clear inet6 on %s: %v", port, err)
 		}
 	}

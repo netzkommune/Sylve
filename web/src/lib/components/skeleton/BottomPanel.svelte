@@ -39,7 +39,10 @@
 		'/api/vnc': 'VNC',
 		'/api/disk/initialize-gpt': 'Disk - Initialize GPT',
 		'/api/disk/wipe': 'Disk - Wipe',
-		'/api/network/object': 'Network Object'
+		'/api/network/object': 'Network Object',
+		'/api/system/file-explorer/delete': 'File Explorer - Delete',
+		'/api/system/file-explorer': 'File Explorer',
+		'/api/system/ppt-devices': 'PCI Passthrough'
 	});
 
 	let records = $derived.by(() => {

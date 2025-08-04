@@ -25,7 +25,7 @@ func (s *Service) PruneOrphanedVMStats() error {
 			"vm_id NOT IN (?)",
 			s.DB.
 				Model(&vmModels.VM{}).
-				Select("vm_id"),
+				Select("id"),
 		).
 		Delete(&vmModels.VMStats{}).
 		Error; err != nil {
@@ -165,7 +165,7 @@ func (s *Service) GetVMUsage(vmId int, limit int) ([]vmModels.VMStats, error) {
 	}
 
 	var vmStats []vmModels.VMStats
-	if err := s.DB.Where("vm_id = ?", vmId).
+	if err := s.DB.Where("vm_id = ?", vmDbId).
 		Order("id DESC").
 		Limit(limit).
 		Find(&vmStats).Error; err != nil {
@@ -173,7 +173,7 @@ func (s *Service) GetVMUsage(vmId int, limit int) ([]vmModels.VMStats, error) {
 	}
 
 	if len(vmStats) == 0 {
-		return nil, fmt.Errorf("no_vm_usage_found")
+		return vmStats, nil
 	}
 
 	return vmStats, nil

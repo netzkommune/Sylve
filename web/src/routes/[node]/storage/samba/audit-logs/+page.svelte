@@ -23,9 +23,10 @@
 			const dataset = data.datasets.find((d) => d.properties.guid === share.dataset);
 			if (dataset?.mountpoint) {
 				const path = cell.getValue().replace(dataset.mountpoint, '');
-				return path;
+				return path || '-';
 			}
 		}
+
 		return cell.getValue() || '-';
 	}
 

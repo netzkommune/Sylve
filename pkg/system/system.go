@@ -152,3 +152,20 @@ func RenameGroup(oldName, newName string) error {
 
 	return nil
 }
+
+func ChangeUsername(oldUsername, newUsername string) error {
+	if exists, _ := UnixUserExists(oldUsername); !exists {
+		return fmt.Errorf("user %s does not exist", oldUsername)
+	}
+
+	if exists, _ := UnixUserExists(newUsername); exists {
+		return fmt.Errorf("user %s already exists", newUsername)
+	}
+
+	_, err := utils.RunCommand("pw", "usermod", oldUsername, "-l", newUsername)
+	if err != nil {
+		return fmt.Errorf("failed to change username from %s to %s: %w", oldUsername, newUsername, err)
+	}
+
+	return nil
+}

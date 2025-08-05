@@ -18,18 +18,20 @@ func (s *Service) InitSamba() error {
 	backupPath := "/usr/local/etc/smb4.conf.pre-sylve"
 
 	data, err := os.ReadFile(cfgPath)
-	if err != nil && !os.IsNotExist(err) {
-		return err
-	}
-
-	if !strings.Contains(string(data), marker) {
-		exists, err := utils.FileExists(backupPath)
-		if err != nil {
+	if err != nil {
+		if !os.IsNotExist(err) {
 			return err
 		}
-		if !exists {
-			if err := utils.CopyFile(cfgPath, backupPath); err != nil {
+	} else {
+		if !strings.Contains(string(data), marker) {
+			exists, err := utils.FileExists(backupPath)
+			if err != nil {
 				return err
+			}
+			if !exists {
+				if err := utils.CopyFile(cfgPath, backupPath); err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -52,6 +54,17 @@ func (s *Service) InitSamba() error {
 		return err
 	}
 
+	if exists, err := utils.FileExists("/var/log/samba4/audit.log"); err != nil {
+		return err
+	} else if !exists {
+		if err := os.MkdirAll("/var/log/samba4", 0755); err != nil {
+			return err
+		}
+		if _, err := os.Create("/var/log/samba4/audit.log"); err != nil {
+			return err
+		}
+	}
+
 	return system.ServiceAction("samba_server", "restart")
 }
 
@@ -61,19 +74,23 @@ func (s *Service) InitSambaAdmins() error {
 		return nil
 	}
 
-	for _, admin := range cfg.Admins {
-		smbExists, err := sambaUtils.SambaUserExists(admin.Username)
+	smbExists, err := sambaUtils.SambaUserExists("admin")
+	if err != nil {
+		logger.L.Error().Msgf("Error checking if Samba user 'admin' exists: %v", err)
+		return err
+	}
+
+	if !smbExists {
+		err = sambaUtils.CreateSambaUser("admin", cfg.Admin.Password)
 		if err != nil {
-			logger.L.Error().Msgf("Error checking if Samba user %s exists: %v", admin.Username, err)
+			logger.L.Error().Msgf("Failed to create Samba user 'admin': %v", err)
 			return err
 		}
-
-		if !smbExists {
-			err = sambaUtils.CreateSambaUser(admin.Username, admin.Password)
-			if err != nil {
-				logger.L.Error().Msgf("Failed to create Samba user %s: %v", admin.Username, err)
-				return err
-			}
+	} else {
+		err = sambaUtils.EditSambaUser("admin", cfg.Admin.Password)
+		if err != nil {
+			logger.L.Error().Msgf("Failed to update Samba user 'admin': %v", err)
+			return err
 		}
 	}
 

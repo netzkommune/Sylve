@@ -10,7 +10,7 @@
 
 import { getIcon, loadIcon } from '@iconify/svelte';
 import isCidr from 'is-cidr';
-import { isIP, isIPv4 } from 'is-ip';
+import { isIP, isIPv4, isIPv6 } from 'is-ip';
 import { decode as magnetDecode, encode as magnetEncode } from 'magnet-uri';
 import { customRandom, nanoid } from 'nanoid';
 import isEmail from 'validator/lib/isEmail';
@@ -122,7 +122,7 @@ export function isValidIPv6(ip: string, cidr: boolean = false): boolean {
 			return true;
 		}
 
-		if (!cidr && isIP(ip)) {
+		if (!cidr && isIPv6(ip)) {
 			return true;
 		}
 

@@ -123,6 +123,15 @@
 		@apply !bg-muted/30 text-foreground !border-muted;
 	}
 
+	.filepond--list {
+		margin-top: 12px !important;
+	}
+
+	.filepond--root {
+		max-height: 500px;
+		overflow-y: auto;
+	}
+
 	.file-explorer-container.drag-over {
 		background-color: rgba(59, 130, 246, 0.1);
 	}

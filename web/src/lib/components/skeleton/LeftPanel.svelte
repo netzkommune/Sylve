@@ -36,11 +36,13 @@
 					label: node,
 					icon: 'mdi:dns',
 					href: `/${node}`,
-					children: vms.map((vm) => ({
-						label: `${vm.name} (${vm.vmId})`,
-						icon: 'material-symbols:monitor-outline',
-						href: `/${node}/vm/${vm.vmId}`
-					}))
+					children: vms
+						.sort((a, b) => a.vmId - b.vmId)
+						.map((vm) => ({
+							label: `${vm.name} (${vm.vmId})`,
+							icon: 'material-symbols:monitor-outline',
+							href: `/${node}/vm/${vm.vmId}`
+						}))
 				}
 			]
 		}

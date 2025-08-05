@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { deleteUser, listUsers } from '$lib/api/auth/local';
 	import { handleAPIResponse } from '$lib/api/common';
-	import Create from '$lib/components/custom/Authentication/Create.svelte';
+	import CreateOrEdit from '$lib/components/custom/Authentication/CreateOrEdit.svelte';
 	import AlertDialog from '$lib/components/custom/Dialog/Alert.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import Search from '$lib/components/custom/TreeTable/Search.svelte';
@@ -85,24 +85,45 @@
 
 	let modals = $state({
 		create: { open: false },
-		delete: { open: false }
+		delete: { open: false },
+		edit: { open: false }
 	});
 </script>
 
 {#snippet button(type: string)}
-	{#if type === 'delete'}
-		{#if activeRows && activeRows.length === 1}
+	{#if activeRows && activeRows.length === 1}
+		{#if type === 'delete'}
 			<Button
 				onclick={() => {
 					modals.delete.open = !modals.delete.open;
 				}}
 				size="sm"
 				variant="outline"
-				class="h-6.5"
+				class="h-6.5 !pointer-events-auto"
+				disabled={!activeRow || activeRow.name === 'admin'}
+				title={activeRow && activeRow.name === 'admin' ? 'Cannot delete admin user' : ''}
 			>
 				<div class="flex items-center">
 					<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
 					<span>Delete</span>
+				</div>
+			</Button>
+		{/if}
+
+		{#if type === 'edit'}
+			<Button
+				onclick={() => {
+					modals.edit.open = !modals.edit.open;
+				}}
+				size="sm"
+				variant="outline"
+				class="h-6.5 !pointer-events-auto"
+				disabled={!activeRow || activeRow.name === 'admin'}
+				title={activeRow && activeRow.name === 'admin' ? 'Cannot edit admin user' : ''}
+			>
+				<div class="flex items-center">
+					<Icon icon="mdi:pencil" class="mr-1 h-4 w-4" />
+					<span>Edit</span>
 				</div>
 			</Button>
 		{/if}
@@ -120,6 +141,7 @@
 			</div>
 		</Button>
 
+		{@render button('edit')}
 		{@render button('delete')}
 	</div>
 
@@ -133,7 +155,16 @@
 </div>
 
 {#if modals.create.open}
-	<Create bind:open={modals.create.open} {users} />
+	<CreateOrEdit bind:open={modals.create.open} {users} />
+{/if}
+
+{#if modals.edit.open}
+	<CreateOrEdit
+		bind:open={modals.edit.open}
+		{users}
+		edit={true}
+		user={activeRow ? (users.find((u) => u.id === activeRow.id) as User) : undefined}
+	/>
 {/if}
 
 <AlertDialog

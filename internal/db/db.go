@@ -45,7 +45,7 @@ func SetupDatabase(cfg *internal.SylveConfig, isTest bool) *gorm.DB {
 		logger.L.Fatal().Msgf("Error connecting to database: %v", err)
 	}
 
-	db.Exec("PRAGMA foreign_keys = ON")
+	db.Exec("PRAGMA foreign_keys = OFF")
 	db.Exec("PRAGMA journal_mode = WAL")
 	db.Exec("PRAGMA synchronous = NORMAL")
 
@@ -62,6 +62,10 @@ func SetupDatabase(cfg *internal.SylveConfig, isTest bool) *gorm.DB {
 		&vmModels.VM{},
 
 		&models.PassedThroughIDs{},
+
+		&networkModels.Object{},
+		&networkModels.ObjectEntry{},
+		&networkModels.ObjectResolution{},
 
 		&infoModels.CPU{},
 		&infoModels.RAM{},
@@ -83,11 +87,14 @@ func SetupDatabase(cfg *internal.SylveConfig, isTest bool) *gorm.DB {
 
 		&sambaModels.SambaSettings{},
 		&sambaModels.SambaShare{},
+		&sambaModels.SambaAuditLog{},
 	)
 
 	if err != nil {
 		logger.L.Fatal().Msgf("Error migrating database: %v", err)
 	}
+
+	db.Exec("PRAGMA foreign_keys = ON")
 
 	err = setupInitUsers(db, cfg)
 
@@ -101,59 +108,70 @@ func SetupDatabase(cfg *internal.SylveConfig, isTest bool) *gorm.DB {
 		}
 	}
 
+	err = Fixups(db)
+
+	if err != nil {
+		logger.L.Fatal().Msgf("Error applying database fixups: %v", err)
+	}
+
 	return db
 }
 
 func setupInitUsers(db *gorm.DB, cfg *internal.SylveConfig) error {
-	for _, admin := range cfg.Admins {
-		var user models.User
-		result := db.Where("email = ?", admin.Email).First(&user)
-		if result.Error != nil {
-			if result.Error == gorm.ErrRecordNotFound {
-				hashed, err := utils.HashPassword(admin.Password)
-				if err != nil {
-					logger.L.Error().Msgf("Failed to hash password for user %s: %v", admin.Email, err)
-					return err
-				}
+	const username = "admin"
+	adminCfg := cfg.Admin
 
-				newUser := models.User{
-					Username: admin.Username,
-					Email:    admin.Email,
-					Password: hashed,
-					Admin:    true,
-				}
-				if err := db.Create(&newUser).Error; err != nil {
-					logger.L.Error().Msgf("Failed to create admin user %s: %v", admin.Email, err)
-					return err
-				}
-				logger.L.Info().Msgf("Admin user %s created successfully", admin.Email)
-			} else {
-				logger.L.Error().Msgf("Error checking user %s: %v", admin.Email, result.Error)
-				return result.Error
+	var user models.User
+	result := db.Where("username = ?", username).First(&user)
+
+	hashed, err := utils.HashPassword(adminCfg.Password)
+	if err != nil {
+		logger.L.Error().Msgf("Failed to hash password for admin user: %v", err)
+		return err
+	}
+
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			newUser := models.User{
+				Username: username,
+				Email:    adminCfg.Email,
+				Password: hashed,
+				Admin:    true,
 			}
-		} else {
-			if !user.Admin {
-				if err := db.Model(&user).Update("admin", true).Error; err != nil {
-					logger.L.Error().Msgf("Failed to promote user %s to admin: %v", admin.Email, err)
-					return err
-				}
-				logger.L.Info().Msgf("User %s promoted to admin", admin.Email)
-			}
-		}
-
-		exists, err := system.UnixUserExists(admin.Username)
-		if err != nil {
-			logger.L.Error().Msgf("Error checking if Unix user %s exists: %v", admin.Username, err)
-		}
-
-		if !exists {
-			err = system.CreateUnixUser(admin.Username, "/usr/sbin/nologin", "/nonexistent")
-			if err != nil {
-				logger.L.Error().Msgf("Failed to create Unix user %s: %v", admin.Username, err)
+			if err := db.Create(&newUser).Error; err != nil {
+				logger.L.Error().Msgf("Failed to create admin user: %v", err)
 				return err
 			}
-			logger.L.Info().Msgf("Unix user %s created successfully", admin.Username)
+			logger.L.Info().Msg("Admin user created successfully")
+		} else {
+			logger.L.Error().Msgf("Error querying admin user: %v", result.Error)
+			return result.Error
 		}
+	} else {
+		updates := map[string]interface{}{
+			"email":    adminCfg.Email,
+			"password": hashed,
+			"admin":    true,
+		}
+		if err := db.Model(&user).Updates(updates).Error; err != nil {
+			logger.L.Error().Msgf("Failed to update admin user: %v", err)
+			return err
+		}
+		logger.L.Info().Msg("Admin user updated successfully")
 	}
+
+	exists, err := system.UnixUserExists(username)
+	if err != nil {
+		logger.L.Error().Msgf("Error checking Unix user 'admin': %v", err)
+	}
+	if !exists {
+		err := system.CreateUnixUser(username, "/usr/sbin/nologin", "/nonexistent")
+		if err != nil {
+			logger.L.Error().Msgf("Failed to create Unix user 'admin': %v", err)
+			return err
+		}
+		logger.L.Info().Msg("Unix user 'admin' created successfully")
+	}
+
 	return nil
 }

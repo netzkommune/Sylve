@@ -19,6 +19,6 @@ export default defineConfig({
 		target: 'esnext'
 	},
 	server: {
-		allowedHosts: ["dxb-test-1.difusedns.com"]
+		allowedHosts: ["dxb-test-1.difusedns.com", "dxbhome.difusedns.com"]
 	}
 });

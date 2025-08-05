@@ -14,6 +14,7 @@
 
 	let status = $derived(pool?.status);
 	let spares = $derived(pool?.spares as Zpool['spares']);
+	let cacheDevices = $derived(pool?.cache as Zpool['cache']);
 
 	let statusColor = $derived.by(() => {
 		if (!pool) return 'bg-gray-500 text-white';
@@ -28,6 +29,8 @@
 				return 'bg-gray-500 text-white';
 		}
 	});
+
+	let special = ['cache'];
 </script>
 
 {#snippet dtEl(device: Zpool['status']['devices'][0], showNote: boolean)}
@@ -80,47 +83,53 @@
 {/snippet}
 
 {#snippet deviceTreeNode(device: Zpool['status']['devices'][0], showNote: boolean)}
-	<div class="device-tree relative">
-		<div class="bg-background relative flex items-center rounded-md border p-1.5">
-			{#if showNote && !device.__isLast}
-				<div
-					class="bg-secondary absolute -left-6 bottom-0 top-0 w-0.5"
-					style="height: calc(100% + 0.7rem);"
-				></div>
-			{:else}
-				<div class="bg-secondary absolute -left-6 bottom-0 top-0 w-0.5" style="height: 18px;"></div>
+	{#if !special.includes(device.name)}
+		<div class="device-tree relative">
+			<div class="bg-background relative flex items-center rounded-md border p-1.5">
+				{#if showNote && !device.__isLast}
+					<div
+						class="bg-secondary absolute -left-6 bottom-0 top-0 w-0.5"
+						style="height: calc(100% + 0.7rem);"
+					></div>
+				{:else}
+					<div
+						class="bg-secondary absolute -left-6 bottom-0 top-0 w-0.5"
+						style="height: 18px;"
+					></div>
+				{/if}
+
+				{@render dtEl(device, showNote)}
+			</div>
+
+			{#if device.children && device.children.length > 0 && !device.name.startsWith('replacing')}
+				<div class=" ml-5 mt-2 space-y-2 pl-4">
+					{#each device.children as child, index (child.name)}
+						<div class="relative">
+							<div
+								class="bg-secondary h-0.5 w-6"
+								style="position: absolute;left: -23px;top:18px"
+							></div>
+							{@render deviceTreeNode(
+								{ ...child, __isLast: index === device.children.length - 1 },
+								true
+							)}
+						</div>
+					{/each}
+				</div>
 			{/if}
-			{@render dtEl(device, showNote)}
+
+			{#if device.name.startsWith('replacing') && device.children && device.children.length > 0}
+				<div class="border-border ml-5 mt-2 space-y-2 border-l-2 pl-4">
+					{#each device.children as replaceDisk}
+						{@render deviceTreeNode(replaceDisk, true)}
+					{/each}
+				</div>
+			{/if}
 		</div>
-
-		{#if device.children && device.children.length > 0 && !device.name.startsWith('replacing')}
-			<div class=" ml-5 mt-2 space-y-2 pl-4">
-				{#each device.children as child, index (child.name)}
-					<div class="relative">
-						<div
-							class="bg-secondary h-0.5 w-6"
-							style="position: absolute;left: -23px;top:18px"
-						></div>
-						{@render deviceTreeNode(
-							{ ...child, __isLast: index === device.children.length - 1 },
-							true
-						)}
-					</div>
-				{/each}
-			</div>
-		{/if}
-
-		{#if device.name.startsWith('replacing') && device.children && device.children.length > 0}
-			<div class="border-border ml-5 mt-2 space-y-2 border-l-2 pl-4">
-				{#each device.children as replaceDisk}
-					{@render deviceTreeNode(replaceDisk, true)}
-				{/each}
-			</div>
-		{/if}
-	</div>
+	{/if}
 {/snippet}
 
-{#if pool !== null && status !== undefined && spares !== undefined}
+{#if pool !== null && status !== undefined && spares !== undefined && cacheDevices !== undefined}
 	<Dialog.Root bind:open>
 		<Dialog.Content
 			onInteractOutside={() => {
@@ -257,6 +266,49 @@
 														></div>
 
 														<span>{spare.name}</span>
+													</div>
+												</div>
+											</div>
+										{/each}
+									</div>
+								</div>
+							{/if}
+
+							{#if cacheDevices && cacheDevices.length > 0}
+								<div class="device-tree relative mt-2">
+									<div
+										class="bg-background relative flex items-center gap-2 rounded-md border p-1.5"
+									>
+										<div
+											class="bg-secondary absolute -left-6 bottom-0 top-0 w-0.5"
+											style="height: calc(100% + 0.7rem);"
+										></div>
+										<Icon icon="octicon:cache-16" />
+										<span class="font-medium">Cache</span>
+									</div>
+
+									<div class="ml-5 mt-2 space-y-2 pl-4">
+										{#each cacheDevices as cache, index (cache.name)}
+											<div class="relative">
+												<div
+													class="bg-secondary h-0.5 w-6"
+													style="position: absolute; left: -23px; top: 18px"
+												></div>
+												<div class="device-tree relative">
+													<div
+														class="bg-background relative flex items-center gap-2 rounded-md border p-1.5"
+													>
+														<div
+															class="bg-secondary absolute -left-6 bottom-0 top-0 w-0.5"
+															style="height: 18px;"
+														></div>
+														<div
+															class="h-2 w-2 rounded-full"
+															class:bg-green-500={cache.health === 'ONLINE'}
+															class:bg-yellow-400={cache.health !== 'ONLINE'}
+														></div>
+
+														<span>{cache.name}</span>
 													</div>
 												</div>
 											</div>

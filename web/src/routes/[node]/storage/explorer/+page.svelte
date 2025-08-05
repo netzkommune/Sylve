@@ -19,7 +19,7 @@
 	import * as ContextMenu from '$lib/components/ui/context-menu/index.js';
 	import { explorerCurrentPath } from '$lib/stores/basic';
 	import type { FileNode } from '$lib/types/system/file-explorer';
-	import { sortFileItems, type SortBy, generateBreadcrumbItems } from '$lib/utils/explorer';
+	import { generateBreadcrumbItems, sortFileItems, type SortBy } from '$lib/utils/explorer';
 	import { Clipboard, FileText, Folder, RotateCcw, UploadIcon } from 'lucide-svelte';
 	import { get } from 'svelte/store';
 
@@ -482,22 +482,35 @@
 
 <AlertDialog
 	open={modals.delete.isOpen}
-	names={{
-		parent: modals.delete.item?.type === 'folder' ? 'folder' : 'file',
-		element: modals.delete.item?.id.split('/').pop() || ''
-	}}
+	names={selectedItems.length === 1 && modals.delete.item
+		? {
+				parent: modals.delete.item.type === 'folder' ? 'folder' : 'file',
+				element: modals.delete.item.id.split('/').pop() || ''
+			}
+		: {
+				parent: `${selectedItems.length}`,
+				element: selectedItems.length === 1 ? 'item' : 'items'
+			}}
 	actions={{
 		onConfirm: async () => {
 			if (modals.delete.item) {
+				console.log('Selected items for deletion:', selectedItems);
+				console.log('delete item:', modals.delete.item);
+
 				const response = await deleteFilesOrFolders(selectedItems);
 
-				delete folderData[currentPath];
-				await loadFolderData(currentPath);
+				const single = selectedItems.length === 1 && modals.delete.item;
 				handleAPIResponse(response, {
-					success: `${modals.delete.item?.type === 'folder' ? 'Folder' : 'File'} ${modals.delete.item?.id.split('/').pop() || ''} deleted`,
-					error: `Failed to delete ${modals.delete.item?.type === 'folder' ? 'folder' : 'file'}`
+					success: single
+						? `${modals.delete.item.type === 'folder' ? 'Folder' : 'File'} "${modals.delete.item.id.split('/').pop() || ''}" was deleted successfully.`
+						: `${selectedItems.length} item${selectedItems.length > 1 ? 's' : ''} were deleted successfully.`,
+					error: single
+						? `Failed to delete ${modals.delete.item.type === 'folder' ? 'folder' : 'file'} "${modals.delete.item.id.split('/').pop() || ''}".`
+						: `Failed to delete ${selectedItems.length} item${selectedItems.length > 1 ? 's' : ''}.`
 				});
 			}
+			delete folderData[currentPath];
+			await loadFolderData(currentPath);
 			modals.delete.isOpen = false;
 			modals.delete.item = null;
 		},

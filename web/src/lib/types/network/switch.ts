@@ -1,4 +1,5 @@
-import { array, z } from 'zod';
+import { z } from 'zod/v4';
+import { NetworkObjectSchema } from './object';
 
 export const NetworkPortSchema = z.object({
 	id: z.number(),
@@ -14,14 +15,16 @@ export const StandardSwitchSchema = z.object({
 	private: z.boolean(),
 	address: z.string(),
 	address6: z.string(),
-	ports: array(NetworkPortSchema).optional(),
+	addressObj: NetworkObjectSchema.nullable(),
+	address6Obj: NetworkObjectSchema.nullable(),
+	ports: z.array(NetworkPortSchema).optional(),
 	dhcp: z.boolean().optional(),
 	slaac: z.boolean(),
 	disableIPv6: z.boolean()
 });
 
 export const SwitchListSchema = z.object({
-	standard: array(StandardSwitchSchema).optional()
+	standard: z.array(StandardSwitchSchema).optional()
 });
 
 export type StandardSwitch = z.infer<typeof StandardSwitchSchema>;

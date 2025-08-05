@@ -25,7 +25,7 @@ func (s *Service) PruneOrphanedVMStats() error {
 			"vm_id NOT IN (?)",
 			s.DB.
 				Model(&vmModels.VM{}).
-				Select("vm_id"),
+				Select("id"),
 		).
 		Delete(&vmModels.VMStats{}).
 		Error; err != nil {
@@ -97,8 +97,17 @@ func (s *Service) StoreVMUsage() error {
 		usedMemMB := float64(rssKB) / 1024
 		memUsagePercent := (usedMemMB / maxMemMB) * 100
 
+		var vmDbId uint
+
+		if err := s.DB.Model(&vmModels.VM{}).
+			Where("vm_id = ?", vmId).
+			Select("id").
+			First(&vmDbId).Error; err != nil {
+			return fmt.Errorf("failed_to_get_actual_vm_id: %w", err)
+		}
+
 		vmStats := &vmModels.VMStats{
-			VMID:        uint(vmId),
+			VMID:        uint(vmDbId),
 			CPUUsage:    cpuUsage,
 			MemoryUsage: memUsagePercent,
 			MemoryUsed:  usedMemMB,
@@ -143,16 +152,28 @@ func (s *Service) StoreVMUsage() error {
 }
 
 func (s *Service) GetVMUsage(vmId int, limit int) ([]vmModels.VMStats, error) {
+	var vmDbId uint
+	if err := s.DB.Model(&vmModels.VM{}).
+		Where("vm_id = ?", vmId).
+		Select("id").
+		First(&vmDbId).Error; err != nil {
+		return nil, fmt.Errorf("failed_to_get_actual_vm_id: %w", err)
+	}
+
+	if vmDbId == 0 {
+		return nil, fmt.Errorf("vm_not_found")
+	}
+
 	var vmStats []vmModels.VMStats
-	if err := s.DB.Where("vm_id = ?", vmId).
-		Order("created_at DESC").
+	if err := s.DB.Where("vm_id = ?", vmDbId).
+		Order("id DESC").
 		Limit(limit).
 		Find(&vmStats).Error; err != nil {
 		return nil, fmt.Errorf("failed_to_get_vm_usage: %w", err)
 	}
 
 	if len(vmStats) == 0 {
-		return nil, fmt.Errorf("no_vm_usage_found")
+		return vmStats, nil
 	}
 
 	return vmStats, nil

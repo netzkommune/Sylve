@@ -26,7 +26,10 @@ type Storage struct {
 
 type Network struct {
 	ID  uint   `gorm:"primaryKey" json:"id"`
-	MAC string `json:"mac" gorm:"unique"`
+	MAC string `json:"mac"`
+
+	MacID      *uint                 `json:"macId" gorm:"column:mac_id"`
+	AddressObj *networkModels.Object `json:"macObj" gorm:"foreignKey:MacID"`
 
 	SwitchID uint                         `json:"switchId" gorm:"not null;index"`
 	Switch   networkModels.StandardSwitch `gorm:"foreignKey:SwitchID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT"`

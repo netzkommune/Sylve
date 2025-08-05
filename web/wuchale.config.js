@@ -5,7 +5,7 @@ import { defineConfig } from 'wuchale';
 export default defineConfig({
 	locales: {
 		mal: { name: 'Malayalam' },
-		'cn-simplified': { name: '简体中文' },
+		cn_simplified: { name: '简体中文' },
 		ar: { name: 'Arabic' },
 		ru: { name: 'Russian' },
 		tu: { name: 'Türkçe' }

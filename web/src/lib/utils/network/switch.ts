@@ -1,4 +1,5 @@
 import type { Column, Row } from '$lib/types/components/tree-table';
+import type { NetworkObject } from '$lib/types/network/object';
 import type { SwitchList } from '$lib/types/network/switch';
 import type { CellComponent } from 'tabulator-tables';
 import { renderWithIcon } from '../table';
@@ -59,8 +60,17 @@ export function generateTableData(
 				const row = cell.getRow();
 				const data = row.getData();
 				const value = cell.getValue();
+
 				if (value === '-' && data.dhcp) {
 					return 'DHCP';
+				}
+
+				const addressObj = data.addressObj as NetworkObject;
+
+				if (data.addressObj) {
+					if (addressObj && addressObj.entries) {
+						return addressObj.entries[0].value || '-';
+					}
 				}
 
 				return value || '-';
@@ -68,7 +78,26 @@ export function generateTableData(
 		},
 		{
 			field: 'ipv6',
-			title: 'IPv6'
+			title: 'IPv6',
+			formatter: (cell: CellComponent) => {
+				const row = cell.getRow();
+				const data = row.getData();
+				const value = cell.getValue();
+
+				if (value === '-' && data.slaac) {
+					return 'SLAAC';
+				}
+
+				const addressObj = data.address6Obj as NetworkObject;
+
+				if (data.address6Obj) {
+					if (addressObj && addressObj.entries) {
+						return addressObj.entries[0].value || '-';
+					}
+				}
+
+				return value || '-';
+			}
 		},
 		{
 			field: 'private',
@@ -108,6 +137,8 @@ export function generateTableData(
 				vlan: sw.vlan || '-',
 				ipv4: sw.address || '-',
 				ipv6: sw.address6 || '-',
+				addressObj: sw.addressObj || '-',
+				address6Obj: sw.address6Obj || '-',
 				ports: sw.ports,
 				private: sw.private,
 				portsOnly: portsOnly,

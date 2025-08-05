@@ -2,6 +2,7 @@ package startup
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"sylve/internal/logger"
 	"sylve/pkg/pkg"
@@ -159,6 +160,42 @@ func (s *Service) CheckKernelModules() error {
 	for _, module := range requiredModules {
 		if _, err := utils.RunCommand("kldload", "-n", module); err != nil {
 			return fmt.Errorf("failed to load kernel module %s: %w", module, err)
+		}
+	}
+
+	return nil
+}
+
+func (s *Service) CheckSyslogConfig() error {
+	const syslogConfPath = "/etc/syslog.conf"
+	const sylveLine = "LOCAL7.* /var/log/samba4/audit.log"
+
+	exists, err := utils.FileExists(syslogConfPath)
+	if err != nil {
+		return fmt.Errorf("failed to check syslog config file: %w", err)
+	}
+
+	if !exists {
+		if err := os.WriteFile(syslogConfPath, []byte(sylveLine+"\n"), 0644); err != nil {
+			return fmt.Errorf("failed to create syslog config file: %w", err)
+		}
+		return nil
+	}
+
+	data, err := os.ReadFile(syslogConfPath)
+	if err != nil {
+		return fmt.Errorf("failed to read syslog config file: %w", err)
+	}
+
+	if !strings.Contains(string(data), sylveLine) {
+		f, err := os.OpenFile(syslogConfPath, os.O_APPEND|os.O_WRONLY, 0644)
+		if err != nil {
+			return fmt.Errorf("failed to open syslog config for appending: %w", err)
+		}
+		defer f.Close()
+
+		if _, err := f.WriteString("\n" + sylveLine + "\n"); err != nil {
+			return fmt.Errorf("failed to append to syslog config: %w", err)
 		}
 	}
 

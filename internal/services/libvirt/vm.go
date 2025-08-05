@@ -12,9 +12,11 @@ import (
 	"fmt"
 	"strings"
 	"sylve/internal/db/models"
+	networkModels "sylve/internal/db/models/network"
 	utilitiesModels "sylve/internal/db/models/utilities"
 	vmModels "sylve/internal/db/models/vm"
 	libvirtServiceInterfaces "sylve/internal/interfaces/services/libvirt"
+	"sylve/internal/logger"
 	"sylve/pkg/utils"
 	"sylve/pkg/zfs"
 
@@ -143,17 +145,38 @@ func validateCreate(data libvirtServiceInterfaces.CreateVMRequest, db *gorm.DB) 
 	}
 
 	if data.SwitchID != nil && *data.SwitchID != 0 {
-		if data.NetworkMAC != "" && !utils.IsValidMACAddress(data.NetworkMAC) {
-			return fmt.Errorf("invalid_mac_address")
+		var macId uint
+		if data.MacId != nil {
+			macId = *data.MacId
+		} else {
+			macId = 0
 		}
 
-		if data.NetworkMAC != "" {
-			count, err := sdb.Count(db, &vmModels.Network{}, "mac = ?", data.NetworkMAC)
-			if err != nil {
-				return fmt.Errorf("failed_to_check_network_mac_usage: %w", err)
+		if macId != 0 {
+			var macObj networkModels.Object
+			if err := db.Preload("Entries").First(&macObj, macId).Error; err != nil {
+				if err == gorm.ErrRecordNotFound {
+					return fmt.Errorf("mac_object_not_found: %d", macId)
+				}
+				return fmt.Errorf("failed_to_find_mac_object: %w", err)
 			}
-			if count > 0 {
-				return fmt.Errorf("network_mac_already_in_use")
+
+			if macObj.Type != "Mac" {
+				return fmt.Errorf("invalid_mac_object_type: %s", macObj.Type)
+			}
+
+			if len(macObj.Entries) == 0 {
+				return fmt.Errorf("mac_object_has_no_entries: %d", macId)
+			}
+
+			var otherNetworks []vmModels.Network
+			if err := db.Where("mac_id = ? AND vm_id != ?", macId, data.VMID).
+				Find(&otherNetworks).Error; err != nil {
+				return fmt.Errorf("failed_to_find_other_networks_using_mac_object: %w", err)
+			}
+
+			if len(otherNetworks) > 0 {
+				return fmt.Errorf("mac_object_already_in_use: %d", macId)
 			}
 		}
 
@@ -275,6 +298,7 @@ func validateCreate(data libvirtServiceInterfaces.CreateVMRequest, db *gorm.DB) 
 
 func (s *Service) CreateVM(data libvirtServiceInterfaces.CreateVMRequest) error {
 	if err := validateCreate(data, s.DB); err != nil {
+		logger.L.Debug().Err(err).Msg("create_vm: validation failed")
 		return err
 	}
 
@@ -300,16 +324,39 @@ func (s *Service) CreateVM(data libvirtServiceInterfaces.CreateVMRequest) error 
 		tpmEmulation = false
 	}
 
+	var macId uint
+	if data.MacId != nil {
+		macId = *data.MacId
+	} else {
+		macId = 0
+	}
+
 	var networks []vmModels.Network
 	if data.SwitchID != nil && *data.SwitchID != 0 {
-		mac := data.NetworkMAC
+		if macId == 0 {
+			macAddress := utils.GenerateRandomMAC()
+			macObj := networkModels.Object{
+				Type: "Mac",
+				Name: fmt.Sprintf("vm-%d-mac-%s", data.VMID, macAddress),
+			}
 
-		if mac == "" {
-			mac = utils.GenerateRandomMAC()
+			if err := s.DB.Create(&macObj).Error; err != nil {
+				return fmt.Errorf("failed_to_create_mac_object: %w", err)
+			}
+
+			macEntry := networkModels.ObjectEntry{
+				ObjectID: macObj.ID,
+				Value:    macAddress,
+			}
+
+			if err := s.DB.Create(&macEntry).Error; err != nil {
+				return fmt.Errorf("failed_to_create_mac_entry: %w", err)
+			}
+			macId = macObj.ID
 		}
 
 		networks = append(networks, vmModels.Network{
-			MAC:       mac,
+			MacID:     &macId,
 			SwitchID:  uint(*data.SwitchID),
 			Emulation: data.SwitchEmulationType,
 		})
@@ -374,26 +421,31 @@ func (s *Service) CreateVM(data libvirtServiceInterfaces.CreateVMRequest) error 
 	if err := s.DB.
 		Session(&gorm.Session{FullSaveAssociations: true}).
 		Create(vm).Error; err != nil {
+		logger.L.Debug().Err(err).Msg("create_vm: failed to create vm with associations")
 		return fmt.Errorf("failed_to_create_vm_with_associations: %w", err)
 	}
 
 	if err := s.CreateLvVm(int(vm.ID)); err != nil {
 		if err := s.DB.Delete(vm).Error; err != nil {
+			logger.L.Debug().Err(err).Msg("create_vm: failed to delete vm after creation failure")
 			return fmt.Errorf("failed_to_delete_vm_after_creation_failure: %w", err)
 		}
 
 		for _, storage := range storages {
 			if err := s.DB.Delete(&storage).Error; err != nil {
+				logger.L.Debug().Err(err).Msg("create_vm: failed to delete storage after creation failure")
 				return fmt.Errorf("failed_to_delete_storage_after_vm_creation_failure: %w", err)
 			}
 		}
 
 		for _, network := range networks {
 			if err := s.DB.Delete(&network).Error; err != nil {
+				logger.L.Debug().Err(err).Msg("create_vm: failed to delete network after creation failure")
 				return fmt.Errorf("failed_to_delete_network_after_vm_creation_failure: %w", err)
 			}
 		}
 
+		logger.L.Debug().Err(err).Msg("create_vm: failed to create lv vm")
 		return fmt.Errorf("failed_to_create_lv_vm: %w", err)
 	}
 

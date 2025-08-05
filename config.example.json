@@ -2,13 +2,10 @@
   "environment": "development",
   "proxyToVite": false,
   "wanInterfaces": ["em0"],
-  "admins": [
-    {
-      "username": "admin",
-      "email": "admin@sylve.local",
-      "password": "admin"
-    }
-  ],
+  "admin": {
+    "email": "admin@sylve.local",
+    "password": "admin"
+  },
   "logLevel": 0,
   "port": 8181
 }

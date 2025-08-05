@@ -168,6 +168,8 @@ func RegisterRoutes(r *gin.Engine,
 		samba.POST("/shares", sambaHandlers.CreateShare(sambaService))
 		samba.PUT("/shares", sambaHandlers.UpdateShare(sambaService))
 		samba.DELETE("/shares/:id", sambaHandlers.DeleteShare(sambaService))
+
+		samba.GET("/audit-logs", sambaHandlers.GetAuditLogs(sambaService))
 	}
 
 	disk := api.Group("/disk")
@@ -185,6 +187,11 @@ func RegisterRoutes(r *gin.Engine,
 	network.Use(middleware.EnsureAuthenticated(authService))
 	network.Use(middleware.RequestLoggerMiddleware(db, authService))
 	{
+		network.GET("/object", networkHandlers.ListNetworkObjects(networkService))
+		network.POST("/object", networkHandlers.CreateNetworkObject(networkService))
+		network.DELETE("/object/:id", networkHandlers.DeleteNetworkObject(networkService))
+		network.PUT("/object/:id", networkHandlers.EditNetworkObject(networkService))
+
 		network.GET("/interface", networkHandlers.ListInterfaces(networkService))
 
 		network.GET("/switch", networkHandlers.ListSwitches(networkService))
@@ -273,6 +280,7 @@ func RegisterRoutes(r *gin.Engine,
 		users.GET("", authHandlers.ListUsersHandler(authService))
 		users.POST("", authHandlers.CreateUserHandler(authService))
 		users.DELETE("/:id", authHandlers.DeleteUserHandler(authService))
+		users.PUT("", authHandlers.EditUserHandler(authService))
 	}
 
 	groups := auth.Group("/groups")

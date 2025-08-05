@@ -6,20 +6,39 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import { onMount } from 'svelte';
+	import type { NetworkObject } from '$lib/types/network/object';
+	import type { VM } from '$lib/types/vm/vm';
+	import { generateMACOptions } from '$lib/utils/network/object';
 
 	interface Props {
 		switch: number;
 		mac: string;
 		emulation: string;
 		switches: SwitchList;
+		vms: VM[];
+		networkObjects: NetworkObject[];
 	}
 
 	let {
 		switch: nwSwitch = $bindable(),
 		mac = $bindable(),
 		emulation = $bindable(),
-		switches
+		switches,
+		networkObjects,
+		vms
 	}: Props = $props();
+
+	let usableMacs = $derived.by(() => {
+		const usedMacIds = new Set<number>(
+			vms
+				.flatMap((vm) => vm.networks.map((net) => net.macId))
+				.filter((id): id is number => id !== undefined)
+		);
+
+		return networkObjects.filter(
+			(obj) => obj.type === 'Mac' && obj.entries?.length === 1 && !usedMacIds.has(obj.id)
+		);
+	});
 
 	let comboBoxes = $state({
 		emulation: {
@@ -29,6 +48,10 @@
 				{ label: 'VirtIO', value: 'virtio' },
 				{ label: 'E1000', value: 'e1000' }
 			]
+		},
+		mac: {
+			open: false,
+			value: '0'
 		}
 	});
 
@@ -41,6 +64,12 @@
 	$effect(() => {
 		if (swStr) {
 			nwSwitch = parseInt(swStr) || 0;
+		}
+	});
+
+	$effect(() => {
+		if (comboBoxes.mac.value) {
+			mac = comboBoxes.mac.value;
 		}
 	});
 </script>
@@ -84,12 +113,15 @@
 				width="w-[40%]"
 			></CustomComboBox>
 
-			<CustomValueInput
+			<CustomComboBox
+				bind:open={comboBoxes.mac.open}
 				label="MAC Address"
-				placeholder="56:49:fc:94:9b:4f"
-				bind:value={mac}
+				bind:value={comboBoxes.mac.value}
+				data={generateMACOptions(usableMacs)}
 				classes="flex-1 space-y-1"
-			/>
+				placeholder="Select MAC address"
+				width="w-full"
+			></CustomComboBox>
 		</div>
 	{/if}
 </div>

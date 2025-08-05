@@ -17,6 +17,14 @@ type CreateUserRequest struct {
 	Admin    *bool  `json:"admin" binding:"required"`
 }
 
+type EditUserRequest struct {
+	ID       uint   `json:"id" binding:"required"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
+	Admin    *bool  `json:"admin" binding:"required"`
+}
+
 // @Summary List Users
 // @Description List all users in the system
 // @Tags Users
@@ -159,6 +167,47 @@ func DeleteUserHandler(authService *auth.Service) gin.HandlerFunc {
 		c.JSON(200, internal.APIResponse[any]{
 			Status:  "success",
 			Message: "user_deleted_successfully",
+			Error:   "",
+			Data:    nil,
+		})
+	}
+}
+
+func EditUserHandler(authService *auth.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var req EditUserRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request",
+				Error:   "invalid_request: " + err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		var admin bool
+		if req.Admin != nil {
+			admin = *req.Admin
+		} else {
+			admin = false
+		}
+
+		err := authService.EditUser(req.ID, req.Username, req.Password, req.Email, admin)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "failed_to_edit_user",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "user_edited_successfully",
 			Error:   "",
 			Data:    nil,
 		})

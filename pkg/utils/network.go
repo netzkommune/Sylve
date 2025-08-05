@@ -27,6 +27,22 @@ func IsValidIP(ip string) bool {
 	return net.ParseIP(ip) != nil
 }
 
+func IsValidIPv4(ip string) bool {
+	parsedIP := net.ParseIP(ip)
+	if parsedIP == nil {
+		return false
+	}
+	return parsedIP.To4() != nil
+}
+
+func IsValidIPv6(ip string) bool {
+	parsedIP := net.ParseIP(ip)
+	if parsedIP == nil {
+		return false
+	}
+	return parsedIP.To4() == nil && parsedIP.To16() != nil
+}
+
 func IsValidVLAN(vlan int) bool {
 	return vlan >= 0 && vlan <= 4095
 }
@@ -43,6 +59,21 @@ func IsValidIPv4CIDR(cidr string) bool {
 	}
 
 	return ip.To4() != nil
+}
+
+func IsValidIPv6CIDR(cidr string) bool {
+	ip, _, err := net.ParseCIDR(cidr)
+
+	if err != nil {
+		return false
+	}
+
+	return ip.To4() == nil && ip.To16() != nil
+}
+
+func IsValidMAC(mac string) bool {
+	_, err := net.ParseMAC(mac)
+	return err == nil
 }
 
 func BridgeIfName(name string) string {

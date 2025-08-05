@@ -21,7 +21,7 @@ type CreateVMRequest struct {
 	StorageEmulationType string  `json:"storageEmulationType"`
 	SwitchID             *int    `json:"switchId" binding:"required"`
 	SwitchEmulationType  string  `json:"switchEmulationType"`
-	NetworkMAC           string  `json:"macAddress"`
+	MacId                *uint   `json:"macId"`
 	CPUSockets           int     `json:"cpuSockets" binding:"required"`
 	CPUCores             int     `json:"cpuCores" binding:"required"`
 	CPUThreads           int     `json:"cpuThreads" binding:"required"`

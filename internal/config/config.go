@@ -84,6 +84,7 @@ func SetupDataPath() error {
 	dirs := []string{
 		dataPath,
 		filepath.Join(dataPath, "vms"),
+		filepath.Join(dataPath, "jails"),
 		filepath.Join(dataPath, "downloads"),
 		filepath.Join(dataPath, "downloads", "torrents"),
 	}
@@ -128,4 +129,15 @@ func GetVMsPath() (string, error) {
 	vmsPath := filepath.Join(dataPath, "vms")
 
 	return vmsPath, nil
+}
+
+func GetJailsPath() (string, error) {
+	dataPath, err := GetDataPath()
+	if err != nil {
+		return "", fmt.Errorf("failed to get data path: %w", err)
+	}
+
+	jailsPath := filepath.Join(dataPath, "jails")
+
+	return jailsPath, nil
 }

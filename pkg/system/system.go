@@ -169,3 +169,15 @@ func ChangeUsername(oldUsername, newUsername string) error {
 
 	return nil
 }
+
+func PixzExists() bool {
+	_, err := utils.RunCommand("which", "pixz")
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			return false
+		}
+		return false
+	}
+
+	return true
+}

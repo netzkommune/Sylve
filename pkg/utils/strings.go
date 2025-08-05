@@ -530,3 +530,21 @@ func IsValidFilename(name string) error {
 	}
 	return nil
 }
+
+func MakeValidHostname(name string) string {
+	name = strings.ToLower(name)
+	re := regexp.MustCompile(`[^a-z0-9-]`)
+	name = re.ReplaceAllString(name, "-")
+	name = regexp.MustCompile(`-+`).ReplaceAllString(name, "-")
+	name = strings.Trim(name, "-")
+
+	if name == "" {
+		name = "host"
+	}
+
+	if len(name) > 63 {
+		name = name[:63]
+	}
+
+	return name
+}

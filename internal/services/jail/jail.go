@@ -10,6 +10,9 @@ package jail
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"sylve/internal/config"
 	jailModels "sylve/internal/db/models/jail"
 	utilitiesModels "sylve/internal/db/models/utilities"
 	jailServiceInterfaces "sylve/internal/interfaces/services/jail"
@@ -177,11 +180,7 @@ func (s *Service) ValidateCreate(data jailServiceInterfaces.CreateJailRequest) e
 		if !dhcp {
 			if data.IPv4 != nil {
 				ipv4Id := uint(*data.IPv4)
-				if ipv4Id == 0 {
-					return fmt.Errorf("invalid_ipv4")
-				}
-
-				if data.IPv4Gw != nil {
+				if ipv4Id != 0 && data.IPv4Gw != nil {
 					ipv4GwId := uint(*data.IPv4Gw)
 					if ipv4GwId == 0 {
 						return fmt.Errorf("invalid_ipv4_gateway")
@@ -202,11 +201,8 @@ func (s *Service) ValidateCreate(data jailServiceInterfaces.CreateJailRequest) e
 		if !slaac {
 			if data.IPv6 != nil {
 				ipv6Id := uint(*data.IPv6)
-				if ipv6Id == 0 {
-					return fmt.Errorf("invalid_ipv6")
-				}
 
-				if data.IPv6Gw != nil {
+				if ipv6Id != 0 && data.IPv6Gw != nil {
 					ipv6GwId := uint(*data.IPv6Gw)
 					if ipv6GwId == 0 {
 						return fmt.Errorf("invalid_ipv6_gateway")
@@ -232,14 +228,105 @@ func (s *Service) ValidateCreate(data jailServiceInterfaces.CreateJailRequest) e
 	return nil
 }
 
-func (s *Service) CreateJailConfig(data jailServiceInterfaces.CreateJailRequest) error {
-	return nil
+func (s *Service) CreateJailConfig(data jailServiceInterfaces.CreateJailRequest) (string, error) {
+	var dataset *zfs.Dataset
+	datasets, err := zfs.Datasets("")
+	if err != nil {
+		return "", fmt.Errorf("failed_to_get_datasets: %w", err)
+	}
+
+	for _, d := range datasets {
+		guid, err := d.GetProperty("guid")
+		if err != nil {
+			return "", fmt.Errorf("failed_to_get_dataset_properties: %w", err)
+		}
+
+		if guid == data.Dataset {
+			dataset = d
+			break
+		}
+	}
+
+	if dataset == nil {
+		return "", fmt.Errorf("dataset_not_found")
+	}
+
+	var mountPoint string
+	mountPoint, err = dataset.GetProperty("mountpoint")
+	if err != nil {
+		return "", fmt.Errorf("failed_to_get_dataset_mountpoint: %w", err)
+	}
+
+	var config string
+	ctid := *data.CTID
+	config += fmt.Sprintf("%d {\n", ctid)
+	config += fmt.Sprintf("\t$ctid = \"%d\";\n", ctid)
+	config += fmt.Sprintf("\tpath = \"%s\";\n", mountPoint)
+	config += fmt.Sprintf("\thost.hostname = \"%s\";\n", utils.MakeValidHostname(data.Name))
+	config += fmt.Sprintf("\tpersist;\n")
+	config += fmt.Sprintf("\texec.clean;\n\n")
+
+	config += fmt.Sprintf("\tmount.devfs;\n")
+	config += fmt.Sprintf("\tdevfs_ruleset=\"8181\";\n\n")
+
+	config += fmt.Sprintf("\tallow.raw_sockets;\n")
+	config += fmt.Sprintf("\tallow.socket_af;\n\n")
+
+	config += fmt.Sprintf("\texec.start = \"/bin/sh /etc/rc\";\n")
+	config += fmt.Sprintf("\texec.stop = \"/bin/sh /etc/rc.shutdown\";\n")
+
+	config += fmt.Sprintf("}\n")
+
+	baseTxz, err := s.FindBaseByUUID(data.Base)
+	if err != nil {
+		logger.L.Error().Err(err).Msg("create_jail: failed to find base")
+		return "", fmt.Errorf("failed_to_find_base: %w", err)
+	}
+
+	output, err := s.ExtractBase(mountPoint, baseTxz)
+	if err != nil {
+		logger.L.Error().Err(err).Msg("create_jail: failed to extract base")
+		return "", fmt.Errorf("failed_to_extract_base: %w", err)
+	}
+
+	logger.L.Info().Msgf("Base extracted successfully: %s", output)
+
+	return config, nil
 }
 
 func (s *Service) CreateJail(data jailServiceInterfaces.CreateJailRequest) error {
 	if err := s.ValidateCreate(data); err != nil {
 		logger.L.Debug().Err(err).Msg("create_jail: validation failed")
 		return err
+	}
+
+	jCfg, err := s.CreateJailConfig(data)
+	if err != nil {
+		logger.L.Error().Err(err).Msg("create_jail: failed to create jail config")
+		return fmt.Errorf("failed_to_create_jail_config: %w", err)
+	}
+
+	jailsPath, err := config.GetJailsPath()
+	if jailsPath == "" {
+		logger.L.Error().Msg("create_jail: jails path is empty")
+		return fmt.Errorf("jails_path_not_found")
+	}
+
+	if err != nil {
+		logger.L.Error().Err(err).Msg("create_jail: failed to get jails path")
+		return fmt.Errorf("failed_to_get_jails_path: %w", err)
+	}
+
+	jailDir := filepath.Join(jailsPath, fmt.Sprintf("%d", *data.CTID))
+	if err := os.MkdirAll(jailDir, 0755); err != nil {
+		logger.L.Error().Err(err).Msg("create_jail: failed to create jail directory")
+		return fmt.Errorf("failed_to_create_jail_directory: %w", err)
+	}
+
+	jailConfigPath := filepath.Join(jailDir, fmt.Sprintf("%d.conf", *data.CTID))
+	if err := os.WriteFile(jailConfigPath, []byte(jCfg), 0644); err != nil {
+		logger.L.Error().Err(err).Msg("create_jail: failed to write jail config file")
+		return fmt.Errorf("failed_to_write_jail_config_file: %w", err)
 	}
 
 	var jail jailModels.Jail
@@ -323,6 +410,18 @@ func (s *Service) DeleteJail(ctId uint) error {
 	if err := s.DB.Delete(&jail).Error; err != nil {
 		logger.L.Error().Err(err).Msg("delete_jail: failed to delete jail")
 		return fmt.Errorf("failed_to_delete_jail: %w", err)
+	}
+
+	jailsPath, err := config.GetJailsPath()
+	if err != nil {
+		logger.L.Error().Err(err).Msg("delete_jail: failed to get jails path")
+		return fmt.Errorf("failed_to_get_jails_path: %w", err)
+	}
+
+	jailDir := filepath.Join(jailsPath, fmt.Sprintf("%d", ctId))
+	if err := os.RemoveAll(jailDir); err != nil {
+		logger.L.Error().Err(err).Msg("delete_jail: failed to remove jail directory")
+		return fmt.Errorf("failed_to_remove_jail_directory: %w", err)
 	}
 
 	return nil

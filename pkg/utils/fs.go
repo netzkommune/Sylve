@@ -132,3 +132,25 @@ func ReadFile(path string) ([]byte, error) {
 
 	return data, nil
 }
+
+func IsEmptyDir(path string) bool {
+	info, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return false
+	}
+
+	if err != nil {
+		return false
+	}
+
+	if !info.IsDir() {
+		return false
+	}
+
+	files, err := os.ReadDir(path)
+	if err != nil {
+		return false
+	}
+
+	return len(files) == 0
+}

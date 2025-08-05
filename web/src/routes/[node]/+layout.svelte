@@ -55,6 +55,15 @@
 					href: `/${node}/vm/${vmName}/network`
 				}
 			];
+		} else if (page.url.pathname.startsWith(`/${$hostname}/jail`)) {
+			const jailName = page.url.pathname.split('/')[3];
+			return [
+				{
+					label: 'Summary',
+					icon: 'basil:document-outline',
+					href: `/${node}/jail/${jailName}/summary`
+				}
+			];
 		} else {
 			return [
 				{
@@ -217,6 +226,11 @@
 			const vmId = page.url.pathname.split('/')[3];
 			if (page.url.pathname === `/${node}/vm/${vmId}`) {
 				goto(`/${node}/vm/${vmId}/summary`, { replaceState: true });
+			}
+		} else if (page.url.pathname.startsWith(`/${$hostname}/jail`)) {
+			const jailId = page.url.pathname.split('/')[3];
+			if (page.url.pathname === `/${node}/jail/${jailId}`) {
+				goto(`/${node}/jail/${jailId}/summary`, { replaceState: true });
 			}
 		}
 	});

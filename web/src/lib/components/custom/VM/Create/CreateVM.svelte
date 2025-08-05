@@ -286,8 +286,8 @@
 				</Tabs.List>
 
 				{#each tabs as { value, label }}
-					<Tabs.Content {value} class="">
-						<div class="">
+					<Tabs.Content {value}>
+						<div>
 							{#if value === 'basic'}
 								<Basic
 									bind:name={modal.name}

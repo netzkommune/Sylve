@@ -16,4 +16,5 @@ type NetworkServiceInterface interface {
 	NewStandardSwitch(name string, mtu int, vlan int, address uint, address6 uint, ports []string, private bool, dhcp bool, disableIPv6 bool, slaac bool) error
 	EditStandardSwitch(id int, mtu int, vlan int, address uint, address6 uint, ports []string, private bool, dhcp bool, disableIPv6 bool, slaac bool) error
 	DeleteStandardSwitch(id int) error
+	IsObjectUsed(id uint) (bool, error)
 }

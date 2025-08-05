@@ -12,6 +12,7 @@ import (
 	"sylve/internal"
 	"sylve/internal/db/models"
 	infoModels "sylve/internal/db/models/info"
+	jailModels "sylve/internal/db/models/jail"
 	networkModels "sylve/internal/db/models/network"
 	sambaModels "sylve/internal/db/models/samba"
 	utilitiesModels "sylve/internal/db/models/utilities"
@@ -60,6 +61,9 @@ func SetupDatabase(cfg *internal.SylveConfig, isTest bool) *gorm.DB {
 		&vmModels.Network{},
 		&vmModels.VMStats{},
 		&vmModels.VM{},
+
+		&jailModels.Network{},
+		&jailModels.Jail{},
 
 		&models.PassedThroughIDs{},
 
@@ -148,15 +152,22 @@ func setupInitUsers(db *gorm.DB, cfg *internal.SylveConfig) error {
 			return result.Error
 		}
 	} else {
+		if user.Email == adminCfg.Email && utils.CheckPasswordHash(adminCfg.Password, user.Password) && user.Admin {
+			logger.L.Debug().Msg("Admin user upto date, no changes needed")
+			return nil
+		}
+
 		updates := map[string]interface{}{
 			"email":    adminCfg.Email,
 			"password": hashed,
 			"admin":    true,
 		}
+
 		if err := db.Model(&user).Updates(updates).Error; err != nil {
 			logger.L.Error().Msgf("Failed to update admin user: %v", err)
 			return err
 		}
+
 		logger.L.Info().Msg("Admin user updated successfully")
 	}
 

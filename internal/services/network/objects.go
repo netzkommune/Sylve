@@ -17,7 +17,16 @@ func (s *Service) GetObjects() ([]networkModels.Object, error) {
 		Find(&objects).Error
 
 	if err != nil {
-		return nil, err
+		return objects, fmt.Errorf("failed to retrieve network objects: %w", err)
+	}
+
+	for i := range objects {
+		used, err := s.IsObjectUsed(objects[i].ID)
+		if err != nil {
+			return nil, err
+		}
+
+		objects[i].IsUsed = used
 	}
 
 	return objects, nil

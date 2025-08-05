@@ -347,7 +347,7 @@
 							placeholder="Notes about VM"
 							bind:value={vmDescription}
 							classes=""
-							textAreaCLasses="!h-32"
+							textAreaClasses="!h-32"
 							type="textarea"
 						/>
 					</Card.Content>

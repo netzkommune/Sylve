@@ -20,11 +20,13 @@ export function isValidCreateData(modal: CreateData): boolean {
 
 	if (modal.description && (modal.description.length < 1 || modal.description.length > 1024)) {
 		toast.error('Invalid description', toastConfig);
+		return false;
 	}
 
 	if (modal.storage.type === 'raw') {
 		if (!modal.storage.size || modal.storage.size < 1024 * 1024 * 128) {
 			toast.error('Disk size must be >= 128 MiB', toastConfig);
+			return false;
 		}
 	}
 

@@ -13,6 +13,7 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"hash/fnv"
 	"math/big"
@@ -505,4 +506,27 @@ func IsValidCountryCode(code string) bool {
 	_, ok := validCountryCodes[code]
 
 	return ok
+}
+
+func IsValidFilename(name string) error {
+	name = strings.TrimSpace(name)
+	if name == "" {
+		return errors.New("file name cannot be blank")
+	}
+
+	validate := validator.New()
+	validFileName := regexp.MustCompile(`^[^\\/:*?"<>|]{1,255}$`)
+
+	_ = validate.RegisterValidation("filename", func(fl validator.FieldLevel) bool {
+		return validFileName.MatchString(fl.Field().String())
+	})
+
+	input := struct {
+		Name string `validate:"required,filename"`
+	}{Name: name}
+
+	if err := validate.Struct(input); err != nil {
+		return errors.New("invalid file name")
+	}
+	return nil
 }

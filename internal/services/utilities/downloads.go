@@ -96,7 +96,7 @@ func (s *Service) GetFilePathById(uuid string, id int) (string, error) {
 	return "", fmt.Errorf("unsupported_download_type")
 }
 
-func (s *Service) DownloadFile(url string) error {
+func (s *Service) DownloadFile(url string, optFilename string) error {
 	var existing utilitiesModels.Downloads
 
 	if s.DB.Where("url = ?", url).First(&existing).RowsAffected > 0 {
@@ -137,15 +137,27 @@ func (s *Service) DownloadFile(url string) error {
 	} else if valid.IsURL(url) {
 		uuid := utils.GenerateDeterministicUUID(url)
 		destDir := config.GetDownloadsPath("http")
-		filename := path.Base(url)
 
-		if idx := strings.Index(filename, "?"); idx != -1 {
-			filename = filename[:idx]
-		}
+		var filename string
 
-		filename = strings.ReplaceAll(filename, " ", "_")
-		if filename == "" {
-			return fmt.Errorf("invalid_filename")
+		if optFilename != "" {
+			err := utils.IsValidFilename(optFilename)
+			if err != nil {
+				return fmt.Errorf("invalid_filename: %w", err)
+			}
+
+			filename = optFilename
+		} else {
+			filename = path.Base(url)
+
+			if idx := strings.Index(filename, "?"); idx != -1 {
+				filename = filename[:idx]
+			}
+
+			filename = strings.ReplaceAll(filename, " ", "_")
+			if filename == "" {
+				return fmt.Errorf("invalid_filename")
+			}
 		}
 
 		filePath := path.Join(destDir, filename)

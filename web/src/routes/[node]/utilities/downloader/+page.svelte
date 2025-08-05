@@ -16,7 +16,7 @@
 	import type { Row } from '$lib/types/components/tree-table';
 	import type { Download } from '$lib/types/utilities/downloader';
 	import { handleAPIError, isAPIResponse, updateCache } from '$lib/utils/http';
-	import { addTrackersToMagnet, isDownloadURL } from '$lib/utils/string';
+	import { addTrackersToMagnet, isDownloadURL, isValidFileName } from '$lib/utils/string';
 	import { generateTableData } from '$lib/utils/utilities/downloader';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
@@ -48,7 +48,8 @@
 		isDelete: false,
 		isBulkDelete: false,
 		title: '',
-		url: ''
+		url: '',
+		name: ''
 	});
 
 	let downloads = $derived($results[0].data as Download[]);
@@ -116,7 +117,12 @@
 			modalState.url = addTrackersToMagnet(modalState.url);
 		}
 
-		const result = await startDownload(modalState.url);
+		if (modalState.name && !isValidFileName(modalState.name)) {
+			toast.error('Invalid file name', { position: 'bottom-center' });
+			return;
+		}
+
+		const result = await startDownload(modalState.url, modalState.name || undefined);
 		if (result) {
 			modalState.isOpen = false;
 			modalState.url = '';
@@ -265,8 +271,17 @@
 				classes="flex-1 space-y-1"
 			/>
 
+			{#if modalState.url && isDownloadURL(modalState.url)}
+				<CustomValueInput
+					label={'Optional File Name'}
+					placeholder="freebsd-14.3-base-amd64.txz"
+					bind:value={modalState.name}
+					classes="flex-1 space-y-1 mt-2"
+				/>
+			{/if}
+
 			<Dialog.Footer class="flex justify-end">
-				<div class="flex w-full items-center justify-end gap-2 px-1 py-2">
+				<div class="flex w-full items-center justify-end gap-2 py-2">
 					<Button onclick={newDownload} type="submit" size="sm">Download</Button>
 				</div>
 			</Dialog.Footer>

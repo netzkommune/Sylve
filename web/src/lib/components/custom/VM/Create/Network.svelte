@@ -91,7 +91,7 @@
 
 <div class="flex flex-col gap-4 p-4">
 	<RadioGroup.Root bind:value={swStr} class="border p-2">
-		<ScrollArea orientation="vertical" class="h-60 w-full max-w-full">
+		<ScrollArea orientation="vertical" class="h-64 w-full max-w-full">
 			{#if switches && switches.standard}
 				{#each switches.standard ?? [] as sw}
 					{@render radioItem(sw.id, sw.name)}

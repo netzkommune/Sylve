@@ -155,6 +155,7 @@ func (s *Service) CheckKernelModules() error {
 		"if_bridge",
 		"zfs",
 		"cryptodev",
+		"if_epair",
 	}
 
 	for _, module := range requiredModules {

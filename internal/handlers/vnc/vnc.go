@@ -13,6 +13,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"strings"
 	"sylve/internal/logger"
 	"sync"
 
@@ -69,10 +70,12 @@ func VNCProxyHandler(c *gin.Context) {
 			if err != nil {
 				return
 			}
+
 			if msgType != websocket.BinaryMessage {
 				io.Copy(io.Discard, reader)
 				continue
 			}
+
 			if _, err := io.Copy(rawConn, reader); err != nil {
 				return
 			}
@@ -85,7 +88,9 @@ func VNCProxyHandler(c *gin.Context) {
 			n, err := rawConn.Read(buffer)
 			if err != nil {
 				if err != io.EOF {
-					logger.L.Debug().Err(err).Msg("Error reading from VNC connection")
+					if !strings.Contains(err.Error(), "use of closed network connection") {
+						logger.L.Debug().Err(err).Msg("Error reading from VNC connection")
+					}
 				}
 				return
 			}

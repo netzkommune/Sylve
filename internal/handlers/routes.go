@@ -20,6 +20,7 @@ import (
 	authHandlers "sylve/internal/handlers/auth"
 	diskHandlers "sylve/internal/handlers/disk"
 	infoHandlers "sylve/internal/handlers/info"
+	jailHandlers "sylve/internal/handlers/jail"
 	"sylve/internal/handlers/middleware"
 	networkHandlers "sylve/internal/handlers/network"
 	sambaHandlers "sylve/internal/handlers/samba"
@@ -30,6 +31,7 @@ import (
 	authService "sylve/internal/services/auth"
 	diskService "sylve/internal/services/disk"
 	infoService "sylve/internal/services/info"
+	"sylve/internal/services/jail"
 	"sylve/internal/services/libvirt"
 	networkService "sylve/internal/services/network"
 	"sylve/internal/services/samba"
@@ -71,6 +73,7 @@ func RegisterRoutes(r *gin.Engine,
 	systemService *systemService.Service,
 	libvirtService *libvirt.Service,
 	sambaService *samba.Service,
+	jailService *jail.Service,
 	db *gorm.DB,
 ) {
 	api := r.Group("/api")
@@ -253,6 +256,16 @@ func RegisterRoutes(r *gin.Engine,
 		vm.PUT("/hardware/ram/:vmid", vmHandlers.ModifyRAM(libvirtService))
 		vm.PUT("/hardware/vnc/:vmid", vmHandlers.ModifyVNC(libvirtService))
 		vm.PUT("/hardware/ppt/:vmid", vmHandlers.ModifyPassthroughDevices(libvirtService))
+	}
+
+	jail := api.Group("/jail")
+	jail.Use(middleware.EnsureAuthenticated(authService))
+	jail.Use(middleware.RequestLoggerMiddleware(db, authService))
+	{
+		jail.GET("/simple", jailHandlers.ListJailsSimple(jailService))
+		jail.GET("", jailHandlers.ListJails(jailService))
+		jail.POST("", jailHandlers.CreateJail(jailService))
+		jail.DELETE("/:ctid", jailHandlers.DeleteJail(jailService))
 	}
 
 	utilities := api.Group("/utilities")

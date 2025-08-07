@@ -27,7 +27,8 @@ func (s *Service) JailAction(ctId int, action string) error {
 	}
 
 	jailConf := fmt.Sprintf("%s/%d/%d.conf", jailsPath, ctId, ctId)
-	output, err := utils.RunCommand("jail", "-f", jailConf, flag, fmt.Sprintf("%d", ctId))
+	ctidHash := utils.HashIntToNLetters(ctId, 5)
+	output, err := utils.RunCommand("jail", "-f", jailConf, flag, ctidHash)
 
 	if err != nil {
 		return fmt.Errorf("failed to %s jail %d: %w", action, ctId, err)

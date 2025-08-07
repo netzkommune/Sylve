@@ -6,7 +6,9 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strconv"
 	"sylve/internal/logger"
+	"sylve/pkg/utils"
 	"sync"
 	"syscall"
 	"unsafe"
@@ -40,6 +42,13 @@ func HandleJailTerminalWebsocket(c *gin.Context) {
 
 	sessionName := "sylve-jail-" + ctid
 	checkSession := exec.Command("tmux", "has-session", "-t", sessionName)
+	ctidInt, err := strconv.Atoi(ctid)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid ctid"})
+		return
+	}
+
+	ctidHash := utils.HashIntToNLetters(ctidInt, 5)
 
 	if err := checkSession.Run(); err != nil {
 		createSession := exec.Command(
@@ -54,7 +63,7 @@ func HandleJailTerminalWebsocket(c *gin.Context) {
 			"-U",
 			"root",
 			"--",
-			ctid)
+			ctidHash)
 		if err := createSession.Run(); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "unable to create tmux jail session"})
 			return

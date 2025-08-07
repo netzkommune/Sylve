@@ -447,3 +447,21 @@ func (s *Service) EditObject(id uint, name string, oType string, values []string
 
 	return nil
 }
+
+func (s *Service) GetObjectEntryByID(id uint) (string, error) {
+	var object networkModels.Object
+
+	if err := s.DB.Preload("Entries").First(&object, id).Error; err != nil {
+		return "", fmt.Errorf("failed to find object with ID %d: %w", id, err)
+	}
+
+	if len(object.Entries) == 0 {
+		return "", fmt.Errorf("no entries found for object with ID %d", id)
+	}
+
+	if len(object.Entries) > 1 {
+		return "", fmt.Errorf("multiple entries found for object with ID %d, expected only one", id)
+	}
+
+	return object.Entries[0].Value, nil
+}

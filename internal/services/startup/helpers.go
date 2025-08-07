@@ -203,6 +203,46 @@ func (s *Service) CheckSyslogConfig() error {
 	return nil
 }
 
+func (s *Service) DevfsSync() error {
+	const devfsRulesPath = "/etc/devfs.rules"
+
+	requiredBlock := `[devfsrules_jails=8181]
+add include $devfsrules_hide_all
+add include $devfsrules_unhide_basic
+add include $devfsrules_unhide_login
+add path 'bpf*' unhide
+`
+
+	var existing string
+	if data, err := os.ReadFile(devfsRulesPath); err == nil {
+		existing = string(data)
+
+		if strings.Contains(existing, "[devfsrules_jails=8181]") &&
+			strings.Contains(existing, "add path 'bpf*' unhide") {
+			return nil
+		}
+	} else if !os.IsNotExist(err) {
+		return fmt.Errorf("devfssync: failed to check devfs.rules: %w", err)
+	}
+
+	var newContent string
+	if existing != "" {
+		newContent = existing + "\n\n" + requiredBlock
+	} else {
+		newContent = requiredBlock
+	}
+
+	if err := os.WriteFile(devfsRulesPath, []byte(newContent), 0644); err != nil {
+		return fmt.Errorf("devfssync: failed to write to /etc/devfs.rules: %w", err)
+	}
+
+	if _, err := utils.RunCommand("service", "devfs", "restart"); err != nil {
+		return fmt.Errorf("devfssync: failed to restart devfs service: %w", err)
+	}
+
+	return nil
+}
+
 func ensureServiceRunning(service string) error {
 	_, err := utils.RunCommand("service", service, "status")
 	if err == nil {

@@ -193,7 +193,7 @@
 				<Card.Root class="w-full gap-0 p-4">
 					<Card.Header class="p-0">
 						<Card.Description class="text-md  font-normal text-blue-600 dark:text-blue-500">
-							{`${jail?.name} (${udTime})`}
+							{`${jail?.name} ${udTime ? `(${udTime})` : ''}`}
 						</Card.Description>
 					</Card.Header>
 					<Card.Content class="mt-3 p-0">

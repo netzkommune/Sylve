@@ -17,6 +17,7 @@ import (
 	"fmt"
 	"hash/fnv"
 	"math/big"
+	"net"
 	"regexp"
 	"strconv"
 	"strings"
@@ -547,4 +548,58 @@ func MakeValidHostname(name string) string {
 	}
 
 	return name
+}
+
+func HashIntToNLetters(n int, length int) string {
+	const letters = "abcdefghijklmnopqrstuvwxyz"
+	max := 1
+	for i := 0; i < length; i++ {
+		max *= 26
+	}
+
+	hasher := sha256.New()
+	buf := make([]byte, 8)
+	binary.BigEndian.PutUint64(buf, uint64(n))
+	hasher.Write(buf)
+	sum := hasher.Sum(nil)
+	num := binary.BigEndian.Uint32(sum[:4]) % uint32(max)
+
+	out := make([]byte, length)
+	for i := length - 1; i >= 0; i-- {
+		out[i] = letters[num%26]
+		num /= 26
+	}
+	return string(out)
+}
+
+func PreviousMAC(macStr string) (string, error) {
+	hw, err := net.ParseMAC(macStr)
+	if err != nil {
+		return "", fmt.Errorf("invalid MAC address: %w", err)
+	}
+
+	hw = hw[:6]
+
+	for i := len(hw) - 1; i >= 0; i-- {
+		if hw[i] > 0 {
+			hw[i]--
+			break
+		}
+		hw[i] = 0xFF
+	}
+
+	return hw.String(), nil
+}
+
+func SplitIPv4AndMask(cidr string) (string, string, error) {
+	ip, network, err := net.ParseCIDR(cidr)
+	if err != nil {
+		return "", "", fmt.Errorf("invalid CIDR: %w", err)
+	}
+
+	mask := network.Mask
+	ipStr := ip.String()
+	maskStr := net.IP(mask).String()
+
+	return ipStr, maskStr, nil
 }

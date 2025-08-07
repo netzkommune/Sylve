@@ -93,6 +93,10 @@ func (s *Service) PreFlightChecklist() error {
 		return err
 	}
 
+	if err := s.DevfsSync(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -126,7 +130,11 @@ func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface)
 
 	err := s.Network.SyncStandardSwitches(nil, "sync")
 	if err != nil {
-		logger.L.Error().Msgf("Error syncing standard switches: %v", err)
+		logger.L.Error().Msgf("error syncing standard switches: %v", err)
+	}
+
+	if err := s.Network.SyncEpairs(); err != nil {
+		return fmt.Errorf("error syncing epairs %v", err)
 	}
 
 	if err := s.System.SyncPPTDevices(); err != nil {

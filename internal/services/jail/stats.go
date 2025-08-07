@@ -23,13 +23,9 @@ func (s *Service) GetStates() ([]jailServiceInterfaces.State, error) {
 	var jlsData struct {
 		JailInformation struct {
 			Jail []struct {
-				JID       int      `json:"jid"`
-				Hostname  string   `json:"hostname"`
-				Path      string   `json:"path"`
-				Name      string   `json:"name"`
-				State     string   `json:"state"`
-				IPv4Addrs []string `json:"ipv4_addrs"`
-				IPv6Addrs []string `json:"ipv6_addrs"`
+				JID   int    `json:"jid"`
+				Name  string `json:"name"`
+				State string `json:"state"`
 			} `json:"jail"`
 		} `json:"jail-information"`
 	}
@@ -38,11 +34,13 @@ func (s *Service) GetStates() ([]jailServiceInterfaces.State, error) {
 		return nil, fmt.Errorf("failed to parse jls JSON: %w", err)
 	}
 
-	activeMap := make(map[int]struct{})
+	// Make a map of running jail names
+	activeMap := make(map[string]struct{})
 	for _, jail := range jlsData.JailInformation.Jail {
-		activeMap[jail.JID] = struct{}{}
+		activeMap[jail.Name] = struct{}{}
 	}
 
+	// Fetch all ctids from DB
 	var ctIDs []int
 	err = s.DB.Model(&jailModels.Jail{}).Pluck("ct_id", &ctIDs).Error
 	if err != nil {
@@ -50,15 +48,13 @@ func (s *Service) GetStates() ([]jailServiceInterfaces.State, error) {
 	}
 
 	for _, ctID := range ctIDs {
+		name := utils.HashIntToNLetters(ctID, 5)
 		state := "INACTIVE"
-		var pcpu int64
-		var memory int64
-		var wallclock int64
+		var pcpu, memory, wallclock int64
 
-		if _, ok := activeMap[ctID]; ok {
+		if _, ok := activeMap[name]; ok {
 			state = "ACTIVE"
-
-			rctlOutput, err := utils.RunCommand("rctl", "-u", fmt.Sprintf("jail:%d", ctID))
+			rctlOutput, err := utils.RunCommand("rctl", "-u", fmt.Sprintf("jail:%s", name))
 			if err == nil {
 				scanner := bufio.NewScanner(strings.NewReader(rctlOutput))
 				for scanner.Scan() {

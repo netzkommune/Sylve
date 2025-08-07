@@ -41,8 +41,18 @@ type Jail struct {
 	StartAtBoot bool   `json:"startAtBoot"`
 	StartOrder  int    `json:"startOrder"`
 
+	InheritIPv4 bool `json:"inheritIPv4"`
+	InheritIPv6 bool `json:"inheritIPv6"`
+
+	Cores  int   `json:"cores"`
+	CPUSet []int `json:"cpuSet" gorm:"serializer:json;type:json"`
+	Memory int   `json:"memory"`
+
 	Networks []Network `json:"networks" gorm:"foreignKey:CTID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT"`
 
 	CreatedAt time.Time `json:"createdAt" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updatedAt" gorm:"autoUpdateTime"`
+
+	StartedAt *time.Time `json:"startedAt" gorm:"default:null"`
+	StoppedAt *time.Time `json:"stoppedAt" gorm:"default:null"`
 }

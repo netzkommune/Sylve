@@ -21,15 +21,11 @@ import { formatInTimeZone } from 'date-fns-tz';
 export function secondsToHoursAgo(seconds: number | undefined): string {
 	if (!seconds) return 'Unknown';
 
-	// If the value is small (like 32893), it's likely seconds of uptime rather than a Unix timestamp
 	if (seconds < 86400 * 365) {
-		// Less than a year in seconds
-		// Convert uptime seconds to a date by subtracting from now
 		const uptimeDate = new Date(Date.now() - seconds * 1000);
 		return formatDistance(uptimeDate, new Date(), { addSuffix: true });
 	}
 
-	// Otherwise treat as a Unix timestamp
 	return formatDistance(fromUnixTime(seconds), new Date(), { addSuffix: true });
 }
 

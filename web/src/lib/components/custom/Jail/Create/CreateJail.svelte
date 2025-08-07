@@ -95,6 +95,7 @@
 	let networkSwitches: SwitchList = $derived($results[2].data as SwitchList);
 	let networkObjects = $derived($results[4].data as NetworkObject[]);
 	let vms: VM[] = $derived($results[3].data as VM[]);
+	let creating: boolean = $state(false);
 
 	let filesystems: Dataset[] = $derived(
 		datasets.filter((dataset) => dataset.type === 'filesystem')
@@ -111,6 +112,8 @@
 		network: {
 			switch: 0,
 			mac: 0,
+			inheritIPv4: true,
+			inheritIPv6: true,
 			ipv4: 0,
 			ipv4Gateway: 0,
 			ipv6: 0,
@@ -134,10 +137,16 @@
 
 	async function create() {
 		const data = $state.snapshot(modal);
+
+		data.network.switch = data.network.switch < 0 ? 0 : data.network.switch;
+
 		if (!isValidCreateData(data)) {
 			return;
 		} else {
+			creating = true;
 			const response = await newJail(data);
+			creating = false;
+
 			if (response.error) {
 				handleAPIError(response);
 				toast.error('Failed to create jail');
@@ -207,6 +216,8 @@
 								<Network
 									bind:switch={modal.network.switch}
 									bind:mac={modal.network.mac}
+									bind:inheritIPv4={modal.network.inheritIPv4}
+									bind:inheritIPv6={modal.network.inheritIPv6}
 									bind:ipv4={modal.network.ipv4}
 									bind:ipv4Gateway={modal.network.ipv4Gateway}
 									bind:ipv6={modal.network.ipv6}
@@ -232,7 +243,14 @@
 
 		<Dialog.Footer>
 			<div class="flex w-full justify-end md:flex-row">
-				<Button size="sm" type="button" class="h-8" onclick={() => create()}>Create Jail</Button>
+				<Button size="sm" type="button" class="h-8" onclick={() => create()} disabled={creating}>
+					<!-- Create Jail -->
+					{#if creating}
+						<Icon icon="mdi:loading" class="h-4 w-4 animate-spin" />
+					{:else}
+						Create Jail
+					{/if}
+				</Button>
 			</div>
 		</Dialog.Footer>
 	</Dialog.Content>

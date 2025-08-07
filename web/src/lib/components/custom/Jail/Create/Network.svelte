@@ -17,6 +17,8 @@
 	interface Props {
 		switch: number;
 		mac: number;
+		inheritIPv4: boolean;
+		inheritIPv6: boolean;
 		ipv4: number;
 		ipv4Gateway: number;
 		ipv6: number;
@@ -30,6 +32,8 @@
 	let {
 		switch: nwSwitch = $bindable(),
 		mac = $bindable(),
+		inheritIPv4 = $bindable(),
+		inheritIPv6 = $bindable(),
 		ipv4 = $bindable(),
 		ipv4Gateway = $bindable(),
 		ipv6 = $bindable(),
@@ -112,6 +116,11 @@
 				checkBoxes.dhcp = false;
 				checkBoxes.slaac = false;
 			}
+
+			if (nwSwitch !== -1) {
+				inheritIPv4 = false;
+				inheritIPv6 = false;
+			}
 		}
 
 		if (checkBoxes.dhcp) {
@@ -175,9 +184,13 @@
 		<Label for={i} class="flex flex-col items-start gap-2">
 			<p class="">{name}</p>
 			<p class="text-muted-foreground text-sm">
-				{name === 'None'
-					? 'No network switch will be allocated now, you can add it later'
-					: 'Standard switch'}
+				{#if id === 0}
+					No network switch will be allocated now, you can add it later
+				{:else if id === -1}
+					Inherit network from the host
+				{:else}
+					Standard switch
+				{/if}
 			</p>
 		</Label>
 	</div>
@@ -191,11 +204,12 @@
 					{@render radioItem(sw.id, sw.name)}
 				{/each}
 			{/if}
+			{@render radioItem(-1, 'Inherit')}
 			{@render radioItem(0, 'None')}
 		</ScrollArea>
 	</RadioGroup.Root>
 
-	{#if swStr !== '0'}
+	{#if swStr !== '0' && swStr !== '-1'}
 		<div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
 			<CustomComboBox
 				bind:open={comboBoxes.ipv4.open}
@@ -259,6 +273,13 @@
 				label="SLAAC"
 				bind:checked={checkBoxes.slaac}
 				classes="flex items-center gap-2"
+			></CustomCheckbox>
+		</div>
+	{:else if swStr === '-1'}
+		<div class="mt-1 flex flex-row gap-4">
+			<CustomCheckbox label="IPv4" bind:checked={inheritIPv4} classes="flex items-center gap-2"
+			></CustomCheckbox>
+			<CustomCheckbox label="IPv6" bind:checked={inheritIPv6} classes="flex items-center gap-2"
 			></CustomCheckbox>
 		</div>
 	{/if}

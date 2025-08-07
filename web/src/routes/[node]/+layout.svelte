@@ -62,6 +62,11 @@
 					label: 'Summary',
 					icon: 'basil:document-outline',
 					href: `/${node}/jail/${jailName}/summary`
+				},
+				{
+					label: 'Console',
+					icon: 'mdi:monitor',
+					href: `/${node}/jail/${jailName}/console`
 				}
 			];
 		} else {

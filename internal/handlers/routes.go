@@ -263,9 +263,15 @@ func RegisterRoutes(r *gin.Engine,
 	jail.Use(middleware.RequestLoggerMiddleware(db, authService))
 	{
 		jail.GET("/simple", jailHandlers.ListJailsSimple(jailService))
+		jail.GET("/state", jailHandlers.ListJailStates(jailService))
 		jail.GET("", jailHandlers.ListJails(jailService))
+		jail.POST("/action/:ctId/:action", jailHandlers.JailAction(jailService))
+		jail.PUT("/description", jailHandlers.UpdateJailDescription(jailService))
+
 		jail.POST("", jailHandlers.CreateJail(jailService))
 		jail.DELETE("/:ctid", jailHandlers.DeleteJail(jailService))
+
+		jail.GET("/console", jailHandlers.HandleJailTerminalWebsocket)
 	}
 
 	utilities := api.Group("/utilities")

@@ -1,16 +1,17 @@
 import { APIResponseSchema, type APIResponse } from '$lib/types/common';
 import {
 	JailSchema,
+	JailStateSchema,
 	SimpleJailSchema,
 	type CreateData,
 	type Jail,
+	type JailState,
 	type SimpleJail
 } from '$lib/types/jail/jail';
 import { apiRequest } from '$lib/utils/http';
 import { z } from 'zod/v4';
 
 export async function newJail(data: CreateData): Promise<APIResponse> {
-	console.log(data);
 	return await apiRequest('/jail', APIResponseSchema, 'POST', {
 		name: data.name,
 		ctId: parseInt(data.id.toString(), 10),
@@ -20,11 +21,15 @@ export async function newJail(data: CreateData): Promise<APIResponse> {
 		switchId: data.network.switch,
 		dhcp: data.network.dhcp,
 		slaac: data.network.slaac,
+		inheritIPv4: data.network.inheritIPv4,
+		inheritIPv6: data.network.inheritIPv6,
 		ipv4: data.network.ipv4,
 		ipv4Gw: data.network.ipv4Gateway,
 		ipv6: data.network.ipv6,
 		ipv6Gw: data.network.ipv6Gateway,
 		mac: data.network.mac,
+		cores: parseInt(data.hardware.cpuCores.toString(), 10),
+		memory: parseInt(data.hardware.ram.toString(), 10),
 		startAtBoot: data.hardware.startAtBoot,
 		startOrder: data.hardware.bootOrder
 	});
@@ -40,4 +45,19 @@ export async function getJails(): Promise<Jail[]> {
 
 export async function deleteJail(ctId: number): Promise<APIResponse> {
 	return await apiRequest(`/jail/${ctId}`, APIResponseSchema, 'DELETE');
+}
+
+export async function getJailStates(): Promise<JailState[]> {
+	return await apiRequest('/jail/state', z.array(JailStateSchema), 'GET');
+}
+
+export async function jailAction(ctId: number, action: string): Promise<APIResponse> {
+	return await apiRequest(`/jail/action/${ctId}/${action}`, APIResponseSchema, 'POST');
+}
+
+export async function updateDescription(id: number, description: string): Promise<APIResponse> {
+	return await apiRequest('/jail/description', APIResponseSchema, 'PUT', {
+		id,
+		description
+	});
 }

@@ -6,8 +6,6 @@ import (
 	"strings"
 	"sylve/internal/config"
 	utilitiesModels "sylve/internal/db/models/utilities"
-	"sylve/internal/logger"
-	"sylve/pkg/system"
 	"sylve/pkg/utils"
 )
 
@@ -51,22 +49,6 @@ func (s *Service) FindBaseByUUID(uuid string) (string, error) {
 }
 
 func (s *Service) ExtractBase(mountPoint, baseTxz string) (string, error) {
-	tryArgs := func(usePixz bool) (string, error) {
-		args := []string{}
-		if usePixz {
-			args = append(args, "--use-compress-program=pixz")
-		}
-		args = append(args, "-C", mountPoint, "-xf", baseTxz)
-		return utils.RunCommand("tar", args...)
-	}
-
-	if system.PixzExists() {
-		output, err := tryArgs(true)
-		if err == nil {
-			return output, nil
-		}
-		logger.L.Warn().Err(err).Msg("pixz extraction failed, falling back to default tar")
-	}
-
-	return tryArgs(false)
+	args := []string{"-C", mountPoint, "-xf", baseTxz}
+	return utils.RunCommand("tar", args...)
 }

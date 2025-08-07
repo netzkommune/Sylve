@@ -1,20 +1,33 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { deleteJail, getJails } from '$lib/api/jail/jail';
+	import {
+		deleteJail,
+		getJails,
+		getJailStates,
+		jailAction,
+		updateDescription
+	} from '$lib/api/jail/jail';
 	import AlertDialog from '$lib/components/custom/Dialog/Alert.svelte';
 	import LoadingDialog from '$lib/components/custom/Dialog/Loading.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import * as Card from '$lib/components/ui/card/index.js';
+	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
+	import { Progress } from '$lib/components/ui/progress/index.js';
+	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 	import { hostname } from '$lib/stores/basic';
-	import type { Jail } from '$lib/types/jail/jail';
+	import type { Jail, JailState } from '$lib/types/jail/jail';
 	import { sleep } from '$lib/utils';
 	import { updateCache } from '$lib/utils/http';
+	import { dateToAgo, secondsToHoursAgo } from '$lib/utils/time';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
+	import humanFormat from 'human-format';
 	import { toast } from 'svelte-sonner';
 
 	interface Data {
 		jails: Jail[];
+		jailStates: JailState[];
 	}
 
 	let { data }: { data: Data } = $props();
@@ -43,12 +56,50 @@
 			onSuccess: (data: Jail[]) => {
 				updateCache('jail-list', data);
 			}
+		},
+		{
+			queryKey: ['jail-states'],
+			queryFn: async () => {
+				return await getJailStates();
+			},
+			refetchInterval: 1000,
+			keepPreviousData: true,
+			initialData: data.jailStates,
+			onSuccess: (data: JailState[]) => {
+				updateCache('jail-states', data);
+			}
 		}
 	]);
 
 	let jail: Jail = $derived(
 		($results[0].data as Jail[]).find((jail: Jail) => jail.ctId === parseInt(ctId)) || ({} as Jail)
 	);
+
+	let jState: JailState = $derived(
+		($results[1].data as JailState[]).find((state: JailState) => state.ctId === parseInt(ctId)) ||
+			({} as JailState)
+	);
+
+	let jailDesc = $state(jail.description || '');
+
+	$effect(() => {
+		if (jailDesc) {
+			updateDescription(jail.id, jailDesc);
+		}
+	});
+
+	let udTime = $derived.by(() => {
+		if (jState.state === 'ACTIVE') {
+			if (jail.startedAt) {
+				return `Started ${dateToAgo(jail.startedAt)}`;
+			}
+		} else if (jState.state === 'INACTIVE' || jState.state === 'UNKNOWN') {
+			if (jail.stoppedAt) {
+				return `Stopped ${dateToAgo(jail.stoppedAt)}`;
+			}
+		}
+		return '';
+	});
 
 	async function handleDelete() {
 		modalState.isDeleteOpen = false;
@@ -78,21 +129,161 @@
 			});
 		}
 	}
+
+	async function handleStop() {
+		modalState.loading.open = true;
+		modalState.loading.title = 'Stopping Jail';
+		modalState.loading.description = `Please wait while Jail <b>${jail.name} (${jail.ctId})</b> is being stopped`;
+
+		await sleep(1000);
+		await jailAction(jail.ctId, 'stop');
+
+		modalState.loading.open = false;
+	}
+
+	async function handleStart() {
+		modalState.loading.open = true;
+		modalState.loading.title = 'Starting Jail';
+		modalState.loading.description = `Please wait while Jail <b>${jail.name} (${jail.ctId})</b> is being started`;
+
+		await sleep(1000);
+		await jailAction(jail.ctId, 'start');
+
+		modalState.loading.open = false;
+	}
 </script>
 
 <div class="flex h-full w-full flex-col">
 	<div class="flex h-10 w-full items-center gap-2 border p-4">
-		<Button
-			onclick={() => {
-				modalState.isDeleteOpen = true;
-				modalState.title = `${jail.name} (${jail.ctId})`;
-			}}
-			size="sm"
-			class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
-		>
-			<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
-			{'Delete'}
-		</Button>
+		{#if jState?.state === 'ACTIVE'}
+			<Button
+				onclick={handleStop}
+				size="sm"
+				class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+			>
+				<Icon icon="mdi:stop" class="mr-1 h-4 w-4" />
+				{'Stop'}
+			</Button>
+		{:else}
+			<div class="flex items-center gap-2">
+				<Button
+					onclick={handleStart}
+					size="sm"
+					class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+				>
+					<Icon icon="mdi:play" class="mr-1 h-4 w-4" />
+					{'Start'}
+				</Button>
+
+				<Button
+					onclick={handleDelete}
+					size="sm"
+					class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
+				>
+					<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
+					{'Delete'}
+				</Button>
+			</div>
+		{/if}
+	</div>
+
+	<div class="min-h-0 flex-1">
+		<ScrollArea orientation="both" class="h-full">
+			<div class="grid grid-cols-1 gap-4 p-4 lg:grid-cols-2">
+				<Card.Root class="w-full gap-0 p-4">
+					<Card.Header class="p-0">
+						<Card.Description class="text-md  font-normal text-blue-600 dark:text-blue-500">
+							{`${jail?.name} (${udTime})`}
+						</Card.Description>
+					</Card.Header>
+					<Card.Content class="mt-3 p-0">
+						<div class="flex items-start">
+							<div class="flex items-center">
+								<Icon icon="fluent:status-12-filled" class="mr-1 h-5 w-5" />
+								{'Status'}
+							</div>
+							<div class="ml-auto">
+								{jState.state === 'ACTIVE'
+									? 'Running'
+									: jState.state === 'INACTIVE'
+										? 'Stopped'
+										: jState.state}
+							</div>
+						</div>
+
+						<div class="mt-2">
+							<div class="flex w-full justify-between pb-1">
+								<p class="inline-flex items-center">
+									<Icon icon="solar:cpu-bold" class="mr-1 h-5 w-5" />
+									{'CPU Usage'}
+								</p>
+								<p class="ml-auto">
+									{#if jState.state === 'ACTIVE'}
+										{`${Math.min((jState.pcpu * 100) / (100 * jail.cores), 100).toFixed(2)}% of ${jail.cores} Core(s)`}
+									{:else}
+										{`0% of ${jail.cores} Core(s)`}
+									{/if}
+								</p>
+							</div>
+
+							{#if jState.state === 'ACTIVE'}
+								<Progress
+									value={(jState.pcpu / (100 * jail.cores)) * 100}
+									max={100}
+									class="ml-auto h-2"
+								/>
+							{:else}
+								<Progress value={0} max={100} class="ml-auto h-2" />
+							{/if}
+						</div>
+
+						<div class="mt-2">
+							<div class="flex w-full justify-between pb-1">
+								<p class="inline-flex items-center">
+									<Icon icon="ph:memory" class="mr-1 h-5 w-5" />
+									{'RAM Usage'}
+								</p>
+								<p class="ml-auto">
+									{#if jState.state === 'ACTIVE'}
+										{`${((jState.memory / (jail.memory || 1)) * 100).toFixed(2)}% of ${humanFormat(jail.memory || 0)}`}
+									{:else}
+										{`0% of ${humanFormat(jail.memory || 0)}`}
+									{/if}
+								</p>
+							</div>
+
+							{#if jState.state === 'ACTIVE'}
+								<Progress
+									value={(jState.memory / (jail.memory || 1)) * 100}
+									max={100}
+									class="ml-auto h-2"
+								/>
+							{:else}
+								<Progress value={0} max={100} class="ml-auto h-2" />
+							{/if}
+						</div>
+					</Card.Content>
+				</Card.Root>
+
+				<Card.Root class="w-full gap-0 p-4">
+					<Card.Header class="p-0">
+						<Card.Description class="text-md font-normal text-blue-600 dark:text-blue-500">
+							Description
+						</Card.Description>
+					</Card.Header>
+					<Card.Content class="mt-3 p-0">
+						<CustomValueInput
+							label={''}
+							placeholder="Notes about Jail"
+							bind:value={jailDesc}
+							classes=""
+							textAreaClasses="!h-32"
+							type="textarea"
+						/>
+					</Card.Content>
+				</Card.Root>
+			</div>
+		</ScrollArea>
 	</div>
 </div>
 

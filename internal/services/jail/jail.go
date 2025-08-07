@@ -12,6 +12,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
+	"strings"
 	"sylve/internal/config"
 	jailModels "sylve/internal/db/models/jail"
 	utilitiesModels "sylve/internal/db/models/utilities"
@@ -24,6 +26,8 @@ import (
 	"gorm.io/gorm"
 
 	sdb "sylve/internal/db"
+
+	cpuid "github.com/klauspost/cpuid/v2"
 )
 
 var _ jailServiceInterfaces.JailServiceInterface = (*Service)(nil)
@@ -269,27 +273,88 @@ func (s *Service) CreateJailConfig(data jailServiceInterfaces.CreateJailRequest)
 	config += fmt.Sprintf("\tmount.devfs;\n")
 	config += fmt.Sprintf("\tdevfs_ruleset=\"8181\";\n\n")
 
+	config += fmt.Sprintf("\tallow.sysvipc;\n")
+	config += fmt.Sprintf("\tallow.reserved_ports;\n")
 	config += fmt.Sprintf("\tallow.raw_sockets;\n")
 	config += fmt.Sprintf("\tallow.socket_af;\n\n")
 
-	config += fmt.Sprintf("\texec.start = \"/bin/sh /etc/rc\";\n")
-	config += fmt.Sprintf("\texec.stop = \"/bin/sh /etc/rc.shutdown\";\n")
+	if data.SwitchId != nil && *data.SwitchId > 0 {
+		// Switch Stuff To be Added Later!
+	} else {
+		if data.InheritIPv4 != nil && *data.InheritIPv4 {
+			config += fmt.Sprintf("\tip4=\"inherit\";\n")
+		}
+
+		if data.InheritIPv6 != nil && *data.InheritIPv6 {
+			config += fmt.Sprintf("\tip6=\"inherit\";\n")
+		}
+	}
+
+	var cpuCores int
+	var memory int
+
+	if data.Cores != nil {
+		cpuCores = *data.Cores
+	} else {
+		cpuCores = 0
+	}
+
+	if data.Memory != nil {
+		memory = *data.Memory
+	} else {
+		memory = 0
+	}
+
+	config += fmt.Sprintf("\texec.start += \"/bin/sh /etc/rc\";\n")
+
+	var currentJails []jailModels.Jail
+	if err := s.DB.Find(&currentJails).Error; err != nil {
+		logger.L.Error().Err(err).Msg("failed to fetch current jails")
+		return "", fmt.Errorf("failed_to_fetch_current_jails: %w", err)
+	}
+
+	numLogicalCores := cpuid.CPU.LogicalCores
+	coreUsage := map[int]int{}
+	for _, jail := range currentJails {
+		for _, core := range jail.CPUSet {
+			coreUsage[core]++
+		}
+	}
+
+	type coreCount struct {
+		Core  int
+		Count int
+	}
+
+	var allCores []coreCount
+	for i := 0; i < numLogicalCores; i++ {
+		allCores = append(allCores, coreCount{Core: i, Count: coreUsage[i]})
+	}
+
+	sort.Slice(allCores, func(i, j int) bool {
+		return allCores[i].Count < allCores[j].Count
+	})
+
+	selectedCores := []int{}
+	for i := 0; i < cpuCores && i < len(allCores); i++ {
+		selectedCores = append(selectedCores, allCores[i].Core)
+	}
+
+	coreListStr := strings.Trim(strings.Replace(fmt.Sprint(selectedCores), " ", ",", -1), "[]")
+
+	if memory > 0 {
+		memoryMB := memory / (1024 * 1024)
+		config += fmt.Sprintf("\texec.poststart += \"rctl -a jail:%d:memoryuse:deny=%dM\";\n", ctid, memoryMB)
+	}
+
+	config += fmt.Sprintf("\texec.created += \"cpuset -l %s -j %d\";\n", coreListStr, ctid)
+	config += fmt.Sprintf("\texec.stop += \"/bin/sh /etc/rc.shutdown\";\n\n")
+
+	if cpuCores > 0 || memory > 0 {
+		config += fmt.Sprintf("\texec.poststop += \"rctl -r jail:%d\";\n", ctid)
+	}
 
 	config += fmt.Sprintf("}\n")
-
-	baseTxz, err := s.FindBaseByUUID(data.Base)
-	if err != nil {
-		logger.L.Error().Err(err).Msg("create_jail: failed to find base")
-		return "", fmt.Errorf("failed_to_find_base: %w", err)
-	}
-
-	output, err := s.ExtractBase(mountPoint, baseTxz)
-	if err != nil {
-		logger.L.Error().Err(err).Msg("create_jail: failed to extract base")
-		return "", fmt.Errorf("failed_to_extract_base: %w", err)
-	}
-
-	logger.L.Info().Msgf("Base extracted successfully: %s", output)
 
 	return config, nil
 }
@@ -302,30 +367,25 @@ func (s *Service) CreateJail(data jailServiceInterfaces.CreateJailRequest) error
 
 	jCfg, err := s.CreateJailConfig(data)
 	if err != nil {
-		logger.L.Error().Err(err).Msg("create_jail: failed to create jail config")
 		return fmt.Errorf("failed_to_create_jail_config: %w", err)
 	}
 
 	jailsPath, err := config.GetJailsPath()
 	if jailsPath == "" {
-		logger.L.Error().Msg("create_jail: jails path is empty")
 		return fmt.Errorf("jails_path_not_found")
 	}
 
 	if err != nil {
-		logger.L.Error().Err(err).Msg("create_jail: failed to get jails path")
 		return fmt.Errorf("failed_to_get_jails_path: %w", err)
 	}
 
 	jailDir := filepath.Join(jailsPath, fmt.Sprintf("%d", *data.CTID))
 	if err := os.MkdirAll(jailDir, 0755); err != nil {
-		logger.L.Error().Err(err).Msg("create_jail: failed to create jail directory")
 		return fmt.Errorf("failed_to_create_jail_directory: %w", err)
 	}
 
 	jailConfigPath := filepath.Join(jailDir, fmt.Sprintf("%d.conf", *data.CTID))
 	if err := os.WriteFile(jailConfigPath, []byte(jCfg), 0644); err != nil {
-		logger.L.Error().Err(err).Msg("create_jail: failed to write jail config file")
 		return fmt.Errorf("failed_to_write_jail_config_file: %w", err)
 	}
 
@@ -338,6 +398,8 @@ func (s *Service) CreateJail(data jailServiceInterfaces.CreateJailRequest) error
 	jail.Base = data.Base
 	jail.StartAtBoot = *data.StartAtBoot
 	jail.StartOrder = data.StartOrder
+	jail.Cores = *data.Cores
+	jail.Memory = *data.Memory
 
 	if data.SwitchId != nil && *data.SwitchId > 0 {
 		var mac uint
@@ -376,9 +438,58 @@ func (s *Service) CreateJail(data jailServiceInterfaces.CreateJailRequest) error
 		})
 	}
 
+	if data.InheritIPv4 != nil {
+		jail.InheritIPv4 = *data.InheritIPv4
+	}
+
+	if data.InheritIPv6 != nil {
+		jail.InheritIPv6 = *data.InheritIPv6
+	}
+
 	if err := s.DB.Create(&jail).Error; err != nil {
 		logger.L.Error().Err(err).Msg("create_jail: failed to create jail")
 		return fmt.Errorf("failed_to_create_jail: %w", err)
+	}
+
+	var dataset *zfs.Dataset
+	datasets, err := zfs.Datasets("")
+	if err != nil {
+		return fmt.Errorf("failed_to_get_datasets: %w", err)
+	}
+
+	for _, d := range datasets {
+		guid, err := d.GetProperty("guid")
+		if err != nil {
+			return fmt.Errorf("failed_to_get_dataset_properties: %w", err)
+		}
+
+		if guid == data.Dataset {
+			dataset = d
+			break
+		}
+	}
+
+	mountPoint, err := dataset.GetProperty("mountpoint")
+	if err != nil {
+		return fmt.Errorf("failed_to_get_dataset_mountpoint: %w", err)
+	}
+
+	baseTxz, err := s.FindBaseByUUID(data.Base)
+	if err != nil {
+		return fmt.Errorf("failed_to_find_base: %w", err)
+	}
+
+	_, err = s.ExtractBase(mountPoint, baseTxz)
+	if err != nil {
+		return fmt.Errorf("failed_to_extract_base: %w", err)
+	}
+
+	if err := utils.CopyFile("/etc/resolv.conf", filepath.Join(mountPoint, "etc", "resolv.conf")); err != nil {
+		return fmt.Errorf("failed_to_copy_resolv_conf: %w", err)
+	}
+
+	if err := utils.CopyFile("/etc/localtime", filepath.Join(mountPoint, "etc", "localtime")); err != nil {
+		return fmt.Errorf("failed_to_copy_localtime: %w", err)
 	}
 
 	return nil
@@ -398,6 +509,33 @@ func (s *Service) DeleteJail(ctId uint) error {
 		return fmt.Errorf("failed_to_find_jail: %w", err)
 	}
 
+	var dataset *zfs.Dataset
+	datasets, err := zfs.Datasets("")
+	if err != nil {
+		return fmt.Errorf("failed_to_get_datasets: %w", err)
+	}
+
+	for _, d := range datasets {
+		guid, err := d.GetProperty("guid")
+		if err != nil {
+			return fmt.Errorf("failed_to_get_dataset_properties: %w", err)
+		}
+
+		if guid == jail.Dataset {
+			dataset = d
+			break
+		}
+	}
+
+	if dataset == nil {
+		return fmt.Errorf("dataset_not_found")
+	}
+
+	dProps, err := dataset.GetAllProperties()
+	if err != nil {
+		return fmt.Errorf("failed_to_get_dataset_properties: %w", err)
+	}
+
 	if len(jail.Networks) > 0 {
 		for _, network := range jail.Networks {
 			if err := s.DB.Delete(&network).Error; err != nil {
@@ -408,20 +546,82 @@ func (s *Service) DeleteJail(ctId uint) error {
 	}
 
 	if err := s.DB.Delete(&jail).Error; err != nil {
-		logger.L.Error().Err(err).Msg("delete_jail: failed to delete jail")
 		return fmt.Errorf("failed_to_delete_jail: %w", err)
 	}
 
 	jailsPath, err := config.GetJailsPath()
 	if err != nil {
-		logger.L.Error().Err(err).Msg("delete_jail: failed to get jails path")
 		return fmt.Errorf("failed_to_get_jails_path: %w", err)
 	}
 
 	jailDir := filepath.Join(jailsPath, fmt.Sprintf("%d", ctId))
 	if err := os.RemoveAll(jailDir); err != nil {
-		logger.L.Error().Err(err).Msg("delete_jail: failed to remove jail directory")
 		return fmt.Errorf("failed_to_remove_jail_directory: %w", err)
+	}
+
+	if err := dataset.Destroy(zfs.DestroyRecursive); err != nil {
+		logger.L.Error().Err(err).Msg("delete_jail: failed to destroy dataset")
+		return fmt.Errorf("failed_to_destroy_dataset: %w", err)
+	}
+
+	allowedProps := map[string]struct{}{
+		"atime":       {},
+		"checksum":    {},
+		"compression": {},
+		"dedup":       {},
+		"encryption":  {},
+		"aclinherit":  {},
+		"aclmode":     {},
+		"keylocation": {},
+		"quota":       {},
+	}
+
+	props := make(map[string]string)
+	for k, v := range dProps {
+		if _, ok := allowedProps[strings.ToLower(k)]; ok {
+			if k == "quota" && v == "0" || v == "" || v == "-" {
+				continue
+			}
+
+			props[strings.ToLower(k)] = v
+		}
+	}
+
+	newDataset, err := zfs.CreateFilesystem(dataset.Name, props)
+	if err != nil {
+		return fmt.Errorf("failed_to_create_new_dataset: %w", err)
+	}
+
+	if newDataset == nil {
+		return fmt.Errorf("new_dataset_is_nil")
+	}
+
+	return nil
+}
+
+func (s *Service) UpdateDescription(id uint, description string) error {
+	if id == 0 {
+		return fmt.Errorf("invalid_jail_id")
+	}
+
+	if description == "" || len(description) > 1024 {
+		return fmt.Errorf("invalid_description")
+	}
+
+	var jail jailModels.Jail
+	if err := s.DB.First(&jail, id).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return fmt.Errorf("jail_not_found")
+		}
+		logger.L.Error().Err(err).Msg("update_jail_description: failed to find jail")
+		return fmt.Errorf("failed_to_find_jail: %w", err)
+	}
+
+	jail.Description = description
+
+	if err := s.DB.Save(&jail).Error; err != nil {
+		logger.L.Error().Err(err).Msg("update_jail_description: failed to update jail description")
+		return fmt.Errorf("failed_to_update_jail_description: %w", err)
 	}
 
 	return nil

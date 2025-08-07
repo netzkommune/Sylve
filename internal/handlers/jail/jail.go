@@ -11,6 +11,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type JailEditDescRequest struct {
+	ID          uint   `json:"id" binding:"required"`
+	Description string `json:"description" binding:"required"`
+}
+
 // @Summary List all Jails
 // @Description Retrieve a list of all jails
 // @Tags Jail
@@ -158,6 +163,49 @@ func DeleteJail(jailService *jail.Service) gin.HandlerFunc {
 		c.JSON(200, internal.APIResponse[any]{
 			Status:  "success",
 			Message: "jail_deleted",
+			Data:    nil,
+			Error:   "",
+		})
+	}
+}
+
+// @Summary Edit a Jail's description
+// @Description Update the description of a jail by its ID
+// @Tags Jail
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body jailServiceInterfaces.JailEditDescRequest true "Edit Jail Description Request"
+// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Failure 400 {object} internal.APIResponse[any] "Bad Request"
+// @Router /jail/description [put]
+func UpdateJailDescription(jailService *jail.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var req JailEditDescRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(400, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request_data",
+				Data:    nil,
+				Error:   "Invalid request data: " + err.Error(),
+			})
+			return
+		}
+
+		err := jailService.UpdateDescription(req.ID, req.Description)
+		if err != nil {
+			c.JSON(500, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "failed_to_update_description",
+				Data:    nil,
+				Error:   "failed_to_update_description: " + err.Error(),
+			})
+			return
+		}
+
+		c.JSON(200, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "jail_description_updated",
 			Data:    nil,
 			Error:   "",
 		})

@@ -33,5 +33,12 @@ export function isValidCreateData(modal: CreateData): boolean {
 		return false;
 	}
 
+	if (modal.network.switch == -1) {
+		if (modal.network.inheritIPv4 === false && modal.network.inheritIPv6 === false) {
+			toast.error('Either IPv4 or IPv6 must be inherited', toastConfig);
+			return false;
+		}
+	}
+
 	return true;
 }

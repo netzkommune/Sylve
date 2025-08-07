@@ -18,18 +18,12 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import { Progress } from '$lib/components/ui/progress/index.js';
-
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
-
 	import { hostname } from '$lib/stores/basic';
 	import type { VM, VMDomain, VMStat } from '$lib/types/vm/vm';
 	import { sleep } from '$lib/utils';
 	import { updateCache } from '$lib/utils/http';
-
-	import LineGraph from '$lib/components/custom/Charts/LineGraph.svelte';
-	import type { HistoricalData } from '$lib/types/common';
 	import { floatToNDecimals } from '$lib/utils/numbers';
-	import { capitalizeFirstLetter } from '$lib/utils/string';
 	import { dateToAgo } from '$lib/utils/time';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';

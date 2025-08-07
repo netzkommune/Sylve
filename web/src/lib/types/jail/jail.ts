@@ -11,6 +11,8 @@ export interface CreateData {
 	network: {
 		switch: number;
 		mac: number;
+		inheritIPv4: boolean;
+		inheritIPv6: boolean;
 		ipv4: number;
 		ipv4Gateway: number;
 		ipv6: number;
@@ -50,8 +52,21 @@ export const JailSchema = SimpleJailSchema.extend({
 	startOrder: z.number().int(),
 	networks: z.array(NetworkSchema).optional().default([]),
 	createdAt: z.string(),
-	updatedAt: z.string()
+	cores: z.number().int(),
+	memory: z.number().int(),
+	updatedAt: z.string(),
+	startedAt: z.string().nullable(),
+	stoppedAt: z.string().nullable()
+});
+
+export const JailStateSchema = z.object({
+	ctId: z.number().int(),
+	state: z.enum(['ACTIVE', 'INACTIVE', 'UNKNOWN']),
+	pcpu: z.number().int(),
+	memory: z.number().int(),
+	wallClock: z.number().int()
 });
 
 export type SimpleJail = z.infer<typeof SimpleJailSchema>;
 export type Jail = z.infer<typeof JailSchema>;
+export type JailState = z.infer<typeof JailStateSchema>;

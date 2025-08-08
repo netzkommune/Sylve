@@ -3,6 +3,7 @@
 	import { page } from '$app/state';
 	import {
 		deleteJail,
+		getJailLogs,
 		getJails,
 		getJailStates,
 		jailAction,
@@ -28,6 +29,7 @@
 	interface Data {
 		jails: Jail[];
 		jailStates: JailState[];
+		jail: Jail;
 	}
 
 	let { data }: { data: Data } = $props();
@@ -68,6 +70,30 @@
 			onSuccess: (data: JailState[]) => {
 				updateCache('jail-states', data);
 			}
+		},
+		{
+			queryKey: [`jail-${ctId}-start-logs`],
+			queryFn: async () => {
+				return await getJailLogs(data.jail.id, true);
+			},
+			refetchInterval: 1000,
+			keepPreviousData: true,
+			initialData: { logs: '' },
+			onSuccess: (data: any) => {
+				updateCache(`jail-${ctId}-start-logs`, data);
+			}
+		},
+		{
+			queryKey: [`jail-${ctId}-stop-logs`],
+			queryFn: async () => {
+				return await getJailLogs(data.jail.id, false);
+			},
+			refetchInterval: 1000,
+			keepPreviousData: true,
+			initialData: { logs: '' },
+			onSuccess: (data: any) => {
+				updateCache(`jail-${ctId}-stop-logs`, data);
+			}
 		}
 	]);
 
@@ -80,11 +106,17 @@
 			({} as JailState)
 	);
 
+	let startLogs = $derived($results[2].data);
+	let stopLogs = $derived($results[3].data);
 	let jailDesc = $state(jail.description || '');
+
+	$inspect(startLogs, 'startLogs');
 
 	$effect(() => {
 		if (jailDesc) {
 			updateDescription(jail.id, jailDesc);
+		} else {
+			updateDescription(jail.id, '');
 		}
 	});
 
@@ -134,6 +166,7 @@
 		modalState.loading.open = true;
 		modalState.loading.title = 'Stopping Jail';
 		modalState.loading.description = `Please wait while Jail <b>${jail.name} (${jail.ctId})</b> is being stopped`;
+		modalState.loading.iconColor = 'text-red-500';
 
 		await sleep(1000);
 		await jailAction(jail.ctId, 'stop');
@@ -145,6 +178,7 @@
 		modalState.loading.open = true;
 		modalState.loading.title = 'Starting Jail';
 		modalState.loading.description = `Please wait while Jail <b>${jail.name} (${jail.ctId})</b> is being started`;
+		modalState.loading.iconColor = 'text-green-500';
 
 		await sleep(1000);
 		await jailAction(jail.ctId, 'start');
@@ -274,7 +308,7 @@
 					<Card.Content class="mt-3 p-0">
 						<CustomValueInput
 							label={''}
-							placeholder="Notes about Jail"
+							placeholder="Notes"
 							bind:value={jailDesc}
 							classes=""
 							textAreaClasses="!h-32"
@@ -305,4 +339,7 @@
 	title={modalState.loading.title}
 	description={modalState.loading.description}
 	iconColor={modalState.loading.iconColor}
+	logs={modalState.loading.title.toLowerCase().includes('deleting')
+		? ''
+		: startLogs?.logs || stopLogs?.logs || ''}
 />

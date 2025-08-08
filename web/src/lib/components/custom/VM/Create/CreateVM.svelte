@@ -14,7 +14,7 @@
 	import type { Download } from '$lib/types/utilities/downloader';
 	import type { Dataset } from '$lib/types/zfs/dataset';
 	import { capitalizeFirstLetter, generatePassword } from '$lib/utils/string';
-	import { isValidCreateData } from '$lib/utils/vm/vm';
+	import { getNextId, isValidCreateData } from '$lib/utils/vm/vm';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
 	import Advanced from './Advanced.svelte';
@@ -23,7 +23,9 @@
 	import Network from './Network.svelte';
 	import Storage from './Storage.svelte';
 
+	import { getJails } from '$lib/api/jail/jail';
 	import { getNetworkObjects } from '$lib/api/network/object';
+	import type { Jail } from '$lib/types/jail/jail';
 	import type { NetworkObject } from '$lib/types/network/object';
 	import { type CreateData, type VM } from '$lib/types/vm/vm';
 	import { handleAPIError } from '$lib/utils/http';
@@ -127,10 +129,21 @@
 			keepPreviousData: true,
 			initialData: [],
 			refetchOnMount: 'always'
+		},
+		{
+			queryKey: ['jails-svm'],
+			queryFn: async () => {
+				return await getJails();
+			},
+			refetchInterval: 1000,
+			keepPreviousData: true,
+			initialData: [],
+			refetchOnMount: 'always'
 		}
 	]);
 
 	let vms: VM[] = $derived($results[7].data as VM[]);
+	let jails: Jail[] = $derived($results[9].data as Jail[]);
 	let datasets: Dataset[] = $derived($results[1].data as Dataset[]);
 	let volumes: Dataset[] = $derived(datasets.filter((dataset) => dataset.type === 'volume'));
 	let filesystems: Dataset[] = $derived(
@@ -213,7 +226,7 @@
 	function resetModal() {
 		modal = {
 			name: '',
-			id: 0,
+			id: getNextId(vms, jails),
 			description: '',
 			storage: {
 				type: 'zvol',
@@ -246,6 +259,10 @@
 			}
 		};
 	}
+
+	onMount(() => {
+		modal.id = getNextId(vms, jails);
+	});
 </script>
 
 <Dialog.Root bind:open>

@@ -13,7 +13,7 @@ import (
 
 type JailEditDescRequest struct {
 	ID          uint   `json:"id" binding:"required"`
-	Description string `json:"description" binding:"required"`
+	Description string `json:"description"`
 }
 
 // @Summary List all Jails

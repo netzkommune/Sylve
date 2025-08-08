@@ -1,8 +1,10 @@
 package jail
 
 import (
+	"bufio"
 	"fmt"
-	"strings"
+	"io"
+	"os/exec"
 	"sylve/internal/config"
 	jailModels "sylve/internal/db/models/jail"
 	"sylve/pkg/utils"
@@ -28,37 +30,64 @@ func (s *Service) JailAction(ctId int, action string) error {
 
 	jailConf := fmt.Sprintf("%s/%d/%d.conf", jailsPath, ctId, ctId)
 	ctidHash := utils.HashIntToNLetters(ctId, 5)
-	output, err := utils.RunCommand("jail", "-f", jailConf, flag, ctidHash)
-
-	if err != nil {
-		return fmt.Errorf("failed to %s jail %d: %w", action, ctId, err)
-	}
-
-	if action == "start" && !strings.Contains(output, ": created") {
-		return fmt.Errorf("unexpected output from jail command: %s", output)
-	}
-
-	if action == "stop" && !strings.Contains(output, ": removed") {
-		return fmt.Errorf("unexpected output from jail command: %s", output)
-	}
 
 	var jail jailModels.Jail
-	err = s.DB.First(&jail, "ct_id = ?", ctId).Error
-	if err != nil {
+	if err := s.DB.First(&jail, "ct_id = ?", ctId).Error; err != nil {
 		return fmt.Errorf("failed to find jail with ct_id %d: %w", ctId, err)
 	}
 
-	now := time.Now().UTC()
+	cmd := exec.Command("jail", "-f", jailConf, flag, ctidHash)
 
-	if action == "start" {
-		jail.StartedAt = &now
-	} else {
-		jail.StoppedAt = &now
+	stdout, _ := cmd.StdoutPipe()
+	stderr, _ := cmd.StderrPipe()
+
+	if err := cmd.Start(); err != nil {
+		return fmt.Errorf("failed to start jail command: %w", err)
 	}
 
-	err = s.DB.Save(&jail).Error
+	streamToDB := func(r io.Reader, isStart bool) {
+		scanner := bufio.NewScanner(r)
+		for scanner.Scan() {
+			line := scanner.Text()
+			if isStart {
+				jail.StartLogs += line + "\n"
+				s.DB.Model(&jail).Update("start_logs", jail.StartLogs)
+			} else {
+				jail.StopLogs += line + "\n"
+				s.DB.Model(&jail).Update("stop_logs", jail.StopLogs)
+			}
+		}
+	}
 
-	if err != nil {
+	isStart := (action == "start")
+
+	if isStart {
+		jail.StartLogs = ""
+	} else {
+		jail.StopLogs = ""
+	}
+
+	if err := s.DB.Save(&jail).Error; err != nil {
+		return fmt.Errorf("failed to reset logs: %w", err)
+	}
+
+	go streamToDB(stdout, isStart)
+	go streamToDB(stderr, isStart)
+
+	if err := cmd.Wait(); err != nil {
+		return fmt.Errorf("failed to %s jail %d: %w", action, ctId, err)
+	}
+
+	now := time.Now().UTC()
+	if action == "start" {
+		jail.StartedAt = &now
+		jail.StartLogs = ""
+	} else {
+		jail.StoppedAt = &now
+		jail.StopLogs = ""
+	}
+
+	if err := s.DB.Save(&jail).Error; err != nil {
 		return fmt.Errorf("failed to update jail status: %w", err)
 	}
 

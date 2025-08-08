@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { newJail } from '$lib/api/jail/jail';
+	import { getJails, newJail } from '$lib/api/jail/jail';
 	import { getNetworkObjects } from '$lib/api/network/object';
 	import { getSwitches } from '$lib/api/network/switch';
 	import { getDownloads } from '$lib/api/utilities/downloader';
@@ -8,7 +8,7 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
-	import type { CreateData } from '$lib/types/jail/jail';
+	import type { CreateData, Jail } from '$lib/types/jail/jail';
 	import type { NetworkObject } from '$lib/types/network/object';
 	import type { SwitchList } from '$lib/types/network/switch';
 	import type { Download } from '$lib/types/utilities/downloader';
@@ -16,8 +16,10 @@
 	import type { Dataset } from '$lib/types/zfs/dataset';
 	import { handleAPIError } from '$lib/utils/http';
 	import { isValidCreateData } from '$lib/utils/jail/jail';
+	import { getNextId } from '$lib/utils/vm/vm';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
+	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import Basic from './Basic.svelte';
 	import Hardware from './Hardware.svelte';
@@ -87,6 +89,16 @@
 			keepPreviousData: true,
 			initialData: [],
 			refetchOnMount: 'always'
+		},
+		{
+			queryKey: ['jails-svm'],
+			queryFn: async () => {
+				return await getJails();
+			},
+			refetchInterval: 1000,
+			keepPreviousData: true,
+			initialData: [],
+			refetchOnMount: 'always'
 		}
 	]);
 
@@ -95,6 +107,7 @@
 	let networkSwitches: SwitchList = $derived($results[2].data as SwitchList);
 	let networkObjects = $derived($results[4].data as NetworkObject[]);
 	let vms: VM[] = $derived($results[3].data as VM[]);
+	let jails: Jail[] = $derived($results[5].data as Jail[]);
 	let creating: boolean = $state(false);
 
 	let filesystems: Dataset[] = $derived(
@@ -157,6 +170,10 @@
 			toast.success(`Jail ${data.name} created`);
 		}
 	}
+
+	onMount(() => {
+		modal.id = getNextId(vms, jails);
+	});
 </script>
 
 <Dialog.Root bind:open>

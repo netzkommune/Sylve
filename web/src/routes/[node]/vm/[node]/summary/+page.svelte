@@ -83,7 +83,7 @@
 		($results[0].data as VM[]).find((vm: VM) => vm.vmId === parseInt(vmId)) || ({} as VM)
 	);
 	let stats: VMStat[] = $derived($results[2].data as VMStat[]);
-	let recentStat = $derived(stats[0] || ({} as VMStat));
+	let recentStat = $derived(stats[stats.length - 1] || ({} as VMStat));
 
 	let vmDescription = $derived.by(() => {
 		return vm.description || '';

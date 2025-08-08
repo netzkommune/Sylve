@@ -63,11 +63,27 @@ func (s *Service) GetJailsSimple() ([]jailServiceInterfaces.SimpleList, error) {
 
 	var list []jailServiceInterfaces.SimpleList
 
+	var states []jailServiceInterfaces.State
+	states, err := s.GetStates()
+	if err != nil {
+		return nil, fmt.Errorf("failed_to_get_states: %w", err)
+	}
+
 	for _, jail := range jails {
+		var state string
+
+		for _, s := range states {
+			if s.CTID == jail.CTID {
+				state = s.State
+				break
+			}
+		}
+
 		list = append(list, jailServiceInterfaces.SimpleList{
-			ID:   jail.ID,
-			Name: jail.Name,
-			CTID: jail.CTID,
+			ID:    jail.ID,
+			Name:  jail.Name,
+			CTID:  jail.CTID,
+			State: state,
 		})
 	}
 
@@ -298,8 +314,16 @@ func (s *Service) CreateJailConfig(data jailServiceInterfaces.CreateJailRequest,
 
 				config += fmt.Sprintf("\texec.prestart += \"if ! ifconfig %s | grep -qw %s_%sa; then ifconfig %s addm %s_%sa; fi\";\n", bridgeName, ctidHash, networkId, bridgeName, ctidHash, networkId)
 
-				if network.Switch.DHCP {
+				if network.DHCP && network.SLAAC {
 					config += fmt.Sprintf("\texec.start += \"dhclient %s_%sb\";\n", ctidHash, networkId)
+					config += fmt.Sprintf("\texec.start += \"sysrc ifconfig_%s_%sb=\\\"DHCP\\\"\";\n", ctidHash, networkId)
+					config += fmt.Sprintf("\texec.start += \"sysrc ifconfig_%s_%sb_ipv6=\\\"inet6 accept_rtadv\\\"\";\n", ctidHash, networkId)
+				} else if network.DHCP {
+					config += fmt.Sprintf("\texec.start += \"dhclient %s_%sb\";\n", ctidHash, networkId)
+					config += fmt.Sprintf("\texec.start += \"sysrc ifconfig_%s_%sb=\\\"DHCP\\\"\";\n", ctidHash, networkId)
+				} else if network.SLAAC {
+					config += fmt.Sprintf("\texec.start += \"ifconfig %s_%sb inet6 accept_rtadv up\";\n", ctidHash, networkId)
+					config += fmt.Sprintf("\texec.start += \"sysrc ifconfig_%s_%sb_ipv6=\\\"inet6 accept_rtadv\\\"\";\n", ctidHash, networkId)
 				} else {
 					if network.IPv4ID != nil && *network.IPv4ID > 0 && network.IPv4GwID != nil && *network.IPv4GwID > 0 {
 						ipv4, err := s.NetworkService.GetObjectEntryByID(*network.IPv4ID)
@@ -319,6 +343,23 @@ func (s *Service) CreateJailConfig(data jailServiceInterfaces.CreateJailRequest,
 
 						config += fmt.Sprintf("\texec.start += \"ifconfig %s_%sb inet %s netmask %s\";\n", ctidHash, networkId, ip, mask)
 						config += fmt.Sprintf("\texec.start += \"route add default %s\";\n", ipv4Gw)
+						config += fmt.Sprintf("\texec.start += \"sysrc ifconfig_%s_%sb=\\\"inet %s netmask %s\\\"\";\n", ctidHash, networkId, ip, mask)
+					}
+
+					if network.IPv6ID != nil && *network.IPv6ID > 0 && network.IPv6GwID != nil && *network.IPv6GwID > 0 {
+						ipv6, err := s.NetworkService.GetObjectEntryByID(*network.IPv6ID)
+						if err != nil {
+							return "", fmt.Errorf("failed to get ipv6 address: %w", err)
+						}
+
+						ipv6Gw, err := s.NetworkService.GetObjectEntryByID(*network.IPv6GwID)
+						if err != nil {
+							return "", fmt.Errorf("failed to get ipv6 gateway: %w", err)
+						}
+
+						config += fmt.Sprintf("\texec.start += \"ifconfig %s_%sb inet6 %s\";\n", ctidHash, networkId, ipv6)
+						config += fmt.Sprintf("\texec.start += \"sysrc ipv6_defaultrouter=\\\"%s\\\"\";\n", ipv6Gw)
+						config += fmt.Sprintf("\texec.start += \"sysrc ifconfig_%s_%sb_ipv6=\\\"inet6 %s\\\"\";\n", ctidHash, networkId, ipv6)
 					}
 				}
 			}
@@ -445,6 +486,17 @@ func (s *Service) CreateJail(data jailServiceInterfaces.CreateJailRequest) error
 			*ipv6GwId = uint(*data.IPv6Gw)
 		}
 
+		dhcp := false
+		slaac := false
+
+		if data.DHCP != nil && *data.DHCP {
+			dhcp = *data.DHCP
+		}
+
+		if data.SLAAC != nil && *data.SLAAC {
+			slaac = *data.SLAAC
+		}
+
 		jail.Networks = append(jail.Networks, jailModels.Network{
 			SwitchID: uint(*data.SwitchId),
 			MacID:    &mac,
@@ -452,6 +504,8 @@ func (s *Service) CreateJail(data jailServiceInterfaces.CreateJailRequest) error
 			IPv4GwID: ipv4GwId,
 			IPv6ID:   ipv6Id,
 			IPv6GwID: ipv6GwId,
+			DHCP:     dhcp,
+			SLAAC:    slaac,
 		})
 	}
 
@@ -645,7 +699,7 @@ func (s *Service) UpdateDescription(id uint, description string) error {
 		return fmt.Errorf("invalid_jail_id")
 	}
 
-	if description == "" || len(description) > 1024 {
+	if len(description) > 1024 {
 		return fmt.Errorf("invalid_description")
 	}
 

@@ -1,10 +1,12 @@
 import { APIResponseSchema, type APIResponse } from '$lib/types/common';
 import {
+	JailLogsSchema,
 	JailSchema,
 	JailStateSchema,
 	SimpleJailSchema,
 	type CreateData,
 	type Jail,
+	type JailLogs,
 	type JailState,
 	type SimpleJail
 } from '$lib/types/jail/jail';
@@ -60,4 +62,8 @@ export async function updateDescription(id: number, description: string): Promis
 		id,
 		description
 	});
+}
+
+export async function getJailLogs(id: number, start: boolean): Promise<JailLogs> {
+	return await apiRequest(`/jail/${id}/logs?start=${start}`, JailLogsSchema, 'GET');
 }

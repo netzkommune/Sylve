@@ -267,6 +267,7 @@ func RegisterRoutes(r *gin.Engine,
 		jail.GET("", jailHandlers.ListJails(jailService))
 		jail.POST("/action/:ctId/:action", jailHandlers.JailAction(jailService))
 		jail.PUT("/description", jailHandlers.UpdateJailDescription(jailService))
+		jail.GET("/:id/logs", jailHandlers.GetJailLogs(jailService))
 
 		jail.POST("", jailHandlers.CreateJail(jailService))
 		jail.DELETE("/:ctid", jailHandlers.DeleteJail(jailService))

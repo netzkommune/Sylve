@@ -73,6 +73,7 @@ type VM struct {
 	CPUPinning []int     `json:"cpuPinning" gorm:"serializer:json;type:json"`
 
 	Stats []VMStats `json:"-" gorm:"foreignKey:VMID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	State string    `json:"state" gorm:"-"`
 
 	CreatedAt time.Time `json:"createdAt" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updatedAt" gorm:"autoUpdateTime"`

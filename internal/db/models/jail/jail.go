@@ -28,6 +28,9 @@ type Network struct {
 	IPv6GwID  *uint                 `json:"ipv6GwId" gorm:"column:ipv6_gw_id"`
 	IPv6GwObj *networkModels.Object `json:"ipv6GwObj" gorm:"foreignKey:IPv6GwID"`
 
+	DHCP  bool `json:"dhcp" gorm:"default:false"`
+	SLAAC bool `json:"slaac" gorm:"default:false"`
+
 	CTID uint `json:"ctId" gorm:"index"`
 }
 
@@ -53,6 +56,8 @@ type Jail struct {
 	CreatedAt time.Time `json:"createdAt" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updatedAt" gorm:"autoUpdateTime"`
 
+	StartLogs string     `json:"startLogs" gorm:"default:''"`
+	StopLogs  string     `json:"stopLogs" gorm:"default:''"`
 	StartedAt *time.Time `json:"startedAt" gorm:"default:null"`
 	StoppedAt *time.Time `json:"stoppedAt" gorm:"default:null"`
 }

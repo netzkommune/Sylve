@@ -47,13 +47,15 @@
 				id: vm.vmId,
 				label: `${vm.name} (${vm.vmId})`,
 				icon: 'material-symbols:monitor-outline',
-				href: `/${node}/vm/${vm.vmId}`
+				href: `/${node}/vm/${vm.vmId}`,
+				state: vm.state === 'ACTIVE' ? 'active' : 'inactive'
 			})),
 			...simpleJails.map((jail) => ({
 				id: jail.ctId,
 				label: `${jail.name} (${jail.ctId})`,
 				icon: 'hugeicons:prison',
-				href: `/${node}/jail/${jail.ctId}`
+				href: `/${node}/jail/${jail.ctId}`,
+				state: jail.state === 'ACTIVE' ? 'active' : 'inactive'
 			}))
 		].sort((a, b) => a.id - b.id)
 	) as {
@@ -61,14 +63,14 @@
 		label: string;
 		icon: string;
 		href: string;
+		state: 'active' | 'inactive';
 		children?: {
 			label: string;
 			icon: string;
 			href: string;
+			state: 'active' | 'inactive';
 		}[];
 	}[];
-
-	// sort by id
 
 	const tree = $derived([
 		{

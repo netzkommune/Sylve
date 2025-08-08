@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getPCIDevices, getPPTDevices } from '$lib/api/system/pci';
-	import { getVMs } from '$lib/api/vm/vm';
+	import { getVMDomain, getVMs } from '$lib/api/vm/vm';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import CPU from '$lib/components/custom/VM/Hardware/CPU.svelte';
 	import PCIDevices from '$lib/components/custom/VM/Hardware/PCIDevices.svelte';
@@ -64,6 +64,18 @@
 			onSuccess: (data: PPTDevice[]) => {
 				updateCache('pptDevices', data);
 			}
+		},
+		{
+			queryKey: [`vmDomain-${data.vm.vmId}`],
+			queryFn: async () => {
+				return await getVMDomain(data.vm.vmId);
+			},
+			refetchInterval: 1000,
+			keepPreviousData: true,
+			initialData: data.domain,
+			onSuccess: (updated: VMDomain) => {
+				updateCache(`vmDomain-${data.vm.vmId}`, updated);
+			}
 		}
 	]);
 
@@ -73,6 +85,7 @@
 	);
 	let pciDevices: PCIDevice[] = $derived($results[1].data as PCIDevice[]);
 	let pptDevices: PPTDevice[] = $derived($results[2].data as PPTDevice[]);
+	let domain = $derived($results[3].data as VMDomain);
 
 	let options = {
 		cpu: {
@@ -191,6 +204,13 @@
 			}
 		]
 	});
+
+	$inspect(
+		'status=',
+		JSON.stringify(data.domain?.status),
+		'equal=',
+		data.domain?.status === 'Shutoff'
+	);
 </script>
 
 {#snippet button(property: 'ram' | 'cpu' | 'vnc' | 'pciDevices', title: string)}
@@ -201,10 +221,8 @@
 		size="sm"
 		variant="outline"
 		class="h-6.5"
-		title={data.domain.status === 'Shutoff'
-			? ''
-			: `${title} can only be edited when the VM is shut off`}
-		disabled={data.domain.status !== 'Shutoff'}
+		title={domain.status === 'Shutoff' ? '' : `${title} can only be edited when the VM is shut off`}
+		disabled={domain.status ? domain.status !== 'Shutoff' : false}
 	>
 		<div class="flex items-center">
 			<Icon icon="mdi:pencil" class="mr-1 h-4 w-4" />

@@ -11,8 +11,11 @@ export async function load({ params }) {
 		cachedFetch('jail-states', async () => getJailStates(), cacheDuration)
 	]);
 
+	const jail = jails.find((jail) => jail.ctId === parseInt(params.node, 10));
+
 	return {
 		jails: jails,
-		jailStates: jailStates
+		jailStates: jailStates,
+		jail: jail
 	};
 }

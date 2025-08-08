@@ -31,7 +31,8 @@ export interface CreateData {
 export const SimpleJailSchema = z.object({
 	id: z.number().int(),
 	name: z.string(),
-	ctId: z.number().int()
+	ctId: z.number().int(),
+	state: z.enum(['ACTIVE', 'INACTIVE', 'UNKNOWN']).optional()
 });
 
 export const NetworkSchema = z.object({
@@ -67,6 +68,11 @@ export const JailStateSchema = z.object({
 	wallClock: z.number().int()
 });
 
+export const JailLogsSchema = z.object({
+	logs: z.string()
+});
+
 export type SimpleJail = z.infer<typeof SimpleJailSchema>;
 export type Jail = z.infer<typeof JailSchema>;
 export type JailState = z.infer<typeof JailStateSchema>;
+export type JailLogs = z.infer<typeof JailLogsSchema>;

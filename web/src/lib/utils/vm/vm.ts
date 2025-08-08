@@ -1,4 +1,5 @@
-import type { CreateData } from '$lib/types/vm/vm';
+import type { Jail } from '$lib/types/jail/jail';
+import type { CreateData, VM } from '$lib/types/vm/vm';
 import { toast } from 'svelte-sonner';
 import { isValidVMName } from '../string';
 
@@ -90,4 +91,10 @@ export function isValidCreateData(modal: CreateData): boolean {
 	}
 
 	return true;
+}
+
+export function getNextId(vms: VM[], jails: Jail[]): number {
+	const usedIds = [...vms.map((vm) => vm.vmId), ...jails.map((jail) => jail.ctId)];
+	if (usedIds.length === 0) return 100;
+	return Math.max(...usedIds) + 1;
 }

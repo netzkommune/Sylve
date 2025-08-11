@@ -3,10 +3,12 @@ import {
 	JailLogsSchema,
 	JailSchema,
 	JailStateSchema,
+	JailStatSchema,
 	SimpleJailSchema,
 	type CreateData,
 	type Jail,
 	type JailLogs,
+	type JailStat,
 	type JailState,
 	type SimpleJail
 } from '$lib/types/jail/jail';
@@ -66,4 +68,8 @@ export async function updateDescription(id: number, description: string): Promis
 
 export async function getJailLogs(id: number, start: boolean): Promise<JailLogs> {
 	return await apiRequest(`/jail/${id}/logs?start=${start}`, JailLogsSchema, 'GET');
+}
+
+export async function getStats(ctId: number, limit: number): Promise<JailStat[]> {
+	return await apiRequest(`/jail/stats/${ctId}/${limit}`, z.array(JailStatSchema), 'GET');
 }

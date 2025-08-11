@@ -6,9 +6,11 @@
 		getJailLogs,
 		getJails,
 		getJailStates,
+		getStats,
 		jailAction,
 		updateDescription
 	} from '$lib/api/jail/jail';
+	import AreaChart from '$lib/components/custom/Charts/Area.svelte';
 	import AlertDialog from '$lib/components/custom/Dialog/Alert.svelte';
 	import LoadingDialog from '$lib/components/custom/Dialog/Loading.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -17,9 +19,10 @@
 	import { Progress } from '$lib/components/ui/progress/index.js';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 	import { hostname } from '$lib/stores/basic';
-	import type { Jail, JailState } from '$lib/types/jail/jail';
+	import type { Jail, JailStat, JailState } from '$lib/types/jail/jail';
 	import { sleep } from '$lib/utils';
 	import { updateCache } from '$lib/utils/http';
+	import { cleanStats } from '$lib/utils/jail/stats';
 	import { dateToAgo, secondsToHoursAgo } from '$lib/utils/time';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
@@ -30,6 +33,7 @@
 		jails: Jail[];
 		jailStates: JailState[];
 		jail: Jail;
+		stats: JailStat[];
 	}
 
 	let { data }: { data: Data } = $props();
@@ -94,6 +98,18 @@
 			onSuccess: (data: any) => {
 				updateCache(`jail-${ctId}-stop-logs`, data);
 			}
+		},
+		{
+			queryKey: [`jail-stats-${ctId}`],
+			queryFn: async () => {
+				return await getStats(Number(ctId), 128);
+			},
+			refetchInterval: 1000,
+			keepPreviousData: true,
+			initialData: data.stats,
+			onSuccess: (data: JailStat[]) => {
+				updateCache(`jail-stats-${ctId}`, data);
+			}
 		}
 	]);
 
@@ -109,14 +125,31 @@
 	let startLogs = $derived($results[2].data);
 	let stopLogs = $derived($results[3].data);
 	let jailDesc = $state(jail.description || '');
+	let jailStats = $derived($results[4].data || []);
 
-	$inspect(startLogs, 'startLogs');
+	// $inspect(cleanStats(jailStats, jail));
+
+	let cpuHistoricalData = $derived.by(() => {
+		return {
+			field: 'cpuUsage',
+			label: 'CPU Usage',
+			color: 'chart-1',
+			data: cleanStats(jailStats, jail).cpu.slice(-12)
+		};
+	});
+
+	let memoryHistoricalData = $derived.by(() => {
+		return {
+			field: 'memoryUsage',
+			label: 'Memory Usage',
+			color: 'chart-2',
+			data: cleanStats(jailStats, jail).memory.slice(-12)
+		};
+	});
 
 	$effect(() => {
 		if (jailDesc) {
 			updateDescription(jail.id, jailDesc);
-		} else {
-			updateDescription(jail.id, '');
 		}
 	});
 
@@ -316,6 +349,11 @@
 						/>
 					</Card.Content>
 				</Card.Root>
+			</div>
+
+			<div class="space-y-4 p-3">
+				<AreaChart title="CPU Usage" elements={[cpuHistoricalData]} />
+				<AreaChart title="Memory Usage" elements={[memoryHistoricalData]} />
 			</div>
 		</ScrollArea>
 	</div>

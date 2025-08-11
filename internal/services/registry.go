@@ -62,8 +62,9 @@ func NewService[T any](db *gorm.DB, dependencies ...interface{}) interface{} {
 		utilitiesService := dependencies[4].(utilitiesServiceInterfaces.UtilitiesServiceInterface)
 		systemService := dependencies[5].(systemServiceInterfaces.SystemServiceInterface)
 		sambaService := dependencies[6].(sambaServiceInterfaces.SambaServiceInterface)
+		jailService := dependencies[7].(jailServiceInterfaces.JailServiceInterface)
 
-		return startup.NewStartupService(db, infoService, zfsService, networkService, libvirtService, utilitiesService, systemService, sambaService)
+		return startup.NewStartupService(db, infoService, zfsService, networkService, libvirtService, utilitiesService, systemService, sambaService, jailService)
 	case *info.Service:
 		return info.NewInfoService(db)
 	case *zfs.Service:
@@ -100,7 +101,7 @@ func NewServiceRegistry(db *gorm.DB) *ServiceRegistry {
 
 	return &ServiceRegistry{
 		AuthService:      authService.(serviceInterfaces.AuthServiceInterface),
-		StartupService:   NewService[startup.Service](db, infoService, zfsService, networkService, libvirtService, utilitiesService, systemService, sambaService).(*startup.Service),
+		StartupService:   NewService[startup.Service](db, infoService, zfsService, networkService, libvirtService, utilitiesService, systemService, sambaService, jailService).(*startup.Service),
 		InfoService:      infoService.(infoServiceInterfaces.InfoServiceInterface),
 		ZfsService:       zfsService.(*zfs.Service),
 		DiskService:      NewService[disk.Service](db, zfsService).(*disk.Service),

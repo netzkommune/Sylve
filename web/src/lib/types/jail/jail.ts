@@ -72,7 +72,16 @@ export const JailLogsSchema = z.object({
 	logs: z.string()
 });
 
+export const JailStatSchema = z.object({
+	id: z.number().int(),
+	ctId: z.number().int(),
+	cpuUsage: z.number().int(),
+	memoryUsage: z.number().int(),
+	createdAt: z.string()
+});
+
 export type SimpleJail = z.infer<typeof SimpleJailSchema>;
 export type Jail = z.infer<typeof JailSchema>;
 export type JailState = z.infer<typeof JailStateSchema>;
 export type JailLogs = z.infer<typeof JailLogsSchema>;
+export type JailStat = z.infer<typeof JailStatSchema>;

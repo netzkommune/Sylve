@@ -34,6 +34,15 @@ type Network struct {
 	CTID uint `json:"ctId" gorm:"index"`
 }
 
+type JailStats struct {
+	ID          uint  `json:"id" gorm:"primaryKey"`
+	CTID        int   `json:"ctId"`
+	CPUUsage    int64 `json:"cpuUsage"`
+	MemoryUsage int64 `json:"memoryUsage"`
+
+	CreatedAt time.Time `json:"createdAt" gorm:"autoCreateTime"`
+}
+
 type Jail struct {
 	ID          uint   `json:"id" gorm:"primaryKey"`
 	CTID        int    `json:"ctId" gorm:"unique;not null;uniqueIndex"`
@@ -51,7 +60,8 @@ type Jail struct {
 	CPUSet []int `json:"cpuSet" gorm:"serializer:json;type:json"`
 	Memory int   `json:"memory"`
 
-	Networks []Network `json:"networks" gorm:"foreignKey:CTID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT"`
+	Networks []Network   `json:"networks" gorm:"foreignKey:CTID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT"`
+	Stats    []JailStats `json:"-" gorm:"foreignKey:CTID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 
 	CreatedAt time.Time `json:"createdAt" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updatedAt" gorm:"autoUpdateTime"`

@@ -3,8 +3,10 @@ package jailHandlers
 import (
 	"strconv"
 	"sylve/internal"
+	jailModels "sylve/internal/db/models/jail"
 	jailServiceInterfaces "sylve/internal/interfaces/services/jail"
 	"sylve/internal/services/jail"
+	"sylve/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -96,6 +98,50 @@ func GetJailLogs(jailService *jail.Service) gin.HandlerFunc {
 			Status:  "success",
 			Message: "jail_logs_retrieved",
 			Data:    LogsResponse{Logs: logs},
+			Error:   "",
+		})
+	}
+}
+
+// @Summary Get Jail Statistics
+// @Description Retrieve statistics for a specific jail
+// @Tags Jail
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} internal.APIResponse[[]jailModels.JailStats] "Success"
+// @Failure 400 {object} internal.APIResponse[any] "Bad Request"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /jail/stats/:ctId/:limit [get]
+func GetJailStats(jailService *jail.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctId := c.Param("ctId")
+		limit := c.Param("limit")
+		if ctId == "" || limit == "" {
+			c.JSON(400, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request",
+				Data:    nil,
+				Error:   "ctId and limit are required",
+			})
+			return
+		}
+
+		stats, err := jailService.GetJailUsage(int(utils.StringToUint64(ctId)), int(utils.StringToUint64(limit)))
+		if err != nil {
+			c.JSON(500, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Data:    nil,
+				Error:   err.Error(),
+			})
+			return
+		}
+
+		c.JSON(200, internal.APIResponse[[]jailModels.JailStats]{
+			Status:  "success",
+			Message: "jail_stats_retrieved",
+			Data:    stats,
 			Error:   "",
 		})
 	}

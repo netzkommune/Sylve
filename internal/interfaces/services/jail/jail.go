@@ -53,4 +53,6 @@ type State struct {
 	WallClock int64  `json:"wallClock"`
 }
 
-type JailServiceInterface interface{}
+type JailServiceInterface interface {
+	StoreJailUsage() error
+}

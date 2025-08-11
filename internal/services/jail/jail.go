@@ -22,6 +22,7 @@ import (
 	"sylve/internal/logger"
 	"sylve/pkg/utils"
 	"sylve/pkg/zfs"
+	"sync"
 
 	"gorm.io/gorm"
 
@@ -35,6 +36,8 @@ var _ jailServiceInterfaces.JailServiceInterface = (*Service)(nil)
 type Service struct {
 	DB             *gorm.DB
 	NetworkService networkServiceInterfaces.NetworkServiceInterface
+
+	crudMutex sync.Mutex
 }
 
 func NewJailService(db *gorm.DB, networkService networkServiceInterfaces.NetworkServiceInterface) jailServiceInterfaces.JailServiceInterface {

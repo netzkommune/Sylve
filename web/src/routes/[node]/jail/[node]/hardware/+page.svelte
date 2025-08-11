@@ -37,9 +37,14 @@
 	]);
 
 	let jails = $derived($results[0].data);
-	let jail = $derived(jails?.find((j) => j.ctId === data.jail.ctId));
+	let jail = $derived.by(() => {
+		if (jails) {
+			const found = jails.find((j) => j.ctId === data.jail?.ctId);
+			return found || data.jail;
+		}
 
-	$inspect(jail);
+		return data.jail;
+	});
 
 	let options = {
 		ram: {

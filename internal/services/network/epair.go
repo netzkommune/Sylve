@@ -35,6 +35,34 @@ func (s *Service) CreateEpair(name string) error {
 	return nil
 }
 
+func (s *Service) DeleteEpair(name string) error {
+	ifaces, err := iface.List()
+	if err != nil {
+		return fmt.Errorf("failed to list interfaces: %w", err)
+	}
+
+	var epairA string
+	for _, iface := range ifaces {
+		if strings.HasPrefix(iface.Name, name) {
+			if strings.HasSuffix(iface.Name, "a") {
+				epairA = iface.Name
+			}
+		}
+	}
+
+	if epairA == "" {
+		return fmt.Errorf("epair %s not found", name)
+	}
+
+	_, err = utils.RunCommand("ifconfig", epairA, "destroy")
+
+	if err != nil {
+		return fmt.Errorf("failed to delete epair %s: %w", epairA, err)
+	}
+
+	return nil
+}
+
 func (s *Service) SyncEpairs() error {
 	var jails []jailModels.Jail
 	err := s.DB.Preload("Networks").Find(&jails).Error

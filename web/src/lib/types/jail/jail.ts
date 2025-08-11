@@ -51,6 +51,8 @@ export const JailSchema = SimpleJailSchema.extend({
 	base: z.string(),
 	startAtBoot: z.boolean(),
 	startOrder: z.number().int(),
+	inheritIPv4: z.boolean(),
+	inheritIPv6: z.boolean(),
 	networks: z.array(NetworkSchema).optional().default([]),
 	createdAt: z.string(),
 	cores: z.number().int(),

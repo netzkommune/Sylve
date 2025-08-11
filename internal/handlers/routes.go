@@ -276,6 +276,8 @@ func RegisterRoutes(r *gin.Engine,
 		jail.DELETE("/:ctid", jailHandlers.DeleteJail(jailService))
 
 		jail.GET("/console", jailHandlers.HandleJailTerminalWebsocket)
+		jail.POST("/network/inheritance", jailHandlers.InheritJailNetwork(jailService))
+		jail.DELETE("/network/disinherit/:ctId", jailHandlers.DisinheritJailNetwork(jailService))
 	}
 
 	utilities := api.Group("/utilities")

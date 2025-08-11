@@ -21,4 +21,5 @@ type NetworkServiceInterface interface {
 	GetBridgeNameByID(id uint) (string, error)
 	CreateEpair(name string) error
 	SyncEpairs() error
+	DeleteEpair(name string) error
 }

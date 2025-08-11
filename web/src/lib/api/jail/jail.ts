@@ -73,3 +73,19 @@ export async function getJailLogs(id: number, start: boolean): Promise<JailLogs>
 export async function getStats(ctId: number, limit: number): Promise<JailStat[]> {
 	return await apiRequest(`/jail/stats/${ctId}/${limit}`, z.array(JailStatSchema), 'GET');
 }
+
+export async function inheritHostNetwork(
+	ctId: number,
+	ipv4: boolean,
+	ipv6: boolean
+): Promise<APIResponse> {
+	return await apiRequest('/jail/network/inheritance', APIResponseSchema, 'POST', {
+		ctId,
+		ipv4,
+		ipv6
+	});
+}
+
+export async function disinheritHostNetwork(ctId: number): Promise<APIResponse> {
+	return await apiRequest(`/jail/network/disinherit/${ctId}`, APIResponseSchema, 'DELETE');
+}

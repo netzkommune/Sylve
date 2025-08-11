@@ -72,6 +72,11 @@
 					label: 'Hardware',
 					icon: 'ix:hardware-cabinet',
 					href: `/${node}/jail/${jailName}/hardware`
+				},
+				{
+					label: 'Network',
+					icon: 'mdi:network',
+					href: `/${node}/jail/${jailName}/network`
 				}
 			];
 		} else {

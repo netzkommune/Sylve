@@ -42,7 +42,9 @@
 		'/api/network/object': 'Network Object',
 		'/api/system/file-explorer/delete': 'File Explorer - Delete',
 		'/api/system/file-explorer': 'File Explorer',
-		'/api/system/ppt-devices': 'PCI Passthrough'
+		'/api/system/ppt-devices': 'PCI Passthrough',
+		'/api/zfs/datasets/filesystem': 'ZFS Filesystem',
+		'/api/zfs/datasets/volume': 'ZFS Volume'
 	});
 
 	let records = $derived.by(() => {

@@ -12,15 +12,17 @@ import (
 )
 
 func (s *Service) JailAction(ctId int, action string) error {
-	if action != "start" && action != "stop" {
+	if action != "start" && action != "stop" && action != "restart" {
 		return fmt.Errorf("invalid_action: %s", action)
 	}
 
 	var flag string
 	if action == "start" {
 		flag = "-c"
-	} else {
+	} else if action == "stop" {
 		flag = "-r"
+	} else if action == "restart" {
+		flag = "-mr"
 	}
 
 	jailsPath, err := config.GetJailsPath()
@@ -63,7 +65,10 @@ func (s *Service) JailAction(ctId int, action string) error {
 
 	if isStart {
 		jail.StartLogs = ""
-	} else {
+	} else if action == "stop" {
+		jail.StopLogs = ""
+	} else if action == "restart" {
+		jail.StartLogs = ""
 		jail.StopLogs = ""
 	}
 
@@ -82,7 +87,7 @@ func (s *Service) JailAction(ctId int, action string) error {
 	if action == "start" {
 		jail.StartedAt = &now
 		jail.StartLogs = ""
-	} else {
+	} else if action == "stop" {
 		jail.StoppedAt = &now
 		jail.StopLogs = ""
 	}

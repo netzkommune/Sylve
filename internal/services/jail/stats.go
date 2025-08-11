@@ -89,6 +89,21 @@ func (s *Service) GetStates() ([]jailServiceInterfaces.State, error) {
 	return states, nil
 }
 
+func (s *Service) IsJailActive(ctId uint) (bool, error) {
+	states, err := s.GetStates()
+	if err != nil {
+		return false, err
+	}
+
+	for _, state := range states {
+		if state.CTID == int(ctId) {
+			return state.State == "ACTIVE", nil
+		}
+	}
+
+	return false, nil
+}
+
 func (s *Service) StoreJailUsage() error {
 	if !s.crudMutex.TryLock() {
 		return nil

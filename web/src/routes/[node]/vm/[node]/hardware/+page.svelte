@@ -204,13 +204,6 @@
 			}
 		]
 	});
-
-	$inspect(
-		'status=',
-		JSON.stringify(data.domain?.status),
-		'equal=',
-		data.domain?.status === 'Shutoff'
-	);
 </script>
 
 {#snippet button(property: 'ram' | 'cpu' | 'vnc' | 'pciDevices', title: string)}

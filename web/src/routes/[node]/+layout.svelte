@@ -67,6 +67,11 @@
 					label: 'Console',
 					icon: 'mdi:monitor',
 					href: `/${node}/jail/${jailName}/console`
+				},
+				{
+					label: 'Hardware',
+					icon: 'ix:hardware-cabinet',
+					href: `/${node}/jail/${jailName}/hardware`
 				}
 			];
 		} else {

@@ -90,6 +90,7 @@
 					type="text"
 					placeholder="Enter your username"
 					bind:value={username}
+					autocomplete="off"
 					required
 				/>
 			</div>
@@ -99,6 +100,7 @@
 					id="password"
 					type="password"
 					placeholder="●●●●●●●●"
+					autocomplete="off"
 					class="h-8 w-full"
 					bind:value={password}
 					required

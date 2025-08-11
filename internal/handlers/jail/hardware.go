@@ -12,6 +12,11 @@ type JailUpdateMemoryRequest struct {
 	Memory int64 `json:"memory" binding:"required"`
 }
 
+type JailUpdateCPURequest struct {
+	CTID  uint  `json:"ctId" binding:"required"`
+	Cores int64 `json:"cores" binding:"required"`
+}
+
 // @Summary Update Jail Memory
 // @Description Update the memory limit of a jail by its ID
 // @Tags Jail
@@ -49,6 +54,49 @@ func UpdateJailMemory(jailService *jail.Service) gin.HandlerFunc {
 		c.JSON(200, internal.APIResponse[any]{
 			Status:  "success",
 			Message: "jail_memory_updated",
+			Data:    nil,
+			Error:   "",
+		})
+	}
+}
+
+// @Summary Update Jail CPU
+// @Description Update the CPU limit of a jail by its ID
+// @Tags Jail
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body jailServiceInterfaces.JailUpdateCPURequest true "Update Jail CPU Request"
+// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Failure 400 {object} internal.APIResponse[any] "Bad Request"
+// @Router /jail/cpu [put]
+func UpdateJailCPU(jailService *jail.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var req JailUpdateCPURequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(400, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request_data",
+				Data:    nil,
+				Error:   "Invalid request data: " + err.Error(),
+			})
+			return
+		}
+
+		err := jailService.UpdateCPU(req.CTID, req.Cores)
+		if err != nil {
+			c.JSON(500, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "failed_to_update_cpu",
+				Data:    nil,
+				Error:   "failed_to_update_cpu: " + err.Error(),
+			})
+			return
+		}
+
+		c.JSON(200, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "jail_cpu_updated",
 			Data:    nil,
 			Error:   "",
 		})

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getJails } from '$lib/api/jail/jail';
+	import CPU from '$lib/components/custom/Jail/Hardware/CPU.svelte';
 	import RAM from '$lib/components/custom/Jail/Hardware/RAM.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -44,6 +45,10 @@
 		ram: {
 			value: jail?.memory,
 			open: false
+		},
+		cpu: {
+			value: jail?.cores,
+			open: false
 		}
 	};
 
@@ -52,6 +57,7 @@
 	$effect(() => {
 		if (jail) {
 			properties.ram.value = jail.memory;
+			properties.cpu.value = jail.cores;
 		}
 	});
 
@@ -63,13 +69,7 @@
 			{ title: 'Property', field: 'property' },
 			{
 				title: 'Value',
-				field: 'value',
-				formatter: (cell: CellComponent) => {
-					const row = cell.getRow();
-					const value = cell.getValue();
-
-					return value;
-				}
+				field: 'value'
 			}
 		],
 		rows: [
@@ -77,12 +77,17 @@
 				id: generateNanoId(`${properties.ram.value}-ram`),
 				property: 'RAM',
 				value: bytesToHumanReadable(properties.ram.value)
+			},
+			{
+				id: generateNanoId(`${properties.cpu.value}-cpu`),
+				property: 'CPU',
+				value: properties.cpu.value
 			}
 		]
 	});
 </script>
 
-{#snippet button(property: 'ram', title: string)}
+{#snippet button(property: 'ram' | 'cpu', title: string)}
 	<Button
 		onclick={() => {
 			properties[property].open = true;
@@ -104,6 +109,10 @@
 			{#if activeRow && activeRow.property === 'RAM'}
 				{@render button('ram', 'RAM')}
 			{/if}
+
+			{#if activeRow && activeRow.property === 'CPU'}
+				{@render button('cpu', 'CPU')}
+			{/if}
 		</div>
 	{/if}
 
@@ -120,4 +129,8 @@
 
 {#if properties.ram.open}
 	<RAM bind:open={properties.ram.open} ram={data.ram} {jail} />
+{/if}
+
+{#if properties.cpu.open}
+	<CPU bind:open={properties.cpu.open} {jail} />
 {/if}

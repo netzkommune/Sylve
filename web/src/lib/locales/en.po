@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-22T11:34:22.984Z\n"
-"PO-Revision-Date: 2025-08-11T08:34:14.656Z\n"
+"PO-Revision-Date: 2025-08-11T09:30:38.258Z\n"
 "Last-Translator: \n"
 "Language: English\n"
 "Language-Team: \n"
@@ -85,6 +85,8 @@ msgstr "<0/> Upload File"
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/lib/components/custom/Jail/Hardware/RAM.svelte
 #: src/lib/components/custom/Jail/Hardware/RAM.svelte
+#: src/lib/components/custom/Jail/Hardware/CPU.svelte
+#: src/lib/components/custom/Jail/Hardware/CPU.svelte
 msgid "Close"
 msgstr "Close"
 
@@ -486,6 +488,8 @@ msgstr "<0/> Create Virtual Machine"
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/lib/components/custom/Jail/Hardware/RAM.svelte
 #: src/lib/components/custom/Jail/Hardware/RAM.svelte
+#: src/lib/components/custom/Jail/Hardware/CPU.svelte
+#: src/lib/components/custom/Jail/Hardware/CPU.svelte
 msgid "Reset"
 msgstr "Reset"
 
@@ -930,6 +934,7 @@ msgstr "This is a note"
 #: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
 #: src/lib/components/custom/Jail/Hardware/RAM.svelte
+#: src/lib/components/custom/Jail/Hardware/CPU.svelte
 msgid "Save"
 msgstr "Save"
 
@@ -2143,9 +2148,9 @@ msgstr "Edit {0}"
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
-#: src/routes/[node]/jail/[node]/hardware/+page.svelte
-#: src/routes/[node]/jail/[node]/hardware/+page.svelte
 #: src/lib/components/custom/Jail/Hardware/RAM.svelte
+#: src/routes/[node]/jail/[node]/hardware/+page.svelte
+#: src/routes/[node]/jail/[node]/hardware/+page.svelte
 msgid "RAM"
 msgstr "RAM"
 
@@ -2163,6 +2168,9 @@ msgid "Property"
 msgstr "Property"
 
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
+#: src/routes/[node]/jail/[node]/hardware/+page.svelte
+#: src/routes/[node]/jail/[node]/hardware/+page.svelte
+#: src/lib/components/custom/Jail/Hardware/CPU.svelte
 msgid "CPU"
 msgstr "CPU"
 
@@ -2188,7 +2196,6 @@ msgstr "Failed to modify CPU"
 
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
-#: src/lib/components/custom/Jail/Hardware/RAM.svelte
 msgid "VM not found"
 msgstr "VM not found"
 
@@ -3390,3 +3397,18 @@ msgstr "Jail console connected for jail {0}"
 
 #~ msgid "Memory"
 #~ msgstr "Memory"
+
+#: src/lib/components/custom/Jail/Hardware/RAM.svelte
+msgid "Jail not found"
+msgstr "Jail not found"
+
+#: src/lib/components/custom/Jail/Hardware/CPU.svelte
+msgid "CPU cores must be at least 1"
+msgstr "CPU cores must be at least 1"
+
+#~ msgid "CPU cores updated successfully"
+#~ msgstr "CPU cores updated successfully"
+
+#: src/lib/components/custom/Jail/Hardware/CPU.svelte
+msgid "CPU cores updated"
+msgstr "CPU cores updated"

@@ -7,3 +7,10 @@ export async function modifyRAM(ctId: number, bytes: number): Promise<APIRespons
 		memory: bytes
 	});
 }
+
+export async function modifyCPU(ctId: number, cores: number): Promise<APIResponse> {
+	return await apiRequest('/jail/cpu', APIResponseSchema, 'PUT', {
+		ctId: ctId,
+		cores: parseInt(cores.toString(), 10)
+	});
+}

@@ -17,11 +17,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// type StatsRequest struct {
-// 	VMID  int `json:"vmId" binding:"required"`
-// 	Limit int `json:"limit" binding:"required"`
-// }
-
 // @Summary Get VM Statistics
 // @Description Retrieve statistics for a virtual machine
 // @Tags VM

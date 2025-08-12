@@ -132,8 +132,6 @@
 						? macObj.entries[0].value
 						: undefined;
 
-				console.log(mac);
-
 				const row: Row = {
 					id: network.id,
 					name: sw?.name || 'Unknown Switch',

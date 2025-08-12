@@ -13,7 +13,7 @@
 		autocomplete?: FullAutoFill | null | undefined;
 		classes: string;
 		type?: string;
-		textAreaCLasses?: string;
+		textAreaClasses?: string;
 		disabled?: boolean;
 		onChange?: (value: string | number) => void;
 	}
@@ -26,7 +26,7 @@
 		autocomplete = 'off',
 		classes = 'space-y-1.5',
 		type = 'text',
-		textAreaCLasses = 'min-h-56',
+		textAreaClasses = 'min-h-56',
 		disabled = false,
 		onChange
 	}: Props = $props();
@@ -47,7 +47,7 @@
 	{/if}
 	{#if type === 'textarea'}
 		<Textarea
-			class={textAreaCLasses}
+			class={textAreaClasses}
 			id={nanoId}
 			{placeholder}
 			{autocomplete}

@@ -74,6 +74,8 @@ export const VMSchema = z.object({
 	startAtBoot: z.boolean(),
 	startOrder: z.number().int(),
 
+	state: z.enum(['ACTIVE', 'INACTIVE']),
+
 	storages: z.array(VMStorageSchema),
 	networks: z.array(VMNetworkSchema),
 	pciDevices: z.union([z.array(z.number().int()), z.null()]),

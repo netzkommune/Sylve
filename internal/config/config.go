@@ -84,8 +84,11 @@ func SetupDataPath() error {
 	dirs := []string{
 		dataPath,
 		filepath.Join(dataPath, "vms"),
+		filepath.Join(dataPath, "jails"),
 		filepath.Join(dataPath, "downloads"),
 		filepath.Join(dataPath, "downloads", "torrents"),
+		filepath.Join(dataPath, "downloads", "http"),
+		filepath.Join(dataPath, "downloads", "extracted"),
 	}
 
 	for _, dir := range dirs {
@@ -108,12 +111,15 @@ func GetDownloadsPath(dType string) string {
 		return filepath.Join(cwd, "data", "downloads")
 	}
 
-	if dType == "torrents" {
+	switch dType {
+	case "torrents":
 		return filepath.Join(ParsedConfig.DataPath, "downloads", "torrents")
-	} else if dType == "torrent.db" {
+	case "torrent.db":
 		return filepath.Join(ParsedConfig.DataPath, "downloads", "torrents", "torrent.db")
-	} else if dType == "http" {
+	case "http":
 		return filepath.Join(ParsedConfig.DataPath, "downloads", "http")
+	case "extracted":
+		return filepath.Join(ParsedConfig.DataPath, "downloads", "extracted")
 	}
 
 	return filepath.Join(ParsedConfig.DataPath, "downloads")
@@ -128,4 +134,15 @@ func GetVMsPath() (string, error) {
 	vmsPath := filepath.Join(dataPath, "vms")
 
 	return vmsPath, nil
+}
+
+func GetJailsPath() (string, error) {
+	dataPath, err := GetDataPath()
+	if err != nil {
+		return "", fmt.Errorf("failed to get data path: %w", err)
+	}
+
+	jailsPath := filepath.Join(dataPath, "jails")
+
+	return jailsPath, nil
 }

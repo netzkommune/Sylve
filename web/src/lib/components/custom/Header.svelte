@@ -6,10 +6,14 @@
 	import { openTerminal, terminalStore } from '$lib/stores/terminal.svelte';
 	import Icon from '@iconify/svelte';
 	import { mode, toggleMode } from 'mode-watcher';
+	import CreateJail from './Jail/Create/CreateJail.svelte';
 	import CreateVM from './VM/Create/CreateVM.svelte';
 
 	let menuData = $state({
 		createVM: {
+			open: false
+		},
+		createJail: {
 			open: false
 		},
 		menuItems: [
@@ -76,12 +80,29 @@
 				size="sm"
 				onclick={() => (menuData.createVM.open = !menuData.createVM.open)}
 			>
-				<Icon icon="material-symbols:monitor-outline-rounded" class="mr-1.5 h-5 w-5" />
-				Create VM
+				<div class="flex items-center gap-2">
+					<Icon icon="material-symbols:monitor-outline-rounded" class="h-4 w-4" />
+					<span>Create VM</span>
+				</div>
+			</Button>
+
+			<Button
+				class="h-6"
+				size="sm"
+				onclick={() => (menuData.createJail.open = !menuData.createJail.open)}
+			>
+				<div class="flex items-center gap-2">
+					<Icon icon="hugeicons:prison" class="h-4 w-4" />
+					<span>Create Jail</span>
+				</div>
 			</Button>
 
 			{#if menuData.createVM.open}
 				<CreateVM bind:open={menuData.createVM.open} />
+			{/if}
+
+			{#if menuData.createJail.open}
+				<CreateJail bind:open={menuData.createJail.open} />
 			{/if}
 		</div>
 		<DropdownMenu.Root>

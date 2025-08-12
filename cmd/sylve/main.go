@@ -28,6 +28,7 @@ import (
 	"sylve/internal/services/auth"
 	"sylve/internal/services/disk"
 	"sylve/internal/services/info"
+	"sylve/internal/services/jail"
 	"sylve/internal/services/libvirt"
 	"sylve/internal/services/network"
 	"sylve/internal/services/samba"
@@ -57,6 +58,7 @@ func main() {
 	sysS := serviceRegistry.SystemService
 	lvS := serviceRegistry.LibvirtService
 	smbS := serviceRegistry.SambaService
+	jS := serviceRegistry.JailService
 
 	err := sS.Initialize(aS.(*auth.Service))
 
@@ -90,6 +92,7 @@ func main() {
 		sysS.(*system.Service),
 		lvS.(*libvirt.Service),
 		smbS.(*samba.Service),
+		jS.(*jail.Service),
 		d,
 	)
 

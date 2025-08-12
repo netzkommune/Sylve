@@ -13,9 +13,11 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"hash/fnv"
 	"math/big"
+	"net"
 	"regexp"
 	"strconv"
 	"strings"
@@ -505,4 +507,99 @@ func IsValidCountryCode(code string) bool {
 	_, ok := validCountryCodes[code]
 
 	return ok
+}
+
+func IsValidFilename(name string) error {
+	name = strings.TrimSpace(name)
+	if name == "" {
+		return errors.New("file name cannot be blank")
+	}
+
+	validate := validator.New()
+	validFileName := regexp.MustCompile(`^[^\\/:*?"<>|]{1,255}$`)
+
+	_ = validate.RegisterValidation("filename", func(fl validator.FieldLevel) bool {
+		return validFileName.MatchString(fl.Field().String())
+	})
+
+	input := struct {
+		Name string `validate:"required,filename"`
+	}{Name: name}
+
+	if err := validate.Struct(input); err != nil {
+		return errors.New("invalid file name")
+	}
+	return nil
+}
+
+func MakeValidHostname(name string) string {
+	name = strings.ToLower(name)
+	re := regexp.MustCompile(`[^a-z0-9-]`)
+	name = re.ReplaceAllString(name, "-")
+	name = regexp.MustCompile(`-+`).ReplaceAllString(name, "-")
+	name = strings.Trim(name, "-")
+
+	if name == "" {
+		name = "host"
+	}
+
+	if len(name) > 63 {
+		name = name[:63]
+	}
+
+	return name
+}
+
+func HashIntToNLetters(n int, length int) string {
+	const letters = "abcdefghijklmnopqrstuvwxyz"
+	max := 1
+	for i := 0; i < length; i++ {
+		max *= 26
+	}
+
+	hasher := sha256.New()
+	buf := make([]byte, 8)
+	binary.BigEndian.PutUint64(buf, uint64(n))
+	hasher.Write(buf)
+	sum := hasher.Sum(nil)
+	num := binary.BigEndian.Uint32(sum[:4]) % uint32(max)
+
+	out := make([]byte, length)
+	for i := length - 1; i >= 0; i-- {
+		out[i] = letters[num%26]
+		num /= 26
+	}
+	return string(out)
+}
+
+func PreviousMAC(macStr string) (string, error) {
+	hw, err := net.ParseMAC(macStr)
+	if err != nil {
+		return "", fmt.Errorf("invalid MAC address: %w", err)
+	}
+
+	hw = hw[:6]
+
+	for i := len(hw) - 1; i >= 0; i-- {
+		if hw[i] > 0 {
+			hw[i]--
+			break
+		}
+		hw[i] = 0xFF
+	}
+
+	return hw.String(), nil
+}
+
+func SplitIPv4AndMask(cidr string) (string, string, error) {
+	ip, network, err := net.ParseCIDR(cidr)
+	if err != nil {
+		return "", "", fmt.Errorf("invalid CIDR: %w", err)
+	}
+
+	mask := network.Mask
+	ipStr := ip.String()
+	maskStr := net.IP(mask).String()
+
+	return ipStr, maskStr, nil
 }

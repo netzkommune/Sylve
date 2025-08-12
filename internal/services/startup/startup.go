@@ -14,6 +14,7 @@ import (
 	"os"
 	serviceInterfaces "sylve/internal/interfaces/services"
 	infoServiceInterfaces "sylve/internal/interfaces/services/info"
+	jailServiceInterfaces "sylve/internal/interfaces/services/jail"
 	libvirtServiceInterfaces "sylve/internal/interfaces/services/libvirt"
 	networkServiceInterfaces "sylve/internal/interfaces/services/network"
 	sambaServiceInterfaces "sylve/internal/interfaces/services/samba"
@@ -37,6 +38,7 @@ type Service struct {
 	Utilities utilitiesServiceInterfaces.UtilitiesServiceInterface
 	System    systemServiceInterfaces.SystemServiceInterface
 	Samba     sambaServiceInterfaces.SambaServiceInterface
+	Jail      jailServiceInterfaces.JailServiceInterface
 }
 
 func NewStartupService(db *gorm.DB,
@@ -47,6 +49,7 @@ func NewStartupService(db *gorm.DB,
 	utiliies utilitiesServiceInterfaces.UtilitiesServiceInterface,
 	system systemServiceInterfaces.SystemServiceInterface,
 	samba sambaServiceInterfaces.SambaServiceInterface,
+	jail jailServiceInterfaces.JailServiceInterface,
 ) serviceInterfaces.StartupServiceInterface {
 	return &Service{
 		DB:        db,
@@ -57,6 +60,7 @@ func NewStartupService(db *gorm.DB,
 		Utilities: utiliies,
 		System:    system,
 		Samba:     samba,
+		Jail:      jail,
 	}
 }
 
@@ -93,6 +97,10 @@ func (s *Service) PreFlightChecklist() error {
 		return err
 	}
 
+	if err := s.DevfsSync(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -123,10 +131,15 @@ func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface)
 	go s.ZFS.Cron()
 	go s.ZFS.StartSnapshotScheduler(context.Background())
 	go s.Libvirt.StoreVMUsage()
+	go s.Jail.StoreJailUsage()
 
 	err := s.Network.SyncStandardSwitches(nil, "sync")
 	if err != nil {
-		logger.L.Error().Msgf("Error syncing standard switches: %v", err)
+		logger.L.Error().Msgf("error syncing standard switches: %v", err)
+	}
+
+	if err := s.Network.SyncEpairs(); err != nil {
+		return fmt.Errorf("error syncing epairs %v", err)
 	}
 
 	if err := s.System.SyncPPTDevices(); err != nil {
@@ -157,6 +170,11 @@ func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface)
 			if err := s.Libvirt.StoreVMUsage(); err != nil {
 				logger.L.Error().Msgf("Failed to store VM usage: %v", err)
 			}
+
+			if err := s.Jail.StoreJailUsage(); err != nil {
+				logger.L.Error().Msgf("Failed to store Jail usage: %v", err)
+			}
+
 			time.Sleep(5 * time.Second)
 		}
 	}()

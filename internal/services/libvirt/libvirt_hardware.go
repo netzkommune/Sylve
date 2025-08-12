@@ -13,7 +13,6 @@ import (
 	"strconv"
 	"strings"
 	"sylve/internal/db/models"
-	vmModels "sylve/internal/db/models/vm"
 	"sylve/pkg/utils"
 
 	"github.com/beevik/etree"
@@ -200,7 +199,7 @@ func updateVNC(xml string, vncPort int, vncResolution string, vncPassword string
 	return out, nil
 }
 
-func updatePassthrough(xml string, pciDevices []string) (string, error) {
+func updatePassthrough(xml string, pciDevices []string, passedThroughIds []models.PassedThroughIDs) (string, error) {
 	doc := etree.NewDocument()
 	if err := doc.ReadFromString(xml); err != nil {
 		return "", fmt.Errorf("failed to parse XML: %w", err)
@@ -238,9 +237,23 @@ func updatePassthrough(xml string, pciDevices []string) (string, error) {
 	}
 
 	for i, devID := range pciDevices {
+		pid := ""
+
+		for _, ptID := range passedThroughIds {
+			intDevId, err := strconv.Atoi(devID)
+			if err != nil {
+				return "", fmt.Errorf("failed to convert device ID to int: %w", err)
+			}
+
+			if ptID.ID == intDevId {
+				pid = ptID.DeviceID
+				break
+			}
+		}
+
 		idx := startIdx + i
 		arg := bhyveCL.CreateElement("bhyve:arg")
-		arg.CreateAttr("value", fmt.Sprintf("-s %d:0,passthru,%s", idx, devID))
+		arg.CreateAttr("value", fmt.Sprintf("-s %d:0,passthru,%s", idx, pid))
 	}
 
 	out, err := doc.WriteToString()
@@ -287,214 +300,6 @@ func cleanPassthrough(xml string) (string, error) {
 		return "", fmt.Errorf("failed to serialize XML: %w", err)
 	}
 	return out, nil
-}
-
-func (s *Service) ModifyHardware(vmId int,
-	cpuSockets int,
-	cpuCores int,
-	cpuThreads int,
-	cpuPinning []int,
-	ram int,
-	vncPort int,
-	vncResolution string,
-	vncPassword string,
-	vncWait bool,
-	pciDevices []int) error {
-	vms, err := s.ListVMs()
-	if err != nil {
-		return fmt.Errorf("failed_to_get_vm_by_id: %w", err)
-	}
-
-	var vm vmModels.VM
-
-	for _, v := range vms {
-		if v.VmID == vmId {
-			vm = v
-			break
-		}
-	}
-
-	if vm.VmID == 0 {
-		return fmt.Errorf("vm_not_found: %d", vmId)
-	}
-
-	var storedPciDevices []models.PassedThroughIDs
-	if len(pciDevices) > 0 {
-		if err := s.DB.Find(&storedPciDevices).Error; err != nil {
-			return fmt.Errorf("failed_to_get_stored_pci_devices: %w", err)
-		}
-
-		for _, pciDevice := range pciDevices {
-			found := false
-			for _, storedDevice := range storedPciDevices {
-				if storedDevice.ID == pciDevice {
-					found = true
-					break
-				}
-			}
-
-			if !found {
-				return fmt.Errorf("pci_device_not_found: %d", pciDevice)
-			}
-		}
-	}
-
-	if vm.CPUCores == cpuCores &&
-		vm.CPUSockets == cpuSockets &&
-		vm.CPUsThreads == cpuThreads &&
-		vm.RAM == ram &&
-		len(vm.CPUPinning) == len(cpuPinning) {
-		for i, cpu := range vm.CPUPinning {
-			if i >= len(cpuPinning) || cpu != cpuPinning[i] {
-				return fmt.Errorf("no_changes_detected: %d", vmId)
-			}
-		}
-	}
-
-	vCPUs := cpuSockets * cpuCores * cpuThreads
-
-	if vCPUs <= 0 {
-		return fmt.Errorf("invalid_cpu_configuration: sockets=%d, cores=%d, threads=%d", cpuSockets, cpuCores, cpuThreads)
-	}
-
-	if len(cpuPinning) > 0 {
-		for _, v := range vms {
-			if v.VmID != vmId && len(v.CPUPinning) > 0 {
-				for _, pinnedCPU := range v.CPUPinning {
-					for _, cpu := range cpuPinning {
-						if pinnedCPU == cpu {
-							return fmt.Errorf("cpu_pinning_conflict: %d", cpu)
-						}
-					}
-				}
-			}
-		}
-
-		if len(cpuPinning) > vCPUs {
-			return fmt.Errorf("cpu_pinning_exceeds_vcpus: %d", vCPUs)
-		}
-	}
-
-	domain, err := s.Conn.DomainLookupByName(strconv.Itoa(vmId))
-	if err != nil {
-		return fmt.Errorf("failed_to_lookup_domain_by_name: %w", err)
-	}
-
-	state, _, err := s.Conn.DomainGetState(domain, 0)
-
-	if err != nil {
-		return fmt.Errorf("failed_to_get_domain_state: %w", err)
-	}
-
-	if state != 5 {
-		return fmt.Errorf("domain_state_not_shutoff: %d", vmId)
-	}
-
-	domainXML, err := s.Conn.DomainGetXMLDesc(domain, 0)
-	if err != nil {
-		return fmt.Errorf("failed_to_get_domain_xml_desc: %w", err)
-	}
-
-	xml := string(domainXML)
-	updatedXML := xml
-
-	if vm.RAM != ram {
-		if err := s.DB.Model(&vm).Update("ram", ram).Error; err != nil {
-			return fmt.Errorf("failed_to_update_vm_ram_in_db: %w", err)
-		}
-
-		updatedXML, err = updateMemory(xml, ram)
-		if err != nil {
-			return fmt.Errorf("failed_to_update_memory_in_xml: %w", err)
-		}
-	}
-
-	if vm.CPUCores != cpuCores ||
-		vm.CPUSockets != cpuSockets ||
-		vm.CPUsThreads != cpuThreads ||
-		len(vm.CPUPinning) != len(cpuPinning) {
-		vm.CPUCores = cpuCores
-		vm.CPUSockets = cpuSockets
-		vm.CPUsThreads = cpuThreads
-		vm.CPUPinning = cpuPinning
-
-		if err := s.DB.Save(&vm).Error; err != nil {
-			return fmt.Errorf("failed_to_update_vm_cpu_in_db: %w", err)
-		}
-
-		updatedXML, err = updateCPU(xml, cpuSockets, cpuCores, cpuThreads, cpuPinning)
-
-		if err != nil {
-			return fmt.Errorf("failed_to_update_cpu_in_xml: %w", err)
-		}
-	}
-
-	if vm.VNCPort != vncPort ||
-		vm.VNCResolution != vncResolution ||
-		vm.VNCPassword != vncPassword ||
-		vm.VNCWait != vncWait {
-		if utils.IsValidPort(vncPort) == false {
-			return fmt.Errorf("invalid_vnc_port: %d", vncPort)
-		}
-
-		if utils.IsPortInUse(vncPort) {
-			return fmt.Errorf("vnc_port_in_use: %d", vncPort)
-		}
-
-		vm.VNCPort = vncPort
-		vm.VNCResolution = vncResolution
-		vm.VNCPassword = vncPassword
-		vm.VNCWait = vncWait
-		if err := s.DB.Save(&vm).Error; err != nil {
-			return fmt.Errorf("failed_to_update_vm_vnc_in_db: %w", err)
-		}
-
-		updatedXML, err = updateVNC(xml, vncPort, vncResolution, vncPassword, vncWait)
-		if err != nil {
-			return fmt.Errorf("failed_to_update_vnc_in_xml: %w", err)
-		}
-	}
-
-	if len(pciDevices) > 0 {
-		vm.PCIDevices = pciDevices
-
-		if err := s.DB.Save(&vm).Error; err != nil {
-			return fmt.Errorf("failed_to_update_vm_vnc_in_db: %w", err)
-		}
-
-		// 3) For the XML, convert ints → strings and inject passthru + memoryBacking
-		strSlice := utils.IntSliceToStrSlice(pciDevices)
-		updatedXML, err = updatePassthrough(updatedXML, strSlice)
-		if err != nil {
-			return fmt.Errorf("failed_to_update_passthrough_in_xml: %w", err)
-		}
-	} else {
-		updatedXML, err = removeMemoryBacking(updatedXML)
-		if err != nil {
-			return fmt.Errorf("failed_to_remove_memory_backing: %w", err)
-		}
-
-		updatedXML, err = cleanPassthrough(updatedXML)
-		if err != nil {
-			return fmt.Errorf("failed_to_clean_passthrough: %w", err)
-		}
-
-		vm.PCIDevices = []int{}
-
-		if err := s.DB.Save(&vm).Error; err != nil {
-			return fmt.Errorf("failed_to_update_vm_pci_devices_in_db: %w", err)
-		}
-	}
-
-	if err := s.Conn.DomainUndefineFlags(domain, 0); err != nil {
-		return fmt.Errorf("failed_to_undefine_domain: %w", err)
-	}
-
-	if _, err := s.Conn.DomainDefineXML(updatedXML); err != nil {
-		return fmt.Errorf("failed_to_define_domain_with_modified_xml: %w", err)
-	}
-
-	return nil
 }
 
 func (s *Service) ModifyCPU(
@@ -724,7 +529,13 @@ func (s *Service) ModifyPassthrough(vmId int, pciDevices []int) error {
 	}
 
 	strSlice := utils.IntSliceToStrSlice(pciDevices)
-	updatedXML, err = updatePassthrough(xml, strSlice)
+
+	var passedThroughIds []models.PassedThroughIDs
+	if err := s.DB.Find(&passedThroughIds).Error; err != nil {
+		return fmt.Errorf("failed_to_get_passed_through_ids: %w", err)
+	}
+
+	updatedXML, err = updatePassthrough(xml, strSlice, passedThroughIds)
 	if err != nil {
 		return fmt.Errorf("failed_to_update_passthrough_in_xml: %w", err)
 	}

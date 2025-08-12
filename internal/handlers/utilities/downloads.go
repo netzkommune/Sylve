@@ -24,7 +24,8 @@ import (
 )
 
 type DownloadFileRequest struct {
-	URL string `json:"url" binding:"required"`
+	URL      string  `json:"url" binding:"required"`
+	Filename *string `json:"filename"`
 }
 
 type BulkDeleteDownloadRequest struct {
@@ -91,7 +92,14 @@ func DownloadFile(utilitiesService *utilities.Service) gin.HandlerFunc {
 			return
 		}
 
-		if err := utilitiesService.DownloadFile(request.URL); err != nil {
+		var fileName string
+		if request.Filename != nil && *request.Filename != "" {
+			fileName = *request.Filename
+		} else {
+			fileName = ""
+		}
+
+		if err := utilitiesService.DownloadFile(request.URL, fileName); err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 				Status:  "error",
 				Message: "failed_to_download_file",

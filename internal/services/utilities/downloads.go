@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"sylve/internal/config"
 	utilitiesModels "sylve/internal/db/models/utilities"
@@ -96,7 +97,7 @@ func (s *Service) GetFilePathById(uuid string, id int) (string, error) {
 	return "", fmt.Errorf("unsupported_download_type")
 }
 
-func (s *Service) DownloadFile(url string) error {
+func (s *Service) DownloadFile(url string, optFilename string) error {
 	var existing utilitiesModels.Downloads
 
 	if s.DB.Where("url = ?", url).First(&existing).RowsAffected > 0 {
@@ -137,15 +138,27 @@ func (s *Service) DownloadFile(url string) error {
 	} else if valid.IsURL(url) {
 		uuid := utils.GenerateDeterministicUUID(url)
 		destDir := config.GetDownloadsPath("http")
-		filename := path.Base(url)
 
-		if idx := strings.Index(filename, "?"); idx != -1 {
-			filename = filename[:idx]
-		}
+		var filename string
 
-		filename = strings.ReplaceAll(filename, " ", "_")
-		if filename == "" {
-			return fmt.Errorf("invalid_filename")
+		if optFilename != "" {
+			err := utils.IsValidFilename(optFilename)
+			if err != nil {
+				return fmt.Errorf("invalid_filename: %w", err)
+			}
+
+			filename = optFilename
+		} else {
+			filename = path.Base(url)
+
+			if idx := strings.Index(filename, "?"); idx != -1 {
+				filename = filename[:idx]
+			}
+
+			filename = strings.ReplaceAll(filename, " ", "_")
+			if filename == "" {
+				return fmt.Errorf("invalid_filename")
+			}
 		}
 
 		filePath := path.Join(destDir, filename)
@@ -259,6 +272,28 @@ func (s *Service) SyncDownloadProgress() error {
 				delete(s.httpResponses, download.UUID)
 				s.httpRspMu.Unlock()
 
+				download.Progress = 99
+
+				if strings.HasSuffix(download.Name, ".txz") {
+					extractsPath := filepath.Join(config.GetDownloadsPath("extracted"), download.UUID)
+					if _, err := os.Stat(extractsPath); err == nil {
+						if err := os.RemoveAll(extractsPath); err != nil {
+							logger.L.Error().Msgf("Failed to remove extracts folder: %v", err)
+						}
+					}
+
+					if err := os.MkdirAll(extractsPath, 0755); err != nil {
+						logger.L.Error().Msgf("Failed to create extracts folder: %v", err)
+					}
+
+					output, err := utils.RunCommand("tar", "-xf", resp.Filename, "-C", extractsPath)
+					if err != nil {
+						logger.L.Error().Msgf("Failed to extract tar file: %v", err)
+					} else {
+						logger.L.Info().Msgf("Extracted tar file to %s: %s", extractsPath, output)
+					}
+				}
+
 				download.Progress = 100
 			}
 
@@ -289,6 +324,21 @@ func (s *Service) DeleteDownload(id int) error {
 	}
 
 	if download.Type == "http" {
+		if strings.HasSuffix(download.Name, ".txz") {
+			extractsPath := filepath.Join(config.GetDownloadsPath("extracted"), download.UUID)
+			_, err := utils.RunCommand("sudo", "chflags", "-R", "noschg", extractsPath)
+
+			if err != nil {
+				logger.L.Error().Msgf("Failed to change flags for extracts folder: %v", err)
+			}
+
+			if _, err := os.Stat(extractsPath); err == nil {
+				if err := os.RemoveAll(extractsPath); err != nil {
+					logger.L.Error().Msgf("Failed to remove extracts folder: %v", err)
+				}
+			}
+		}
+
 		err := utils.DeleteFile(path.Join(config.GetDownloadsPath(download.Type), download.Name))
 		if err != nil {
 			logger.L.Debug().Msgf("Failed to delete HTTP download file: %v", err)

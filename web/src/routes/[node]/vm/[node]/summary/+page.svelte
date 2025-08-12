@@ -18,18 +18,12 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import { Progress } from '$lib/components/ui/progress/index.js';
-
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
-
 	import { hostname } from '$lib/stores/basic';
 	import type { VM, VMDomain, VMStat } from '$lib/types/vm/vm';
 	import { sleep } from '$lib/utils';
 	import { updateCache } from '$lib/utils/http';
-
-	import LineGraph from '$lib/components/custom/Charts/LineGraph.svelte';
-	import type { HistoricalData } from '$lib/types/common';
 	import { floatToNDecimals } from '$lib/utils/numbers';
-	import { capitalizeFirstLetter } from '$lib/utils/string';
 	import { dateToAgo } from '$lib/utils/time';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
@@ -89,7 +83,7 @@
 		($results[0].data as VM[]).find((vm: VM) => vm.vmId === parseInt(vmId)) || ({} as VM)
 	);
 	let stats: VMStat[] = $derived($results[2].data as VMStat[]);
-	let recentStat = $derived(stats[0] || ({} as VMStat));
+	let recentStat = $derived(stats[stats.length - 1] || ({} as VMStat));
 
 	let vmDescription = $derived.by(() => {
 		return vm.description || '';
@@ -347,7 +341,7 @@
 							placeholder="Notes about VM"
 							bind:value={vmDescription}
 							classes=""
-							textAreaCLasses="!h-32"
+							textAreaClasses="!h-32"
 							type="textarea"
 						/>
 					</Card.Content>

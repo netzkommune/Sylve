@@ -165,9 +165,14 @@ func (s *Service) GetVMUsage(vmId int, limit int) ([]vmModels.VMStats, error) {
 	}
 
 	var vmStats []vmModels.VMStats
-	if err := s.DB.Where("vm_id = ?", vmDbId).
+	sub := s.DB.
+		Model(&vmModels.VMStats{}).
+		Where("vm_id = ?", vmDbId).
 		Order("id DESC").
-		Limit(limit).
+		Limit(limit)
+
+	if err := s.DB.Table("(?) as sub", sub).
+		Order("id ASC").
 		Find(&vmStats).Error; err != nil {
 		return nil, fmt.Errorf("failed_to_get_vm_usage: %w", err)
 	}

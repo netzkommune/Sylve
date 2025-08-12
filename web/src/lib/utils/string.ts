@@ -219,3 +219,23 @@ export function addTrackersToMagnet(uri: string): string {
 
 	return uri;
 }
+
+export function isValidFileName(name: string): boolean {
+	if (!name || name.trim().length === 0) return false;
+	if (name.length > 255) return false;
+
+	const invalidChars = /[\\\/:*?"<>|]/;
+	return !invalidChars.test(name);
+}
+
+export function generateUnicastMAC() {
+	const mac = new Uint8Array(6);
+	crypto.getRandomValues(mac);
+
+	mac[0] &= 0xfe;
+	mac[0] &= 0xfc;
+
+	return Array.from(mac)
+		.map((b) => b.toString(16).padStart(2, '0'))
+		.join(':');
+}

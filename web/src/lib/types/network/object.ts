@@ -8,6 +8,7 @@ export const NetworkObjectSchema = z.object({
 	comment: z.string().optional().default(''),
 	createdAt: z.string(),
 	updatedAt: z.string(),
+	isUsed: z.boolean().optional().default(false),
 	entries: z
 		.array(
 			z.object({

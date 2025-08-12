@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { modifyCPU, modifyHardware } from '$lib/api/vm/hardware';
+	import { modifyCPU } from '$lib/api/vm/hardware';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';

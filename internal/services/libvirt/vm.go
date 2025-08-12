@@ -31,6 +31,21 @@ func (s *Service) ListVMs() ([]vmModels.VM, error) {
 	if err := s.DB.Preload("Networks").Preload("Storages").Find(&vms).Error; err != nil {
 		return nil, fmt.Errorf("failed_to_list_vms: %w", err)
 	}
+
+	for i := range vms {
+		inactive, err := s.IsDomainInactive(vms[i].VmID)
+		if err != nil {
+			logger.L.Error().Err(err).Msg("ListVMs: failed to check domain state")
+			return nil, fmt.Errorf("failed_to_check_domain_state: %w", err)
+		}
+
+		if inactive {
+			vms[i].State = "INACTIVE"
+		} else {
+			vms[i].State = "ACTIVE"
+		}
+	}
+
 	return vms, nil
 }
 

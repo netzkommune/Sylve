@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import { iconCache } from '$lib/utils/icons';
 	import Icon from '@iconify/svelte';
 	import { slide } from 'svelte/transition';
 	import SidebarElement from './TreeView.svelte';
@@ -9,6 +10,7 @@
 		label: string;
 		icon: string;
 		href?: string;
+		state?: 'active' | 'inactive';
 		children?: SidebarProps[];
 	}
 
@@ -75,7 +77,22 @@
 		onclick={toggle}
 	>
 		<div class="flex items-center space-x-1 text-sm">
-			<Icon icon={item.icon} width="18" />
+			{#if item.icon === 'material-symbols:monitor-outline' || item.icon === 'hugeicons:prison'}
+				<div class="flex items-center space-x-1 text-sm">
+					<div class="relative">
+						<Icon icon={item.icon} width="18" />
+						{#if item.state && item.state === 'active'}
+							<div
+								class="absolute -bottom-1 -right-1 flex h-2 w-2 items-center justify-center rounded-full bg-green-500"
+							>
+								<Icon icon="mdi:play" class="h-2 w-2 text-white" />
+							</div>
+						{/if}
+					</div>
+				</div>
+			{:else}
+				<Icon icon={item.icon} width="18" />
+			{/if}
 			<p class="font-inter cursor-pointer whitespace-nowrap">
 				{item.label}
 			</p>

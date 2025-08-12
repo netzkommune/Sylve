@@ -3,6 +3,7 @@ package network
 import (
 	"fmt"
 	"strconv"
+	jailModels "sylve/internal/db/models/jail"
 	networkModels "sylve/internal/db/models/network"
 	vmModels "sylve/internal/db/models/vm"
 	utils "sylve/pkg/utils"
@@ -17,7 +18,16 @@ func (s *Service) GetObjects() ([]networkModels.Object, error) {
 		Find(&objects).Error
 
 	if err != nil {
-		return nil, err
+		return objects, fmt.Errorf("failed to retrieve network objects: %w", err)
+	}
+
+	for i := range objects {
+		used, err := s.IsObjectUsed(objects[i].ID)
+		if err != nil {
+			return nil, err
+		}
+
+		objects[i].IsUsed = used
 	}
 
 	return objects, nil
@@ -125,6 +135,7 @@ func (s *Service) IsObjectUsed(id uint) (bool, error) {
 
 	if object.Type == "Host" {
 		var switches []networkModels.StandardSwitch
+		var jailNetworks []jailModels.Network
 
 		if err := s.DB.
 			Preload("AddressObj.Entries").
@@ -145,6 +156,32 @@ func (s *Service) IsObjectUsed(id uint) (bool, error) {
 				}
 			}
 		}
+
+		for _, jn := range jailNetworks {
+			if jn.IPv4ID != nil {
+				if *jn.IPv4ID == id {
+					return true, nil
+				}
+			}
+
+			if jn.IPv4GwID != nil {
+				if *jn.IPv4GwID == id {
+					return true, nil
+				}
+			}
+
+			if jn.IPv6ID != nil {
+				if *jn.IPv6ID == id {
+					return true, nil
+				}
+			}
+
+			if jn.IPv4GwID != nil {
+				if *jn.IPv4GwID == id {
+					return true, nil
+				}
+			}
+		}
 	}
 
 	if object.Type == "Mac" {
@@ -157,6 +194,14 @@ func (s *Service) IsObjectUsed(id uint) (bool, error) {
 			return true, nil
 		}
 
+		var jailNetworks []jailModels.Network
+		if err := s.DB.Where("mac_id = ?", id).Find(&jailNetworks).Error; err != nil {
+			return true, fmt.Errorf("failed to find jail networks using object %d: %w", id, err)
+		}
+
+		if len(jailNetworks) > 0 {
+			return true, nil
+		}
 	}
 
 	return false, nil
@@ -437,4 +482,22 @@ func (s *Service) EditObject(id uint, name string, oType string, values []string
 	}
 
 	return nil
+}
+
+func (s *Service) GetObjectEntryByID(id uint) (string, error) {
+	var object networkModels.Object
+
+	if err := s.DB.Preload("Entries").First(&object, id).Error; err != nil {
+		return "", fmt.Errorf("failed to find object with ID %d: %w", id, err)
+	}
+
+	if len(object.Entries) == 0 {
+		return "", fmt.Errorf("no entries found for object with ID %d", id)
+	}
+
+	if len(object.Entries) > 1 {
+		return "", fmt.Errorf("multiple entries found for object with ID %d, expected only one", id)
+	}
+
+	return object.Entries[0].Value, nil
 }

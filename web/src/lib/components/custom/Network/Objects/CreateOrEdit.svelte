@@ -5,10 +5,16 @@
 	import ComboBox from '$lib/components/ui/custom-input/combobox.svelte';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import Label from '$lib/components/ui/label/label.svelte';
 	import type { NetworkObject } from '$lib/types/network/object';
 	import { handleAPIError } from '$lib/utils/http';
 	import { generateComboboxOptions } from '$lib/utils/input';
-	import { isValidIPv4, isValidIPv6, isValidMACAddress } from '$lib/utils/string';
+	import {
+		generateUnicastMAC,
+		isValidIPv4,
+		isValidIPv6,
+		isValidMACAddress
+	} from '$lib/utils/string';
 	import Icon from '@iconify/svelte';
 	import { toast } from 'svelte-sonner';
 
@@ -303,6 +309,12 @@
 			open = false;
 		}
 	}
+
+	function addRandomMAC() {
+		const newMac = generateUnicastMAC();
+		properties.macs.combobox.options.push({ label: newMac, value: newMac });
+		properties.macs.combobox.value.push(newMac);
+	}
 </script>
 
 <Dialog.Root bind:open>
@@ -371,7 +383,7 @@
 							data={properties.hosts.combobox.options}
 							classes="flex-1 space-y-1"
 							placeholder="Select hosts"
-							width="w-3/4"
+							width="w-full"
 							multiple={true}
 						></ComboBoxBindable>
 					{:else if properties.type.combobox.value === 'Network(s)'}
@@ -382,20 +394,29 @@
 							data={properties.networks.combobox.options}
 							classes="flex-1 space-y-1"
 							placeholder="Select networks"
-							width="w-3/4"
+							width="w-full"
 							multiple={true}
 						></ComboBoxBindable>
 					{:else if properties.type.combobox.value === 'MAC(s)'}
-						<ComboBoxBindable
-							bind:open={properties.macs.combobox.open}
-							label={'MACs'}
-							bind:value={properties.macs.combobox.value}
-							data={properties.macs.combobox.options}
-							classes="flex-1 space-y-1"
-							placeholder="Select MACs"
-							width="w-3/4"
-							multiple={true}
-						></ComboBoxBindable>
+						<div class="flex w-full items-center space-x-2">
+							<ComboBoxBindable
+								bind:open={properties.macs.combobox.open}
+								label={'MACs'}
+								bind:value={properties.macs.combobox.value}
+								data={properties.macs.combobox.options}
+								classes="flex-1 space-y-1 w-full"
+								placeholder="Select MACs"
+								width="w-full"
+								multiple={true}
+							></ComboBoxBindable>
+
+							<div class="mt-1 space-y-1">
+								<Label class="invisible">1</Label>
+								<Button size="sm" class="h-9.5" onclick={addRandomMAC}>
+									<Icon icon="fad:random-2dice" class="h-5 w-5" />
+								</Button>
+							</div>
+						</div>
 					{/if}
 				{/if}
 			</div>

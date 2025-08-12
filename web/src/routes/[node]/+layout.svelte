@@ -55,6 +55,30 @@
 					href: `/${node}/vm/${vmName}/network`
 				}
 			];
+		} else if (page.url.pathname.startsWith(`/${$hostname}/jail`)) {
+			const jailName = page.url.pathname.split('/')[3];
+			return [
+				{
+					label: 'Summary',
+					icon: 'basil:document-outline',
+					href: `/${node}/jail/${jailName}/summary`
+				},
+				{
+					label: 'Console',
+					icon: 'mdi:monitor',
+					href: `/${node}/jail/${jailName}/console`
+				},
+				{
+					label: 'Hardware',
+					icon: 'ix:hardware-cabinet',
+					href: `/${node}/jail/${jailName}/hardware`
+				},
+				{
+					label: 'Network',
+					icon: 'mdi:network',
+					href: `/${node}/jail/${jailName}/network`
+				}
+			];
 		} else {
 			return [
 				{
@@ -217,6 +241,11 @@
 			const vmId = page.url.pathname.split('/')[3];
 			if (page.url.pathname === `/${node}/vm/${vmId}`) {
 				goto(`/${node}/vm/${vmId}/summary`, { replaceState: true });
+			}
+		} else if (page.url.pathname.startsWith(`/${$hostname}/jail`)) {
+			const jailId = page.url.pathname.split('/')[3];
+			if (page.url.pathname === `/${node}/jail/${jailId}`) {
+				goto(`/${node}/jail/${jailId}/summary`, { replaceState: true });
 			}
 		}
 	});

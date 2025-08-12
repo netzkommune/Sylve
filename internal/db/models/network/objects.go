@@ -9,6 +9,7 @@ type Object struct {
 	Comment   string    `json:"description"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
+	IsUsed    bool      `json:"isUsed" gorm:"-"`
 
 	Entries     []ObjectEntry      `json:"entries" gorm:"foreignKey:ObjectID"`
 	Resolutions []ObjectResolution `json:"resolutions" gorm:"foreignKey:ObjectID"`

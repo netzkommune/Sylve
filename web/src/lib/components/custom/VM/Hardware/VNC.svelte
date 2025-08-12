@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { modifyHardware, modifyVNC } from '$lib/api/vm/hardware';
+	import { modifyVNC } from '$lib/api/vm/hardware';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import CustomComboBox from '$lib/components/ui/custom-input/combobox.svelte';

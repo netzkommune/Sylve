@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { modifyHardware } from '$lib/api/vm/hardware';
 	import { storageAttach } from '$lib/api/vm/storage';
 	import SimpleSelect from '$lib/components/custom/SimpleSelect.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';

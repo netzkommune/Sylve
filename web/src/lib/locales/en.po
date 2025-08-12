@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-22T11:34:22.984Z\n"
-"PO-Revision-Date: 2025-08-11T16:36:30.078Z\n"
+"PO-Revision-Date: 2025-08-12T15:00:10.395Z\n"
 "Last-Translator: \n"
 "Language: English\n"
 "Language-Team: \n"
@@ -20,57 +20,19 @@ msgstr "<0/> Upload File"
 #: src/lib/components/custom/Authentication/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
-#: src/lib/components/custom/Samba/Share.svelte
-#: src/lib/components/custom/Samba/Share.svelte
-#: src/lib/components/custom/Dialog/SingleValue.svelte
-#: src/lib/components/custom/Dialog/SingleValue.svelte
-#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
-#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
-#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
-#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
-#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
-#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
 #: src/lib/components/custom/Terminal.svelte
-#: src/lib/components/ui/dialog/dialog-content.svelte
 #: src/lib/components/custom/Jail/Create/CreateJail.svelte
 #: src/lib/components/custom/Jail/Create/CreateJail.svelte
 #: src/lib/components/custom/VM/Create/CreateVM.svelte
 #: src/lib/components/custom/VM/Create/CreateVM.svelte
 #: src/lib/components/ui/sheet/sheet-content.svelte
-#: src/routes/[node]/notes/+page.svelte
-#: src/routes/[node]/notes/+page.svelte
-#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
-#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
-#: src/lib/components/custom/VM/Hardware/CPU.svelte
-#: src/lib/components/custom/VM/Hardware/CPU.svelte
-#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
-#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
-#: src/lib/components/custom/VM/Hardware/RAM.svelte
-#: src/lib/components/custom/VM/Hardware/RAM.svelte
-#: src/lib/components/custom/VM/Hardware/VNC.svelte
-#: src/lib/components/custom/VM/Hardware/VNC.svelte
-#: src/lib/components/custom/VM/Hardware/Network.svelte
-#: src/lib/components/custom/VM/Hardware/Network.svelte
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
-#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
-#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
-#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
-#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
-#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
-#: src/lib/components/custom/VM/Hardware/Storage.svelte
-#: src/lib/components/custom/VM/Hardware/Storage.svelte
-#: src/routes/[node]/network/switches/+page.svelte
-#: src/routes/[node]/network/switches/+page.svelte
-#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
-#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
-#: src/routes/[node]/settings/authentication/groups/+page.svelte
-#: src/routes/[node]/settings/authentication/groups/+page.svelte
-#: src/routes/[node]/settings/authentication/groups/+page.svelte
-#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/lib/components/ui/dialog/dialog-content.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
 #: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
@@ -81,12 +43,52 @@ msgstr "<0/> Upload File"
 #: src/lib/components/custom/FileExplorer/RenameModal.svelte
 #: src/lib/components/disk/CreatePartition.svelte
 #: src/lib/components/disk/CreatePartition.svelte
-#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
-#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/lib/components/custom/Jail/Hardware/CPU.svelte
 #: src/lib/components/custom/Jail/Hardware/CPU.svelte
 #: src/lib/components/custom/Jail/Hardware/RAM.svelte
 #: src/lib/components/custom/Jail/Hardware/RAM.svelte
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/notes/+page.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+#: src/lib/components/custom/Dialog/SingleValue.svelte
+#: src/lib/components/custom/Dialog/SingleValue.svelte
+#: src/routes/[node]/jail/[node]/network/+page.svelte
+#: src/routes/[node]/jail/[node]/network/+page.svelte
 msgid "Close"
 msgstr "Close"
 
@@ -98,16 +100,16 @@ msgstr "Close"
 msgid "Sylve Logo"
 msgstr "Sylve Logo"
 
-#: src/lib/components/custom/Throbber.svelte
 #: src/lib/components/custom/Login.svelte
+#: src/lib/components/custom/Throbber.svelte
 #: src/lib/components/custom/Header.svelte
 #: src/lib/components/custom/Header.svelte
 msgid "SYLVE"
 msgstr "SYLVE"
 
 #: src/lib/components/custom/Authentication/Create.svelte
-#: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/Authentication/CreateOrEdit.svelte
+#: src/lib/components/custom/Login.svelte
 msgid "Username"
 msgstr "Username"
 
@@ -116,9 +118,9 @@ msgid "Enter your username"
 msgstr "Enter your username"
 
 #: src/lib/components/custom/Authentication/Create.svelte
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 #: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
-#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 msgid "Password"
 msgstr "Password"
 
@@ -136,15 +138,15 @@ msgstr "PAM"
 msgid "Sylve"
 msgstr "Sylve"
 
-#: src/lib/components/ui/custom-input/combobox.svelte
 #: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/Terminal.svelte
+#: src/lib/components/ui/custom-input/combobox.svelte
 #: src/lib/components/ui/custom-input/combobox-bindable.svelte
 msgid "Enter"
 msgstr "Enter"
 
-#: src/lib/components/skeleton/LeftPanel.svelte
 #: src/routes/[node]/+layout.svelte
+#: src/lib/components/skeleton/LeftPanel.svelte
 msgid "Data Center"
 msgstr "Data Center"
 
@@ -177,24 +179,24 @@ msgstr "Storage"
 msgid "Hardware"
 msgstr "Hardware"
 
+#: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/+layout.svelte
 #: src/lib/components/custom/Jail/Create/Network.svelte
 #: src/lib/components/custom/Jail/Create/Network.svelte
-#: src/routes/[node]/+layout.svelte
-#: src/routes/[node]/+layout.svelte
-#: src/routes/[node]/+layout.svelte
 msgid "Network"
 msgstr "Network"
 
+#: src/routes/[node]/+layout.svelte
 #: src/lib/components/skeleton/BottomPanel.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
-#: src/routes/[node]/+layout.svelte
 msgid "Notes"
 msgstr "Notes"
 
-#: src/routes/[node]/storage/samba/settings/+page.svelte
-#: src/routes/[node]/storage/samba/settings/+page.svelte
-#: src/routes/[node]/storage/samba/settings/+page.svelte
 #: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Interfaces"
 msgstr "Interfaces"
 
@@ -206,14 +208,14 @@ msgstr "Switches"
 msgid "Explorer"
 msgstr "Explorer"
 
-#: src/lib/components/custom/ZFS/pools/Create.svelte
 #: src/routes/[node]/+layout.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Disks"
 msgstr "Disks"
 
-#: src/routes/[node]/storage/disks/+page.svelte
-#: src/routes/[node]/storage/disks/+page.svelte
 #: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/storage/disks/+page.svelte
+#: src/routes/[node]/storage/disks/+page.svelte
 msgid "ZFS"
 msgstr "ZFS"
 
@@ -262,9 +264,9 @@ msgstr "Utilities"
 msgid "Downloader"
 msgstr "Downloader"
 
-#: src/lib/components/custom/VM/Create/Hardware.svelte
-#: src/lib/components/skeleton/BottomPanel.svelte
 #: src/routes/[node]/+layout.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
+#: src/lib/components/custom/VM/Create/Hardware.svelte
 msgid "PCI Passthrough"
 msgstr "PCI Passthrough"
 
@@ -387,11 +389,11 @@ msgstr "User"
 msgid "Action"
 msgstr "Action"
 
-#: src/routes/[node]/network/interfaces/+page.svelte
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
-#: src/routes/[node]/storage/zfs/pools/+page.svelte
 #: src/lib/components/skeleton/BottomPanel.svelte
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
 msgid "Status"
 msgstr "Status"
 
@@ -400,15 +402,15 @@ msgstr "Status"
 msgid "Login"
 msgstr "Login"
 
-#: src/lib/components/custom/VM/Hardware/Network.svelte
 #: src/lib/components/skeleton/BottomPanel.svelte
+#: src/lib/components/custom/VM/Hardware/Network.svelte
 msgid "Switch"
 msgstr "Switch"
 
+#: src/lib/components/skeleton/BottomPanel.svelte
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
-#: src/lib/components/skeleton/BottomPanel.svelte
 msgid "VNC"
 msgstr "VNC"
 
@@ -431,22 +433,28 @@ msgstr "<0/> Create Virtual Machine"
 #: src/lib/components/custom/Authentication/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
-#: src/lib/components/custom/Samba/Share.svelte
-#: src/lib/components/custom/Samba/Share.svelte
-#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
-#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
-#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
-#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
-#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
-#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/settings/authentication/groups/+page.svelte
 #: src/lib/components/custom/Jail/Create/CreateJail.svelte
 #: src/lib/components/custom/Jail/Create/CreateJail.svelte
 #: src/lib/components/custom/VM/Create/CreateVM.svelte
 #: src/lib/components/custom/VM/Create/CreateVM.svelte
-#: src/routes/[node]/notes/+page.svelte
-#: src/routes/[node]/notes/+page.svelte
-#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
-#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+#: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
+#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
+#: src/lib/components/custom/FileExplorer/RenameModal.svelte
+#: src/lib/components/custom/FileExplorer/RenameModal.svelte
+#: src/lib/components/disk/CreatePartition.svelte
+#: src/lib/components/disk/CreatePartition.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 #: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
@@ -457,40 +465,34 @@ msgstr "<0/> Create Virtual Machine"
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
-#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
-#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
-#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
-#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
-#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
-#: src/routes/[node]/network/switches/+page.svelte
-#: src/routes/[node]/network/switches/+page.svelte
-#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
-#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
-#: src/routes/[node]/settings/authentication/groups/+page.svelte
-#: src/routes/[node]/settings/authentication/groups/+page.svelte
-#: src/routes/[node]/settings/authentication/groups/+page.svelte
-#: src/routes/[node]/settings/authentication/groups/+page.svelte
-#: src/routes/[node]/utilities/downloader/+page.svelte
-#: src/routes/[node]/utilities/downloader/+page.svelte
-#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
-#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
-#: src/lib/components/custom/FileExplorer/RenameModal.svelte
-#: src/lib/components/custom/FileExplorer/RenameModal.svelte
-#: src/lib/components/disk/CreatePartition.svelte
-#: src/lib/components/disk/CreatePartition.svelte
-#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
-#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 #: src/lib/components/custom/Jail/Hardware/CPU.svelte
 #: src/lib/components/custom/Jail/Hardware/CPU.svelte
 #: src/lib/components/custom/Jail/Hardware/RAM.svelte
 #: src/lib/components/custom/Jail/Hardware/RAM.svelte
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/notes/+page.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/Samba/Share.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Reset"
 msgstr "Reset"
 
@@ -526,9 +528,9 @@ msgid "Cancel"
 msgstr "Cancel"
 
 #: src/lib/components/custom/Dialog/Alert.svelte
-#: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
 msgid "Continue"
 msgstr "Continue"
 
@@ -542,17 +544,17 @@ msgstr "Enter {0} name"
 
 #: src/lib/components/custom/Authentication/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
-#: src/lib/components/custom/Samba/Share.svelte
-#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
-#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
-#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
-#: src/routes/[node]/network/switches/+page.svelte
 #: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
 #: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Create"
 msgstr "Create"
 
@@ -588,34 +590,34 @@ msgid "<0/> Delete"
 msgstr "<0/> Delete"
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
-#: src/routes/[node]/storage/samba/shares/+page.svelte
-#: src/lib/components/custom/Samba/Share.svelte
-#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
-#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
-#: src/routes/[node]/notes/+page.svelte
-#: src/routes/[node]/notes/+page.svelte
-#: src/routes/[node]/network/interfaces/+page.svelte
-#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
-#: src/routes/[node]/vm/[node]/network/+page.svelte
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
-#: src/lib/components/custom/VM/Hardware/Storage.svelte
-#: src/routes/[node]/network/switches/+page.svelte
 #: src/routes/[node]/settings/authentication/users/+page.svelte
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
 #: src/lib/components/custom/FileExplorer/ListView.svelte
 #: src/lib/components/disk/CreatePartition.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/notes/+page.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Name"
 msgstr "Name"
 
-#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
-#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
-#: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/lib/components/custom/FileExplorer/ListView.svelte
 #: src/lib/components/custom/FileExplorer/Toolbar.svelte
 #: src/lib/components/disk/CreatePartition.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
 msgid "Size"
 msgstr "Size"
 
@@ -687,9 +689,9 @@ msgstr "Last Modified"
 msgid "First Modified"
 msgstr "First Modified"
 
-#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
-#: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/lib/components/custom/FileExplorer/Toolbar.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 msgid "Type"
 msgstr "Type"
 
@@ -707,9 +709,9 @@ msgstr "VM ID"
 
 #: src/lib/components/custom/Jail/Create/Basic.svelte
 #: src/lib/components/custom/VM/Create/Basic.svelte
-#: src/routes/[node]/network/interfaces/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
 msgid "Description"
 msgstr "Description"
 
@@ -726,8 +728,8 @@ msgstr "VNC Port"
 msgid "VNC Password"
 msgstr "VNC Password"
 
-#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/VM/Create/Advanced.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 msgid "Enter or generate passphrase"
 msgstr "Enter or generate passphrase"
@@ -804,15 +806,15 @@ msgstr "Select emulation type"
 
 #: src/lib/components/custom/Jail/Create/Network.svelte
 #: src/lib/components/custom/VM/Create/Network.svelte
-#: src/routes/[node]/network/interfaces/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
 msgid "MAC Address"
 msgstr "MAC Address"
 
+#: src/lib/components/skeleton/BottomPanel.svelte
 #: src/lib/components/custom/VM/Create/Storage.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
-#: src/lib/components/skeleton/BottomPanel.svelte
 msgid "ZFS Volume"
 msgstr "ZFS Volume"
 
@@ -846,8 +848,8 @@ msgstr "Select installation media"
 msgid "None"
 msgstr "None"
 
-#: src/lib/components/custom/TreeTable/Search.svelte
 #: src/lib/components/ui/custom-input/combobox.svelte
+#: src/lib/components/custom/TreeTable/Search.svelte
 #: src/lib/components/ui/custom-input/combobox-bindable.svelte
 msgid "Search..."
 msgstr "Search..."
@@ -862,27 +864,27 @@ msgstr "No data"
 msgid "View"
 msgstr "View"
 
-#: src/routes/[node]/notes/+page.svelte
-#: src/routes/[node]/network/objects/+page.svelte
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
-#: src/routes/[node]/storage/zfs/pools/+page.svelte
-#: src/routes/[node]/network/switches/+page.svelte
 #: src/routes/[node]/settings/authentication/users/+page.svelte
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/network/objects/+page.svelte
+#: src/routes/[node]/network/switches/+page.svelte
 msgid "Delete"
 msgstr "Delete"
 
-#: src/lib/components/custom/Samba/Share.svelte
-#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/routes/[node]/settings/authentication/users/+page.svelte
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/routes/[node]/notes/+page.svelte
 #: src/routes/[node]/notes/+page.svelte
 #: src/routes/[node]/network/objects/+page.svelte
-#: src/routes/[node]/storage/zfs/pools/+page.svelte
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
-#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
 #: src/routes/[node]/network/switches/+page.svelte
-#: src/routes/[node]/settings/authentication/users/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Edit"
 msgstr "Edit"
 
@@ -890,20 +892,20 @@ msgstr "Edit"
 msgid "Bulk Delete"
 msgstr "Bulk Delete"
 
-#: src/routes/[node]/storage/samba/shares/+page.svelte
-#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
-#: src/routes/[node]/notes/+page.svelte
-#: src/routes/[node]/notes/+page.svelte
-#: src/routes/[node]/network/objects/+page.svelte
-#: src/routes/[node]/vm/[node]/network/+page.svelte
-#: src/routes/[node]/storage/zfs/pools/+page.svelte
-#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
-#: src/routes/[node]/vm/[node]/storage/+page.svelte
-#: src/routes/[node]/network/switches/+page.svelte
 #: src/routes/[node]/settings/authentication/users/+page.svelte
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/routes/[node]/storage/zfs/pools/+page.svelte
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/network/objects/+page.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
 msgid "New"
 msgstr "New"
 
@@ -925,18 +927,19 @@ msgid "This is a note"
 msgstr "This is a note"
 
 #: src/lib/components/custom/Authentication/Create.svelte
-#: src/lib/components/custom/Dialog/SingleValue.svelte
-#: src/routes/[node]/notes/+page.svelte
-#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 #: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
-#: src/routes/[node]/network/switches/+page.svelte
-#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 #: src/lib/components/custom/Jail/Hardware/CPU.svelte
 #: src/lib/components/custom/Jail/Hardware/RAM.svelte
+#: src/routes/[node]/notes/+page.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/lib/components/custom/Dialog/SingleValue.svelte
+#: src/routes/[node]/jail/[node]/network/+page.svelte
 msgid "Save"
 msgstr "Save"
 
@@ -964,13 +967,13 @@ msgstr "Note created"
 msgid "Failed to create note"
 msgstr "Failed to create note"
 
-#: src/routes/[node]/storage/samba/shares/+page.svelte
-#: src/routes/[node]/notes/+page.svelte
-#: src/routes/[node]/network/interfaces/+page.svelte
-#: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/routes/[node]/settings/authentication/users/+page.svelte
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
 msgid "ID"
 msgstr "ID"
 
@@ -982,9 +985,9 @@ msgstr "Created"
 msgid "Updated"
 msgstr "Updated"
 
-#: src/lib/components/custom/TreeTableRemote.svelte
 #: src/lib/components/custom/TreeTable.svelte
 #: src/routes/[node]/storage/zfs/dashboard/+page.svelte
+#: src/lib/components/custom/TreeTableRemote.svelte
 msgid "No data available"
 msgstr "No data available"
 
@@ -1063,11 +1066,11 @@ msgstr "Create Partition"
 msgid "Attribute"
 msgstr "Attribute"
 
-#: src/routes/[node]/storage/samba/settings/+page.svelte
 #: src/lib/components/custom/Charts/Area.svelte
-#: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/routes/[node]/storage/disks/+page.svelte
+#: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/routes/[node]/jail/[node]/hardware/+page.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Value"
 msgstr "Value"
 
@@ -1087,22 +1090,22 @@ msgstr "Error {0}: {1}"
 msgid "S.M.A.R.T Values ({0})"
 msgstr "S.M.A.R.T Values ({0})"
 
+#: src/routes/[node]/storage/disks/+page.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
-#: src/routes/[node]/storage/disks/+page.svelte
 msgid "NVMe"
 msgstr "NVMe"
 
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-#: src/lib/components/custom/ZFS/pools/Create.svelte
 #: src/routes/[node]/storage/disks/+page.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "HDD"
 msgstr "HDD"
 
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-#: src/lib/components/custom/ZFS/pools/Create.svelte
 #: src/routes/[node]/storage/disks/+page.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "SSD"
 msgstr "SSD"
 
@@ -1122,8 +1125,8 @@ msgstr "Disk {0} initialized with GPT"
 msgid "Unused"
 msgstr "Unused"
 
-#: src/lib/components/custom/ZFS/pools/Create.svelte
 #: src/routes/[node]/storage/disks/+page.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Partitions"
 msgstr "Partitions"
 
@@ -1304,18 +1307,18 @@ msgstr "VDEVs"
 msgid "Drop disks here"
 msgstr "Drop disks here"
 
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
 msgid "Comment"
 msgstr "Comment"
 
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
 msgid "Comments about the pool"
 msgstr "Comments about the pool"
 
-#: src/routes/[node]/storage/samba/shares/+page.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
 msgid "Mount Point"
 msgstr "Mount Point"
 
@@ -1335,101 +1338,101 @@ msgstr "AShift"
 msgid "Select ASHIFT"
 msgstr "Select ASHIFT"
 
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
 msgid "Auto Expand"
 msgstr "Auto Expand"
 
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
 msgid "Select Auto Expand"
 msgstr "Select Auto Expand"
 
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/routes/[node]/storage/samba/settings/+page.svelte
 #: src/routes/[node]/storage/samba/settings/+page.svelte
 #: src/routes/[node]/storage/samba/settings/+page.svelte
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-#: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "Yes"
 msgstr "Yes"
 
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/routes/[node]/storage/samba/settings/+page.svelte
 #: src/routes/[node]/storage/samba/settings/+page.svelte
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-#: src/lib/components/custom/ZFS/pools/Create.svelte
-#: src/lib/components/custom/ZFS/pools/Create.svelte
 msgid "No"
 msgstr "No"
 
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
 msgid "Auto Trim"
 msgstr "Auto Trim"
 
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
 msgid "Select Auto Trim"
 msgstr "Select Auto Trim"
 
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
 msgid "Delegation"
 msgstr "Delegation"
 
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
 msgid "Select Delegation"
 msgstr "Select Delegation"
 
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
 msgid "Fail Mode"
 msgstr "Fail Mode"
 
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
 msgid "Select Fail Mode"
 msgstr "Select Fail Mode"
 
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
 msgid "Wait"
 msgstr "Wait"
 
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
 msgid "Panic"
 msgstr "Panic"
 
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Status.svelte
 msgid "Spares"
 msgstr "Spares"
 
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
 msgid "Select spares"
 msgstr "Select spares"
 
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
 msgid "Auto Replace"
 msgstr "Auto Replace"
 
-#: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
+#: src/lib/components/custom/ZFS/pools/Edit.svelte
 msgid "Select Auto Replace"
 msgstr "Select Auto Replace"
 
@@ -1707,9 +1710,9 @@ msgid "Select ACL Mode"
 msgstr "Select ACL Mode"
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
-#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
-#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
 msgid "Invalid name"
 msgstr "Invalid name"
 
@@ -1897,9 +1900,9 @@ msgstr "Deleted {0} snapshot{1}"
 msgid "Failed to delete snapshots"
 msgstr "Failed to delete snapshots"
 
-#: src/lib/components/custom/Samba/Share.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Dataset"
 msgstr "Dataset"
 
@@ -2126,9 +2129,9 @@ msgstr "Stopped"
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
-#: src/routes/[node]/vm/[node]/storage/+page.svelte
-#: src/routes/[node]/vm/[node]/storage/+page.svelte
 #: src/routes/[node]/vm/[node]/console/+page.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
 msgid "Shutoff"
 msgstr "Shutoff"
 
@@ -2145,9 +2148,9 @@ msgstr "VM Console"
 msgid "The VM is currently powered off.<0/> Start the VM to access its console."
 msgstr "The VM is currently powered off.<0/> Start the VM to access its console."
 
-#: src/routes/[node]/storage/samba/settings/+page.svelte
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/routes/[node]/jail/[node]/hardware/+page.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Edit {0}"
 msgstr "Edit {0}"
 
@@ -2167,9 +2170,9 @@ msgstr "RAM"
 msgid "PCI Devices"
 msgstr "PCI Devices"
 
-#: src/routes/[node]/storage/samba/settings/+page.svelte
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/routes/[node]/jail/[node]/hardware/+page.svelte
+#: src/routes/[node]/storage/samba/settings/+page.svelte
 msgid "Property"
 msgstr "Property"
 
@@ -2247,8 +2250,8 @@ msgid "Port"
 msgstr "Port"
 
 #: src/lib/components/custom/Authentication/Create.svelte
-#: src/lib/components/custom/VM/Hardware/VNC.svelte
 #: src/lib/components/custom/Authentication/CreateOrEdit.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
 msgid "Enter or generate password"
 msgstr "Enter or generate password"
 
@@ -2325,8 +2328,8 @@ msgstr "Select ISO"
 msgid "Select ZFS Volume"
 msgstr "Select ZFS Volume"
 
-#: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/lib/components/skeleton/BottomPanel.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "ZFS Filesystem"
 msgstr "ZFS Filesystem"
 
@@ -2497,6 +2500,7 @@ msgstr "VLAN"
 #: src/lib/components/custom/Jail/Create/Network.svelte
 #: src/routes/[node]/network/switches/+page.svelte
 #: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/jail/[node]/network/+page.svelte
 msgid "IPv4"
 msgstr "IPv4"
 
@@ -2505,6 +2509,7 @@ msgstr "IPv4"
 #: src/lib/components/custom/Jail/Create/Network.svelte
 #: src/routes/[node]/network/switches/+page.svelte
 #: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/jail/[node]/network/+page.svelte
 msgid "IPv6"
 msgstr "IPv6"
 
@@ -2652,9 +2657,9 @@ msgstr "Read-Only Groups"
 msgid "Writeable Groups"
 msgstr "Writeable Groups"
 
-#: src/routes/[node]/storage/samba/shares/+page.svelte
 #: src/routes/[node]/settings/authentication/users/+page.svelte
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
+#: src/routes/[node]/storage/samba/shares/+page.svelte
 msgid "Created At"
 msgstr "Created At"
 
@@ -2695,8 +2700,8 @@ msgstr "Read Only"
 msgid "Share name already exists"
 msgstr "Share name already exists"
 
-#: src/lib/components/custom/Samba/Share.svelte
 #: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+#: src/lib/components/custom/Samba/Share.svelte
 msgid "Name is required"
 msgstr "Name is required"
 
@@ -3421,9 +3426,119 @@ msgid "CPU cores updated"
 msgstr "CPU cores updated"
 
 #: src/routes/[node]/jail/[node]/network/+page.svelte
+#: src/routes/[node]/jail/[node]/network/+page.svelte
 msgid "Disinherit Network"
 msgstr "Disinherit Network"
 
 #: src/routes/[node]/jail/[node]/network/+page.svelte
+#: src/routes/[node]/jail/[node]/network/+page.svelte
 msgid "Inherit Network"
 msgstr "Inherit Network"
+
+#~ msgid "Hello World"
+#~ msgstr "Hello World"
+
+#: src/routes/[node]/jail/[node]/network/+page.svelte
+msgid "Disinherit"
+msgstr "Disinherit"
+
+#~ msgid "Inherit"
+#~ msgstr "Inherit"
+
+#~ msgid "This is awesome!"
+#~ msgstr "This is awesome!"
+
+#~ msgid ""
+#~ "This will inherit the networking stack from the host, you need to stop and start the jail to\n"
+#~ "\t\t\t\tapply the changes"
+#~ msgstr ""
+#~ "This will inherit the networking stack from the host, you need to stop and start the jail to\n"
+#~ "\t\t\t\tapply the changes"
+
+#~ msgid "This will"
+#~ msgstr "This will"
+
+#~ msgid ""
+#~ "This will disinherit the network configuration from the host, you can choose this if you\n"
+#~ "\t\t\t\twant to attach a custom network switch to this jail"
+#~ msgstr ""
+#~ "This will disinherit the network configuration from the host, you can choose this if you\n"
+#~ "\t\t\t\twant to attach a custom network switch to this jail"
+
+#~ msgid ""
+#~ "This will disinherit the network configuration from the host, you can choose this if you\n"
+#~ "\t\t\t\twant to attach a custom network switch to this jail, or to disable networking entirely"
+#~ msgstr ""
+#~ "This will disinherit the network configuration from the host, you can choose this if you\n"
+#~ "\t\t\t\twant to attach a custom network switch to this jail, or to disable networking entirely"
+
+#~ msgid ""
+#~ "This will inherit the network configuration from the host, you can choose this if you want\n"
+#~ "\t\t\t\tto attach the jail to the host network"
+#~ msgstr ""
+#~ "This will inherit the network configuration from the host, you can choose this if you want\n"
+#~ "\t\t\t\tto attach the jail to the host network"
+
+#~ msgid ""
+#~ "This will inherit the network configuration from the host, you can choose this if you want\n"
+#~ "\t\t\t\tthe jail to share networking with the host"
+#~ msgstr ""
+#~ "This will inherit the network configuration from the host, you can choose this if you want\n"
+#~ "\t\t\t\tthe jail to share networking with the host"
+
+#~ msgid ""
+#~ "This option will inherit the network configuration from the host. Choose this if you want\n"
+#~ "\t\t\t\tthe jail to share the host’s networking. You can select which protocols to inherit below."
+#~ msgstr ""
+#~ "This option will inherit the network configuration from the host. Choose this if you want\n"
+#~ "\t\t\t\tthe jail to share the host’s networking. You can select which protocols to inherit below."
+
+#~ msgid ""
+#~ "This option will inherit the network configuration from the host. Choose this if you want\n"
+#~ "\t\t\t\tthe jail to share the host's networking. You can select which protocols to inherit below."
+#~ msgstr ""
+#~ "This option will inherit the network configuration from the host. Choose this if you want\n"
+#~ "\t\t\t\tthe jail to share the host's networking. You can select which protocols to inherit below."
+
+#: src/routes/[node]/jail/[node]/network/+page.svelte
+msgid "You must select at least one protocol to inherit"
+msgstr "You must select at least one protocol to inherit"
+
+#: src/routes/[node]/jail/[node]/network/+page.svelte
+msgid ""
+"This option will inherit the <0>network configuration</0> from the host. Choose this if you\n"
+"\t\t\t\twant the jail to <1>share the host's networking</1>. You can select which <2>protocols</2> to inherit below. <3>Changes will take effect after restarting the jail.</3>"
+msgstr ""
+"This option will inherit the <0>network configuration</0> from the host. Choose this if you\n"
+"\t\t\t\twant the jail to <1>share the host's networking</1>. You can select which <2>protocols</2> to inherit below. <3>Changes will take effect after restarting the jail.</3>"
+
+#: src/routes/[node]/jail/[node]/network/+page.svelte
+msgid "Failed to inherit network"
+msgstr "Failed to inherit network"
+
+#: src/routes/[node]/jail/[node]/network/+page.svelte
+msgid "Host network inherited"
+msgstr "Host network inherited"
+
+#~ msgid ""
+#~ "This option will <0>disinherit the network configuration</0> from the host. Choose this if\n"
+#~ "\t\t\t\tyou want to <1>attach a custom network switch</1> to this jail or <2>disable networking</2> entirely."
+#~ msgstr ""
+#~ "This option will <0>disinherit the network configuration</0> from the host. Choose this if\n"
+#~ "\t\t\t\tyou want to <1>attach a custom network switch</1> to this jail or <2>disable networking</2> entirely."
+
+#: src/routes/[node]/jail/[node]/network/+page.svelte
+msgid ""
+"This option will <0>disinherit the network configuration</0> from the host. Choose this if\n"
+"\t\t\t\tyou want to <1>attach a custom network switch</1> to this jail or <2>disable networking</2> entirely. <3>Changes will take effect after restarting the jail.</3>"
+msgstr ""
+"This option will <0>disinherit the network configuration</0> from the host. Choose this if\n"
+"\t\t\t\tyou want to <1>attach a custom network switch</1> to this jail or <2>disable networking</2> entirely. <3>Changes will take effect after restarting the jail.</3>"
+
+#: src/routes/[node]/jail/[node]/network/+page.svelte
+msgid "Failed to disinherit network"
+msgstr "Failed to disinherit network"
+
+#: src/routes/[node]/jail/[node]/network/+page.svelte
+msgid "Host network disinherited"
+msgstr "Host network disinherited"

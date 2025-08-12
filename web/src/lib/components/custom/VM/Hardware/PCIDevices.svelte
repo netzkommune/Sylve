@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { modifyHardware, modifyPPT } from '$lib/api/vm/hardware';
+	import { modifyPPT } from '$lib/api/vm/hardware';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import CustomComboBox from '$lib/components/ui/custom-input/combobox.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';

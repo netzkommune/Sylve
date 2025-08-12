@@ -23,16 +23,6 @@ func (s *Service) DisinheritNetwork(ctId uint) error {
 }
 
 func (s *Service) InheritNetwork(ctId uint, ipv4 bool, ipv6 bool) error {
-	// active, err := s.IsJailActive(ctId)
-
-	// if err != nil {
-	// 	return err
-	// }
-
-	// if active {
-	// 	return fmt.Errorf("jail %d is active, cannot inherit network", ctId)
-	// }
-
 	var jail jailModels.Jail
 
 	if err := s.DB.Preload("Networks").First(&jail).Where("ct_id = ?", ctId).Error; err != nil {
@@ -128,7 +118,15 @@ func (s *Service) SyncNetwork(ctId uint, jail jailModels.Jail) error {
 			return err
 		}
 	} else {
-		newCfg = cfg
+		if jail.Networks != nil && len(jail.Networks) > 0 {
+			newCfg = cfg
+		} else {
+			toAppend := "\tip4=disable;\n\tip6=disable;\n"
+			newCfg, err = s.AppendToConfig(ctId, cfg, toAppend)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	err = s.SaveJailConfig(ctId, newCfg)

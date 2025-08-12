@@ -127,8 +127,6 @@
 	let jailDesc = $state(jail.description || '');
 	let jailStats = $derived($results[4].data || []);
 
-	// $inspect(cleanStats(jailStats, jail));
-
 	let cpuHistoricalData = $derived.by(() => {
 		return {
 			field: 'cpuUsage',

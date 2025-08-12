@@ -27,7 +27,12 @@ func (s *Service) FindBaseByUUID(uuid string) (string, error) {
 	switch download.Type {
 	case "http":
 		downloadsDir := config.GetDownloadsPath("http")
+		extractsDir := config.GetDownloadsPath("extracted")
 		bPath = fmt.Sprintf("%s/%s", downloadsDir, download.Name)
+
+		if strings.HasSuffix(bPath, ".txz") {
+			bPath = fmt.Sprintf("%s/%s", extractsDir, download.UUID)
+		}
 	case "torrent":
 		torrentsDir := config.GetDownloadsPath("torrents")
 		for _, file := range download.Files {

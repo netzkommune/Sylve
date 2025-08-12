@@ -228,7 +228,7 @@
 				bind:value={comboBoxes.ipv4Gateway.value}
 				data={generateIPOptions(usable.ipv4Gateway, 'IPv4')}
 				classes="flex-1 space-y-1"
-				placeholder="Select IPv4"
+				placeholder="Select IPv4 Gateway"
 				width="w-full"
 				disabled={usable.ipv4Gateway.length === 0 || checkBoxes.dhcp}
 			></CustomComboBox>
@@ -250,7 +250,7 @@
 				bind:value={comboBoxes.ipv6Gateway.value}
 				data={generateIPOptions(usable.ipv6Gateway, 'IPv6')}
 				classes="flex-1 space-y-1"
-				placeholder="Select IPv6"
+				placeholder="Select IPv6 Gateway"
 				width="w-full"
 				disabled={usable.ipv6Gateway.length === 0 || checkBoxes.slaac}
 			></CustomComboBox>

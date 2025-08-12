@@ -89,3 +89,31 @@ export async function inheritHostNetwork(
 export async function disinheritHostNetwork(ctId: number): Promise<APIResponse> {
 	return await apiRequest(`/jail/network/disinherit/${ctId}`, APIResponseSchema, 'DELETE');
 }
+
+export async function addNetwork(
+	ctId: number,
+	switchId: number,
+	macId: number,
+	ip4: number,
+	ip4gw: number,
+	ip6: number,
+	ip6gw: number,
+	dhcp: boolean,
+	slaac: boolean
+): Promise<APIResponse> {
+	return await apiRequest('/jail/network', APIResponseSchema, 'POST', {
+		ctId,
+		switchId,
+		macId,
+		ip4,
+		ip4gw,
+		ip6,
+		ip6gw,
+		dhcp,
+		slaac
+	});
+}
+
+export async function deleteNetwork(ctId: number, networkId: number): Promise<APIResponse> {
+	return await apiRequest(`/jail/network/${ctId}/${networkId}`, APIResponseSchema, 'DELETE');
+}

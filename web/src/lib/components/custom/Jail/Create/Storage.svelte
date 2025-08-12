@@ -51,7 +51,7 @@
 		classes="flex-1 space-y-1"
 		placeholder="Select filesystem"
 		triggerWidth="w-full "
-		width="w-full lg:w-[75%]"
+		width="w-full"
 	></CustomComboBox>
 
 	<CustomComboBox
@@ -61,7 +61,7 @@
 		data={baseOptions}
 		classes="flex-1 space-y-1"
 		placeholder="Select base"
-		triggerWidth="w-full "
-		width="w-full lg:w-[75%]"
+		triggerWidth="w-full"
+		width="w-full"
 	></CustomComboBox>
 </div>

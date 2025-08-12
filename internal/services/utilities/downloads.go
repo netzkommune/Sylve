@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"sylve/internal/config"
 	utilitiesModels "sylve/internal/db/models/utilities"
@@ -271,6 +272,28 @@ func (s *Service) SyncDownloadProgress() error {
 				delete(s.httpResponses, download.UUID)
 				s.httpRspMu.Unlock()
 
+				download.Progress = 99
+
+				if strings.HasSuffix(download.Name, ".txz") {
+					extractsPath := filepath.Join(config.GetDownloadsPath("extracted"), download.UUID)
+					if _, err := os.Stat(extractsPath); err == nil {
+						if err := os.RemoveAll(extractsPath); err != nil {
+							logger.L.Error().Msgf("Failed to remove extracts folder: %v", err)
+						}
+					}
+
+					if err := os.MkdirAll(extractsPath, 0755); err != nil {
+						logger.L.Error().Msgf("Failed to create extracts folder: %v", err)
+					}
+
+					output, err := utils.RunCommand("tar", "-xf", resp.Filename, "-C", extractsPath)
+					if err != nil {
+						logger.L.Error().Msgf("Failed to extract tar file: %v", err)
+					} else {
+						logger.L.Info().Msgf("Extracted tar file to %s: %s", extractsPath, output)
+					}
+				}
+
 				download.Progress = 100
 			}
 
@@ -301,6 +324,21 @@ func (s *Service) DeleteDownload(id int) error {
 	}
 
 	if download.Type == "http" {
+		if strings.HasSuffix(download.Name, ".txz") {
+			extractsPath := filepath.Join(config.GetDownloadsPath("extracted"), download.UUID)
+			_, err := utils.RunCommand("sudo", "chflags", "-R", "noschg", extractsPath)
+
+			if err != nil {
+				logger.L.Error().Msgf("Failed to change flags for extracts folder: %v", err)
+			}
+
+			if _, err := os.Stat(extractsPath); err == nil {
+				if err := os.RemoveAll(extractsPath); err != nil {
+					logger.L.Error().Msgf("Failed to remove extracts folder: %v", err)
+				}
+			}
+		}
+
 		err := utils.DeleteFile(path.Join(config.GetDownloadsPath(download.Type), download.Name))
 		if err != nil {
 			logger.L.Debug().Msgf("Failed to delete HTTP download file: %v", err)

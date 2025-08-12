@@ -18,7 +18,7 @@ export function generateIPOptions(
 	for (const object of objects) {
 		if (object.entries && object.entries.length === 1) {
 			for (const entry of object.entries) {
-				const validator = type == 'IPv4' ? isValidIPv4 : isValidIPv6;
+				const validator = type.toLowerCase() == 'ipv4' ? isValidIPv4 : isValidIPv6;
 				if (validator(entry.value)) {
 					options.push({
 						label: `${object.name} (${entry.value})`,
@@ -49,12 +49,12 @@ export function generateNetworkOptions(
 	for (const object of objects) {
 		if (object.entries && object.entries.length > 0) {
 			for (const entry of object.entries) {
-				if (type === 'IPv4' && isValidIPv4(entry.value, true)) {
+				if (type.toLowerCase() === 'ipv4' && isValidIPv4(entry.value, true)) {
 					options.push({
 						label: `${object.name} (${entry.value})`,
 						value: object.id.toString()
 					});
-				} else if (type === 'IPv6' && isValidIPv6(entry.value, true)) {
+				} else if (type.toLowerCase() === 'ipv6' && isValidIPv6(entry.value, true)) {
 					options.push({
 						label: `${object.name} (${entry.value})`,
 						value: object.id.toString()

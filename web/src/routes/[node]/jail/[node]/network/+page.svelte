@@ -1,11 +1,32 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { disinheritHostNetwork, getJails, inheritHostNetwork } from '$lib/api/jail/jail';
+	import {
+		addNetwork,
+		deleteNetwork,
+		disinheritHostNetwork,
+		getJails,
+		inheritHostNetwork
+	} from '$lib/api/jail/jail';
+	import { getInterfaces } from '$lib/api/network/iface';
+	import { getNetworkObjects } from '$lib/api/network/object';
+	import { getSwitches } from '$lib/api/network/switch';
+	import AlertDialog from '$lib/components/custom/Dialog/Alert.svelte';
+	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import CustomCheckbox from '$lib/components/ui/custom-input/checkbox.svelte';
+	import CustomComboBox from '$lib/components/ui/custom-input/combobox.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import type { Column, Row } from '$lib/types/components/tree-table';
 	import type { Jail, JailState } from '$lib/types/jail/jail';
+	import type { NetworkObject } from '$lib/types/network/object';
+	import type { SwitchList } from '$lib/types/network/switch';
 	import { handleAPIError, updateCache } from '$lib/utils/http';
+	import { ipGatewayFormatter } from '$lib/utils/jail/network';
+	import {
+		generateIPOptions,
+		generateMACOptions,
+		generateNetworkOptions
+	} from '$lib/utils/network/object';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
 	import { toast } from 'svelte-sonner';
@@ -14,6 +35,8 @@
 		jails: Jail[];
 		jailStates: JailState[];
 		jail: Jail;
+		switches: SwitchList;
+		networkObjects: NetworkObject[];
 	}
 
 	let { data }: { data: Data } = $props();
@@ -30,6 +53,30 @@
 			onSuccess: (data: Jail[]) => {
 				updateCache('jail-list', data);
 			}
+		},
+		{
+			queryKey: ['networkSwitches'],
+			queryFn: async () => {
+				return await getSwitches();
+			},
+			refetchInterval: 1000,
+			keepPreviousData: true,
+			initialData: data.switches,
+			onSuccess: (data: SwitchList) => {
+				updateCache('networkSwitches', data);
+			}
+		},
+		{
+			queryKey: ['networkObjects'],
+			queryFn: async () => {
+				return await getNetworkObjects();
+			},
+			refetchInterval: 1000,
+			keepPreviousData: true,
+			initialData: data.networkObjects,
+			onSuccess: (data: NetworkObject[]) => {
+				updateCache('networkObjects', data);
+			}
 		}
 	]);
 
@@ -43,6 +90,8 @@
 		return data.jail;
 	});
 
+	let switches = $derived($results[1].data as SwitchList);
+	let networkObjects = $derived($results[2].data || []);
 	let inherited = $derived.by(() => {
 		if (jail) {
 			return jail.inheritIPv4 || jail.inheritIPv6;
@@ -51,12 +100,144 @@
 		return false;
 	});
 
-	let modals = $state({
+	let usableSwitches = $derived.by(() => {
+		if (!jail) return [];
+		return (
+			switches.standard?.filter((s) => {
+				return !jail.networks.some((n) => n.switchId === s.id);
+			}) || []
+		);
+	});
+
+	let options = {
 		inherit: {
 			open: false,
 			ipv4: false,
 			ipv6: false
+		},
+		add: {
+			open: false,
+			sw: {
+				open: false,
+				value: '',
+				options: usableSwitches.map((s) => ({
+					label: s.name,
+					value: s.id.toString()
+				}))
+			},
+			ipv4: {
+				open: false,
+				value: '',
+				options: generateNetworkOptions(data.networkObjects, 'ipv4')
+			},
+			ipv6: {
+				open: false,
+				value: '',
+				options: generateNetworkOptions(data.networkObjects, 'ipv6')
+			},
+			ipv4Gw: {
+				open: false,
+				value: '',
+				options: generateIPOptions(data.networkObjects, 'ipv4')
+			},
+			ipv6Gw: {
+				open: false,
+				value: '',
+				options: generateIPOptions(data.networkObjects, 'ipv6')
+			},
+			mac: {
+				open: false,
+				value: '',
+				options: generateMACOptions(data.networkObjects)
+			},
+			dhcp: false,
+			slaac: false
+		},
+		delete: {
+			open: false,
+			title: ''
 		}
+	};
+
+	let modals = $state(options);
+
+	$inspect(modals);
+
+	let query = $state('');
+	let activeRows: Row[] = $state([] as Row[]);
+	let activeRow: Row | null = $derived(
+		activeRows.length > 0 ? (activeRows[0] as Row) : ({} as Row)
+	);
+
+	let table = $derived.by(() => {
+		const columns: Column[] = [
+			{
+				title: 'Switch',
+				field: 'switch'
+			},
+			{
+				title: 'IPv4',
+				field: 'ipv4',
+				formatter: 'html'
+			},
+			{
+				title: 'IPv6',
+				field: 'ipv6',
+				formatter: 'html'
+			}
+		];
+
+		if (jail) {
+			if (inherited) {
+				return {
+					rows: [],
+					columns
+				};
+			} else {
+				const rows: Row[] = [];
+				for (const network of jail.networks) {
+					let ipv4 = '';
+					let ipv6 = '';
+
+					if (network.dhcp) {
+						ipv4 = 'DHCP';
+					} else {
+						if (network.ipv4Id && network.ipv4GwId) {
+							ipv4 = ipGatewayFormatter(networkObjects, network.ipv4Id, network.ipv4GwId);
+						} else {
+							ipv4 = '-';
+						}
+					}
+
+					if (network.slaac) {
+						ipv6 = 'SLAAC';
+					} else {
+						if (network.ipv6Id && network.ipv6GwId) {
+							ipv6 = ipGatewayFormatter(networkObjects, network.ipv6Id, network.ipv6GwId);
+						} else {
+							ipv6 = '-';
+						}
+					}
+
+					rows.push({
+						id: network.id,
+						switch: switches.standard?.find((sw) => sw.id === network.switchId)?.name,
+						ipv4,
+						ipv6
+					});
+				}
+
+				return {
+					rows,
+					columns
+				};
+			}
+		}
+
+		return {
+			rows: [],
+			columns
+		};
 	});
 
 	async function inherit() {
@@ -100,31 +281,152 @@
 
 		modals.inherit.open = false;
 	}
+
+	async function addSwitch() {
+		if (!jail) return;
+		let error = '';
+
+		if (!modals.add.sw.value) {
+			error = 'Switch is required';
+		} else if (
+			!modals.add.ipv4.value &&
+			!modals.add.ipv6.value &&
+			!modals.add.dhcp &&
+			!modals.add.slaac
+		) {
+			error = 'At least one network configuration is required';
+		} else if (modals.add.ipv4.value && !modals.add.ipv4Gw.value && !modals.add.dhcp) {
+			error = 'IPv4 Gateway is required when IPv4 network is selected';
+		} else if (modals.add.ipv6.value && !modals.add.ipv6Gw.value && !modals.add.slaac) {
+			error = 'IPv6 Gateway is required when IPv6 network is selected';
+		}
+
+		if (error) {
+			toast.error(error, {
+				position: 'bottom-center'
+			});
+			return;
+		}
+
+		const response = await addNetwork(
+			jail.ctId,
+			parseInt(modals.add.sw.value),
+			parseInt(modals.add.mac.value),
+			parseInt(modals.add.ipv4.value || '0'),
+			parseInt(modals.add.ipv4Gw.value || '0'),
+			parseInt(modals.add.ipv6.value || '0'),
+			parseInt(modals.add.ipv6Gw.value || '0'),
+			modals.add.dhcp,
+			modals.add.slaac
+		);
+
+		console.log(response);
+	}
+
+	async function handleSwitchDelete() {
+		if (!jail) return;
+
+		const response = await deleteNetwork(jail.ctId, Number(activeRow?.id ?? 0));
+		if (response.error) {
+			handleAPIError(response);
+			toast.error('Failed to delete network', {
+				position: 'bottom-center'
+			});
+		} else {
+			toast.success('Network deleted', {
+				position: 'bottom-center'
+			});
+		}
+
+		modals.delete.open = false;
+	}
+
+	$effect(() => {
+		if (modals.add.dhcp) {
+			modals.add.ipv4.value = '';
+			modals.add.ipv4Gw.value = '';
+		}
+
+		if (modals.add.slaac) {
+			modals.add.ipv6.value = '';
+			modals.add.ipv6Gw.value = '';
+		}
+	});
 </script>
 
 <div class="flex h-full w-full flex-col">
 	<div class="flex h-10 w-full items-center gap-2 border p-2">
-		<Button
-			onclick={() => {
-				modals.inherit.open = true;
-			}}
-			size="sm"
-			variant="outline"
-			class="h-6.5"
-		>
-			<div class="flex items-center">
-				{#if inherited}
-					<Icon icon="mdi:close-network" class="mr-1 h-4 w-4" />
-					<span>Disinherit Network</span>
-				{:else}
-					<Icon icon="mdi:plus-network" class="mr-1 h-4 w-4" />
-					<span>Inherit Network</span>
-				{/if}
-			</div>
-		</Button>
+		{#if !inherited}
+			<Button
+				onclick={() => {
+					if (usableSwitches.length === 0) {
+						toast.error('No available switches to add', {
+							position: 'bottom-center'
+						});
+						return;
+					}
+
+					modals.add.open = true;
+				}}
+				size="sm"
+				class="h-6"
+			>
+				<div class="flex items-center">
+					<Icon icon="gg:add" class="mr-1 h-4 w-4" />
+					<span>New</span>
+				</div>
+			</Button>
+		{/if}
+
+		{#if activeRows.length <= 0}
+			<Button
+				onclick={() => {
+					modals.inherit.open = true;
+				}}
+				size="sm"
+				variant="outline"
+				class="h-6.5"
+			>
+				<div class="flex items-center">
+					{#if inherited}
+						<Icon icon="mdi:close-network" class="mr-1 h-4 w-4" />
+						<span>Disinherit Network</span>
+					{:else}
+						<Icon icon="mdi:plus-network" class="mr-1 h-4 w-4" />
+						<span>Inherit Network</span>
+					{/if}
+				</div>
+			</Button>
+		{:else}
+			<Button
+				onclick={() => {
+					modals.delete.title = activeRow?.switch ?? '';
+					modals.delete.open = true;
+				}}
+				size="sm"
+				variant="outline"
+				class="h-6.5"
+			>
+				<div class="flex items-center">
+					<Icon icon="mdi:minus-network" class="mr-1 h-4 w-4" />
+					<span>Detach</span>
+				</div>
+			</Button>
+		{/if}
+	</div>
+
+	<div class="flex h-full flex-col overflow-hidden">
+		<TreeTable
+			data={table}
+			name={'jail-networks-tt'}
+			bind:parentActiveRow={activeRows}
+			multipleSelect={false}
+			bind:query
+		/>
 	</div>
 </div>
 
+<!-- Inherit/Disinherit -->
 <Dialog.Root bind:open={modals.inherit.open}>
 	<Dialog.Content>
 		<Dialog.Header class="p-0">
@@ -197,3 +499,145 @@
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
+
+<Dialog.Root bind:open={modals.add.open}>
+	<Dialog.Content>
+		<Dialog.Header class="p-0">
+			<Dialog.Title class="flex items-center justify-between text-left">
+				<div class="flex items-center">
+					<Icon icon="mdi:network" class="mr-2 h-5 w-5" />
+					<span>New Network</span>
+				</div>
+
+				<div class="flex items-center gap-0.5">
+					<Button
+						size="sm"
+						variant="link"
+						class="h-4"
+						title={'Reset'}
+						onclick={() => {
+							modals = options;
+							modals.add.open = true;
+						}}
+					>
+						<Icon icon="radix-icons:reset" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only">Reset</span>
+					</Button>
+
+					<Button
+						size="sm"
+						variant="link"
+						class="h-4"
+						title={'Close'}
+						onclick={() => {
+							modals.add.open = false;
+						}}
+					>
+						<Icon icon="material-symbols:close-rounded" class="pointer-events-none h-4 w-4" />
+						<span class="sr-only">Close</span>
+					</Button>
+				</div>
+			</Dialog.Title>
+		</Dialog.Header>
+
+		<div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+			<CustomComboBox
+				bind:open={modals.add.sw.open}
+				label="Switch"
+				bind:value={modals.add.sw.value}
+				data={modals.add.sw.options}
+				classes="flex-1 space-y-1"
+				placeholder="Select Switch"
+				width="w-full"
+			></CustomComboBox>
+
+			<CustomComboBox
+				bind:open={modals.add.ipv4.open}
+				label="IPv4 Network"
+				bind:value={modals.add.ipv4.value}
+				data={generateNetworkOptions(networkObjects, 'ipv4')}
+				classes="flex-1 space-y-1"
+				placeholder="Select IPv4"
+				width="w-full"
+				disabled={modals.add.ipv4.options.length === 0 || modals.add.dhcp}
+			></CustomComboBox>
+
+			<CustomComboBox
+				bind:open={modals.add.ipv4Gw.open}
+				label="IPv4 Gateway"
+				bind:value={modals.add.ipv4Gw.value}
+				data={generateIPOptions(networkObjects, 'ipv4')}
+				classes="flex-1 space-y-1"
+				placeholder="Select IPv4 Gateway"
+				width="w-full"
+				disabled={modals.add.ipv4Gw.options.length === 0 || modals.add.dhcp}
+			></CustomComboBox>
+
+			<CustomComboBox
+				bind:open={modals.add.ipv6.open}
+				label="IPv6 Network"
+				bind:value={modals.add.ipv6.value}
+				data={generateNetworkOptions(networkObjects, 'ipv6')}
+				classes="flex-1 space-y-1"
+				placeholder="Select IPv6"
+				width="w-full"
+				disabled={modals.add.ipv6.options.length === 0 || modals.add.slaac}
+			></CustomComboBox>
+
+			<CustomComboBox
+				bind:open={modals.add.ipv6Gw.open}
+				label="IPv6 Gateway"
+				bind:value={modals.add.ipv6Gw.value}
+				data={generateIPOptions(networkObjects, 'ipv6')}
+				classes="flex-1 space-y-1"
+				placeholder="Select IPv6 Gateway"
+				width="w-full"
+				disabled={modals.add.ipv6Gw.options.length === 0 || modals.add.slaac}
+			></CustomComboBox>
+
+			<CustomComboBox
+				bind:open={modals.add.mac.open}
+				label="MAC Address"
+				bind:value={modals.add.mac.value}
+				data={modals.add.mac.options}
+				classes="flex-1 space-y-1"
+				placeholder="Select MAC Address"
+				width="w-full"
+			/>
+		</div>
+
+		<div class="mt-2">
+			<div class="flex flex-row gap-2">
+				<CustomCheckbox
+					label="DHCP"
+					bind:checked={modals.add.dhcp}
+					classes="flex items-center gap-2"
+				></CustomCheckbox>
+				<CustomCheckbox
+					label="SLAAC"
+					bind:checked={modals.add.slaac}
+					classes="flex items-center gap-2"
+				></CustomCheckbox>
+			</div>
+		</div>
+
+		<Dialog.Footer class="flex justify-end">
+			<div class="flex w-full items-center justify-end gap-2">
+				<Button onclick={addSwitch} type="submit" size="sm">{'Save'}</Button>
+			</div>
+		</Dialog.Footer>
+	</Dialog.Content>
+</Dialog.Root>
+
+<AlertDialog
+	open={modals.delete.open}
+	customTitle={`This will detach the jail from the switch <b>${modals.delete.title}</b>`}
+	actions={{
+		onConfirm: async () => {
+			handleSwitchDelete();
+		},
+		onCancel: () => {
+			modals.delete.open = false;
+		}
+	}}
+></AlertDialog>

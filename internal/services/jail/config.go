@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sylve/internal/config"
 	jailModels "sylve/internal/db/models/jail"
@@ -35,6 +36,9 @@ func (s *Service) SaveJailConfig(ctid uint, cfg string) error {
 	if ctid == 0 {
 		return fmt.Errorf("invalid_ct_id")
 	}
+
+	re := regexp.MustCompile(`\n{2,}`)
+	cfg = re.ReplaceAllString(cfg, "\n")
 
 	jailsPath, err := config.GetJailsPath()
 	if err != nil {

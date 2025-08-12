@@ -87,6 +87,8 @@ func SetupDataPath() error {
 		filepath.Join(dataPath, "jails"),
 		filepath.Join(dataPath, "downloads"),
 		filepath.Join(dataPath, "downloads", "torrents"),
+		filepath.Join(dataPath, "downloads", "http"),
+		filepath.Join(dataPath, "downloads", "extracted"),
 	}
 
 	for _, dir := range dirs {
@@ -109,12 +111,15 @@ func GetDownloadsPath(dType string) string {
 		return filepath.Join(cwd, "data", "downloads")
 	}
 
-	if dType == "torrents" {
+	switch dType {
+	case "torrents":
 		return filepath.Join(ParsedConfig.DataPath, "downloads", "torrents")
-	} else if dType == "torrent.db" {
+	case "torrent.db":
 		return filepath.Join(ParsedConfig.DataPath, "downloads", "torrents", "torrent.db")
-	} else if dType == "http" {
+	case "http":
 		return filepath.Join(ParsedConfig.DataPath, "downloads", "http")
+	case "extracted":
+		return filepath.Join(ParsedConfig.DataPath, "downloads", "extracted")
 	}
 
 	return filepath.Join(ParsedConfig.DataPath, "downloads")

@@ -154,3 +154,27 @@ func IsEmptyDir(path string) bool {
 
 	return len(files) == 0
 }
+
+func IsDir(path string) (bool, error) {
+	info, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+
+	if err != nil {
+		return false, fmt.Errorf("stat %q: %w", path, err)
+	}
+
+	return info.IsDir(), nil
+}
+
+func CopyDirContents(source, destination string) error {
+	if _, err := os.Stat(destination); os.IsNotExist(err) {
+		if err := os.MkdirAll(destination, 0755); err != nil {
+			return fmt.Errorf("failed to create destination dir: %w", err)
+		}
+	}
+
+	_, err := RunCommand("cp", "-a", source+"/.", destination)
+	return err
+}

@@ -35,10 +35,108 @@ func (s *Service) InheritNetwork(ctId uint, ipv4 bool, ipv6 bool) error {
 	return s.SyncNetwork(ctId, jail)
 }
 
-func (s *Service) DeleteNetwork(ctId uint, switchId uint, networkId uint) error {
-	epair := fmt.Sprintf("%s_%d", utils.HashIntToNLetters(int(ctId), 5), switchId)
-	err := s.NetworkService.DeleteEpair(epair)
+func (s *Service) AddNetwork(ctId uint,
+	switchId uint,
+	macId uint,
+	ip4 uint,
+	ip4gw uint,
+	ip6 uint,
+	ip6gw uint,
+	dhcp bool,
+	slaac bool) error {
+	var jail jailModels.Jail
+	var network jailModels.Network
 
+	if err := s.DB.Preload("Networks").First(&jail).Where("ct_id = ?", ctId).Error; err != nil {
+		return err
+	}
+
+	_, err := s.NetworkService.GetObjectEntryByID(macId)
+	if err != nil {
+		return fmt.Errorf("failed_to_get_mac_object: %w", err)
+	}
+
+	if jail.InheritIPv4 || jail.InheritIPv6 {
+		return fmt.Errorf("cannot_add_network_when_inheriting_network")
+	}
+
+	for _, network := range jail.Networks {
+		if network.SwitchID == switchId {
+			return fmt.Errorf("switch_id_already_used_by_jail")
+		}
+	}
+
+	network.SwitchID = switchId
+	network.MacID = &macId
+
+	if !dhcp {
+		if ip4 == 0 || ip4gw == 0 {
+			return fmt.Errorf("ip4_and_ip4gw_must_be_specified_when_dhcp_is_disabled")
+		}
+
+		_, err := s.NetworkService.GetObjectEntryByID(ip4)
+		if err != nil {
+			return fmt.Errorf("failed_to_get_ip4_object: %w", err)
+		}
+
+		_, err = s.NetworkService.GetObjectEntryByID(ip4gw)
+		if err != nil {
+			return fmt.Errorf("failed_to_get_ip4gw_object: %w", err)
+		}
+
+		network.IPv4ID = &ip4
+		network.IPv4GwID = &ip4gw
+	} else {
+		network.DHCP = true
+	}
+
+	if !slaac {
+		if ip6 == 0 || ip6gw == 0 {
+			return fmt.Errorf("ip6_and_ip6gw_must_be_specified_when_slaac_is_disabled")
+		}
+
+		_, err := s.NetworkService.GetObjectEntryByID(ip6)
+		if err != nil {
+			return fmt.Errorf("failed_to_get_ip6_object: %w", err)
+		}
+
+		_, err = s.NetworkService.GetObjectEntryByID(ip6gw)
+		if err != nil {
+			return fmt.Errorf("failed_to_get_ip6gw_object: %w", err)
+		}
+
+		network.IPv6ID = &ip6
+		network.IPv6GwID = &ip6gw
+	} else {
+		network.SLAAC = true
+	}
+
+	network.CTID = ctId
+	err = s.DB.Create(&network).Error
+	if err != nil {
+		return fmt.Errorf("failed_to_create_network: %w", err)
+	}
+
+	jail.Networks = append(jail.Networks, network)
+
+	err = s.NetworkService.SyncEpairs()
+
+	if err != nil {
+		return fmt.Errorf("failed_to_sync_epairs: %w", err)
+	}
+
+	return s.SyncNetwork(ctId, jail)
+}
+
+func (s *Service) DeleteNetwork(ctId uint, networkId uint) error {
+	var network jailModels.Network
+	err := s.DB.Find(&network, networkId).Error
+	if err != nil {
+		return fmt.Errorf("failed_to_find_network: %w", err)
+	}
+
+	epair := fmt.Sprintf("%s_%d", utils.HashIntToNLetters(int(ctId), 5), network.SwitchID)
+	err = s.NetworkService.DeleteEpair(epair)
 	if err != nil {
 		return err
 	}
@@ -50,7 +148,14 @@ func (s *Service) DeleteNetwork(ctId uint, switchId uint, networkId uint) error 
 		return err
 	}
 
-	return nil
+	var jail jailModels.Jail
+
+	err = s.DB.Preload("Networks").First(&jail).Where("ct_id = ?", ctId).Error
+	if err != nil {
+		return err
+	}
+
+	return s.SyncNetwork(ctId, jail)
 }
 
 func (s *Service) GetNetworkCleanedConfig(ctId uint) (string, error) {
@@ -96,7 +201,7 @@ func (s *Service) SyncNetwork(ctId uint, jail jailModels.Jail) error {
 	if jail.InheritIPv4 || jail.InheritIPv6 {
 		if jail.Networks != nil && len(jail.Networks) > 0 {
 			for _, network := range jail.Networks {
-				err = s.DeleteNetwork(ctId, network.SwitchID, network.ID)
+				err = s.DeleteNetwork(ctId, network.ID)
 				if err != nil {
 					return err
 				}
@@ -119,7 +224,125 @@ func (s *Service) SyncNetwork(ctId uint, jail jailModels.Jail) error {
 		}
 	} else {
 		if jail.Networks != nil && len(jail.Networks) > 0 {
-			newCfg = cfg
+			ctidHash := utils.HashIntToNLetters(int(ctId), 5)
+
+			// Ensure epairs exist
+			if err := s.NetworkService.SyncEpairs(); err != nil {
+				return err
+			}
+
+			var b strings.Builder
+
+			// vnet declaration once
+			b.WriteString("\tvnet;\n")
+
+			// Add one vnet.interface line per NIC
+			for _, n := range jail.Networks {
+				if n.SwitchID == 0 {
+					continue
+				}
+				b.WriteString(fmt.Sprintf("\tvnet.interface += \"%s_%db\";\n", ctidHash, n.SwitchID))
+			}
+
+			// Guard: only set default routes once
+			setV4Default := false
+			setV6Default := false
+
+			for _, n := range jail.Networks {
+				if n.SwitchID == 0 {
+					continue
+				}
+
+				networkId := n.SwitchID
+
+				// MAC + Bridge membership
+				if n.MacID != nil && *n.MacID > 0 {
+					mac, err := s.NetworkService.GetObjectEntryByID(*n.MacID)
+					if err != nil {
+						return fmt.Errorf("failed to get mac address: %w", err)
+					}
+					prevMAC, err := utils.PreviousMAC(mac)
+					if err != nil {
+						return fmt.Errorf("failed to get previous mac: %w", err)
+					}
+
+					b.WriteString(fmt.Sprintf("\texec.prestart += \"ifconfig %s_%da ether %s up\";\n", ctidHash, networkId, prevMAC))
+					b.WriteString(fmt.Sprintf("\texec.prestart += \"ifconfig %s_%db ether %s up\";\n", ctidHash, networkId, mac))
+
+					bridgeName, err := s.NetworkService.GetBridgeNameByID(n.SwitchID)
+					if err != nil {
+						return fmt.Errorf("failed to get bridge name: %w", err)
+					}
+					b.WriteString(fmt.Sprintf(
+						"\texec.prestart += \"if ! ifconfig %s | grep -qw %s_%da; then ifconfig %s addm %s_%da; fi\";\n",
+						bridgeName, ctidHash, networkId, bridgeName, ctidHash, networkId,
+					))
+				}
+
+				// Addressing
+				switch {
+				case n.DHCP && n.SLAAC:
+					b.WriteString(fmt.Sprintf("\texec.start += \"dhclient %s_%db\";\n", ctidHash, networkId))
+					b.WriteString(fmt.Sprintf("\texec.start += \"sysrc ifconfig_%s_%db=\\\"DHCP\\\"\";\n", ctidHash, networkId))
+					b.WriteString(fmt.Sprintf("\texec.start += \"sysrc ifconfig_%s_%db_ipv6=\\\"inet6 accept_rtadv\\\"\";\n", ctidHash, networkId))
+
+				case n.DHCP:
+					b.WriteString(fmt.Sprintf("\texec.start += \"dhclient %s_%db\";\n", ctidHash, networkId))
+					b.WriteString(fmt.Sprintf("\texec.start += \"sysrc ifconfig_%s_%db=\\\"DHCP\\\"\";\n", ctidHash, networkId))
+
+				case n.SLAAC:
+					b.WriteString(fmt.Sprintf("\texec.start += \"ifconfig %s_%db inet6 accept_rtadv up\";\n", ctidHash, networkId))
+					b.WriteString(fmt.Sprintf("\texec.start += \"sysrc ifconfig_%s_%db_ipv6=\\\"inet6 accept_rtadv\\\"\";\n", ctidHash, networkId))
+
+				default:
+					// Static IPv4
+					if n.IPv4ID != nil && *n.IPv4ID > 0 && n.IPv4GwID != nil && *n.IPv4GwID > 0 {
+						ipv4, err := s.NetworkService.GetObjectEntryByID(*n.IPv4ID)
+						if err != nil {
+							return fmt.Errorf("failed to get ipv4 address: %w", err)
+						}
+						ipv4Gw, err := s.NetworkService.GetObjectEntryByID(*n.IPv4GwID)
+						if err != nil {
+							return fmt.Errorf("failed to get ipv4 gateway: %w", err)
+						}
+						ip, mask, err := utils.SplitIPv4AndMask(ipv4)
+						if err != nil {
+							return fmt.Errorf("failed to split ipv4 address and mask: %w", err)
+						}
+
+						b.WriteString(fmt.Sprintf("\texec.start += \"ifconfig %s_%db inet %s netmask %s\";\n", ctidHash, networkId, ip, mask))
+						if !setV4Default {
+							b.WriteString(fmt.Sprintf("\texec.start += \"route add default %s\";\n", ipv4Gw))
+							setV4Default = true
+						}
+						b.WriteString(fmt.Sprintf("\texec.start += \"sysrc ifconfig_%s_%db=\\\"inet %s netmask %s\\\"\";\n", ctidHash, networkId, ip, mask))
+					}
+
+					// Static IPv6
+					if n.IPv6ID != nil && *n.IPv6ID > 0 && n.IPv6GwID != nil && *n.IPv6GwID > 0 {
+						ipv6, err := s.NetworkService.GetObjectEntryByID(*n.IPv6ID)
+						if err != nil {
+							return fmt.Errorf("failed to get ipv6 address: %w", err)
+						}
+						ipv6Gw, err := s.NetworkService.GetObjectEntryByID(*n.IPv6GwID)
+						if err != nil {
+							return fmt.Errorf("failed to get ipv6 gateway: %w", err)
+						}
+
+						b.WriteString(fmt.Sprintf("\texec.start += \"ifconfig %s_%db inet6 %s\";\n", ctidHash, networkId, ipv6))
+						if !setV6Default {
+							b.WriteString(fmt.Sprintf("\texec.start += \"sysrc ipv6_defaultrouter=\\\"%s\\\"\";\n", ipv6Gw))
+							setV6Default = true
+						}
+						b.WriteString(fmt.Sprintf("\texec.start += \"sysrc ifconfig_%s_%db_ipv6=\\\"inet6 %s\\\"\";\n", ctidHash, networkId, ipv6))
+					}
+				}
+			}
+
+			newCfg, err = s.AppendToConfig(ctId, cfg, b.String())
+			if err != nil {
+				return err
+			}
 		} else {
 			toAppend := "\tip4=disable;\n\tip6=disable;\n"
 			newCfg, err = s.AppendToConfig(ctId, cfg, toAppend)

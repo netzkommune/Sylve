@@ -553,9 +553,15 @@ func (s *Service) CreateJail(data jailServiceInterfaces.CreateJailRequest) error
 		return fmt.Errorf("failed_to_find_base: %w", err)
 	}
 
-	_, err = s.ExtractBase(mountPoint, baseTxz)
-	if err != nil {
-		return fmt.Errorf("failed_to_extract_base: %w", err)
+	isDir, _ := utils.IsDir(baseTxz)
+	if isDir {
+		if err := utils.CopyDirContents(baseTxz, mountPoint); err != nil {
+			return fmt.Errorf("failed_to_copy_base: %w", err)
+		}
+	} else {
+		if _, err = s.ExtractBase(mountPoint, baseTxz); err != nil {
+			return fmt.Errorf("failed_to_extract_base: %w", err)
+		}
 	}
 
 	if err := utils.CopyFile("/etc/resolv.conf", filepath.Join(mountPoint, "etc", "resolv.conf")); err != nil {

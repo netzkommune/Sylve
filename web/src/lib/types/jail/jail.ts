@@ -36,13 +36,16 @@ export const SimpleJailSchema = z.object({
 });
 
 export const NetworkSchema = z.object({
+	id: z.number().int(),
 	switchId: z.number().int(),
-	macId: z.number().int().optional(),
-	ipv4Id: z.number().int().optional(),
-	ipv4GwId: z.number().int().optional(),
-	ipv6Id: z.number().int().optional(),
-	ipv6GwId: z.number().int().optional(),
-	ctId: z.number().int()
+	macId: z.number().int().nullable(),
+	ipv4Id: z.number().int().nullable(),
+	ipv4GwId: z.number().int().nullable(),
+	ipv6Id: z.number().int().nullable(),
+	ipv6GwId: z.number().int().nullable(),
+	ctId: z.number().int(),
+	dhcp: z.boolean().nullable().default(false),
+	slaac: z.boolean().nullable().default(false)
 });
 
 export const JailSchema = SimpleJailSchema.extend({

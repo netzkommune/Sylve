@@ -14,6 +14,18 @@ type JailInheritNetworkRequest struct {
 	IPv6 *bool `json:"ipv6"`
 }
 
+type AddNetworkRequest struct {
+	CTID     uint  `json:"ctId" binding:"required"`
+	SwitchID uint  `json:"switchId" binding:"required"`
+	MacID    uint  `json:"macId" binding:"required"`
+	IP4      *uint `json:"ip4"`
+	IP4GW    *uint `json:"ip4gw"`
+	IP6      *uint `json:"ip6"`
+	IP6GW    *uint `json:"ip6gw"`
+	DHCP     *bool `json:"dhcp"`
+	SLAAC    *bool `json:"slaac"`
+}
+
 // @Summary Update Jail to Inherit Hosts Network
 // @Description Update the network settings of a jail to inherit from the host
 // @Tags Jail
@@ -78,20 +90,6 @@ func InheritJailNetwork(jailService *jail.Service) gin.HandlerFunc {
 	}
 }
 
-/*
-func (s *Service) DisinheritNetwork(ctId uint) error {
-	var jail jailModels.Jail
-
-	if err := s.DB.Preload("Networks").First(&jail, ctId).Error; err != nil {
-		return err
-	}
-
-	jail.InheritIPv4 = false
-	jail.InheritIPv6 = false
-
-	return s.SyncNetwork(ctId, jail)
-}
-*/
 // @Summary Update Jail to Disinherit Hosts Network
 // @Description Update the network settings of a jail to disinherit from the host
 // @Tags Jail
@@ -140,6 +138,148 @@ func DisinheritJailNetwork(jailService *jail.Service) gin.HandlerFunc {
 		c.JSON(200, internal.APIResponse[any]{
 			Status:  "success",
 			Message: "jail_network_disinherited",
+			Data:    nil,
+			Error:   "",
+		})
+	}
+}
+
+// @Summary Add Network Switch to Jail
+// @Description Add a network switch to a jail
+// @Tags Jail
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body jailServiceInterfaces.AddNetworkRequest true "Add Network Request"
+// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Failure 400 {object} internal.APIResponse[any] "Bad Request"
+// @Router /jail/network [post]
+func AddNetwork(jailService *jail.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var req AddNetworkRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(400, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request_data",
+				Data:    nil,
+				Error:   "Invalid request data: " + err.Error(),
+			})
+			return
+		}
+
+		ipv4 := uint(0)
+		ipv4gw := uint(0)
+		ipv6 := uint(0)
+		ipv6gw := uint(0)
+		dhcp := false
+		slaac := false
+
+		if req.IP4 != nil {
+			ipv4 = *req.IP4
+		}
+
+		if req.IP4GW != nil {
+			ipv4gw = *req.IP4GW
+		}
+
+		if req.IP6 != nil {
+			ipv6 = *req.IP6
+		}
+
+		if req.IP6GW != nil {
+			ipv6gw = *req.IP6GW
+		}
+
+		if req.DHCP != nil {
+			dhcp = *req.DHCP
+		}
+
+		if req.SLAAC != nil {
+			slaac = *req.SLAAC
+		}
+
+		err := jailService.AddNetwork(req.CTID, req.SwitchID, req.MacID, ipv4, ipv4gw, ipv6, ipv6gw, dhcp, slaac)
+		if err != nil {
+			c.JSON(500, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "failed_to_add_network",
+				Data:    nil,
+				Error:   "failed_to_add_network: " + err.Error(),
+			})
+			return
+		}
+
+		c.JSON(200, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "network_added_to_jail",
+			Data:    nil,
+			Error:   "",
+		})
+	}
+}
+
+// @Summary Delete Network Switch from Jail
+// @Description Delete a network switch from a jail
+// @Tags Jail
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param ctId path uint true "Container ID"
+// @Param networkId path uint true "Network ID"
+// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Failure 400 {object} internal.APIResponse[any] "Bad Request"
+// @Router /jail/network/{ctId}/{networkId} [delete]
+func DeleteNetwork(jailService *jail.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctId := c.Param("ctId")
+		networkId := c.Param("networkId")
+
+		if ctId == "" || networkId == "" {
+			c.JSON(400, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request",
+				Data:    nil,
+				Error:   "CT ID and Network ID are required",
+			})
+			return
+		}
+
+		ctIdUint, err := strconv.ParseUint(ctId, 10, 32)
+		if err != nil {
+			c.JSON(400, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_ct_id",
+				Data:    nil,
+				Error:   "Invalid CT ID: " + err.Error(),
+			})
+			return
+		}
+
+		networkIdUint, err := strconv.ParseUint(networkId, 10, 32)
+		if err != nil {
+			c.JSON(400, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_network_id",
+				Data:    nil,
+				Error:   "Invalid Network ID: " + err.Error(),
+			})
+			return
+		}
+
+		err = jailService.DeleteNetwork(uint(ctIdUint), uint(networkIdUint))
+		if err != nil {
+			c.JSON(500, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "failed_to_delete_network",
+				Data:    nil,
+				Error:   "failed_to_delete_network: " + err.Error(),
+			})
+			return
+		}
+
+		c.JSON(200, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "network_deleted_from_jail",
 			Data:    nil,
 			Error:   "",
 		})

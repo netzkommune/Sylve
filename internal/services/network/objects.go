@@ -3,6 +3,7 @@ package network
 import (
 	"fmt"
 	"strconv"
+	jailModels "sylve/internal/db/models/jail"
 	networkModels "sylve/internal/db/models/network"
 	vmModels "sylve/internal/db/models/vm"
 	utils "sylve/pkg/utils"
@@ -134,6 +135,7 @@ func (s *Service) IsObjectUsed(id uint) (bool, error) {
 
 	if object.Type == "Host" {
 		var switches []networkModels.StandardSwitch
+		var jailNetworks []jailModels.Network
 
 		if err := s.DB.
 			Preload("AddressObj.Entries").
@@ -154,6 +156,32 @@ func (s *Service) IsObjectUsed(id uint) (bool, error) {
 				}
 			}
 		}
+
+		for _, jn := range jailNetworks {
+			if jn.IPv4ID != nil {
+				if *jn.IPv4ID == id {
+					return true, nil
+				}
+			}
+
+			if jn.IPv4GwID != nil {
+				if *jn.IPv4GwID == id {
+					return true, nil
+				}
+			}
+
+			if jn.IPv6ID != nil {
+				if *jn.IPv6ID == id {
+					return true, nil
+				}
+			}
+
+			if jn.IPv4GwID != nil {
+				if *jn.IPv4GwID == id {
+					return true, nil
+				}
+			}
+		}
 	}
 
 	if object.Type == "Mac" {
@@ -166,6 +194,14 @@ func (s *Service) IsObjectUsed(id uint) (bool, error) {
 			return true, nil
 		}
 
+		var jailNetworks []jailModels.Network
+		if err := s.DB.Where("mac_id = ?", id).Find(&jailNetworks).Error; err != nil {
+			return true, fmt.Errorf("failed to find jail networks using object %d: %w", id, err)
+		}
+
+		if len(jailNetworks) > 0 {
+			return true, nil
+		}
 	}
 
 	return false, nil

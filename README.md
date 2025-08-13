@@ -51,7 +51,7 @@ mountd_enable="YES"
 samba_server_enable="YES"
 ```
 
-If you plan to use jails, enabling `rctl` is required. Do this by adding the following line to `/boot/loader.conf`:
+Enabling `rctl` is required. Do this by adding the following line to `/boot/loader.conf`:
 
 ``` sh
 kern.racct.enable=1

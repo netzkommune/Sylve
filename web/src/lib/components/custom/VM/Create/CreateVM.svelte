@@ -168,9 +168,9 @@
 		{ value: 'advanced', label: 'Advanced' }
 	];
 
-	let modal: CreateData = $derived({
+	let options = {
 		name: '',
-		id: getNextId(vms, jails),
+		id: 0,
 		description: '',
 		storage: {
 			type: 'zvol',
@@ -201,6 +201,13 @@
 			bootOrder: 0,
 			tpmEmulation: false
 		}
+	};
+
+	let nextId = $derived(getNextId(vms, jails));
+	let modal: CreateData = $state(options);
+
+	$effect(() => {
+		modal.id = nextId;
 	});
 
 	async function create() {
@@ -224,40 +231,7 @@
 	}
 
 	function resetModal() {
-		modal = {
-			name: '',
-			id: getNextId(vms, jails),
-			description: '',
-			storage: {
-				type: 'zvol',
-				guid: '',
-				size: 0,
-				emulation: 'ahci-hd',
-				iso: ''
-			},
-			network: {
-				switch: 0,
-				mac: '0',
-				emulation: 'e1000'
-			},
-			hardware: {
-				sockets: 1,
-				cores: 1,
-				threads: 1,
-				memory: 0,
-				passthroughIds: [] as number[],
-				pinnedCPUs: [] as number[]
-			},
-			advanced: {
-				vncPort: 0,
-				vncPassword: generatePassword(),
-				vncWait: false,
-				vncResolution: '1024x768',
-				startAtBoot: false,
-				bootOrder: 0,
-				tpmEmulation: false
-			}
-		};
+		modal = options;
 	}
 </script>
 

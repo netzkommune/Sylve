@@ -51,6 +51,12 @@ mountd_enable="YES"
 samba_server_enable="YES"
 ```
 
+Enabling `rctl` is required. Do this by adding the following line to `/boot/loader.conf`:
+
+``` sh
+kern.racct.enable=1
+```
+
 Please reboot your system after adding those entries to ensure that the services are started correctly and the kernel modules are loaded.
 
 # Installation

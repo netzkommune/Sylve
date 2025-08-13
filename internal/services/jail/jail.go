@@ -425,19 +425,22 @@ func (s *Service) CreateJailConfig(data jailServiceInterfaces.CreateJailRequest,
 		return allCores[i].Count < allCores[j].Count
 	})
 
-	selectedCores := []int{}
-	for i := 0; i < cpuCores && i < len(allCores); i++ {
-		selectedCores = append(selectedCores, allCores[i].Core)
+	if cpuCores > 0 && len(allCores) > 0 {
+		selectedCores := []int{}
+		for i := 0; i < cpuCores && i < len(allCores); i++ {
+			selectedCores = append(selectedCores, allCores[i].Core)
+		}
+		if len(selectedCores) > 0 {
+			coreListStr := strings.Trim(strings.Replace(fmt.Sprint(selectedCores), " ", ",", -1), "[]")
+			config += fmt.Sprintf("\texec.created += \"cpuset -l %s -j %s\";\n", coreListStr, ctidHash)
+		}
 	}
-
-	coreListStr := strings.Trim(strings.Replace(fmt.Sprint(selectedCores), " ", ",", -1), "[]")
 
 	if memory > 0 {
 		memoryMB := memory / (1024 * 1024)
 		config += fmt.Sprintf("\texec.poststart += \"rctl -a jail:%s:memoryuse:deny=%dM\";\n", ctidHash, memoryMB)
 	}
 
-	config += fmt.Sprintf("\texec.created += \"cpuset -l %s -j %s\";\n", coreListStr, ctidHash)
 	config += fmt.Sprintf("\texec.stop += \"/bin/sh /etc/rc.shutdown\";\n\n")
 
 	if cpuCores > 0 || memory > 0 {
@@ -462,10 +465,17 @@ func (s *Service) CreateJail(data jailServiceInterfaces.CreateJailRequest) error
 	jail.Description = data.Description
 	jail.Dataset = data.Dataset
 	jail.Base = data.Base
-	jail.StartAtBoot = *data.StartAtBoot
+	jail.StartAtBoot = data.StartAtBoot
 	jail.StartOrder = data.StartOrder
-	jail.Cores = *data.Cores
-	jail.Memory = *data.Memory
+	jail.ResourceLimits = data.ResourceLimits
+
+	if *jail.ResourceLimits {
+		jail.Cores = *data.Cores
+		jail.Memory = *data.Memory
+	} else {
+		jail.Cores = 0
+		jail.Memory = 0
+	}
 
 	if data.SwitchId != nil && *data.SwitchId > 0 {
 		var mac uint

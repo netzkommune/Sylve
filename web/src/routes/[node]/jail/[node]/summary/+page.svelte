@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import { getCPUInfo } from '$lib/api/info/cpu';
+	import { getRAMInfo } from '$lib/api/info/ram';
 	import {
 		deleteJail,
 		getJailLogs,
@@ -19,6 +21,8 @@
 	import { Progress } from '$lib/components/ui/progress/index.js';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 	import { hostname } from '$lib/stores/basic';
+	import type { CPUInfo, CPUInfoHistorical } from '$lib/types/info/cpu';
+	import type { RAMInfo, RAMInfoHistorical } from '$lib/types/info/ram';
 	import type { Jail, JailStat, JailState } from '$lib/types/jail/jail';
 	import { sleep } from '$lib/utils';
 	import { updateCache } from '$lib/utils/http';
@@ -110,6 +114,28 @@
 			onSuccess: (data: JailStat[]) => {
 				updateCache(`jail-stats-${ctId}`, data);
 			}
+		},
+		{
+			queryKey: ['cpuInfo'],
+			queryFn: getCPUInfo,
+			refetchInterval: false,
+			keepPreviousData: true,
+			onSuccess: (data: CPUInfo | CPUInfoHistorical) => {
+				updateCache('cpuInfo', data as CPUInfo);
+			},
+			refetchOnMount: true,
+			refetchOnWindowFocus: true
+		},
+		{
+			queryKey: ['ramInfo'],
+			queryFn: getRAMInfo,
+			refetchInterval: false,
+			keepPreviousData: true,
+			onSuccess: (data: RAMInfo | RAMInfoHistorical) => {
+				updateCache('ramInfo', data);
+			},
+			refetchOnMount: true,
+			refetchOnWindowFocus: true
 		}
 	]);
 
@@ -126,7 +152,10 @@
 	let stopLogs = $derived($results[3].data);
 	let jailDesc = $state(jail.description || '');
 	let jailStats = $derived($results[4].data || []);
-
+	let cpuInfo = $derived($results[5].data as CPUInfo);
+	let ramInfo = $derived($results[6].data as RAMInfo);
+	let logicalCores = $derived(cpuInfo?.logicalCores ?? 0);
+	let totalRAM = $derived(ramInfo?.total ?? 0);
 	let cpuHistoricalData = $derived.by(() => {
 		return {
 			field: 'cpuUsage',
@@ -284,19 +313,15 @@
 								</p>
 								<p class="ml-auto">
 									{#if jState.state === 'ACTIVE'}
-										{`${Math.min((jState.pcpu * 100) / (100 * jail.cores), 100).toFixed(2)}% of ${jail.cores} Core(s)`}
+										{`${jState.pcpu.toFixed(2)}% of ${jail.cores || logicalCores} Core(s)`}
 									{:else}
-										{`0% of ${jail.cores} Core(s)`}
+										{`0% of ${jail.cores || logicalCores} Core(s)`}
 									{/if}
 								</p>
 							</div>
 
 							{#if jState.state === 'ACTIVE'}
-								<Progress
-									value={(jState.pcpu / (100 * jail.cores)) * 100}
-									max={100}
-									class="ml-auto h-2"
-								/>
+								<Progress value={jState.pcpu} max={100} class="ml-auto h-2" />
 							{:else}
 								<Progress value={0} max={100} class="ml-auto h-2" />
 							{/if}
@@ -310,16 +335,16 @@
 								</p>
 								<p class="ml-auto">
 									{#if jState.state === 'ACTIVE'}
-										{`${((jState.memory / (jail.memory || 1)) * 100).toFixed(2)}% of ${humanFormat(jail.memory || 0)}`}
+										{`${((jState.memory / (jail.memory || totalRAM)) * 100).toFixed(2)}% of ${humanFormat(jail.memory || totalRAM)}`}
 									{:else}
-										{`0% of ${humanFormat(jail.memory || 0)}`}
+										{`0% of ${humanFormat(jail.memory || totalRAM)}`}
 									{/if}
 								</p>
 							</div>
 
 							{#if jState.state === 'ACTIVE'}
 								<Progress
-									value={(jState.memory / (jail.memory || 1)) * 100}
+									value={(jState.memory / (jail.memory || totalRAM)) * 100}
 									max={100}
 									class="ml-auto h-2"
 								/>

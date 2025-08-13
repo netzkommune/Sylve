@@ -24,6 +24,7 @@ export interface CreateData {
 		cpuCores: number;
 		ram: number;
 		startAtBoot: boolean;
+		resourceLimits: boolean;
 		bootOrder: number;
 	};
 }
@@ -58,6 +59,7 @@ export const JailSchema = SimpleJailSchema.extend({
 	inheritIPv6: z.boolean(),
 	networks: z.array(NetworkSchema).optional().default([]),
 	createdAt: z.string(),
+	resourceLimits: z.boolean().optional().default(false),
 	cores: z.number().int(),
 	memory: z.number().int(),
 	updatedAt: z.string(),
@@ -68,9 +70,8 @@ export const JailSchema = SimpleJailSchema.extend({
 export const JailStateSchema = z.object({
 	ctId: z.number().int(),
 	state: z.enum(['ACTIVE', 'INACTIVE', 'UNKNOWN']),
-	pcpu: z.number().int(),
-	memory: z.number().int(),
-	wallClock: z.number().int()
+	pcpu: z.number(),
+	memory: z.number()
 });
 
 export const JailLogsSchema = z.object({
@@ -80,8 +81,8 @@ export const JailLogsSchema = z.object({
 export const JailStatSchema = z.object({
 	id: z.number().int(),
 	ctId: z.number().int(),
-	cpuUsage: z.number().int(),
-	memoryUsage: z.number().int(),
+	cpuUsage: z.number(),
+	memoryUsage: z.number(),
 	createdAt: z.string()
 });
 

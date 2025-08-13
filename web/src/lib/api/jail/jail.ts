@@ -32,6 +32,7 @@ export async function newJail(data: CreateData): Promise<APIResponse> {
 		ipv6: data.network.ipv6,
 		ipv6Gw: data.network.ipv6Gateway,
 		mac: data.network.mac,
+		resourceLimits: data.hardware.resourceLimits,
 		cores: parseInt(data.hardware.cpuCores.toString(), 10),
 		memory: parseInt(data.hardware.ram.toString(), 10),
 		startAtBoot: data.hardware.startAtBoot,
@@ -116,4 +117,12 @@ export async function addNetwork(
 
 export async function deleteNetwork(ctId: number, networkId: number): Promise<APIResponse> {
 	return await apiRequest(`/jail/network/${ctId}/${networkId}`, APIResponseSchema, 'DELETE');
+}
+
+export async function updateResourceLimits(ctId: number, enabled: boolean): Promise<APIResponse> {
+	return await apiRequest(
+		`/jail/resource-limits/${ctId}?enabled=${enabled}`,
+		APIResponseSchema,
+		'PUT'
+	);
 }

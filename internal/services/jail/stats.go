@@ -1,89 +1,122 @@
 package jail
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"math"
+	"os/exec"
 	"strconv"
 	"strings"
 	jailModels "sylve/internal/db/models/jail"
 	jailServiceInterfaces "sylve/internal/interfaces/services/jail"
 	"sylve/pkg/utils"
+
+	cpuid "github.com/klauspost/cpuid/v2"
 )
+
+func (s *Service) GetJidByCtId(ctId int) int {
+	ctidHash := utils.HashIntToNLetters(ctId, 5)
+
+	output, err := utils.RunCommand("jls", "-j", fmt.Sprintf("%s", ctidHash), "jid")
+	if err != nil {
+		return -1
+	}
+
+	jid, err := strconv.Atoi(strings.TrimSpace(output))
+	if err != nil {
+		return -1
+	}
+
+	return jid
+}
+
+func (s *Service) GetJailStats(ctId int) (jailServiceInterfaces.State, error) {
+	var jail jailModels.Jail
+	if err := s.DB.Where("ct_id = ?", ctId).First(&jail).Error; err != nil {
+		return jailServiceInterfaces.State{}, err
+	}
+
+	var state jailServiceInterfaces.State
+	state.CTID = int(ctId)
+
+	jid := s.GetJidByCtId(ctId)
+
+	if jid < 0 {
+		state.Memory = 0
+		state.PCPU = 0.0
+		state.State = "INACTIVE"
+		return state, nil
+	}
+
+	cmd := exec.Command("ps", "-axo", "jid,pcpu,rss", "--libxo", "json")
+	out, err := cmd.Output()
+	if err != nil {
+		return state, fmt.Errorf("failed to run ps: %w", err)
+	}
+
+	var psData struct {
+		ProcessInformation struct {
+			Process []struct {
+				JailID     string `json:"jail-id"`
+				PercentCPU string `json:"percent-cpu"`
+				RSS        string `json:"rss"`
+			} `json:"process"`
+		} `json:"process-information"`
+	}
+	if err := json.Unmarshal(out, &psData); err != nil {
+		return state, fmt.Errorf("failed to parse ps json: %w", err)
+	}
+
+	var totalCPU, totalRSS float64
+	for _, p := range psData.ProcessInformation.Process {
+		if p.JailID == fmt.Sprintf("%d", jid) {
+			cpuVal, _ := strconv.ParseFloat(p.PercentCPU, 64)
+			rssVal, _ := strconv.ParseFloat(p.RSS, 64)
+			totalCPU += cpuVal
+			totalRSS += rssVal
+		}
+	}
+
+	var allowedCores float64
+	if *jail.ResourceLimits {
+		if len(jail.CPUSet) > 0 {
+			allowedCores = float64(len(jail.CPUSet))
+		} else if jail.Cores > 0 {
+			allowedCores = float64(jail.Cores)
+		}
+	}
+
+	if allowedCores == 0 {
+		allowedCores = float64(cpuid.CPU.LogicalCores)
+	}
+
+	normalized := totalCPU / allowedCores
+	if normalized > 100 {
+		normalized = 100
+	}
+
+	state.PCPU = math.Round(normalized*100) / 100
+	state.Memory = int64(totalRSS * 1024)
+	state.State = "ACTIVE"
+
+	return state, nil
+}
 
 func (s *Service) GetStates() ([]jailServiceInterfaces.State, error) {
 	var states []jailServiceInterfaces.State
+	var jails []jailModels.Jail
 
-	output, err := utils.RunCommand("jls", "-v", "--libxo", "json")
-	if err != nil {
-		return states, err
+	if err := s.DB.Find(&jails).Error; err != nil {
+		return nil, fmt.Errorf("failed to load jails: %w", err)
 	}
 
-	var jlsData struct {
-		JailInformation struct {
-			Jail []struct {
-				JID   int    `json:"jid"`
-				Name  string `json:"name"`
-				State string `json:"state"`
-			} `json:"jail"`
-		} `json:"jail-information"`
-	}
-
-	if err := json.Unmarshal([]byte(output), &jlsData); err != nil {
-		return nil, fmt.Errorf("failed to parse jls JSON: %w", err)
-	}
-
-	activeMap := make(map[string]struct{})
-	for _, jail := range jlsData.JailInformation.Jail {
-		activeMap[jail.Name] = struct{}{}
-	}
-
-	var ctIDs []int
-	err = s.DB.Model(&jailModels.Jail{}).Pluck("ct_id", &ctIDs).Error
-	if err != nil {
-		return nil, err
-	}
-
-	for _, ctID := range ctIDs {
-		name := utils.HashIntToNLetters(ctID, 5)
-		state := "INACTIVE"
-		var pcpu, memory, wallclock int64
-
-		if _, ok := activeMap[name]; ok {
-			state = "ACTIVE"
-			rctlOutput, err := utils.RunCommand("rctl", "-u", fmt.Sprintf("jail:%s", name))
-			if err == nil {
-				scanner := bufio.NewScanner(strings.NewReader(rctlOutput))
-				for scanner.Scan() {
-					line := scanner.Text()
-					if strings.HasPrefix(line, "pcpu=") {
-						val := strings.TrimPrefix(line, "pcpu=")
-						if f, err := strconv.ParseFloat(val, 64); err == nil {
-							pcpu = int64(math.Round(f))
-						}
-					} else if strings.HasPrefix(line, "memoryuse=") {
-						val := strings.TrimPrefix(line, "memoryuse=")
-						if b, err := strconv.ParseInt(val, 10, 64); err == nil {
-							memory = b
-						}
-					} else if strings.HasPrefix(line, "wallclock=") {
-						val := strings.TrimPrefix(line, "wallclock=")
-						if sec, err := strconv.ParseInt(val, 10, 64); err == nil {
-							wallclock = sec
-						}
-					}
-				}
-			}
+	for _, jail := range jails {
+		gState, err := s.GetJailStats(jail.CTID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get jail stats: %w", err)
 		}
 
-		states = append(states, jailServiceInterfaces.State{
-			CTID:      ctID,
-			State:     state,
-			PCPU:      pcpu,
-			Memory:    memory,
-			WallClock: wallclock,
-		})
+		states = append(states, gState)
 	}
 
 	return states, nil
@@ -116,8 +149,10 @@ func (s *Service) StoreJailUsage() error {
 		return fmt.Errorf("failed_to_load_jails: %w", err)
 	}
 
+	jDBIDs := make([]uint, 0, len(jails))
+
 	if len(jails) == 0 {
-		return nil
+		return s.PruneOrphanedJailStats(jDBIDs)
 	}
 
 	states, err := s.GetStates()
@@ -126,7 +161,7 @@ func (s *Service) StoreJailUsage() error {
 	}
 
 	type sInfo struct {
-		CPUPercent   int64
+		CPUPercent   float64
 		MemBytesUsed int64
 		Active       bool
 	}
@@ -148,14 +183,21 @@ func (s *Service) StoreJailUsage() error {
 
 		cpuPct := live.CPUPercent
 
-		var memPct int64
+		var memPct float64
 		if j.Memory > 0 {
-			memPct = int64(math.Round((float64(live.MemBytesUsed) / float64(j.Memory)) * 100.0))
+			memPct = float64(math.Round((float64(live.MemBytesUsed) / float64(j.Memory)) * 100.0))
 			if memPct < 0 {
 				memPct = 0
 			} else if memPct > 100 {
 				memPct = 100
 			}
+		} else {
+			sysRAM, err := utils.GetSystemMemoryBytes()
+			if err != nil {
+				return fmt.Errorf("failed to get system memory: %w", err)
+			}
+
+			memPct = math.Round((float64(live.MemBytesUsed)/float64(sysRAM))*10000.0) / 100.0
 		}
 
 		stat := &jailModels.JailStats{
@@ -168,7 +210,6 @@ func (s *Service) StoreJailUsage() error {
 		}
 	}
 
-	jDBIDs := make([]uint, 0, len(jails))
 	for _, j := range jails {
 		jDBIDs = append(jDBIDs, j.ID)
 	}
@@ -193,14 +234,14 @@ func (s *Service) StoreJailUsage() error {
 		}
 	}
 
-	if err := s.pruneOrphanedJailStats(jDBIDs); err != nil {
+	if err := s.PruneOrphanedJailStats(jDBIDs); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (s *Service) pruneOrphanedJailStats(validJailDBIDs []uint) error {
+func (s *Service) PruneOrphanedJailStats(validJailDBIDs []uint) error {
 	if len(validJailDBIDs) == 0 {
 		return s.DB.Where("1 = 1").Delete(&jailModels.JailStats{}).Error
 	}

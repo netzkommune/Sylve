@@ -35,10 +35,10 @@ type Network struct {
 }
 
 type JailStats struct {
-	ID          uint  `json:"id" gorm:"primaryKey"`
-	CTID        int   `json:"ctId"`
-	CPUUsage    int64 `json:"cpuUsage"`
-	MemoryUsage int64 `json:"memoryUsage"`
+	ID          uint    `json:"id" gorm:"primaryKey"`
+	CTID        int     `json:"ctId"`
+	CPUUsage    float64 `json:"cpuUsage"`
+	MemoryUsage float64 `json:"memoryUsage"`
 
 	CreatedAt time.Time `json:"createdAt" gorm:"autoCreateTime"`
 }
@@ -50,15 +50,16 @@ type Jail struct {
 	Description string `json:"description"`
 	Dataset     string `json:"dataset"`
 	Base        string `json:"base"`
-	StartAtBoot bool   `json:"startAtBoot"`
+	StartAtBoot *bool  `json:"startAtBoot" gorm:"default:false"`
 	StartOrder  int    `json:"startOrder"`
 
 	InheritIPv4 bool `json:"inheritIPv4"`
 	InheritIPv6 bool `json:"inheritIPv6"`
 
-	Cores  int   `json:"cores"`
-	CPUSet []int `json:"cpuSet" gorm:"serializer:json;type:json"`
-	Memory int   `json:"memory"`
+	ResourceLimits *bool `json:"resourceLimits" gorm:"default:true"`
+	Cores          int   `json:"cores"`
+	CPUSet         []int `json:"cpuSet" gorm:"serializer:json;type:json"`
+	Memory         int   `json:"memory"`
 
 	Networks []Network   `json:"networks" gorm:"foreignKey:CTID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT"`
 	Stats    []JailStats `json:"-" gorm:"foreignKey:CTID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`

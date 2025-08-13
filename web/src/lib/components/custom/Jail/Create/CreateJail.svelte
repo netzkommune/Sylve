@@ -19,7 +19,6 @@
 	import { getNextId } from '$lib/utils/vm/vm';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
-	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import Basic from './Basic.svelte';
 	import Hardware from './Hardware.svelte';
@@ -138,6 +137,7 @@
 			cpuCores: 1,
 			ram: 0,
 			startAtBoot: false,
+			resourceLimits: true,
 			bootOrder: 0
 		}
 	};
@@ -158,6 +158,11 @@
 
 		data.network.switch = data.network.switch < 0 ? 0 : data.network.switch;
 
+		if (data.hardware.resourceLimits === false) {
+			data.hardware.cpuCores = 0;
+			data.hardware.ram = 0;
+		}
+
 		if (!isValidCreateData(data)) {
 			return;
 		} else {
@@ -175,10 +180,6 @@
 			toast.success(`Jail ${data.name} created`);
 		}
 	}
-
-	// onMount(() => {
-	// 	modal.id = getNextId(vms, jails);
-	// });
 </script>
 
 <Dialog.Root bind:open>
@@ -189,7 +190,7 @@
 			<Dialog.Title class="flex  justify-between gap-1 text-left">
 				<div class="flex items-center gap-2">
 					<Icon icon="hugeicons:prison" class="h-5 w-5 " />
-					Create Jail
+					<span>Create Jail</span>
 				</div>
 				<div class="flex items-center gap-0.5">
 					<Button size="sm" variant="link" class="h-4" onclick={() => resetModal()} title={'Reset'}>
@@ -255,6 +256,7 @@
 									bind:ram={modal.hardware.ram}
 									bind:startAtBoot={modal.hardware.startAtBoot}
 									bind:bootOrder={modal.hardware.bootOrder}
+									bind:resourceLimits={modal.hardware.resourceLimits}
 								/>
 							{/if}
 						</div>

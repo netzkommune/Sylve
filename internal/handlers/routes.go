@@ -270,6 +270,7 @@ func RegisterRoutes(r *gin.Engine,
 		jail.PUT("/memory", jailHandlers.UpdateJailMemory(jailService))
 		jail.PUT("/cpu", jailHandlers.UpdateJailCPU(jailService))
 		jail.GET("/stats/:ctId/:limit", jailHandlers.GetJailStats(jailService))
+		jail.PUT("/resource-limits/:ctId", jailHandlers.UpdateResourceLimits(jailService))
 
 		jail.POST("", jailHandlers.CreateJail(jailService))
 		jail.DELETE("/:ctid", jailHandlers.DeleteJail(jailService))

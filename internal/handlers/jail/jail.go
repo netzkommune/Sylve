@@ -211,3 +211,68 @@ func UpdateJailDescription(jailService *jail.Service) gin.HandlerFunc {
 		})
 	}
 }
+
+// @Summary Update Resource Limits
+// @Description Enable or disable a Jail's resource limits
+// @Tags jail
+// @Accept json
+// @Produce json
+// @Param ctId path int true "Container ID"
+// @Param enabled query bool true "Enable or Disable"
+// @Success 200 {object} internal.APIResponse[any]
+// @Failure 400 {object} internal.APIResponse[any]
+// @Failure 500 {object} internal.APIResponse[any]
+// @Router /jail/resource-limits/{ctId} [put]
+func UpdateResourceLimits(jailService *jail.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctId, err := strconv.ParseUint(c.Param("ctId"), 10, 32)
+		if err != nil {
+			c.JSON(400, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_ctid",
+				Error:   "invalid_ctid: " + err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		enabledStr := c.Query("enabled")
+		if enabledStr == "" {
+			c.JSON(400, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "missing_enabled_param",
+				Error:   "missing 'enabled' query parameter",
+				Data:    nil,
+			})
+			return
+		}
+
+		enabled, err := strconv.ParseBool(enabledStr)
+		if err != nil {
+			c.JSON(400, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_enabled_param",
+				Error:   "invalid 'enabled' value: " + err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		if err := jailService.UpdateResourceLimits(uint(ctId), enabled); err != nil {
+			c.JSON(500, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "failed_to_update_resource_limits",
+				Data:    nil,
+				Error:   "failed_to_update_resource_limits: " + err.Error(),
+			})
+			return
+		}
+
+		c.JSON(200, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "jail_resource_limits_updated",
+			Data:    nil,
+			Error:   "",
+		})
+	}
+}

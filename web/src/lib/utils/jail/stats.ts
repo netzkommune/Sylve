@@ -22,7 +22,7 @@ export function cleanStats(
 	}
 
 	const result = stats.map((stat) => {
-		const cpu = parseFloat(Math.min((stat.cpuUsage * 100) / (100 * jail.cores), 100).toFixed(2));
+		const cpu = stat.cpuUsage;
 		const memory = stat.memoryUsage;
 
 		return { cpu, memory, createdAt: stat.createdAt };

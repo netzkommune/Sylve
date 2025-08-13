@@ -20,6 +20,7 @@ import (
 	"github.com/mackerelio/go-osstat/uptime"
 )
 
+var getSysctlInt64 = sysctl.GetInt64
 var getSysctlString = sysctl.GetString
 var getHostname = os.Hostname
 var getUptime = uptime.Get
@@ -144,4 +145,15 @@ func GetSupportedCharsets() []string {
 	}
 
 	return charsets
+}
+
+func GetSystemMemoryBytes() (int64, error) {
+	const kenvKey = "hw.physmem"
+
+	memBytes, err := getSysctlInt64(kenvKey)
+	if err != nil {
+		return 0, err
+	}
+
+	return memBytes, nil
 }

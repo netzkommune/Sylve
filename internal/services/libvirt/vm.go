@@ -494,7 +494,6 @@ func (s *Service) RemoveVM(id uint) error {
 	}
 
 	for _, stat := range vm.Stats {
-		fmt.Println("Deleting VM Stat:", stat.ID)
 		if err := s.DB.Delete(&stat).Error; err != nil {
 			return fmt.Errorf("failed_to_delete_vm_stat: %w", err)
 		}

@@ -31,10 +31,11 @@ type CreateJailRequest struct {
 
 	MAC *int `json:"mac"`
 
-	Cores  *int `json:"cores"`
-	Memory *int `json:"memory"`
+	ResourceLimits *bool `json:"resourceLimits"`
+	Cores          *int  `json:"cores"`
+	Memory         *int  `json:"memory"`
 
-	StartAtBoot *bool `json:"startAtBoot" binding:"required"`
+	StartAtBoot *bool `json:"startAtBoot"`
 	StartOrder  int   `json:"startOrder"`
 }
 
@@ -46,13 +47,13 @@ type SimpleList struct {
 }
 
 type State struct {
-	CTID      int    `json:"ctId"`
-	State     string `json:"state"`
-	PCPU      int64  `json:"pcpu"`
-	Memory    int64  `json:"memory"`
-	WallClock int64  `json:"wallClock"`
+	CTID   int     `json:"ctId"`
+	State  string  `json:"state"`
+	PCPU   float64 `json:"pcpu"`
+	Memory int64   `json:"memory"`
 }
 
 type JailServiceInterface interface {
 	StoreJailUsage() error
+	PruneOrphanedJailStats([]uint) error
 }

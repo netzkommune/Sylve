@@ -114,9 +114,9 @@
 		datasets.filter((dataset) => dataset.type === 'filesystem')
 	);
 
-	let options = $derived({
+	let options = {
 		name: '',
-		id: getNextId(vms, jails),
+		id: 0,
 		description: '',
 		storage: {
 			dataset: '',
@@ -140,9 +140,14 @@
 			startAtBoot: false,
 			bootOrder: 0
 		}
-	});
+	};
 
-	let modal: CreateData = $derived(options);
+	let nextId = $derived(getNextId(vms, jails));
+	let modal: CreateData = $state(options);
+
+	$effect(() => {
+		modal.id = nextId;
+	});
 
 	function resetModal() {
 		modal = options;

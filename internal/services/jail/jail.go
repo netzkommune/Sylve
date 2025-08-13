@@ -141,8 +141,13 @@ func (s *Service) ValidateCreate(data jailServiceInterfaces.CreateJailRequest) e
 		return fmt.Errorf("dataset_mountpoint_not_found")
 	}
 
-	if emptyDir := utils.IsEmptyDir(mountPoint); !emptyDir {
-		return fmt.Errorf("dataset_mountpoint_not_empty: %w", err)
+	emptyDir, err := utils.IsEmptyDir(mountPoint)
+	if err != nil {
+		return fmt.Errorf("failed_to_check_if_empty_mountpoint: %w", err)
+	}
+
+	if !emptyDir {
+		return fmt.Errorf("dataset_mountpoint_not_empty")
 	}
 
 	if data.Base == "" {

@@ -133,26 +133,26 @@ func ReadFile(path string) ([]byte, error) {
 	return data, nil
 }
 
-func IsEmptyDir(path string) bool {
+func IsEmptyDir(path string) (bool, error) {
 	info, err := os.Stat(path)
 	if os.IsNotExist(err) {
-		return false
+		return false, fmt.Errorf("directory %q does not exist", path)
 	}
 
 	if err != nil {
-		return false
+		return false, fmt.Errorf("stat %q: %w", path, err)
 	}
 
 	if !info.IsDir() {
-		return false
+		return false, fmt.Errorf("%q is not a directory", path)
 	}
 
 	files, err := os.ReadDir(path)
 	if err != nil {
-		return false
+		return false, fmt.Errorf("failed to read directory %q: %w", path, err)
 	}
 
-	return len(files) == 0
+	return len(files) == 0, nil
 }
 
 func IsDir(path string) (bool, error) {

@@ -320,7 +320,20 @@
 			modals.add.slaac
 		);
 
-		console.log(response);
+		if (response.error) {
+			handleAPIError(response);
+			toast.error('Failed to add network', {
+				position: 'bottom-center'
+			});
+
+			return;
+		} else {
+			toast.success('Network added', {
+				position: 'bottom-center'
+			});
+		}
+
+		modals.add.open = false;
 	}
 
 	async function handleSwitchDelete() {

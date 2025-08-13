@@ -114,9 +114,9 @@
 		datasets.filter((dataset) => dataset.type === 'filesystem')
 	);
 
-	let options = {
+	let options = $derived({
 		name: '',
-		id: 0,
+		id: getNextId(vms, jails),
 		description: '',
 		storage: {
 			dataset: '',
@@ -140,9 +140,9 @@
 			startAtBoot: false,
 			bootOrder: 0
 		}
-	};
+	});
 
-	let modal: CreateData = $state(options);
+	let modal: CreateData = $derived(options);
 
 	function resetModal() {
 		modal = options;
@@ -171,9 +171,9 @@
 		}
 	}
 
-	onMount(() => {
-		modal.id = getNextId(vms, jails);
-	});
+	// onMount(() => {
+	// 	modal.id = getNextId(vms, jails);
+	// });
 </script>
 
 <Dialog.Root bind:open>

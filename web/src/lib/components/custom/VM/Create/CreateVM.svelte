@@ -168,9 +168,9 @@
 		{ value: 'advanced', label: 'Advanced' }
 	];
 
-	let modal: CreateData = $state({
+	let modal: CreateData = $derived({
 		name: '',
-		id: 0,
+		id: getNextId(vms, jails),
 		description: '',
 		storage: {
 			type: 'zvol',
@@ -259,10 +259,6 @@
 			}
 		};
 	}
-
-	onMount(() => {
-		modal.id = getNextId(vms, jails);
-	});
 </script>
 
 <Dialog.Root bind:open>

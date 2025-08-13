@@ -18,6 +18,7 @@ import (
 	"hash/fnv"
 	"math/big"
 	"net"
+	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
@@ -602,4 +603,32 @@ func SplitIPv4AndMask(cidr string) (string, string, error) {
 	maskStr := net.IP(mask).String()
 
 	return ipStr, maskStr, nil
+}
+
+func IsMagnetURI(uri string) bool {
+	if !strings.HasPrefix(uri, "magnet:?") {
+		return false
+	}
+
+	u, err := url.Parse(uri)
+	if err != nil {
+		return false
+	}
+
+	q := u.Query()
+
+	btihRegex := regexp.MustCompile(`^urn:btih:[a-zA-Z0-9]{32,40}$`)
+	if !btihRegex.MatchString(q.Get("xt")) {
+		return false
+	}
+
+	if q.Get("dn") == "" {
+		return false
+	}
+
+	if q.Get("tr") == "" {
+		return false
+	}
+
+	return true
 }

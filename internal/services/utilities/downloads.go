@@ -105,7 +105,7 @@ func (s *Service) DownloadFile(url string, optFilename string) error {
 		return nil
 	}
 
-	if valid.IsMagnetURI(url) {
+	if utils.IsMagnetURI(url) {
 		torrentOpts := torrent.AddTorrentOptions{
 			ID:                utils.GenerateDeterministicUUID(url),
 			StopAfterDownload: false,

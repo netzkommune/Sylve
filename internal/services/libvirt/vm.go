@@ -493,7 +493,7 @@ func (s *Service) CreateVM(data libvirtServiceInterfaces.CreateVMRequest) error 
 	return nil
 }
 
-func (s *Service) RemoveVM(id uint) error {
+func (s *Service) RemoveVM(id uint, cleanUpMacs bool) error {
 	var vm vmModels.VM
 	if err := s.DB.Preload("Stats").Preload("Networks").Preload("Storages").First(&vm, "id = ?", id).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -507,7 +507,13 @@ func (s *Service) RemoveVM(id uint) error {
 		return fmt.Errorf("failed_to_remove_lv_vm: %w", err)
 	}
 
+	var usedMACS []uint
+
 	for _, network := range vm.Networks {
+		if network.MacID != nil {
+			usedMACS = append(usedMACS, *network.MacID)
+		}
+
 		if err := s.DB.Delete(&network).Error; err != nil {
 			return fmt.Errorf("failed_to_delete_network: %w", err)
 		}
@@ -527,6 +533,31 @@ func (s *Service) RemoveVM(id uint) error {
 
 	if err := s.DB.Delete(&vm).Error; err != nil {
 		return fmt.Errorf("failed_to_delete_vm: %w", err)
+	}
+
+	if cleanUpMacs {
+		tx := s.DB.Begin()
+
+		if err := tx.Where("object_id IN ?", usedMACS).
+			Delete(&networkModels.ObjectEntry{}).Error; err != nil {
+			tx.Rollback()
+			return fmt.Errorf("failed_to_delete_object_entries: %w", err)
+		}
+
+		if err := tx.Where("object_id IN ?", usedMACS).
+			Delete(&networkModels.ObjectResolution{}).Error; err != nil {
+			tx.Rollback()
+			return fmt.Errorf("failed_to_delete_object_resolutions: %w", err)
+		}
+
+		if err := tx.Delete(&networkModels.Object{}, usedMACS).Error; err != nil {
+			tx.Rollback()
+			return fmt.Errorf("failed_to_delete_objects: %w", err)
+		}
+
+		if err := tx.Commit().Error; err != nil {
+			return fmt.Errorf("failed_to_commit_cleanup: %w", err)
+		}
 	}
 
 	return nil

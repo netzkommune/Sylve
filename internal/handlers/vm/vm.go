@@ -162,6 +162,7 @@ func CreateVM(libvirtService *libvirt.Service) gin.HandlerFunc {
 // @Produce json
 // @Security BearerAuth
 // @Param id path string true "Virtual Machine ID"
+// @Param deletemacs query bool true "Delete or Keep"
 // @Success 200 {object} internal.APIResponse[any] "Success"
 // @Failure 400 {object} internal.APIResponse[any] "Bad Request"
 // @Failure 404 {object} internal.APIResponse[any] "Not Found"
@@ -191,7 +192,29 @@ func RemoveVM(libvirtService *libvirt.Service) gin.HandlerFunc {
 			return
 		}
 
-		err = libvirtService.RemoveVM(uint(vmInt))
+		deleteMacsStr := c.Query("deletemacs")
+		if deleteMacsStr == "" {
+			c.JSON(400, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "missing_deletemacs_param",
+				Error:   "missing 'deletemacs' query parameter",
+				Data:    nil,
+			})
+			return
+		}
+
+		deleteMacs, err := strconv.ParseBool(deleteMacsStr)
+		if err != nil {
+			c.JSON(400, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_enabled_param",
+				Error:   "invalid 'enabled' value: " + err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		err = libvirtService.RemoveVM(uint(vmInt), deleteMacs)
 
 		if err != nil {
 			c.JSON(500, internal.APIResponse[any]{

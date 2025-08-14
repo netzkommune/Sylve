@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import AlertDialog from '$lib/components/custom/Dialog/Alert.svelte';
+	import * as AlertDialogRaw from '$lib/components/ui/alert-dialog/index.js';
+	import CustomCheckbox from '$lib/components/ui/custom-input/checkbox.svelte';
 
 	import { goto } from '$app/navigation';
 	import AreaChart from '$lib/components/custom/Charts/Area.svelte';
@@ -91,6 +93,7 @@
 
 	let modalState = $state({
 		isDeleteOpen: false,
+		deleteMACs: false,
 		title: '',
 		loading: {
 			open: false,
@@ -107,7 +110,7 @@
 		modalState.loading.description = `Please wait while VM <b>${vm.name} (${vm.vmId})</b> is being deleted`;
 
 		await sleep(1000);
-		const result = await deleteVM(vm.id);
+		const result = await deleteVM(vm.id, modalState.deleteMACs);
 		modalState.loading.open = false;
 
 		if (result.status === 'error') {
@@ -356,7 +359,7 @@
 	</div>
 </div>
 
-<AlertDialog
+<!-- <AlertDialog
 	open={modalState.isDeleteOpen}
 	names={{ parent: 'VM', element: modalState?.title || '' }}
 	actions={{
@@ -367,7 +370,33 @@
 			modalState.isDeleteOpen = false;
 		}
 	}}
-></AlertDialog>
+></AlertDialog> -->
+
+<AlertDialogRaw.Root bind:open={modalState.isDeleteOpen}>
+	<AlertDialogRaw.Content onInteractOutside={(e) => e.preventDefault()} class="p-5">
+		<AlertDialogRaw.Header>
+			<AlertDialogRaw.Title>Are you sure?</AlertDialogRaw.Title>
+			<AlertDialogRaw.Description>
+				{`This will permanently delete VM`}
+				<span class="font-semibold">{modalState?.title}.</span>
+
+				<CustomCheckbox
+					label="Delete MAC Object(s)"
+					bind:checked={modalState.deleteMACs}
+					classes="flex items-center gap-2 mt-4"
+				></CustomCheckbox>
+			</AlertDialogRaw.Description>
+		</AlertDialogRaw.Header>
+		<AlertDialogRaw.Footer>
+			<AlertDialogRaw.Cancel
+				onclick={() => {
+					modalState.isDeleteOpen = false;
+				}}>Cancel</AlertDialogRaw.Cancel
+			>
+			<AlertDialogRaw.Action onclick={handleDelete}>Continue</AlertDialogRaw.Action>
+		</AlertDialogRaw.Footer>
+	</AlertDialogRaw.Content>
+</AlertDialogRaw.Root>
 
 <LoadingDialog
 	bind:open={modalState.loading.open}

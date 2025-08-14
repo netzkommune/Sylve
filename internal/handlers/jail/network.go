@@ -17,7 +17,7 @@ type JailInheritNetworkRequest struct {
 type AddNetworkRequest struct {
 	CTID     uint  `json:"ctId" binding:"required"`
 	SwitchID uint  `json:"switchId" binding:"required"`
-	MacID    uint  `json:"macId" binding:"required"`
+	MacID    *uint `json:"macId"`
 	IP4      *uint `json:"ip4"`
 	IP4GW    *uint `json:"ip4gw"`
 	IP6      *uint `json:"ip6"`
@@ -167,6 +167,7 @@ func AddNetwork(jailService *jail.Service) gin.HandlerFunc {
 			return
 		}
 
+		macId := uint(0)
 		ipv4 := uint(0)
 		ipv4gw := uint(0)
 		ipv6 := uint(0)
@@ -198,7 +199,11 @@ func AddNetwork(jailService *jail.Service) gin.HandlerFunc {
 			slaac = *req.SLAAC
 		}
 
-		err := jailService.AddNetwork(req.CTID, req.SwitchID, req.MacID, ipv4, ipv4gw, ipv6, ipv6gw, dhcp, slaac)
+		if req.MacID != nil {
+			macId = *req.MacID
+		}
+
+		err := jailService.AddNetwork(req.CTID, req.SwitchID, macId, ipv4, ipv4gw, ipv6, ipv6gw, dhcp, slaac)
 		if err != nil {
 			c.JSON(500, internal.APIResponse[any]{
 				Status:  "error",

@@ -15,3 +15,12 @@ export function ipGatewayFormatter(
 
 	return `${found?.name || '0'} (${entry?.value || '0'}) <br> ${foundGw?.name || '0'} (${gwEntry?.value || '0'})`;
 }
+
+export function macFormtter(networkObjects: NetworkObject[], macId: number): string {
+	const found = networkObjects.find((obj) =>
+		obj.entries?.some((entry) => entry.objectId === macId)
+	);
+	const entry = found?.entries?.[0];
+
+	return `${found?.name || '0'} (${entry?.value || '0'})`;
+}

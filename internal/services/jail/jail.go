@@ -16,6 +16,7 @@ import (
 	"strings"
 	"sylve/internal/config"
 	jailModels "sylve/internal/db/models/jail"
+	networkModels "sylve/internal/db/models/network"
 	utilitiesModels "sylve/internal/db/models/utilities"
 	jailServiceInterfaces "sylve/internal/interfaces/services/jail"
 	networkServiceInterfaces "sylve/internal/interfaces/services/network"
@@ -180,18 +181,14 @@ func (s *Service) ValidateCreate(data jailServiceInterfaces.CreateJailRequest) e
 
 	if data.MAC != nil {
 		mac = uint(*data.MAC)
-		if mac == 0 && switchId != 0 {
-			return fmt.Errorf("mac_required_if_switch_id_provided")
-		} else {
-			if mac != 0 {
-				used, err := s.NetworkService.IsObjectUsed(mac)
-				if err != nil {
-					return fmt.Errorf("failed_to_check_mac_usage: %w", err)
-				}
+		if mac != 0 && switchId != 0 {
+			used, err := s.NetworkService.IsObjectUsed(mac)
+			if err != nil {
+				return fmt.Errorf("failed_to_check_mac_usage: %w", err)
+			}
 
-				if used {
-					return fmt.Errorf("mac_already_used")
-				}
+			if used {
+				return fmt.Errorf("mac_already_used")
 			}
 		}
 	}
@@ -222,7 +219,11 @@ func (s *Service) ValidateCreate(data jailServiceInterfaces.CreateJailRequest) e
 					if isUsed {
 						return fmt.Errorf("ipv4_already_used")
 					}
+				} else {
+					return fmt.Errorf("invalid_ipv4_gateway_or_address")
 				}
+			} else {
+				return fmt.Errorf("invalid_ipv4_address")
 			}
 		}
 
@@ -244,7 +245,11 @@ func (s *Service) ValidateCreate(data jailServiceInterfaces.CreateJailRequest) e
 					if isUsed {
 						return fmt.Errorf("ipv6_already_used")
 					}
+				} else {
+					return fmt.Errorf("invalid_ipv6_gateway_or_address")
 				}
+			} else {
+				return fmt.Errorf("invalid_ipv6_address")
 			}
 		}
 	}
@@ -481,6 +486,54 @@ func (s *Service) CreateJail(data jailServiceInterfaces.CreateJailRequest) error
 		var mac uint
 		if data.MAC != nil {
 			mac = uint(*data.MAC)
+		}
+
+		if mac == 0 {
+			var sw networkModels.StandardSwitch
+			if err := s.DB.First(&sw).Where("id = ?", *data.SwitchId).Error; err != nil {
+				return fmt.Errorf("failed_to_find_switch: %w", err)
+			}
+
+			base := fmt.Sprintf("%s-%s", data.Name, sw.Name)
+			name := base
+
+			for i := 0; ; i++ {
+				if i > 0 {
+					name = fmt.Sprintf("%s-%d", base, i)
+				}
+				var exists int64
+				if err := s.DB.
+					Model(&networkModels.Object{}).
+					Where("name = ?", name).
+					Limit(1).
+					Count(&exists).Error; err != nil {
+					return fmt.Errorf("failed_to_check_mac_object_exists: %w", err)
+				}
+				if exists == 0 {
+					break
+				}
+			}
+
+			macAddress := utils.GenerateRandomMAC()
+			macObj := networkModels.Object{
+				Type: "Mac",
+				Name: name,
+			}
+
+			if err := s.DB.Create(&macObj).Error; err != nil {
+				return fmt.Errorf("failed_to_create_mac_object: %w", err)
+			}
+
+			macEntry := networkModels.ObjectEntry{
+				ObjectID: macObj.ID,
+				Value:    macAddress,
+			}
+
+			if err := s.DB.Create(&macEntry).Error; err != nil {
+				return fmt.Errorf("failed_to_create_mac_entry: %w", err)
+			}
+
+			mac = macObj.ID
 		}
 
 		var ipv4Id, ipv4GwId, ipv6Id, ipv6GwId *uint

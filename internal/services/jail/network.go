@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 	jailModels "sylve/internal/db/models/jail"
+	networkModels "sylve/internal/db/models/network"
 	"sylve/pkg/utils"
 )
 
@@ -51,11 +52,6 @@ func (s *Service) AddNetwork(ctId uint,
 		return err
 	}
 
-	_, err := s.NetworkService.GetObjectEntryByID(macId)
-	if err != nil {
-		return fmt.Errorf("failed_to_get_mac_object: %w", err)
-	}
-
 	if jail.InheritIPv4 || jail.InheritIPv6 {
 		return fmt.Errorf("cannot_add_network_when_inheriting_network")
 	}
@@ -67,7 +63,6 @@ func (s *Service) AddNetwork(ctId uint,
 	}
 
 	network.SwitchID = switchId
-	network.MacID = &macId
 
 	if !dhcp {
 		if ip4 == 0 || ip4gw == 0 {
@@ -111,8 +106,66 @@ func (s *Service) AddNetwork(ctId uint,
 		network.SLAAC = true
 	}
 
+	if macId == 0 {
+		var sw networkModels.StandardSwitch
+		if err := s.DB.First(&sw, "id = ?", switchId).Error; err != nil {
+			return fmt.Errorf("failed_to_find_switch: %w", err)
+		}
+
+		macAddress := utils.GenerateRandomMAC()
+		base := fmt.Sprintf("%s-%s", jail.Name, sw.Name)
+		name := base
+
+		for i := 0; ; i++ {
+			if i > 0 {
+				name = fmt.Sprintf("%s-%d", base, i)
+			}
+
+			var exists int64
+
+			if err := s.DB.
+				Model(&networkModels.Object{}).
+				Where("name = ?", name).
+				Limit(1).
+				Count(&exists).Error; err != nil {
+				return fmt.Errorf("failed_to_check_mac_object_exists: %w", err)
+			}
+
+			if exists == 0 {
+				break
+			}
+		}
+
+		macObj := networkModels.Object{
+			Name: name,
+			Type: "Mac",
+		}
+
+		if err := s.DB.Create(&macObj).Error; err != nil {
+			return fmt.Errorf("failed_to_create_mac_object: %w", err)
+		}
+
+		macEntry := networkModels.ObjectEntry{
+			ObjectID: macObj.ID,
+			Value:    macAddress,
+		}
+
+		if err := s.DB.Create(&macEntry).Error; err != nil {
+			return fmt.Errorf("failed_to_create_mac_entry: %w", err)
+		}
+
+		network.MacID = &macObj.ID
+	} else {
+		_, err := s.NetworkService.GetObjectEntryByID(macId)
+		if err != nil {
+			return fmt.Errorf("failed_to_get_mac_object: %w", err)
+		}
+
+		network.MacID = &macId
+	}
+
 	network.CTID = ctId
-	err = s.DB.Create(&network).Error
+	err := s.DB.Create(&network).Error
 	if err != nil {
 		return fmt.Errorf("failed_to_create_network: %w", err)
 	}

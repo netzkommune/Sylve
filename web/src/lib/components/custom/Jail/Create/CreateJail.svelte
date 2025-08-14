@@ -172,12 +172,29 @@
 
 			if (response.error) {
 				handleAPIError(response);
-				toast.error('Failed to create jail');
+				let error = 'Failed to create jail';
+
+				switch (response.error) {
+					case 'failed_to_create: invalid_ipv4_gateway_or_address':
+						error = 'Invalid IPv4 gateway or address';
+						break;
+					case 'failed_to_create: invalid_ipv6_gateway_or_address':
+						error = 'Invalid IPv6 gateway or address';
+						break;
+					default:
+						error = 'Failed to create jail';
+				}
+
+				toast.error(error, {
+					position: 'bottom-center'
+				});
 				return;
 			}
 
 			open = false;
-			toast.success(`Jail ${data.name} created`);
+			toast.success(`Jail ${data.name} created`, {
+				position: 'bottom-center'
+			});
 		}
 	}
 </script>

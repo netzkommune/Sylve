@@ -21,7 +21,7 @@
 	import type { NetworkObject } from '$lib/types/network/object';
 	import type { SwitchList } from '$lib/types/network/switch';
 	import { handleAPIError, updateCache } from '$lib/utils/http';
-	import { ipGatewayFormatter } from '$lib/utils/jail/network';
+	import { ipGatewayFormatter, macFormtter } from '$lib/utils/jail/network';
 	import {
 		generateIPOptions,
 		generateMACOptions,
@@ -176,6 +176,10 @@
 				field: 'switch'
 			},
 			{
+				title: 'MAC',
+				field: 'mac'
+			},
+			{
 				title: 'IPv4',
 				field: 'ipv4',
 				formatter: 'html'
@@ -222,6 +226,7 @@
 					rows.push({
 						id: network.id,
 						switch: switches.standard?.find((sw) => sw.id === network.switchId)?.name,
+						mac: macFormtter(networkObjects, network.macId || 0),
 						ipv4,
 						ipv6
 					});

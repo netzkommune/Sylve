@@ -1,6 +1,49 @@
 basePath: /api
 definitions:
-  internal_handlers.LoginRequest:
+  internal_handlers_auth.AddUsersToGroupRequest:
+    properties:
+      group:
+        type: string
+      usernames:
+        items:
+          type: string
+        type: array
+    required:
+    - group
+    - usernames
+    type: object
+  internal_handlers_auth.CreateGroupRequest:
+    properties:
+      members:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+    required:
+    - members
+    - name
+    type: object
+  internal_handlers_auth.CreateUserRequest:
+    properties:
+      admin:
+        type: boolean
+      email:
+        type: string
+      password:
+        maxLength: 128
+        minLength: 3
+        type: string
+      username:
+        maxLength: 128
+        minLength: 3
+        type: string
+    required:
+    - admin
+    - password
+    - username
+    type: object
+  internal_handlers_auth.LoginRequest:
     properties:
       authType:
         type: string
@@ -18,7 +61,7 @@ definitions:
     - password
     - username
     type: object
-  internal_handlers.SuccessfulLogin:
+  internal_handlers_auth.SuccessfulLogin:
     properties:
       hostname:
         type: string
@@ -72,12 +115,91 @@ definitions:
       status:
         type: string
     type: object
+  internal_handlers_jail.AddNetworkRequest:
+    properties:
+      ctId:
+        type: integer
+      dhcp:
+        type: boolean
+      ip4:
+        type: integer
+      ip4gw:
+        type: integer
+      ip6:
+        type: integer
+      ip6gw:
+        type: integer
+      macId:
+        type: integer
+      slaac:
+        type: boolean
+      switchId:
+        type: integer
+    required:
+    - ctId
+    - switchId
+    type: object
+  internal_handlers_jail.JailEditDescRequest:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+    required:
+    - id
+    type: object
+  internal_handlers_jail.JailInheritNetworkRequest:
+    properties:
+      ctId:
+        type: integer
+      ipv4:
+        type: boolean
+      ipv6:
+        type: boolean
+    required:
+    - ctId
+    type: object
+  internal_handlers_jail.JailUpdateCPURequest:
+    properties:
+      cores:
+        type: integer
+      ctId:
+        type: integer
+    required:
+    - cores
+    - ctId
+    type: object
+  internal_handlers_jail.JailUpdateMemoryRequest:
+    properties:
+      ctId:
+        type: integer
+      memory:
+        type: integer
+    required:
+    - ctId
+    - memory
+    type: object
+  internal_handlers_network.CreateOrEditNetworkObjectRequest:
+    properties:
+      name:
+        type: string
+      type:
+        type: string
+      values:
+        items:
+          type: string
+        type: array
+    required:
+    - name
+    - type
+    - values
+    type: object
   internal_handlers_network.CreateStandardSwitchRequest:
     properties:
       address:
-        type: string
+        type: integer
       address6:
-        type: string
+        type: integer
       dhcp:
         type: boolean
       disableIPv6:
@@ -124,9 +246,9 @@ definitions:
   internal_handlers_network.UpdateStandardSwitchRequest:
     properties:
       address:
-        type: string
+        type: integer
       address6:
-        type: string
+        type: integer
       dhcp:
         type: boolean
       disableIPv6:
@@ -150,6 +272,80 @@ definitions:
     - ports
     - private
     type: object
+  internal_handlers_samba.CreateSambaShareRequest:
+    properties:
+      createMask:
+        type: string
+      dataset:
+        type: string
+      directoryMask:
+        type: string
+      guestOk:
+        type: boolean
+      name:
+        type: string
+      readOnly:
+        type: boolean
+      readOnlyGroups:
+        items:
+          type: string
+        type: array
+      writeableGroups:
+        items:
+          type: string
+        type: array
+    type: object
+  internal_handlers_samba.SambaConfigRequest:
+    properties:
+      bindInterfacesOnly:
+        type: boolean
+      interfaces:
+        type: string
+      serverString:
+        type: string
+      unixCharset:
+        type: string
+      workgroup:
+        type: string
+    type: object
+  internal_handlers_samba.UpdateSambaShareRequest:
+    properties:
+      createMask:
+        type: string
+      dataset:
+        type: string
+      directoryMask:
+        type: string
+      guestOk:
+        type: boolean
+      id:
+        type: integer
+      name:
+        type: string
+      readOnly:
+        type: boolean
+      readOnlyGroups:
+        items:
+          type: string
+        type: array
+      writeableGroups:
+        items:
+          type: string
+        type: array
+    type: object
+  internal_handlers_system.AddFileOrFolderRequest:
+    properties:
+      isFolder:
+        type: boolean
+      name:
+        type: string
+      path:
+        type: string
+    required:
+    - isFolder
+    - name
+    - path
+    type: object
   internal_handlers_system.AddPassthroughDeviceRequest:
     properties:
       deviceId:
@@ -160,7 +356,28 @@ definitions:
     - deviceId
     - domain
     type: object
-  internal_handlers_vm.ModifyHardwareRequest:
+  internal_handlers_system.CopyOrMoveFileOrFolderRequest:
+    properties:
+      cut:
+        type: boolean
+      id:
+        type: string
+      newPath:
+        type: string
+    required:
+    - cut
+    - id
+    - newPath
+    type: object
+  internal_handlers_system.DeleteUploadRequest:
+    properties:
+      data:
+        properties:
+          path:
+            type: string
+        type: object
+    type: object
+  internal_handlers_vm.ModifyCPURequest:
     properties:
       cpuCores:
         type: integer
@@ -172,14 +389,43 @@ definitions:
         type: integer
       cpuThreads:
         type: integer
-      ram:
-        type: integer
     required:
     - cpuCores
     - cpuPinning
     - cpuSockets
     - cpuThreads
+    type: object
+  internal_handlers_vm.ModifyPassthroughRequest:
+    properties:
+      pciDevices:
+        items:
+          type: integer
+        type: array
+    required:
+    - pciDevices
+    type: object
+  internal_handlers_vm.ModifyRAMRequest:
+    properties:
+      ram:
+        type: integer
+    required:
     - ram
+    type: object
+  internal_handlers_vm.ModifyVNCRequest:
+    properties:
+      vncPassword:
+        type: string
+      vncPort:
+        type: integer
+      vncResolution:
+        type: string
+      vncWait:
+        type: boolean
+    required:
+    - vncPassword
+    - vncPort
+    - vncResolution
+    - vncWait
     type: object
   internal_handlers_vm.VMEditDescRequest:
     properties:
@@ -296,6 +542,11 @@ definitions:
     - guid
     - uuid
     type: object
+  internal_handlers_zfs.PoolDisksUsageResponse:
+    properties:
+      usage:
+        type: number
+    type: object
   internal_handlers_zfs.PoolEditRequest:
     properties:
       name:
@@ -344,9 +595,26 @@ definitions:
       status:
         type: string
     type: object
+  map_string_string:
+    additionalProperties:
+      type: string
+    type: object
   sylve_internal.APIResponse-any:
     properties:
       data: {}
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-array_sylve_internal_db_models_Group:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models.Group'
+        type: array
       error:
         type: string
       message:
@@ -367,11 +635,24 @@ definitions:
       status:
         type: string
     type: object
-  sylve_internal.APIResponse-array_sylve_internal_db_models_info_AuditLog:
+  sylve_internal.APIResponse-array_sylve_internal_db_models_User:
     properties:
       data:
         items:
-          $ref: '#/definitions/sylve_internal_db_models_info.AuditLog'
+          $ref: '#/definitions/sylve_internal_db_models.User'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-array_sylve_internal_db_models_info_AuditRecord:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models_info.AuditRecord'
         type: array
       error:
         type: string
@@ -424,6 +705,71 @@ definitions:
       data:
         items:
           $ref: '#/definitions/sylve_internal_db_models_info.Swap'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-array_sylve_internal_db_models_jail_Jail:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models_jail.Jail'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-array_sylve_internal_db_models_jail_JailStats:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models_jail.JailStats'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-array_sylve_internal_db_models_network_Object:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models_network.Object'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-array_sylve_internal_db_models_samba_SambaSettings:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models_samba.SambaSettings'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-array_sylve_internal_db_models_samba_SambaShare:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models_samba.SambaShare'
         type: array
       error:
         type: string
@@ -497,6 +843,45 @@ definitions:
       status:
         type: string
     type: object
+  sylve_internal.APIResponse-array_sylve_internal_interfaces_services_jail_SimpleList:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_internal_interfaces_services_jail.SimpleList'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-array_sylve_internal_interfaces_services_jail_State:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_internal_interfaces_services_jail.State'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-array_sylve_internal_interfaces_services_system_FileNode:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_internal_interfaces_services_system.FileNode'
+        type: array
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
   sylve_internal.APIResponse-array_sylve_internal_interfaces_services_zfs_Dataset:
     properties:
       data:
@@ -545,6 +930,17 @@ definitions:
       status:
         type: string
     type: object
+  sylve_internal.APIResponse-internal_handlers_zfs_PoolDisksUsageResponse:
+    properties:
+      data:
+        $ref: '#/definitions/internal_handlers_zfs.PoolDisksUsageResponse'
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
   sylve_internal.APIResponse-internal_handlers_zfs_PoolStatPointResponse:
     properties:
       data:
@@ -556,10 +952,32 @@ definitions:
       status:
         type: string
     type: object
+  sylve_internal.APIResponse-map_string_string:
+    properties:
+      data:
+        $ref: '#/definitions/map_string_string'
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
   sylve_internal.APIResponse-string:
     properties:
       data:
         type: string
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  sylve_internal.APIResponse-sylve_internal_db_models_User:
+    properties:
+      data:
+        $ref: '#/definitions/sylve_internal_db_models.User'
       error:
         type: string
       message:
@@ -633,12 +1051,40 @@ definitions:
       status:
         type: string
     type: object
+  sylve_internal.APIResponse-sylve_internal_interfaces_services_samba_AuditLogsResponse:
+    properties:
+      data:
+        $ref: '#/definitions/sylve_internal_interfaces_services_samba.AuditLogsResponse'
+      error:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
   sylve_internal_db.IntervalOption:
     properties:
       label:
         type: string
       value:
         type: integer
+    type: object
+  sylve_internal_db_models.Group:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      notes:
+        type: string
+      updatedAt:
+        type: string
+      users:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models.User'
+        type: array
     type: object
   sylve_internal_db_models.PassedThroughIDs:
     properties:
@@ -651,7 +1097,51 @@ definitions:
       oldDriver:
         type: string
     type: object
-  sylve_internal_db_models_info.AuditLog:
+  sylve_internal_db_models.Token:
+    properties:
+      authType:
+        type: string
+      createdAt:
+        type: string
+      expiry:
+        type: string
+      id:
+        type: integer
+      token:
+        type: string
+      updatedAt:
+        type: string
+      user:
+        $ref: '#/definitions/sylve_internal_db_models.User'
+      userId:
+        type: integer
+    type: object
+  sylve_internal_db_models.User:
+    properties:
+      admin:
+        type: boolean
+      createdAt:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      lastLoginTime:
+        type: string
+      notes:
+        type: string
+      tokens:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models.Token'
+        type: array
+      totp:
+        type: string
+      updatedAt:
+        type: string
+      username:
+        type: string
+    type: object
+  sylve_internal_db_models_info.AuditRecord:
     properties:
       action:
         type: string
@@ -659,6 +1149,8 @@ definitions:
         type: string
       createdAt:
         type: string
+      duration:
+        $ref: '#/definitions/time.Duration'
       ended:
         type: string
       id:
@@ -674,6 +1166,8 @@ definitions:
       user:
         type: string
       userId:
+        type: integer
+      version:
         type: integer
     type: object
   sylve_internal_db_models_info.CPU:
@@ -725,6 +1219,103 @@ definitions:
       usage:
         type: number
     type: object
+  sylve_internal_db_models_jail.Jail:
+    properties:
+      base:
+        type: string
+      cores:
+        type: integer
+      cpuSet:
+        items:
+          type: integer
+        type: array
+      createdAt:
+        type: string
+      ctId:
+        type: integer
+      dataset:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      inheritIPv4:
+        type: boolean
+      inheritIPv6:
+        type: boolean
+      memory:
+        type: integer
+      name:
+        type: string
+      networks:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models_jail.Network'
+        type: array
+      resourceLimits:
+        type: boolean
+      startAtBoot:
+        type: boolean
+      startLogs:
+        type: string
+      startOrder:
+        type: integer
+      startedAt:
+        type: string
+      stopLogs:
+        type: string
+      stoppedAt:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  sylve_internal_db_models_jail.JailStats:
+    properties:
+      cpuUsage:
+        type: number
+      createdAt:
+        type: string
+      ctId:
+        type: integer
+      id:
+        type: integer
+      memoryUsage:
+        type: number
+    type: object
+  sylve_internal_db_models_jail.Network:
+    properties:
+      ctId:
+        type: integer
+      dhcp:
+        type: boolean
+      id:
+        type: integer
+      ipv4GwId:
+        type: integer
+      ipv4GwObj:
+        $ref: '#/definitions/sylve_internal_db_models_network.Object'
+      ipv4Id:
+        type: integer
+      ipv4Obj:
+        $ref: '#/definitions/sylve_internal_db_models_network.Object'
+      ipv6GwId:
+        type: integer
+      ipv6GwObj:
+        $ref: '#/definitions/sylve_internal_db_models_network.Object'
+      ipv6Id:
+        type: integer
+      ipv6Obj:
+        $ref: '#/definitions/sylve_internal_db_models_network.Object'
+      macId:
+        type: integer
+      macObj:
+        $ref: '#/definitions/sylve_internal_db_models_network.Object'
+      slaac:
+        type: boolean
+      switch:
+        $ref: '#/definitions/sylve_internal_db_models_network.StandardSwitch'
+      switchId:
+        type: integer
+    type: object
   sylve_internal_db_models_network.NetworkPort:
     properties:
       id:
@@ -736,12 +1327,74 @@ definitions:
       switchId:
         type: integer
     type: object
+  sylve_internal_db_models_network.Object:
+    properties:
+      createdAt:
+        type: string
+      description:
+        type: string
+      entries:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models_network.ObjectEntry'
+        type: array
+      id:
+        type: integer
+      isUsed:
+        type: boolean
+      name:
+        type: string
+      resolutions:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models_network.ObjectResolution'
+        type: array
+      type:
+        description: '"Host", "Mac", "Network", "Port", "Country", "List"'
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  sylve_internal_db_models_network.ObjectEntry:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      objectId:
+        type: integer
+      updatedAt:
+        type: string
+      value:
+        description: IP, CIDR, port, country code, FQDN, etc.
+        type: string
+    type: object
+  sylve_internal_db_models_network.ObjectResolution:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      objectId:
+        type: integer
+      resolvedIp:
+        description: actual IP resolved only in the case of FQDN
+        type: string
+      updatedAt:
+        type: string
+    type: object
   sylve_internal_db_models_network.StandardSwitch:
     properties:
       address:
         type: string
       address6:
         type: string
+      address6Id:
+        type: integer
+      address6Obj:
+        $ref: '#/definitions/sylve_internal_db_models_network.Object'
+      addressId:
+        type: integer
+      addressObj:
+        $ref: '#/definitions/sylve_internal_db_models_network.Object'
       bridgeName:
         type: string
       createdAt:
@@ -768,6 +1421,73 @@ definitions:
         type: string
       vlan:
         type: integer
+    type: object
+  sylve_internal_db_models_samba.SambaAuditLog:
+    properties:
+      action:
+        type: string
+      createdAt:
+        type: string
+      folder:
+        type: string
+      id:
+        type: integer
+      ip:
+        type: string
+      path:
+        type: string
+      result:
+        type: string
+      share:
+        type: string
+      target:
+        type: string
+      user:
+        type: string
+    type: object
+  sylve_internal_db_models_samba.SambaSettings:
+    properties:
+      bindInterfacesOnly:
+        type: boolean
+      id:
+        type: integer
+      interfaces:
+        type: string
+      serverString:
+        type: string
+      unixCharset:
+        type: string
+      workgroup:
+        type: string
+    type: object
+  sylve_internal_db_models_samba.SambaShare:
+    properties:
+      createMask:
+        type: string
+      createdAt:
+        type: string
+      dataset:
+        type: string
+      directoryMask:
+        type: string
+      guestOk:
+        type: boolean
+      id:
+        type: integer
+      name:
+        type: string
+      readOnly:
+        type: boolean
+      readOnlyGroups:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models.Group'
+        type: array
+      updatedAt:
+        type: string
+      writeableGroups:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models.Group'
+        type: array
     type: object
   sylve_internal_db_models_utilities.DownloadedFile:
     properties:
@@ -817,6 +1537,10 @@ definitions:
         type: integer
       mac:
         type: string
+      macId:
+        type: integer
+      macObj:
+        $ref: '#/definitions/sylve_internal_db_models_network.Object'
       switch:
         $ref: '#/definitions/sylve_internal_db_models_network.StandardSwitch'
       switchId:
@@ -878,6 +1602,8 @@ definitions:
       startOrder:
         type: integer
       startedAt:
+        type: string
+      state:
         type: string
       stoppedAt:
         type: string
@@ -1049,6 +1775,74 @@ definitions:
       usedPercent:
         type: number
     type: object
+  sylve_internal_interfaces_services_jail.CreateJailRequest:
+    properties:
+      base:
+        type: string
+      cores:
+        type: integer
+      ctId:
+        type: integer
+      dataset:
+        type: string
+      description:
+        type: string
+      dhcp:
+        type: boolean
+      inheritIPv4:
+        type: boolean
+      inheritIPv6:
+        type: boolean
+      ipv4:
+        type: integer
+      ipv4Gw:
+        type: integer
+      ipv6:
+        type: integer
+      ipv6Gw:
+        type: integer
+      mac:
+        type: integer
+      memory:
+        type: integer
+      name:
+        type: string
+      resourceLimits:
+        type: boolean
+      slaac:
+        type: boolean
+      startAtBoot:
+        type: boolean
+      startOrder:
+        type: integer
+      switchId:
+        type: integer
+    required:
+    - ctId
+    - name
+    type: object
+  sylve_internal_interfaces_services_jail.SimpleList:
+    properties:
+      ctId:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+      state:
+        type: string
+    type: object
+  sylve_internal_interfaces_services_jail.State:
+    properties:
+      ctId:
+        type: integer
+      memory:
+        type: integer
+      pcpu:
+        type: number
+      state:
+        type: string
+    type: object
   sylve_internal_interfaces_services_libvirt.CreateVMRequest:
     properties:
       cpuCores:
@@ -1065,8 +1859,8 @@ definitions:
         type: string
       iso:
         type: string
-      macAddress:
-        type: string
+      macId:
+        type: integer
       name:
         type: string
       pciDevices:
@@ -1128,6 +1922,28 @@ definitions:
       status:
         type: string
       uuid:
+        type: string
+    type: object
+  sylve_internal_interfaces_services_samba.AuditLogsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/sylve_internal_db_models_samba.SambaAuditLog'
+        type: array
+      last_page:
+        type: integer
+    type: object
+  sylve_internal_interfaces_services_system.FileNode:
+    properties:
+      date:
+        type: string
+      id:
+        type: string
+      lazy:
+        type: boolean
+      size:
+        type: integer
+      type:
         type: string
     type: object
   sylve_internal_interfaces_services_zfs.Dataset:
@@ -1439,6 +2255,15 @@ definitions:
       vendor:
         type: integer
     type: object
+  sylve_pkg_zfs.CacheDevice:
+    properties:
+      health:
+        type: string
+      name:
+        type: string
+      size:
+        type: integer
+    type: object
   sylve_pkg_zfs.RW:
     properties:
       read:
@@ -1506,6 +2331,10 @@ definitions:
     properties:
       allocated:
         type: integer
+      cache:
+        items:
+          $ref: '#/definitions/sylve_pkg_zfs.CacheDevice'
+        type: array
       dedupRatio:
         type: number
       fragmentation:
@@ -1591,6 +2420,26 @@ definitions:
       status:
         type: string
     type: object
+  time.Duration:
+    enum:
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
+    type: integer
+    x-enum-varnames:
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
 host: sylve.lan:8181
 info:
   contact:
@@ -1606,6 +2455,125 @@ info:
   title: Sylve API
   version: 0.0.1
 paths:
+  /auth/groups:
+    get:
+      consumes:
+      - application/json
+      description: List all groups in the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_internal_db_models_Group'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: List Groups
+      tags:
+      - Groups
+    post:
+      consumes:
+      - application/json
+      description: Create a new group with specified members
+      parameters:
+      - description: Group creation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_auth.CreateGroupRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Group created successfully
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Create Group
+      tags:
+      - Groups
+  /auth/groups/:id:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a group by ID
+      parameters:
+      - description: Group ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Group deleted successfully
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Delete Group
+      tags:
+      - Groups
+  /auth/groups/users:
+    post:
+      consumes:
+      - application/json
+      description: Add users to a specified group
+      parameters:
+      - description: Add users to group request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_auth.AddUsersToGroupRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User added to group successfully
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Add Users to Group
+      tags:
+      - Groups
   /auth/login:
     post:
       consumes:
@@ -1617,14 +2585,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers.LoginRequest'
+          $ref: '#/definitions/internal_handlers_auth.LoginRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/internal_handlers.SuccessfulLogin'
+            $ref: '#/definitions/internal_handlers_auth.SuccessfulLogin'
         "400":
           description: Bad Request
           schema:
@@ -1665,6 +2633,93 @@ paths:
       summary: Logout
       tags:
       - Authentication
+  /auth/users:
+    get:
+      consumes:
+      - application/json
+      description: List all users in the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_internal_db_models_User'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: List Users
+      tags:
+      - Users
+    post:
+      consumes:
+      - application/json
+      description: Create a new local (sylve) user in the system
+      parameters:
+      - description: Create User Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_auth.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User Created
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-sylve_internal_db_models_User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Create User
+      tags:
+      - Users
+  /auth/users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a local (sylve) user from the system
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: User Deleted
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Delete User
+      tags:
+      - Users
   /disk/create-partitions:
     post:
       consumes:
@@ -1798,18 +2853,18 @@ paths:
       summary: Wipe disk
       tags:
       - Disk
-  /hardware/:vmid:
+  /hardware/cpu/:vmid:
     put:
       consumes:
       - application/json
-      description: Modify the hardware configuration of a virtual machine
+      description: Modify the CPU configuration of a virtual machine
       parameters:
-      - description: Modify Hardware Request
+      - description: Modify CPU Request
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers_vm.ModifyHardwareRequest'
+          $ref: '#/definitions/internal_handlers_vm.ModifyCPURequest'
       produces:
       - application/json
       responses:
@@ -1827,7 +2882,103 @@ paths:
             $ref: '#/definitions/sylve_internal.APIResponse-any'
       security:
       - BearerAuth: []
-      summary: Modify Hardware of a Virtual Machine
+      summary: Modify CPU of a Virtual Machine
+      tags:
+      - VM
+  /hardware/ppt/:vmid:
+    put:
+      consumes:
+      - application/json
+      description: Modify the PCI Passthrough devices of a virtual machine
+      parameters:
+      - description: Modify PCI Devices Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_vm.ModifyPassthroughRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Modify PCI Devices of a Virtual Machine
+      tags:
+      - VM
+  /hardware/ram/:vmid:
+    put:
+      consumes:
+      - application/json
+      description: Modify the RAM configuration of a virtual machine
+      parameters:
+      - description: Modify RAM Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_vm.ModifyRAMRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Modify RAM of a Virtual Machine
+      tags:
+      - VM
+  /hardware/vnc/:vmid:
+    put:
+      consumes:
+      - application/json
+      description: Modify the VNC configuration of a virtual machine
+      parameters:
+      - description: Modify VNC Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_vm.ModifyVNCRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Modify VNC of a Virtual Machine
       tags:
       - VM
   /health/basic:
@@ -1851,25 +3002,25 @@ paths:
       summary: Basic health check
       tags:
       - Health
-  /info/audit-logs:
+  /info/audit-records:
     get:
       consumes:
       - application/json
-      description: Get the latest audit logs
+      description: Get the latest audit records
       produces:
       - application/json
       responses:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_internal_db_models_info_AuditLog'
+            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_internal_db_models_info_AuditRecord'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/sylve_internal.APIResponse-any'
       security:
       - BearerAuth: []
-      summary: Get Audit Logs
+      summary: Get Audit Records
       tags:
       - Info
   /info/basic:
@@ -2149,6 +3300,469 @@ paths:
       summary: Get Historical Swap information
       tags:
       - system
+  /jail:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all jails
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_internal_db_models_jail_Jail'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: List all Jails
+      tags:
+      - Jail
+    post:
+      consumes:
+      - application/json
+      description: Create a new jail with the provided configuration
+      parameters:
+      - description: Create Jail Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/sylve_internal_interfaces_services_jail.CreateJailRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Create a new Jail
+      tags:
+      - Jail
+  /jail/:id/logs:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve start/stop logs for a specific jail
+      parameters:
+      - description: Jail ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 'Get start logs (default: false for stop logs)'
+        in: query
+        name: start
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-string'
+        "404":
+          description: Jail Not Found
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Get Jail Logs
+      tags:
+      - Jail
+  /jail/{ctid}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a jail by its CTID
+      parameters:
+      - description: CTID of the Jail
+        in: path
+        name: ctid
+        required: true
+        type: integer
+      - description: Delete or Keep
+        in: query
+        name: deletemacs
+        required: true
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Delete a Jail
+      tags:
+      - Jail
+  /jail/action/{ctId}/{action}:
+    post:
+      consumes:
+      - application/json
+      description: Perform an action (start/stop) on a specific jail
+      parameters:
+      - description: Container ID
+        in: path
+        name: ctId
+        required: true
+        type: integer
+      - description: Action to perform (start/stop)
+        in: path
+        name: action
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-string'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Perform Jail Action
+      tags:
+      - Jail
+  /jail/cpu:
+    put:
+      consumes:
+      - application/json
+      description: Update the CPU limit of a jail by its ID
+      parameters:
+      - description: Update Jail CPU Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_jail.JailUpdateCPURequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Update Jail CPU
+      tags:
+      - Jail
+  /jail/description:
+    put:
+      consumes:
+      - application/json
+      description: Update the description of a jail by its ID
+      parameters:
+      - description: Edit Jail Description Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_jail.JailEditDescRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Edit a Jail's description
+      tags:
+      - Jail
+  /jail/memory:
+    put:
+      consumes:
+      - application/json
+      description: Update the memory limit of a jail by its ID
+      parameters:
+      - description: Update Jail Memory Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_jail.JailUpdateMemoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Update Jail Memory
+      tags:
+      - Jail
+  /jail/network:
+    post:
+      consumes:
+      - application/json
+      description: Add a network switch to a jail
+      parameters:
+      - description: Add Network Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_jail.AddNetworkRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Add Network Switch to Jail
+      tags:
+      - Jail
+  /jail/network/{ctId}/{networkId}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a network switch from a jail
+      parameters:
+      - description: Container ID
+        in: path
+        name: ctId
+        required: true
+        type: integer
+      - description: Network ID
+        in: path
+        name: networkId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Delete Network Switch from Jail
+      tags:
+      - Jail
+  /jail/network/disinherit/{ctId}:
+    delete:
+      consumes:
+      - application/json
+      description: Update the network settings of a jail to disinherit from the host
+      parameters:
+      - description: Container ID
+        in: path
+        name: ctId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Update Jail to Disinherit Hosts Network
+      tags:
+      - Jail
+  /jail/network/inheritance:
+    post:
+      consumes:
+      - application/json
+      description: Update the network settings of a jail to inherit from the host
+      parameters:
+      - description: Inherit Network Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_jail.JailInheritNetworkRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Update Jail to Inherit Hosts Network
+      tags:
+      - Jail
+  /jail/resource-limits/{ctId}:
+    put:
+      consumes:
+      - application/json
+      description: Enable or disable a Jail's resource limits
+      parameters:
+      - description: Container ID
+        in: path
+        name: ctId
+        required: true
+        type: integer
+      - description: Enable or Disable
+        in: query
+        name: enabled
+        required: true
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      summary: Update Resource Limits
+      tags:
+      - jail
+  /jail/simple:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a simple list of all jails
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_internal_interfaces_services_jail_SimpleList'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: List all Jails (Simple)
+      tags:
+      - Jail
+  /jail/state:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all jails states
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_internal_interfaces_services_jail_State'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: List all Jails States
+      tags:
+      - Jail
+  /jail/stats/:ctId/:limit:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve statistics for a specific jail
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_internal_db_models_jail_JailStats'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Get Jail Statistics
+      tags:
+      - Jail
   /network/attach:
     post:
       consumes:
@@ -2218,6 +3832,137 @@ paths:
       security:
       - BearerAuth: []
       summary: List Network Interfaces
+      tags:
+      - Network
+  /network/object:
+    get:
+      consumes:
+      - application/json
+      description: List all network objects
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_internal_db_models_network_Object'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: List Network Objects
+      tags:
+      - Network
+    post:
+      consumes:
+      - application/json
+      description: Create a new network object with specified type and values
+      parameters:
+      - description: Create Network Object Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_network.CreateOrEditNetworkObjectRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Samba share created successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Create Network Object
+      tags:
+      - Network
+  /network/object/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a network object by ID
+      parameters:
+      - description: Object ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Object deleted successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "404":
+          description: Object not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Delete Network Object
+      tags:
+      - Network
+    put:
+      consumes:
+      - application/json
+      description: Edit an existing network object by ID
+      parameters:
+      - description: Object ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Edit Network Object Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_network.CreateOrEditNetworkObjectRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Network object updated successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "404":
+          description: Object not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Edit Network Object
       tags:
       - Network
   /network/switch:
@@ -2339,6 +4084,201 @@ paths:
       summary: Delete a Standard Switch
       tags:
       - Network
+  /samba/audit-logs:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve Samba audit logs
+      parameters:
+      - description: Auth hash
+        in: query
+        name: hash
+        required: true
+        type: string
+      - description: Page number (default 1)
+        in: query
+        name: page
+        type: integer
+      - description: Page size  (default 100)
+        in: query
+        name: size
+        type: integer
+      - description: Field to sort by (e.g. id, action, share, created_at)
+        in: query
+        name: sort[0][field]
+        type: string
+      - description: Sort direction (asc or desc)
+        in: query
+        name: sort[0][dir]
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Samba audit logs
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-sylve_internal_interfaces_services_samba_AuditLogsResponse'
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get Samba Audit Logs
+      tags:
+      - Samba
+  /samba/config:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve Samba global configuration settings
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Samba global configuration
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_internal_db_models_samba_SambaSettings'
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get Samba Global Configuration
+      tags:
+      - Samba
+    post:
+      consumes:
+      - application/json
+      description: Set Samba global configuration settings
+      parameters:
+      - description: Samba Global Configuration
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_samba.SambaConfigRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Samba global configuration updated successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Set Samba Global Configuration
+      tags:
+      - Samba
+  /samba/shares:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all Samba shares
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_internal_db_models_samba_SambaShare'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      summary: Get Samba Shares
+      tags:
+      - Samba
+    post:
+      consumes:
+      - application/json
+      description: Create a new Samba share with specified settings
+      parameters:
+      - description: Create Samba Share Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_samba.CreateSambaShareRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Samba share created successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Create Samba Share
+      tags:
+      - Samba
+    put:
+      consumes:
+      - application/json
+      description: Update an existing Samba share with specified settings
+      parameters:
+      - description: Update Samba Share Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_samba.UpdateSambaShareRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Samba share updated successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Update Samba Share
+      tags:
+      - Samba
+  /samba/shares/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a Samba share by ID
+      parameters:
+      - description: Share ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Samba share deleted successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Delete Samba Share
+      tags:
+      - Samba
   /storage/attach:
     post:
       consumes:
@@ -2389,6 +4329,313 @@ paths:
       summary: Detach Storage from a Virtual Machine
       tags:
       - VM
+  /system/file-explorer:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a file or folder from the system
+      parameters:
+      - description: Path to the file or folder
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Delete File or Folder
+      tags:
+      - System
+    get:
+      consumes:
+      - application/json
+      description: Find files on the system based on a search term
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-array_sylve_internal_interfaces_services_system_FileNode'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Find Files on System
+      tags:
+      - System
+    post:
+      consumes:
+      - application/json
+      description: Add a file or folder to the system
+      parameters:
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_system.AddFileOrFolderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Add File or Folder
+      tags:
+      - System
+  /system/file-explorer/copy-or-move:
+    post:
+      consumes:
+      - application/json
+      description: Copy or move a file or folder to a new path
+      parameters:
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_system.CopyOrMoveFileOrFolderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Copy or Move File or Folder
+      tags:
+      - System
+  /system/file-explorer/copy-or-move-batch:
+    post:
+      consumes:
+      - application/json
+      description: Copy or move multiple files or folders to new paths
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Copy or Move Files or Folders
+      tags:
+      - System
+  /system/file-explorer/delete:
+    post:
+      consumes:
+      - application/json
+      description: Delete multiple files or folders from the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Delete Files or Folders
+      tags:
+      - System
+  /system/file-explorer/download:
+    get:
+      consumes:
+      - application/json
+      description: Download a file from the system
+      parameters:
+      - description: Path to the file
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: File content
+          schema:
+            type: file
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Download File
+      tags:
+      - System
+  /system/file-explorer/rename:
+    post:
+      consumes:
+      - application/json
+      description: Rename a file or folder in the system
+      parameters:
+      - description: Path to the file or folder
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Rename File or Folder
+      tags:
+      - System
+  /system/file-explorer/upload:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a previously uploaded file using JSON body metadata
+      parameters:
+      - description: Parent folder path (unused in deletion, just for consistency)
+        in: query
+        name: path
+        required: true
+        type: string
+      - description: Delete Upload Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_system.DeleteUploadRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "404":
+          description: File Not Found
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Delete Uploaded File
+      tags:
+      - System
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload a file to a user-specified path via FilePond; fails if file
+        exists
+      parameters:
+      - description: Destination folder path (e.g. /zroot/share)
+        in: query
+        name: path
+        required: true
+        type: string
+      - description: File to upload
+        in: formData
+        name: filepond
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-map_string_string'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "409":
+          description: Conflict - File Already Exists
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Upload File (FilePond)
+      tags:
+      - System
   /system/pci-devices:
     get:
       consumes:
@@ -2723,6 +4970,11 @@ paths:
         name: id
         required: true
         type: string
+      - description: Delete or Keep
+        in: query
+        name: deletemacs
+        required: true
+        type: boolean
       produces:
       - application/json
       responses:
@@ -2851,8 +5103,8 @@ paths:
       summary: Get a Virtual Machine's Domain
       tags:
       - VM
-  /vm/stats:
-    post:
+  /vm/stats/:vmId/:limit:
+    get:
       consumes:
       - application/json
       description: Retrieve statistics for a virtual machine
@@ -3536,6 +5788,27 @@ paths:
       security:
       - BearerAuth: []
       summary: Scrub Pool
+      tags:
+      - ZFS
+  /zfs/pools/disk-usage:
+    get:
+      consumes:
+      - application/json
+      description: Get the overall disk usage percentage across all ZFS pools
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Disk usage percentage
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-internal_handlers_zfs_PoolDisksUsageResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sylve_internal.APIResponse-any'
+      security:
+      - BearerAuth: []
+      summary: Get Disk Usage
       tags:
       - ZFS
 securityDefinitions:

@@ -206,7 +206,7 @@ func DeleteJail(jailService *jail.Service) gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param request body jailServiceInterfaces.JailEditDescRequest true "Edit Jail Description Request"
+// @Param request body JailEditDescRequest true "Edit Jail Description Request"
 // @Success 200 {object} internal.APIResponse[any] "Success"
 // @Failure 400 {object} internal.APIResponse[any] "Bad Request"
 // @Router /jail/description [put]

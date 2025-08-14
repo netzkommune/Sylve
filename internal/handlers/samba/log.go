@@ -28,7 +28,7 @@ import (
 // @Param size query int false "Page size  (default 100)"
 // @Param sort[0][field] query string false "Field to sort by (e.g. id, action, share, created_at)"
 // @Param sort[0][dir]   query string false "Sort direction (asc or desc)"
-// @Success 200 {object} internal.APIResponse[*sambaServiceInterfaces.AuditLogsResponse] "Samba audit logs"
+// @Success 200 {object} internal.APIResponse[sambaServiceInterfaces.AuditLogsResponse] "Samba audit logs"
 // @Failure 500 {string} string "Internal server error"
 // @Router /samba/audit-logs [get]
 func GetAuditLogs(smbService *samba.Service) gin.HandlerFunc {

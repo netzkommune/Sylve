@@ -40,7 +40,7 @@ type AddNetworkRequest struct {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param request body jailServiceInterfaces.JailInheritNetworkRequest true "Inherit Network Request"
+// @Param request body JailInheritNetworkRequest true "Inherit Network Request"
 // @Success 200 {object} internal.APIResponse[any] "Success"
 // @Failure 400 {object} internal.APIResponse[any] "Bad Request"
 // @Router /jail/network/inheritance [post]
@@ -158,7 +158,7 @@ func DisinheritJailNetwork(jailService *jail.Service) gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param request body jailServiceInterfaces.AddNetworkRequest true "Add Network Request"
+// @Param request body AddNetworkRequest true "Add Network Request"
 // @Success 200 {object} internal.APIResponse[any] "Success"
 // @Failure 400 {object} internal.APIResponse[any] "Bad Request"
 // @Router /jail/network [post]

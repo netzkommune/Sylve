@@ -31,7 +31,7 @@ type JailUpdateCPURequest struct {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param request body jailServiceInterfaces.JailUpdateMemoryRequest true "Update Jail Memory Request"
+// @Param request body JailUpdateMemoryRequest true "Update Jail Memory Request"
 // @Success 200 {object} internal.APIResponse[any] "Success"
 // @Failure 400 {object} internal.APIResponse[any] "Bad Request"
 // @Router /jail/memory [put]
@@ -74,7 +74,7 @@ func UpdateJailMemory(jailService *jail.Service) gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param request body jailServiceInterfaces.JailUpdateCPURequest true "Update Jail CPU Request"
+// @Param request body JailUpdateCPURequest true "Update Jail CPU Request"
 // @Success 200 {object} internal.APIResponse[any] "Success"
 // @Failure 400 {object} internal.APIResponse[any] "Bad Request"
 // @Router /jail/cpu [put]

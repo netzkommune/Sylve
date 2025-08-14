@@ -538,25 +538,27 @@ func (s *Service) RemoveVM(id uint, cleanUpMacs bool) error {
 	if cleanUpMacs {
 		tx := s.DB.Begin()
 
-		if err := tx.Where("object_id IN ?", usedMACS).
-			Delete(&networkModels.ObjectEntry{}).Error; err != nil {
-			tx.Rollback()
-			return fmt.Errorf("failed_to_delete_object_entries: %w", err)
-		}
+		if len(usedMACS) > 0 {
+			if err := tx.Where("object_id IN ?", usedMACS).
+				Delete(&networkModels.ObjectEntry{}).Error; err != nil {
+				tx.Rollback()
+				return fmt.Errorf("failed_to_delete_object_entries: %w", err)
+			}
 
-		if err := tx.Where("object_id IN ?", usedMACS).
-			Delete(&networkModels.ObjectResolution{}).Error; err != nil {
-			tx.Rollback()
-			return fmt.Errorf("failed_to_delete_object_resolutions: %w", err)
-		}
+			if err := tx.Where("object_id IN ?", usedMACS).
+				Delete(&networkModels.ObjectResolution{}).Error; err != nil {
+				tx.Rollback()
+				return fmt.Errorf("failed_to_delete_object_resolutions: %w", err)
+			}
 
-		if err := tx.Delete(&networkModels.Object{}, usedMACS).Error; err != nil {
-			tx.Rollback()
-			return fmt.Errorf("failed_to_delete_objects: %w", err)
-		}
+			if err := tx.Delete(&networkModels.Object{}, usedMACS).Error; err != nil {
+				tx.Rollback()
+				return fmt.Errorf("failed_to_delete_objects: %w", err)
+			}
 
-		if err := tx.Commit().Error; err != nil {
-			return fmt.Errorf("failed_to_commit_cleanup: %w", err)
+			if err := tx.Commit().Error; err != nil {
+				return fmt.Errorf("failed_to_commit_cleanup: %w", err)
+			}
 		}
 	}
 

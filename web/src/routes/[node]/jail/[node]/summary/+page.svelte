@@ -194,19 +194,13 @@
 	});
 
 	async function handleDelete() {
-		modalState.isDeleteOpen = false;
 		modalState.loading.open = true;
 		modalState.loading.title = 'Deleting Jail';
 		modalState.loading.description = `Please wait while Jail <b>${jail.name} (${jail.ctId})</b> is being deleted`;
-
-		await sleep(1000);
 		modalState.loading.open = false;
 
-		await sleep(1000);
 		const result = await deleteJail(jail.ctId);
 		modalState.loading.open = false;
-
-		console.log(result, 'result');
 
 		if (result.status === 'error') {
 			toast.error('Error deleting jail', {
@@ -219,6 +213,8 @@
 				duration: 5000,
 				position: 'bottom-center'
 			});
+
+			modalState.isDeleteOpen = false;
 		}
 	}
 
@@ -270,7 +266,9 @@
 				</Button>
 
 				<Button
-					onclick={handleDelete}
+					onclick={() => {
+						modalState.isDeleteOpen = true;
+					}}
 					size="sm"
 					class="bg-muted-foreground/40 dark:bg-muted h-6 text-black disabled:!pointer-events-auto disabled:hover:bg-neutral-600 dark:text-white"
 				>
@@ -384,7 +382,7 @@
 
 <AlertDialog
 	open={modalState.isDeleteOpen}
-	names={{ parent: 'Jail', element: modalState?.title || '' }}
+	customTitle={`This will delete Jail ${jail.name} (${jail.ctId})`}
 	actions={{
 		onConfirm: async () => {
 			handleDelete();
@@ -404,3 +402,33 @@
 		? ''
 		: startLogs?.logs || stopLogs?.logs || ''}
 />
+
+<!-- <AlertDialog
+	open={properties.resourceLimits.open}
+	customTitle={jail.resourceLimits
+		? 'This will give unlimited resources to this jail, proceed with <b>caution!</b>'
+		: 'This will enable resource limits for this jail, defaulting to <b>1 GB RAM</b> and <b>1 vCPU</b>, you can change this later'}
+	actions={{
+		onConfirm: async () => {
+			const response = await updateResourceLimits(jail.ctId, !jail.resourceLimits);
+			if (response.error) {
+				handleAPIError(response);
+				let adjective = jail.resourceLimits ? 'disable' : 'enable';
+				toast.error(`Failed to ${adjective} resource limits`, {
+					position: 'bottom-center'
+				});
+
+				return;
+			}
+
+			let adjective = jail.resourceLimits ? 'disabled' : 'enabled';
+			toast.success(`Resource limits ${adjective}`, {
+				position: 'bottom-center'
+			});
+			properties.resourceLimits.open = false;
+		},
+		onCancel: () => {
+			properties.resourceLimits.open = false;
+		}
+	}}
+></AlertDialog> -->

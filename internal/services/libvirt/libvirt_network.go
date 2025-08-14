@@ -141,11 +141,39 @@ func (s *Service) NetworkAttach(vmId int, switchId int, emulation string, macObj
 		return fmt.Errorf("network_already_attached_to_vm: %s", existingNetwork.MAC)
 	}
 
+	var sw networkModels.StandardSwitch
+	if err := s.DB.First(&sw, "id = ?", switchId).Error; err != nil {
+		return fmt.Errorf("failed_to_find_switch: %w", err)
+	}
+
 	if macObjId == 0 {
 		macAddress := utils.GenerateRandomMAC()
 
+		base := fmt.Sprintf("%s-%s", vm.Name, sw.Name)
+		name := base
+
+		for i := 0; ; i++ {
+			if i > 0 {
+				name = fmt.Sprintf("%s-%d", base, i)
+			}
+
+			var exists int64
+
+			if err := s.DB.
+				Model(&networkModels.Object{}).
+				Where("name = ?", name).
+				Limit(1).
+				Count(&exists).Error; err != nil {
+				return fmt.Errorf("failed_to_check_mac_object_exists: %w", err)
+			}
+
+			if exists == 0 {
+				break
+			}
+		}
+
 		macObj := networkModels.Object{
-			Name: fmt.Sprintf("vm-%d-mac-%s", vm.VmID, macAddress),
+			Name: name,
 			Type: "Mac",
 		}
 

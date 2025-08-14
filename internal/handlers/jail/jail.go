@@ -118,6 +118,7 @@ func CreateJail(jailService *jail.Service) gin.HandlerFunc {
 // @Produce json
 // @Security BearerAuth
 // @Param ctid path int true "CTID of the Jail"
+// @Param deletemacs query bool true "Delete or Keep"
 // @Success 200 {object} internal.APIResponse[any] "Success"
 // @Failure 400 {object} internal.APIResponse[any] "Bad Request"
 // @Failure 404 {object} internal.APIResponse[any] "Not Found"
@@ -148,7 +149,29 @@ func DeleteJail(jailService *jail.Service) gin.HandlerFunc {
 			return
 		}
 
-		err = jailService.DeleteJail(uint(ctidInt))
+		deleteMacsStr := c.Query("deletemacs")
+		if deleteMacsStr == "" {
+			c.JSON(400, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "missing_deletemacs_param",
+				Error:   "missing 'deletemacs' query parameter",
+				Data:    nil,
+			})
+			return
+		}
+
+		deleteMacs, err := strconv.ParseBool(deleteMacsStr)
+		if err != nil {
+			c.JSON(400, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_deletemacs_param",
+				Error:   "invalid 'deletemacs' value: " + err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		err = jailService.DeleteJail(uint(ctidInt), deleteMacs)
 
 		if err != nil {
 			c.JSON(500, internal.APIResponse[any]{

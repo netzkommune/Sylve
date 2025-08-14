@@ -15,8 +15,10 @@
 	import AreaChart from '$lib/components/custom/Charts/Area.svelte';
 	import AlertDialog from '$lib/components/custom/Dialog/Alert.svelte';
 	import LoadingDialog from '$lib/components/custom/Dialog/Loading.svelte';
+	import * as AlertDialogRaw from '$lib/components/ui/alert-dialog/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
+	import CustomCheckbox from '$lib/components/ui/custom-input/checkbox.svelte';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import { Progress } from '$lib/components/ui/progress/index.js';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
@@ -45,6 +47,7 @@
 
 	let modalState = $state({
 		isDeleteOpen: false,
+		deleteMacs: false,
 		title: '',
 		loading: {
 			open: false,
@@ -199,7 +202,7 @@
 		modalState.loading.description = `Please wait while Jail <b>${jail.name} (${jail.ctId})</b> is being deleted`;
 		modalState.loading.open = false;
 
-		const result = await deleteJail(jail.ctId);
+		const result = await deleteJail(jail.ctId, modalState.deleteMacs);
 		modalState.loading.open = false;
 
 		if (result.status === 'error') {
@@ -380,7 +383,7 @@
 	</div>
 </div>
 
-<AlertDialog
+<!-- <AlertDialog
 	open={modalState.isDeleteOpen}
 	customTitle={`This will delete Jail ${jail.name} (${jail.ctId})`}
 	actions={{
@@ -391,7 +394,32 @@
 			modalState.isDeleteOpen = false;
 		}
 	}}
-></AlertDialog>
+></AlertDialog> -->
+
+<AlertDialogRaw.Root bind:open={modalState.isDeleteOpen}>
+	<AlertDialogRaw.Content onInteractOutside={(e) => e.preventDefault()} class="p-5">
+		<AlertDialogRaw.Header>
+			<AlertDialogRaw.Title>Are you sure?</AlertDialogRaw.Title>
+			<AlertDialogRaw.Description>
+				{`This will permanently delete Jail`}
+				<span class="font-semibold">{jail?.name} ({jail?.ctId}).</span>
+				<CustomCheckbox
+					label="Delete MAC Object(s)"
+					bind:checked={modalState.deleteMacs}
+					classes="flex items-center gap-2 mt-4"
+				></CustomCheckbox>
+			</AlertDialogRaw.Description>
+		</AlertDialogRaw.Header>
+		<AlertDialogRaw.Footer>
+			<AlertDialogRaw.Cancel
+				onclick={() => {
+					modalState.isDeleteOpen = false;
+				}}>Cancel</AlertDialogRaw.Cancel
+			>
+			<AlertDialogRaw.Action onclick={handleDelete}>Continue</AlertDialogRaw.Action>
+		</AlertDialogRaw.Footer>
+	</AlertDialogRaw.Content>
+</AlertDialogRaw.Root>
 
 <LoadingDialog
 	bind:open={modalState.loading.open}

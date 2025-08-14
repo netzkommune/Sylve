@@ -667,7 +667,7 @@ func (s *Service) CreateJail(data jailServiceInterfaces.CreateJailRequest) error
 	return nil
 }
 
-func (s *Service) DeleteJail(ctId uint) error {
+func (s *Service) DeleteJail(ctId uint, deleteMacs bool) error {
 	if ctId == 0 {
 		return fmt.Errorf("invalid_ct_id")
 	}
@@ -766,6 +766,40 @@ func (s *Service) DeleteJail(ctId uint) error {
 
 	if newDataset == nil {
 		return fmt.Errorf("new_dataset_is_nil")
+	}
+
+	if deleteMacs {
+		var usedMACS []uint
+
+		for _, network := range jail.Networks {
+			macId := network.MacID
+			if macId != nil {
+				usedMACS = append(usedMACS, *macId)
+			}
+		}
+
+		tx := s.DB.Begin()
+
+		if err := tx.Where("object_id IN ?", usedMACS).
+			Delete(&networkModels.ObjectEntry{}).Error; err != nil {
+			tx.Rollback()
+			return fmt.Errorf("failed_to_delete_object_entries: %w", err)
+		}
+
+		if err := tx.Where("object_id IN ?", usedMACS).
+			Delete(&networkModels.ObjectResolution{}).Error; err != nil {
+			tx.Rollback()
+			return fmt.Errorf("failed_to_delete_object_resolutions: %w", err)
+		}
+
+		if err := tx.Delete(&networkModels.Object{}, usedMACS).Error; err != nil {
+			tx.Rollback()
+			return fmt.Errorf("failed_to_delete_objects: %w", err)
+		}
+
+		if err := tx.Commit().Error; err != nil {
+			return fmt.Errorf("failed_to_commit_cleanup: %w", err)
+		}
 	}
 
 	return nil

@@ -207,8 +207,8 @@ func RemoveVM(libvirtService *libvirt.Service) gin.HandlerFunc {
 		if err != nil {
 			c.JSON(400, internal.APIResponse[any]{
 				Status:  "error",
-				Message: "invalid_enabled_param",
-				Error:   "invalid 'enabled' value: " + err.Error(),
+				Message: "invalid_deletemacs_param",
+				Error:   "invalid 'deletemacs' value: " + err.Error(),
 				Data:    nil,
 			})
 			return

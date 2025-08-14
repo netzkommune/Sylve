@@ -18,6 +18,7 @@ import (
 	"strings"
 	"sylve/internal/config"
 	"sylve/internal/db/models"
+	networkModels "sylve/internal/db/models/network"
 	vmModels "sylve/internal/db/models/vm"
 	libvirtServiceInterfaces "sylve/internal/interfaces/services/libvirt"
 	systemServiceInterfaces "sylve/internal/interfaces/services/system"
@@ -178,8 +179,14 @@ func (s *Service) CreateVmXML(vm vmModels.VM, vmPath string) (string, error) {
 				emulation := network.Emulation
 
 				var mac *libvirtServiceInterfaces.MACAddress
-				if network.MAC != "" {
-					mac = &libvirtServiceInterfaces.MACAddress{Address: network.MAC}
+				if network.MacID != nil && *network.MacID != 0 {
+					var macObj networkModels.Object
+					if err := s.DB.Preload("Entries").Find(&macObj).Where("id = ?", *network.MacID).Error; err != nil {
+						return "", fmt.Errorf("failed_to_find_mac_object: %w", err)
+					}
+
+					entry := macObj.Entries[0]
+					mac = &libvirtServiceInterfaces.MACAddress{Address: entry.Value}
 				}
 
 				interfaces = append(interfaces, libvirtServiceInterfaces.Interface{

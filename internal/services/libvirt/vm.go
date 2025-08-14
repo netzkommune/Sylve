@@ -348,11 +348,36 @@ func (s *Service) CreateVM(data libvirtServiceInterfaces.CreateVMRequest) error 
 
 	var networks []vmModels.Network
 	if data.SwitchID != nil && *data.SwitchID != 0 {
+		var sw networkModels.StandardSwitch
+		if err := s.DB.First(&sw).Where("id = ?", *data.SwitchID).Error; err != nil {
+			return fmt.Errorf("failed_to_find_switch: %w", err)
+		}
+
 		if macId == 0 {
+			base := fmt.Sprintf("%s-%s", data.Name, sw.Name)
+			name := base
+
+			for i := 0; ; i++ {
+				if i > 0 {
+					name = fmt.Sprintf("%s-%d", base, i)
+				}
+				var exists int64
+				if err := s.DB.
+					Model(&networkModels.Object{}).
+					Where("name = ?", name).
+					Limit(1).
+					Count(&exists).Error; err != nil {
+					return fmt.Errorf("failed_to_check_mac_object_exists: %w", err)
+				}
+				if exists == 0 {
+					break
+				}
+			}
+
 			macAddress := utils.GenerateRandomMAC()
 			macObj := networkModels.Object{
 				Type: "Mac",
-				Name: fmt.Sprintf("vm-%d-mac-%s", data.VMID, macAddress),
+				Name: name,
 			}
 
 			if err := s.DB.Create(&macObj).Error; err != nil {
@@ -367,6 +392,7 @@ func (s *Service) CreateVM(data libvirtServiceInterfaces.CreateVMRequest) error 
 			if err := s.DB.Create(&macEntry).Error; err != nil {
 				return fmt.Errorf("failed_to_create_mac_entry: %w", err)
 			}
+
 			macId = macObj.ID
 		}
 

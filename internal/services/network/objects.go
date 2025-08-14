@@ -205,6 +205,17 @@ func (s *Service) IsObjectUsed(id uint) (bool, error) {
 		}
 	}
 
+	if object.Type == "Network" {
+		var jailNetworks []jailModels.Network
+		if err := s.DB.Where("ipv4_id = ? OR ipv4_gw_id = ? OR ipv6_id = ? OR ipv6_gw_id = ?", id, id, id, id).Find(&jailNetworks).Error; err != nil {
+			return true, fmt.Errorf("failed to find jail networks using object %d: %w", id, err)
+		}
+
+		if len(jailNetworks) > 0 {
+			return true, nil
+		}
+	}
+
 	return false, nil
 }
 
@@ -415,6 +426,41 @@ func (s *Service) EditObject(id uint, name string, oType string, values []string
 			if len(switches) > 0 && oType != "Host" {
 				return fmt.Errorf("cannot_change_object_type_host")
 			}
+
+			/* IP Used in Jail */
+			var jailNetworks []jailModels.Network
+			if err := s.DB.Where("ipv4_id = ? OR ipv4_gw_id = ? OR ipv6_id = ? OR ipv6_gw_id = ?", id, id, id, id).Find(&jailNetworks).Error; err != nil {
+				return fmt.Errorf("failed to find jail networks using object %d: %w", id, err)
+			}
+
+			if len(jailNetworks) > 0 && oType != "Host" {
+				return fmt.Errorf("cannot_change_object_type_jail")
+			}
+
+			if len(jailNetworks) > 0 && oType == "Host" {
+				err := s.AddNetworkObjectEditJailTrigger(id, values)
+				if err != nil {
+					return fmt.Errorf("failed to add network object edit jail trigger for object %d: %w", id, err)
+				}
+			}
+		}
+
+		if object.Type == "Network" {
+			var jailNetworks []jailModels.Network
+			if err := s.DB.Where("ipv4_id = ? OR ipv4_gw_id = ? OR ipv6_id = ? OR ipv6_gw_id = ?", id, id, id, id).Find(&jailNetworks).Error; err != nil {
+				return fmt.Errorf("failed to find jail networks using object %d: %w", id, err)
+			}
+
+			if len(jailNetworks) > 0 && oType != "Network" {
+				return fmt.Errorf("cannot_change_object_type_jail")
+			}
+
+			if len(jailNetworks) > 0 && oType == "Network" {
+				err := s.AddNetworkObjectEditJailTrigger(id, values)
+				if err != nil {
+					return fmt.Errorf("failed to add network object edit jail trigger for object %d: %w", id, err)
+				}
+			}
 		}
 
 		if object.Type == "Mac" {
@@ -433,6 +479,11 @@ func (s *Service) EditObject(id uint, name string, oType string, values []string
 				if err := s.DB.First(&vm, vmNetworks[0].VMID).Error; err != nil {
 					return fmt.Errorf("failed to find VM for network %d: %w", vmNetworks[0].ID, err)
 				}
+			}
+
+			/* Object was used in a VM, but now we're changing it to something else, we can't do that */
+			if len(vmNetworks) > 0 && oType != "Mac" {
+				return fmt.Errorf("cannot_change_object_type_vm")
 			}
 
 			/* MAC Used in a VM */
@@ -497,61 +548,66 @@ func (s *Service) EditObject(id uint, name string, oType string, values []string
 				}
 			}
 
-			/* Object was used in a VM, but now we're changing it to something else, we can't do that */
-			if len(vmNetworks) > 0 && oType != "Mac" {
-				return fmt.Errorf("cannot_change_object_type_vm")
+			/* Object was used in a Jail, but now we're changing it to something else, we can't do that */
+			if len(jailNetworks) > 0 && oType != "Mac" {
+				return fmt.Errorf("cannot_change_object_type_jail")
 			}
 
 			/* MAC Used in a Jail */
 			if len(jailNetworks) > 0 && oType == "Mac" {
-				if len(values) != 1 {
-					return fmt.Errorf("cannot edit object %d, it is used by %d jail networks, please ensure only one MAC is provided", id, len(jailNetworks))
-				}
-
-				if err := s.DB.Where("object_id = ?", id).Delete(&networkModels.ObjectEntry{}).Error; err != nil {
-					return fmt.Errorf("failed to delete existing entries for object %d: %w", id, err)
-				}
-
-				for _, value := range values {
-					entry := networkModels.ObjectEntry{
-						ObjectID: id,
-						Value:    value,
-					}
-
-					if err := s.DB.Create(&entry).Error; err != nil {
-						return fmt.Errorf("failed to create entry for object %d: %w", id, err)
-					}
-				}
-
-				used, jailIds, err := s.IsObjectUsedByJail(id)
-
+				err := s.AddNetworkObjectEditJailTrigger(id, values)
 				if err != nil {
-					return fmt.Errorf("failed to check if object %d is used by a jail: %w", id, err)
-				}
-
-				if used {
-					var trigger models.Triggers
-
-					slice, err := utils.UintSliceToJSON(jailIds)
-					if err != nil {
-						return fmt.Errorf("failed to convert jail IDs to JSON: %w", err)
-					}
-
-					trigger = models.Triggers{
-						Action:    "edit_network_object_used_by_jails",
-						Completed: false,
-						Data:      slice,
-					}
-
-					if err := s.DB.Create(&trigger).Error; err != nil {
-						return fmt.Errorf("failed to create trigger for object %d: %w", id, err)
-					}
+					return fmt.Errorf("failed to add network object edit jail trigger for object %d: %w", id, err)
 				}
 			}
+		}
+	}
 
-			if len(jailNetworks) > 0 && oType != "Mac" {
-				return fmt.Errorf("cannot_change_object_type_jail")
-			}
+	return nil
+}
+
+func (s *Service) AddNetworkObjectEditJailTrigger(id uint, values []string) error {
+	if len(values) != 1 {
+		return fmt.Errorf("at_most_1_entry_allowed")
+	}
+
+	if err := s.DB.Where("object_id = ?", id).Delete(&networkModels.ObjectEntry{}).Error; err != nil {
+		return fmt.Errorf("failed to delete existing entries for object %d: %w", id, err)
+	}
+
+	for _, value := range values {
+		entry := networkModels.ObjectEntry{
+			ObjectID: id,
+			Value:    value,
+		}
+
+		if err := s.DB.Create(&entry).Error; err != nil {
+			return fmt.Errorf("failed to create entry for object %d: %w", id, err)
+		}
+	}
+
+	used, jailIds, err := s.IsObjectUsedByJail(id)
+
+	if err != nil {
+		return fmt.Errorf("failed to check if object %d is used by a jail: %w", id, err)
+	}
+
+	if used {
+		var trigger models.Triggers
+
+		slice, err := utils.UintSliceToJSON(jailIds)
+		if err != nil {
+			return fmt.Errorf("failed to convert jail IDs to JSON: %w", err)
+		}
+
+		trigger = models.Triggers{
+			Action:    "edit_network_object_used_by_jails",
+			Completed: false,
+			Data:      slice,
+		}
+
+		if err := s.DB.Create(&trigger).Error; err != nil {
+			return fmt.Errorf("failed to create trigger for object %d: %w", id, err)
 		}
 	}
 

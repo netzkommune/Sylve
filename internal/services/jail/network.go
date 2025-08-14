@@ -89,22 +89,20 @@ func (s *Service) AddNetwork(ctId uint,
 	}
 
 	if !slaac {
-		if ip6 == 0 || ip6gw == 0 {
-			return fmt.Errorf("ip6_and_ip6gw_must_be_specified_when_slaac_is_disabled")
-		}
+		if ip6 != 0 && ip6gw != 0 {
+			_, err := s.NetworkService.GetObjectEntryByID(ip6)
+			if err != nil {
+				return fmt.Errorf("failed_to_get_ip6_object: %w", err)
+			}
 
-		_, err := s.NetworkService.GetObjectEntryByID(ip6)
-		if err != nil {
-			return fmt.Errorf("failed_to_get_ip6_object: %w", err)
-		}
+			_, err = s.NetworkService.GetObjectEntryByID(ip6gw)
+			if err != nil {
+				return fmt.Errorf("failed_to_get_ip6gw_object: %w", err)
+			}
 
-		_, err = s.NetworkService.GetObjectEntryByID(ip6gw)
-		if err != nil {
-			return fmt.Errorf("failed_to_get_ip6gw_object: %w", err)
+			network.IPv6ID = &ip6
+			network.IPv6GwID = &ip6gw
 		}
-
-		network.IPv6ID = &ip6
-		network.IPv6GwID = &ip6gw
 	} else {
 		network.SLAAC = true
 	}
@@ -393,6 +391,9 @@ func (s *Service) SyncNetwork(ctId uint, jail jailModels.Jail, save bool) error 
 							setV6Default = true
 						}
 						b.WriteString(fmt.Sprintf("\texec.start += \"sysrc ifconfig_%s_%db_ipv6=\\\"inet6 %s\\\"\";\n", ctidHash, networkId, ipv6))
+					} else {
+						// ip6=disable; ? in the config?
+						b.WriteString(fmt.Sprintf("\tip6=disable;\n"))
 					}
 				}
 			}

@@ -94,12 +94,12 @@
 				class="w-full flex-nowrap justify-between gap-1 overflow-hidden"
 				{disabled}
 			>
-				<div class="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
+				<div class="flex min-w-0 flex-1 flex-wrap items-center gap-1 overflow-hidden">
 					{#if selectedLabels.length > 0}
 						{#each selectedLabels as lbl, i}
 							<span
 								class={multiple
-									? 'bg-secondary/100 truncate rounded px-2 py-0.5 text-sm'
+									? 'bg-secondary/100 max-w-full truncate rounded px-2 py-0.5 text-sm'
 									: 'truncate rounded px-2 text-sm'}
 								title={lbl}
 							>

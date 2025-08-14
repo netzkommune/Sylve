@@ -41,6 +41,16 @@ func updateMemory(xml string, ram int) (string, error) {
 	return out, nil
 }
 
+func removePinArgs(cmd *etree.Element) {
+	for _, arg := range append([]*etree.Element{}, cmd.SelectElements("bhyve:arg")...) {
+		if v := arg.SelectAttrValue("value", ""); v != "" {
+			if strings.HasPrefix(v, "-p ") || strings.Contains(v, " -p ") {
+				cmd.RemoveChild(arg)
+			}
+		}
+	}
+}
+
 func updateCPU(xml string, cpuSockets, cpuCores, cpuThreads int, cpuPinning []int) (string, error) {
 	doc := etree.NewDocument()
 	if err := doc.ReadFromString(xml); err != nil {
@@ -103,12 +113,10 @@ func updateCPU(xml string, cpuSockets, cpuCores, cpuThreads int, cpuPinning []in
 			arg.CreateAttr("value", pinStr)
 		}
 	} else {
-		bhyveCommandline := doc.FindElement("//bhyve:commandline")
-		if bhyveCommandline != nil {
-			for _, arg := range bhyveCommandline.SelectElements("bhyve:arg") {
-				if arg.Text() != "" && arg.Text()[0:2] == "-p" {
-					bhyveCommandline.RemoveChild(arg)
-				}
+		if bhyveCommandline := doc.FindElement("//bhyve:commandline"); bhyveCommandline != nil {
+			removePinArgs(bhyveCommandline)
+			if len(bhyveCommandline.ChildElements()) == 0 {
+				bhyveCommandline.Parent().RemoveChild(bhyveCommandline)
 			}
 		}
 	}

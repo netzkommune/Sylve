@@ -145,36 +145,29 @@
 					const value = cell.getValue();
 
 					if (row.getData().property === 'PCI Devices') {
-						if (value && Array.isArray(value)) {
-							if (value.length === 0) {
-								return '-';
-							}
+						if (!Array.isArray(value) || value.length === 0) return '-';
 
-							const deviceIds = pptDevices.filter((device) => value.includes(device.id));
-							for (const device of deviceIds) {
-								const split = device.deviceID.split('/');
-								const bus = Number(split[0]);
-								const deviceC = Number(split[1]);
-								const functionC = Number(split[2]);
-								const valArr = [] as string[];
+						const selected = pptDevices.filter((d) => value.includes(d.id));
+						const labels: string[] = [];
 
-								for (const pciDevice of pciDevices) {
-									if (
-										pciDevice.bus === bus &&
-										pciDevice.device === deviceC &&
-										pciDevice['function'] === functionC
-									) {
-										valArr.push(`${pciDevice.names.vendor} ${pciDevice.names.device}`);
-									}
-								}
+						for (const dev of selected) {
+							const [busStr, deviceStr, functionStr] = dev.deviceID.split('/');
+							const bus = Number(busStr);
+							const deviceC = Number(deviceStr);
+							const functionC = Number(functionStr);
 
-								if (valArr.length > 0) {
-									return `<div class="flex flex-col gap-1">${valArr.map((item) => `<div>${item}</div>`).join('')}</div>`;
+							for (const pci of pciDevices) {
+								if (pci.bus === bus && pci.device === deviceC && pci['function'] === functionC) {
+									labels.push(`${pci.names.vendor} ${pci.names.device}`);
 								}
 							}
-						} else {
-							return '-';
 						}
+
+						if (labels.length === 0) return '-';
+
+						return `<div class="flex flex-col gap-1">${labels
+							.map((t) => `<div>${t}</div>`)
+							.join('')}</div>`;
 					} else {
 						return value;
 					}

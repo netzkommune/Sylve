@@ -8,6 +8,8 @@
 
 package models
 
+import "time"
+
 type DefaultRoutes struct {
 	IPv4 string `json:"ipv4"`
 	IPv6 string `json:"ipv6"`
@@ -26,4 +28,13 @@ type PassedThroughIDs struct {
 	Domain    int    `json:"domain"`
 	OldDriver string `json:"oldDriver"`
 	DeviceID  string `json:"deviceID" gorm:"uniqueIndex"`
+}
+
+type Triggers struct {
+	ID          int       `json:"id" gorm:"primaryKey"`
+	Action      string    `json:"action"`
+	Data        string    `json:"data"`
+	Completed   bool      `json:"completed"`
+	CreatedAt   time.Time `json:"createdAt" gorm:"autoCreateTime"`
+	CompletedAt time.Time `json:"completedAt" gorm:"autoUpdateTime"`
 }

@@ -56,4 +56,5 @@ type State struct {
 type JailServiceInterface interface {
 	StoreJailUsage() error
 	PruneOrphanedJailStats([]uint) error
+	WatchNetworkObjectChanges() error
 }

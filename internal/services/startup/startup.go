@@ -132,6 +132,7 @@ func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface)
 	go s.ZFS.StartSnapshotScheduler(context.Background())
 	go s.Libvirt.StoreVMUsage()
 	go s.Jail.StoreJailUsage()
+	go s.Jail.WatchNetworkObjectChanges()
 
 	err := s.Network.SyncStandardSwitches(nil, "sync")
 	if err != nil {
@@ -185,6 +186,16 @@ func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface)
 				logger.L.Error().Msgf("Failed to parse Samba audit logs: %v", err)
 			}
 			time.Sleep(5 * time.Second)
+		}
+	}()
+
+	go func() {
+		for {
+			if err := s.Jail.WatchNetworkObjectChanges(); err != nil {
+				logger.L.Error().Msgf("Failed to watch network object changes: %v", err)
+			}
+
+			time.Sleep(1 * time.Second)
 		}
 	}()
 

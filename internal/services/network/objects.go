@@ -3,6 +3,7 @@ package network
 import (
 	"fmt"
 	"strconv"
+	"sylve/internal/db/models"
 	jailModels "sylve/internal/db/models/jail"
 	networkModels "sylve/internal/db/models/network"
 	vmModels "sylve/internal/db/models/vm"
@@ -273,6 +274,25 @@ func (s *Service) DeleteObject(id uint) error {
 	return nil
 }
 
+func (s *Service) IsObjectUsedByJail(id uint) (bool, []uint, error) {
+	var jailNetworks []jailModels.Network
+	var jailIds []uint
+
+	if err := s.DB.Where("mac_id = ? OR ipv4_id = ? OR ipv6_id = ?", id, id, id).Find(&jailNetworks).Error; err != nil {
+		return false, []uint{}, fmt.Errorf("failed to find jail networks using object %d: %w", id, err)
+	}
+
+	if len(jailNetworks) > 0 {
+		for _, jn := range jailNetworks {
+			jailIds = append(jailIds, jn.CTID)
+		}
+
+		return true, jailIds, nil
+	}
+
+	return false, []uint{}, nil
+}
+
 func (s *Service) EditObject(id uint, name string, oType string, values []string) error {
 	if err := validateType(oType); err != nil {
 		return err
@@ -403,6 +423,11 @@ func (s *Service) EditObject(id uint, name string, oType string, values []string
 				return fmt.Errorf("failed to find VM networks using object %d: %w", id, err)
 			}
 
+			var jailNetworks []jailModels.Network
+			if err := s.DB.Where("mac_id = ?", id).Find(&jailNetworks).Error; err != nil {
+				return fmt.Errorf("failed to find jail networks using object %d: %w", id, err)
+			}
+
 			var vm vmModels.VM
 			if len(vmNetworks) > 0 {
 				if err := s.DB.First(&vm, vmNetworks[0].VMID).Error; err != nil {
@@ -412,8 +437,6 @@ func (s *Service) EditObject(id uint, name string, oType string, values []string
 
 			/* MAC Used in a VM */
 			if len(vmNetworks) > 0 && oType == "Mac" {
-				// emulation := vmNetworks[0].Emulation
-
 				if len(values) != 1 {
 					return fmt.Errorf("cannot edit object %d, it is used by %d VM networks, please ensure only one MAC is provided", id, len(vmNetworks))
 				}
@@ -477,6 +500,57 @@ func (s *Service) EditObject(id uint, name string, oType string, values []string
 			/* Object was used in a VM, but now we're changing it to something else, we can't do that */
 			if len(vmNetworks) > 0 && oType != "Mac" {
 				return fmt.Errorf("cannot_change_object_type_vm")
+			}
+
+			/* MAC Used in a Jail */
+			if len(jailNetworks) > 0 && oType == "Mac" {
+				if len(values) != 1 {
+					return fmt.Errorf("cannot edit object %d, it is used by %d jail networks, please ensure only one MAC is provided", id, len(jailNetworks))
+				}
+
+				if err := s.DB.Where("object_id = ?", id).Delete(&networkModels.ObjectEntry{}).Error; err != nil {
+					return fmt.Errorf("failed to delete existing entries for object %d: %w", id, err)
+				}
+
+				for _, value := range values {
+					entry := networkModels.ObjectEntry{
+						ObjectID: id,
+						Value:    value,
+					}
+
+					if err := s.DB.Create(&entry).Error; err != nil {
+						return fmt.Errorf("failed to create entry for object %d: %w", id, err)
+					}
+				}
+
+				used, jailIds, err := s.IsObjectUsedByJail(id)
+
+				if err != nil {
+					return fmt.Errorf("failed to check if object %d is used by a jail: %w", id, err)
+				}
+
+				if used {
+					var trigger models.Triggers
+
+					slice, err := utils.UintSliceToJSON(jailIds)
+					if err != nil {
+						return fmt.Errorf("failed to convert jail IDs to JSON: %w", err)
+					}
+
+					trigger = models.Triggers{
+						Action:    "edit_network_object_used_by_jails",
+						Completed: false,
+						Data:      slice,
+					}
+
+					if err := s.DB.Create(&trigger).Error; err != nil {
+						return fmt.Errorf("failed to create trigger for object %d: %w", id, err)
+					}
+				}
+			}
+
+			if len(jailNetworks) > 0 && oType != "Mac" {
+				return fmt.Errorf("cannot_change_object_type_jail")
 			}
 		}
 	}

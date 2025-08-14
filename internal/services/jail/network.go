@@ -1,12 +1,15 @@
 package jail
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
+	"sylve/internal/db/models"
 	jailModels "sylve/internal/db/models/jail"
 	networkModels "sylve/internal/db/models/network"
+	"sylve/internal/logger"
 	"sylve/pkg/utils"
 )
 
@@ -20,7 +23,7 @@ func (s *Service) DisinheritNetwork(ctId uint) error {
 	jail.InheritIPv4 = false
 	jail.InheritIPv6 = false
 
-	return s.SyncNetwork(ctId, jail)
+	return s.SyncNetwork(ctId, jail, true)
 }
 
 func (s *Service) InheritNetwork(ctId uint, ipv4 bool, ipv6 bool) error {
@@ -33,7 +36,7 @@ func (s *Service) InheritNetwork(ctId uint, ipv4 bool, ipv6 bool) error {
 	jail.InheritIPv4 = ipv4
 	jail.InheritIPv6 = ipv6
 
-	return s.SyncNetwork(ctId, jail)
+	return s.SyncNetwork(ctId, jail, true)
 }
 
 func (s *Service) AddNetwork(ctId uint,
@@ -178,7 +181,7 @@ func (s *Service) AddNetwork(ctId uint,
 		return fmt.Errorf("failed_to_sync_epairs: %w", err)
 	}
 
-	return s.SyncNetwork(ctId, jail)
+	return s.SyncNetwork(ctId, jail, true)
 }
 
 func (s *Service) DeleteNetwork(ctId uint, networkId uint) error {
@@ -208,7 +211,7 @@ func (s *Service) DeleteNetwork(ctId uint, networkId uint) error {
 		return err
 	}
 
-	return s.SyncNetwork(ctId, jail)
+	return s.SyncNetwork(ctId, jail, true)
 }
 
 func (s *Service) GetNetworkCleanedConfig(ctId uint) (string, error) {
@@ -237,10 +240,12 @@ func (s *Service) GetNetworkCleanedConfig(ctId uint) (string, error) {
 	return cfg, nil
 }
 
-func (s *Service) SyncNetwork(ctId uint, jail jailModels.Jail) error {
-	err := s.DB.Save(&jail).Error
-	if err != nil {
-		return err
+func (s *Service) SyncNetwork(ctId uint, jail jailModels.Jail, save bool) error {
+	if save {
+		err := s.DB.Save(&jail).Error
+		if err != nil {
+			return err
+		}
 	}
 
 	cfg, err := s.GetNetworkCleanedConfig(ctId)
@@ -444,6 +449,60 @@ func (s *Service) SyncNetwork(ctId uint, jail jailModels.Jail) error {
 				return err
 			}
 		}
+	}
+
+	return nil
+}
+
+func (s *Service) WatchNetworkObjectChanges() error {
+	var triggers []models.Triggers
+	if err := s.DB.
+		Where("action = ? AND completed = 0", "edit_network_object_used_by_jails").
+		Find(&triggers).Error; err != nil {
+		return fmt.Errorf("failed to find triggers: %w", err)
+	}
+
+	if len(triggers) == 0 {
+		return nil
+	}
+
+	jailToTriggerIDs := map[int64][]int64{}
+	for _, t := range triggers {
+		var jailIDs []int64
+		if err := json.Unmarshal([]byte(t.Data), &jailIDs); err != nil {
+			logger.L.Warn().Msgf("Bad trigger data id=%d data=%q err=%v\n", t.ID, t.Data, err)
+			continue
+		}
+		for _, jailID := range jailIDs {
+			jailToTriggerIDs[jailID] = append(jailToTriggerIDs[jailID], int64(t.ID))
+		}
+	}
+
+	for jailID := range jailToTriggerIDs {
+		var jail jailModels.Jail
+		if err := s.DB.Preload("Networks").First(&jail, "id = ?", jailID).Error; err != nil {
+			logger.L.Warn().Msgf("Failed to find jail id=%d err=%v\n", jailID, err)
+			continue
+		}
+
+		err := s.SyncNetwork(uint(jail.CTID), jail, false)
+
+		if err != nil {
+			logger.L.Warn().Msgf("Failed to sync network for jail id=%d err=%v\n", jailID, err)
+		}
+	}
+
+	var allTriggerIDs []int64
+	for _, ids := range jailToTriggerIDs {
+		allTriggerIDs = append(allTriggerIDs, ids...)
+	}
+
+	if err := s.DB.Model(&models.Triggers{}).
+		Where("id IN ?", allTriggerIDs).
+		Updates(map[string]any{
+			"completed": true,
+		}).Error; err != nil {
+		return fmt.Errorf("failed to mark triggers complete: %w", err)
 	}
 
 	return nil

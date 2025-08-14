@@ -13,6 +13,7 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"hash/fnv"
@@ -631,4 +632,12 @@ func IsMagnetURI(uri string) bool {
 	}
 
 	return true
+}
+
+func UintSliceToJSON(slice []uint) (string, error) {
+	bytes, err := json.Marshal(slice)
+	if err != nil {
+		return "", err
+	}
+	return string(bytes), nil
 }

@@ -210,7 +210,7 @@
 				});
 			} else {
 				handleAPIError(result);
-				if (result.error?.includes('used')) {
+				if (result.error?.includes('used') || result.error?.includes('in use')) {
 					toast.error(`Object ${active?.name} is in use`, {
 						position: 'bottom-center'
 					});

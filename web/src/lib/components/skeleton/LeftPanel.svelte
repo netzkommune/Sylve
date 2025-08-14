@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { getSimpleJails } from '$lib/api/jail/jail';
-	import { getVMs } from '$lib/api/vm/vm';
+	import { getSimpleVMs, getVMs } from '$lib/api/vm/vm';
 	import { default as TreeView } from '$lib/components/custom/TreeView.svelte';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
+	import { reload } from '$lib/stores/api.svelte';
 	import { hostname } from '$lib/stores/basic';
 	import type { SimpleJail } from '$lib/types/jail/jail';
-	import type { VM } from '$lib/types/vm/vm';
-	import { useQueries } from '@sveltestack/svelte-query';
+	import type { SimpleVm, VM } from '$lib/types/vm/vm';
+	import { useQueries, useQueryClient } from '@sveltestack/svelte-query';
 
 	let openCategories: { [key: string]: boolean } = $state({});
 	let node = $hostname;
@@ -15,35 +16,34 @@
 		openCategories[label] = !openCategories[label];
 	};
 
+	const queryClient = useQueryClient();
 	const results = useQueries([
 		{
-			queryKey: ['vms-list'],
+			queryKey: 'simple-vms-list',
 			queryFn: async () => {
-				return await getVMs();
+				return await getSimpleVMs();
 			},
-			refetchInterval: 1000,
 			keepPreviousData: true,
-			initialData: [] as VM[],
+			initialData: [] as SimpleVm[],
 			refetchOnMount: 'always'
 		},
 		{
-			queryKey: ['simple-jails-list'],
+			queryKey: 'simple-jails-list',
 			queryFn: async () => {
 				return await getSimpleJails();
 			},
-			refetchInterval: 1000,
 			keepPreviousData: true,
 			initialData: [] as SimpleJail[],
 			refetchOnMount: 'always'
 		}
 	]);
 
-	const vms = $derived($results[0].data || []);
+	const simpleVMs = $derived($results[0].data || []);
 	const simpleJails = $derived($results[1].data || []);
 
 	let children = $derived(
 		[
-			...vms.map((vm) => ({
+			...simpleVMs.map((vm) => ({
 				id: vm.vmId,
 				label: `${vm.name} (${vm.vmId})`,
 				icon: 'material-symbols:monitor-outline',
@@ -86,6 +86,15 @@
 			]
 		}
 	]);
+
+	$effect(() => {
+		if (reload.leftPanel) {
+			queryClient.refetchQueries('simple-vms-list');
+			queryClient.refetchQueries('simple-jails-list');
+
+			reload.leftPanel = false;
+		}
+	});
 </script>
 
 <div class="h-full overflow-y-auto px-1.5 pt-1">

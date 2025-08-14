@@ -103,8 +103,16 @@ export const VMDomainSchema = z.object({
 	status: z.string()
 });
 
+export const SimpleVmSchema = z.object({
+	id: z.number().int(),
+	name: z.string(),
+	vmId: z.number().int(),
+	state: z.string()
+});
+
 export type VM = z.infer<typeof VMSchema>;
 export type VMStorage = z.infer<typeof VMStorageSchema>;
 export type VMNetwork = z.infer<typeof VMNetworkSchema>;
 export type VMDomain = z.infer<typeof VMDomainSchema>;
 export type VMStat = z.infer<typeof VMStatSchema>;
+export type SimpleVm = z.infer<typeof SimpleVmSchema>;

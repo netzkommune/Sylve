@@ -49,6 +49,39 @@ func (s *Service) ListVMs() ([]vmModels.VM, error) {
 	return vms, nil
 }
 
+func (s *Service) SimpleListVM() ([]libvirtServiceInterfaces.SimpleList, error) {
+	var vms []vmModels.VM
+	var list []libvirtServiceInterfaces.SimpleList
+
+	if err := s.DB.Find(&vms).Error; err != nil {
+		return nil, fmt.Errorf("failed_to_list_vms: %w", err)
+	}
+
+	for _, vm := range vms {
+		inactive, err := s.IsDomainInactive(vm.VmID)
+		if err != nil {
+			logger.L.Error().Err(err).Msg("ListVMs: failed to check domain state")
+			return nil, fmt.Errorf("failed_to_check_domain_state: %w", err)
+		}
+
+		var state string
+
+		if inactive {
+			state = "INACTIVE"
+		} else {
+			state = "ACTIVE"
+		}
+
+		list = append(list, libvirtServiceInterfaces.SimpleList{
+			VMID:  vm.VmID,
+			Name:  vm.Name,
+			State: state,
+		})
+	}
+
+	return list, nil
+}
+
 func validateCreate(data libvirtServiceInterfaces.CreateVMRequest, db *gorm.DB) error {
 	if data.Name == "" || !utils.IsValidVMName(data.Name) {
 		return fmt.Errorf("invalid_vm_name")

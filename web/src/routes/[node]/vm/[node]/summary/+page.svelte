@@ -21,6 +21,7 @@
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import { Progress } from '$lib/components/ui/progress/index.js';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
+	import { reload } from '$lib/stores/api.svelte';
 	import { hostname } from '$lib/stores/basic';
 	import type { VM, VMDomain, VMStat } from '$lib/types/vm/vm';
 	import { sleep } from '$lib/utils';
@@ -134,7 +135,8 @@
 		modalState.loading.iconColor = 'text-green-500';
 
 		const result = await actionVm(vm.id, 'start');
-		console.log('Start VM result:', result);
+
+		reload.leftPanel = true;
 
 		if (result.status === 'error') {
 			modalState.loading.open = false;
@@ -159,6 +161,8 @@
 		modalState.loading.iconColor = 'text-red-500';
 
 		const result = await actionVm(vm.id, 'stop');
+
+		reload.leftPanel = true;
 
 		if (result.status === 'error') {
 			modalState.loading.open = false;

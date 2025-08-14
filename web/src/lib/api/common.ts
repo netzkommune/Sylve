@@ -97,7 +97,6 @@ export function handleAPIResponse(
 		warn?: string;
 	}
 ): void {
-	// console.log('API Response:', response);
 	if (response.status === 'error') {
 		adze.withEmoji.error(response);
 		toast.error(messages.error || 'Operation failed', {

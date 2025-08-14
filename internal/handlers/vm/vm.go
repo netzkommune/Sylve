@@ -336,3 +336,30 @@ func UpdateVMDescription(libvirtService *libvirt.Service) gin.HandlerFunc {
 		})
 	}
 }
+
+// @Summary List all VMs (Simple)
+// @Description Retrieve a simple list of all VMs
+// @Tags VM
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} internal.APIResponse[[]libvirtServiceInterfaces.SimpleList] "Success"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /vm/simple [get]
+func ListVMsSimple(libvirtService *libvirt.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		vms, err := libvirtService.SimpleListVM()
+
+		if err != nil {
+			c.JSON(500, internal.APIResponse[any]{Error: "failed_to_list_jails_simple: " + err.Error()})
+			return
+		}
+
+		c.JSON(200, internal.APIResponse[[]libvirtServiceInterfaces.SimpleList]{
+			Status:  "success",
+			Message: "vm_listed_simple",
+			Data:    vms,
+			Error:   "",
+		})
+	}
+}

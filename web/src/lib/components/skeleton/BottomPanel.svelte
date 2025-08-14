@@ -3,31 +3,40 @@
 	import { getVMs } from '$lib/api/vm/vm';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
+	import { reload } from '$lib/stores/api.svelte';
 	import type { AuditRecord } from '$lib/types/info/audit';
 	import type { VM } from '$lib/types/vm/vm';
 	import { convertDbTime } from '$lib/utils/time';
-	import { useQueries } from '@sveltestack/svelte-query';
+	import { useQueries, useQueryClient } from '@sveltestack/svelte-query';
 
+	const queryClient = useQueryClient();
 	const results = useQueries([
 		{
 			queryKey: ['auditRecord'],
 			queryFn: async () => {
 				return await getAuditRecords();
 			},
-			refetchInterval: 1000,
-			keepPreviousData: true
+			refetchInterval: false,
+			keepPreviousData: true,
+			initialData: [] as AuditRecord[]
 		},
 		{
 			queryKey: ['vms-list'],
 			queryFn: async () => {
 				return await getVMs();
 			},
-			refetchInterval: 1000,
+			refetchInterval: false,
 			keepPreviousData: true,
-			initialData: [] as VM[],
-			refetchOnMount: 'always'
+			initialData: [] as VM[]
 		}
 	]);
+
+	$effect(() => {
+		if (reload.auditLog) {
+			queryClient.refetchQueries(['auditRecord']);
+			reload.auditLog = false;
+		}
+	});
 
 	let data = $derived($results[0].data as AuditRecord[]);
 	let vms = $derived($results[1].data as VM[]);

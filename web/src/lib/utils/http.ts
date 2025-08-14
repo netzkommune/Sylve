@@ -9,6 +9,7 @@
  */
 
 import { api } from '$lib/api/common';
+import { reload } from '$lib/stores/api.svelte';
 import { APIResponseSchema, type APIResponse } from '$lib/types/common';
 import type { QueryFunctionContext } from '@sveltestack/svelte-query';
 import adze from 'adze';
@@ -20,6 +21,12 @@ export async function apiRequest<T extends z.ZodType>(
 	method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
 	body?: unknown
 ): Promise<z.infer<T>> {
+	function setReloadFlag() {
+		if (method === 'POST' || method === 'PUT' || method === 'DELETE') {
+			reload.auditLog = true;
+		}
+	}
+
 	try {
 		const config = {
 			method,
@@ -32,26 +39,32 @@ export async function apiRequest<T extends z.ZodType>(
 
 		/* Couldn't parse response data into APIResponse so we'll just return the data? */
 		if (!apiResponse.success) {
+			setReloadFlag();
 			return apiResponse.data;
 		}
 
 		/* Caller asked for a raw response */
 		if (schema._def.description === 'APIResponseSchema') {
+			setReloadFlag();
 			return apiResponse.data as z.infer<T>;
 		}
 
 		if (apiResponse.data.data) {
 			const parsedResult = schema.safeParse(apiResponse.data.data);
 			if (parsedResult.success) {
+				setReloadFlag();
 				return parsedResult.data;
 			} else {
 				adze.withEmoji.warn('Zod Validation Error', parsedResult.error);
+				setReloadFlag();
 				return getDefaultValue(schema, apiResponse.data);
 			}
 		}
 
+		setReloadFlag();
 		return getDefaultValue(schema, apiResponse.data);
 	} catch (error) {
+		setReloadFlag();
 		adze.withEmoji.error('API Request Error', error);
 		return getDefaultValue(schema, { status: 'error' });
 	}

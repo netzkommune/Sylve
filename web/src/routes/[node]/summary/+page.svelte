@@ -9,6 +9,7 @@
 	import { Progress } from '$lib/components/ui/progress/index.js';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
+	import { reload } from '$lib/stores/api.svelte';
 	import type { BasicInfo } from '$lib/types/info/basic';
 	import type { CPUInfo, CPUInfoHistorical } from '$lib/types/info/cpu';
 	import type { HistoricalNetworkInterface } from '$lib/types/info/network';
@@ -19,6 +20,7 @@
 	import { formatUptime, secondsToHoursAgo } from '$lib/utils/time';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
+	import { onMount } from 'svelte';
 
 	interface Data {
 		basicInfo: BasicInfo;

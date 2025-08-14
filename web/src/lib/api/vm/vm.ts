@@ -1,9 +1,11 @@
 import { APIResponseSchema, type APIResponse } from '$lib/types/common';
 import {
+	SimpleVmSchema,
 	VMDomainSchema,
 	VMSchema,
 	VMStatSchema,
 	type CreateData,
+	type SimpleVm,
 	type VM,
 	type VMDomain,
 	type VMStat
@@ -13,6 +15,10 @@ import { z } from 'zod/v4';
 
 export async function getVMs(): Promise<VM[]> {
 	return await apiRequest('/vm', z.array(VMSchema), 'GET');
+}
+
+export async function getSimpleVMs(): Promise<SimpleVm[]> {
+	return await apiRequest('/vm/simple', z.array(SimpleVmSchema), 'GET');
 }
 
 export async function newVM(data: CreateData): Promise<APIResponse> {

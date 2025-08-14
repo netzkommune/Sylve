@@ -22,6 +22,7 @@
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import { Progress } from '$lib/components/ui/progress/index.js';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
+	import { reload } from '$lib/stores/api.svelte';
 	import { hostname } from '$lib/stores/basic';
 	import type { CPUInfo, CPUInfoHistorical } from '$lib/types/info/cpu';
 	import type { RAMInfo, RAMInfoHistorical } from '$lib/types/info/ram';
@@ -203,6 +204,7 @@
 		modalState.loading.open = false;
 
 		const result = await deleteJail(jail.ctId, modalState.deleteMacs);
+		reload.leftPanel = true;
 		modalState.loading.open = false;
 
 		if (result.status === 'error') {
@@ -230,6 +232,7 @@
 		await sleep(1000);
 		await jailAction(jail.ctId, 'stop');
 
+		reload.leftPanel = true;
 		modalState.loading.open = false;
 	}
 
@@ -242,6 +245,7 @@
 		await sleep(1000);
 		await jailAction(jail.ctId, 'start');
 
+		reload.leftPanel = true;
 		modalState.loading.open = false;
 	}
 </script>

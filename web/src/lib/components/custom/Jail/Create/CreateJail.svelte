@@ -8,6 +8,7 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
+	import { reload } from '$lib/stores/api.svelte';
 	import type { CreateData, Jail } from '$lib/types/jail/jail';
 	import type { NetworkObject } from '$lib/types/network/object';
 	import type { SwitchList } from '$lib/types/network/switch';
@@ -185,6 +186,7 @@
 						error = 'Failed to create jail';
 				}
 
+				reload.leftPanel = true;
 				toast.error(error, {
 					position: 'bottom-center'
 				});
@@ -192,6 +194,8 @@
 			}
 
 			open = false;
+			reload.leftPanel = true;
+
 			toast.success(`Jail ${data.name} created`, {
 				position: 'bottom-center'
 			});

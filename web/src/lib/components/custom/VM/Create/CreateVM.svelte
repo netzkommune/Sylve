@@ -25,6 +25,7 @@
 
 	import { getJails } from '$lib/api/jail/jail';
 	import { getNetworkObjects } from '$lib/api/network/object';
+	import { reload } from '$lib/stores/api.svelte';
 	import type { Jail } from '$lib/types/jail/jail';
 	import type { NetworkObject } from '$lib/types/network/object';
 	import { type CreateData, type VM } from '$lib/types/vm/vm';
@@ -227,6 +228,8 @@
 					position: 'bottom-center'
 				});
 			}
+
+			reload.leftPanel = true;
 		}
 	}
 

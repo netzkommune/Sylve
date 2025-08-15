@@ -19,9 +19,9 @@
 	import { generateIPOptions } from '$lib/utils/network/object';
 	import { generateTableData } from '$lib/utils/network/switch';
 	import { isValidMTU, isValidVLAN } from '$lib/utils/numbers';
-	import { isValidIPv4, isValidIPv6, isValidSwitchName } from '$lib/utils/string';
+	import { isValidSwitchName } from '$lib/utils/string';
 	import Icon from '@iconify/svelte';
-	import { useQueries } from '@sveltestack/svelte-query';
+	import { useQueries, useQueryClient } from '@sveltestack/svelte-query';
 	import { toast } from 'svelte-sonner';
 
 	interface Data {
@@ -32,13 +32,13 @@
 
 	let { data }: { data: Data } = $props();
 
+	const queryClient = useQueryClient();
 	const results = useQueries([
 		{
-			queryKey: ['networkInterfaces'],
+			queryKey: 'networkInterfaces',
 			queryFn: async () => {
 				return await getInterfaces();
 			},
-			refetchInterval: 1000,
 			keepPreviousData: true,
 			initialData: data.interfaces,
 			onSuccess: (data: Iface[]) => {
@@ -46,11 +46,10 @@
 			}
 		},
 		{
-			queryKey: ['networkSwitches'],
+			queryKey: 'networkSwitches',
 			queryFn: async () => {
 				return await getSwitches();
 			},
-			refetchInterval: 1000,
 			keepPreviousData: true,
 			initialData: data.switches,
 			onSuccess: (data: SwitchList) => {
@@ -58,11 +57,10 @@
 			}
 		},
 		{
-			queryKey: ['networkObjects'],
+			queryKey: 'networkObjects',
 			queryFn: async () => {
 				return await getNetworkObjects();
 			},
-			refetchInterval: 1000,
 			keepPreviousData: true,
 			initialData: data.objects,
 			onSuccess: (data: NetworkObject[]) => {
@@ -155,6 +153,12 @@
 		}
 	});
 
+	function reloadData() {
+		queryClient.refetchQueries('networkInterfaces');
+		queryClient.refetchQueries('networkSwitches');
+		queryClient.refetchQueries('networkObjects');
+	}
+
 	async function confirmAction() {
 		if (confirmModals.active === 'newSwitch' || confirmModals.active === 'editSwitch') {
 			const activeModal = confirmModals[confirmModals.active];
@@ -207,6 +211,8 @@
 					activeModal.slaac
 				);
 
+				reloadData();
+
 				if (isAPIResponse(created) && created.status === 'success') {
 					toast.success(`Switch ${confirmModals.newSwitch.name} created`, {
 						position: 'bottom-center'
@@ -232,6 +238,8 @@
 					activeModal.slaac,
 					activeModal.dhcp
 				);
+
+				reloadData();
 
 				if (isAPIResponse(edited) && edited.status === 'success') {
 					toast.success(`Switch ${confirmModals.editSwitch.name} updated`, {
@@ -591,6 +599,7 @@
 	actions={{
 		onConfirm: async () => {
 			const result = await deleteSwitch(confirmModals.deleteSwitch.id);
+			reloadData();
 			if (isAPIResponse(result) && result.status === 'success') {
 				toast.success(`Switch ${confirmModals.deleteSwitch.name} deleted`, {
 					position: 'bottom-center'

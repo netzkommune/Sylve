@@ -14,7 +14,7 @@
 	import { generateTableData, markdownToTailwindHTML } from '$lib/utils/info/notes';
 	import { convertDbTime } from '$lib/utils/time';
 	import Icon from '@iconify/svelte';
-	import { useQueries } from '@sveltestack/svelte-query';
+	import { useQueries, useQueryClient } from '@sveltestack/svelte-query';
 	import { toast } from 'svelte-sonner';
 	import type { CellComponent } from 'tabulator-tables';
 
@@ -23,13 +23,14 @@
 	}
 
 	let { data }: { data: Data } = $props();
+
+	const queryClient = useQueryClient();
 	const results = useQueries([
 		{
-			queryKey: ['notes'],
+			queryKey: 'notes',
 			queryFn: async () => {
 				return (await getNotes()) as Note[];
 			},
-			refetchInterval: 1000,
 			keepPreviousData: true,
 			initialData: data.notes,
 			onSuccess: (data: Note[]) => {
@@ -73,6 +74,7 @@
 		if (!modalState.title.trim() || !modalState.content.trim()) return;
 		if (modalState.isEditMode && selectedId !== null) {
 			const response = await updateNote(selectedId, modalState.title, modalState.content);
+			queryClient.refetchQueries('notes');
 			if (response.status === 'success') {
 				toast.success('Note updated', { position: 'bottom-center' });
 				handleNote(undefined, false, true);
@@ -84,6 +86,8 @@
 			}
 		} else {
 			const response = await createNote(modalState.title, modalState.content);
+			queryClient.refetchQueries('notes');
+
 			if ((response as Note).id) {
 				toast.success('Note created', { position: 'bottom-center' });
 				handleNote(undefined, false, true);
@@ -352,6 +356,7 @@
 			onConfirm: async () => {
 				const id = activeRow ? activeRow[0]?.id : null;
 				const result = await deleteNote(id as number);
+				queryClient.refetchQueries('notes');
 				if (isAPIResponse(result) && result.status === 'success') {
 					handleNote(undefined, false, true);
 				} else {
@@ -376,6 +381,7 @@
 					? activeRow.map((row) => (typeof row.id === 'number' ? row.id : parseInt(row.id)))
 					: [];
 				const result = await deleteNotes(ids);
+				queryClient.refetchQueries('notes');
 				if (isAPIResponse(result) && result.status === 'success') {
 					handleNote(undefined, false, true);
 				} else {

@@ -9,7 +9,7 @@
 	import type { NetworkObject } from '$lib/types/network/object';
 	import { handleAPIError, isAPIResponse, updateCache } from '$lib/utils/http';
 	import Icon from '@iconify/svelte';
-	import { useQueries } from '@sveltestack/svelte-query';
+	import { useQueries, useQueryClient } from '@sveltestack/svelte-query';
 	import { toast } from 'svelte-sonner';
 	import type { CellComponent } from 'tabulator-tables';
 
@@ -19,13 +19,13 @@
 
 	let { data }: { data: Data } = $props();
 
+	const queryClient = useQueryClient();
 	const results = useQueries([
 		{
-			queryKey: ['networkObjects'],
+			queryKey: 'networkObjects',
 			queryFn: async () => {
 				return await getNetworkObjects();
 			},
-			refetchInterval: 1000,
 			keepPreviousData: true,
 			initialData: data.objects,
 			onSuccess: (data: NetworkObject[]) => {
@@ -185,7 +185,14 @@
 </div>
 
 {#if modals.create.open}
-	<CreateOrEdit bind:open={modals.create.open} networkObjects={objects} edit={false} />
+	<CreateOrEdit
+		bind:open={modals.create.open}
+		networkObjects={objects}
+		edit={false}
+		afterChange={() => {
+			queryClient.refetchQueries('networkObjects');
+		}}
+	/>
 {/if}
 
 {#if modals.edit.open}
@@ -194,6 +201,9 @@
 		networkObjects={objects}
 		edit={true}
 		id={Number(modals.edit.id)}
+		afterChange={() => {
+			queryClient.refetchQueries('networkObjects');
+		}}
 	/>
 {/if}
 
@@ -204,6 +214,7 @@
 		onConfirm: async () => {
 			let active = $state.snapshot(activeRow);
 			const result = await deleteNetworkObject(modals.delete.id);
+			queryClient.refetchQueries('networkObjects');
 			if (isAPIResponse(result) && result.status === 'success') {
 				toast.success(`Object ${active?.name} deleted`, {
 					position: 'bottom-center'

@@ -23,9 +23,10 @@
 		edit: boolean;
 		id?: number;
 		networkObjects: NetworkObject[];
+		afterChange: () => void;
 	}
 
-	let { open = $bindable(), edit = false, id, networkObjects }: Props = $props();
+	let { open = $bindable(), edit = false, id, networkObjects, afterChange }: Props = $props();
 	let editingObject: NetworkObject | null = $derived.by(() => {
 		if (edit && id) {
 			const obj = networkObjects.find((o) => o.id === id);
@@ -238,6 +239,7 @@
 		let oType = getOType();
 
 		const response = await createNetworkObject(properties.name, oType, values as string[]);
+		afterChange();
 		if (response.error) {
 			handleAPIError(response);
 
@@ -275,6 +277,7 @@
 			oType,
 			values as string[]
 		);
+		afterChange();
 
 		if (response.error) {
 			handleAPIError(response);

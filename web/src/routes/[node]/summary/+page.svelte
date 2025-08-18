@@ -20,6 +20,7 @@
 	import { formatUptime, secondsToHoursAgo } from '$lib/utils/time';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
+	import type { Chart } from 'chart.js';
 	import { onMount } from 'svelte';
 
 	interface Data {
@@ -255,6 +256,10 @@
 			}
 		];
 	});
+
+	let cpuUsageRef: Chart | null = $state(null);
+	let memoryUsageRef: Chart | null = $state(null);
+	let networkUsageRef: Chart | null = $state(null);
 </script>
 
 <div class="flex h-full w-full flex-col">
@@ -374,17 +379,20 @@
 					title="CPU Usage"
 					elements={[chartElements[1], chartElements[0]]}
 					icon="solar:cpu-bold"
+					chart={cpuUsageRef}
 				/>
 				<AreaChart
 					title="Memory Usage"
 					elements={[chartElements[3], chartElements[2]]}
 					icon="la:memory"
+					chart={memoryUsageRef}
 				/>
 				<AreaChart
 					title="Network Usage"
 					elements={[chartElements[4], chartElements[5]]}
 					formatSize={true}
 					icon="gg:smartphone-ram"
+					chart={networkUsageRef}
 				/>
 			</div>
 		</ScrollArea>

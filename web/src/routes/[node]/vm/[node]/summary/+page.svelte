@@ -226,6 +226,9 @@
 			updateDescription(vm.id, vmDescription);
 		}
 	});
+
+	let cpuUsageRef: Chart | null = $state(null);
+	let memoryUsageRef: Chart | null = $state(null);
 </script>
 
 {#snippet button(type: string)}
@@ -356,8 +359,8 @@
 			</div>
 
 			<div class="space-y-4 p-3">
-				<AreaChart title="CPU Usage" elements={[cpuHistoricalData]} />
-				<AreaChart title="Memory Usage" elements={[memoryUsageData]} />
+				<AreaChart title="CPU Usage" elements={[cpuHistoricalData]} chart={cpuUsageRef} />
+				<AreaChart title="Memory Usage" elements={[memoryUsageData]} chart={memoryUsageRef} />
 			</div>
 		</ScrollArea>
 	</div>

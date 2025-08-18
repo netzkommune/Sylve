@@ -250,7 +250,10 @@
 	});
 
 	onDestroy(() => {
-		chart?.destroy();
+		if (chart) {
+			chart.destroy();
+			chart = null;
+		}
 	});
 </script>
 

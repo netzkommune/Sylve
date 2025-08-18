@@ -10,9 +10,10 @@
 		open: boolean;
 		dataset: Dataset;
 		askRecursive?: boolean;
+		reload?: boolean;
 	}
 
-	let { open = $bindable(), dataset, askRecursive = true }: Props = $props();
+	let { open = $bindable(), dataset, askRecursive = true, reload = $bindable() }: Props = $props();
 	let recursive = $state(false);
 
 	async function onCancel() {
@@ -22,6 +23,7 @@
 	async function onConfirm() {
 		if (dataset.guid) {
 			const response = await deleteSnapshot(dataset, recursive);
+			reload = true;
 
 			if (response.status === 'success') {
 				toast.success(`Deleted snapshot ${dataset.name}`, {

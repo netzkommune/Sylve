@@ -69,13 +69,26 @@
 					if (row) row.select();
 				}
 
-				// for (let i = 0; i < treeExpands.length; i++) {
-				// 	const treeExpand = treeExpands[i];
-				// 	const row = findRow(table?.getRows() || [], treeExpand.id);
-				// 	if (row) {
-				// 		treeExpand.expanded ? row.treeExpand() : row.treeCollapse();
-				// 	}
-				// }
+				const rowMap = new Map<number, RowComponent>();
+				const buildRowMap = (rows: RowComponent[]) => {
+					for (const row of rows) {
+						rowMap.set(row.getData().id, row);
+						const children = row.getTreeChildren();
+						if (children.length > 0) {
+							buildRowMap(children);
+						}
+					}
+				};
+
+				buildRowMap(table?.getRows() || []);
+
+				for (let i = 0; i < treeExpands.length; i++) {
+					const treeExpand = treeExpands[i];
+					const row = rowMap.get(treeExpand.id);
+					if (row) {
+						treeExpand.expanded ? row.treeExpand() : row.treeCollapse();
+					}
+				}
 
 				const end = performance.now();
 				console.log(`Performance ${end - now}ms`);

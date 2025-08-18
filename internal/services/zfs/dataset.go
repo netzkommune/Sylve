@@ -12,7 +12,6 @@ import (
 	"fmt"
 	vmModels "sylve/internal/db/models/vm"
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
-	"sylve/pkg/utils"
 	"sylve/pkg/zfs"
 )
 
@@ -95,14 +94,8 @@ func (s *Service) BulkDeleteDataset(guids []string) error {
 	if err := s.DB.Model(&vmModels.Storage{}).Where("dataset IN ?", guids).Count(&count).Error; err != nil {
 		return fmt.Errorf("failed to check if datasets are in use: %w", err)
 	}
-
 	if count > 0 {
 		return fmt.Errorf("datasets_in_use_by_vm")
-	}
-
-	guidsMap := make(map[string]struct{})
-	for _, guid := range guids {
-		guidsMap[guid] = struct{}{}
 	}
 
 	datasets, err := zfs.Datasets("")
@@ -110,29 +103,19 @@ func (s *Service) BulkDeleteDataset(guids []string) error {
 		return err
 	}
 
-	matched := make(map[string]*zfs.Dataset)
+	available := make(map[string]*zfs.Dataset)
+	for _, ds := range datasets {
+		available[ds.GUID] = ds
+	}
 
-	for _, dataset := range datasets {
-		properties, err := dataset.GetAllProperties()
-		if err != nil {
-			return err
-		}
-
-		for _, v := range properties {
-			if _, ok := guidsMap[v]; ok {
-				matched[v] = dataset
-				delete(guidsMap, v)
-				break
-			}
+	for _, guid := range guids {
+		if _, ok := available[guid]; !ok {
+			return fmt.Errorf("dataset with guid %s not found", guid)
 		}
 	}
 
-	if len(guidsMap) > 0 {
-		return fmt.Errorf("datasets with guids %v not found", utils.MapKeys(guidsMap))
-	}
-
-	for guid, dataset := range matched {
-		if err := dataset.Destroy(zfs.DestroyDefault); err != nil {
+	for _, guid := range guids {
+		if err := available[guid].Destroy(zfs.DestroyDefault); err != nil {
 			return fmt.Errorf("failed to delete dataset with guid %s: %w", guid, err)
 		}
 	}

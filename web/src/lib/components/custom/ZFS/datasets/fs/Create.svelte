@@ -23,9 +23,10 @@
 		open: boolean;
 		datasets: Dataset[];
 		grouped: GroupedByPool[];
+		reload?: boolean;
 	}
 
-	let { open = $bindable(), datasets, grouped }: Props = $props();
+	let { open = $bindable(), datasets, grouped, reload = $bindable() }: Props = $props();
 	let parents = $derived.by(() => {
 		let options = [] as { label: string; value: string }[];
 		for (const pool of grouped) {
@@ -134,6 +135,8 @@
 			aclinherit: properties.aclinherit,
 			aclmode: properties.aclmode
 		});
+
+		reload = true;
 
 		if (response.status === 'error') {
 			handleAPIError(response);

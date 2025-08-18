@@ -9,7 +9,7 @@
  */
 
 import type { Row } from '$lib/types/components/tree-table';
-import type { RowComponent } from 'tabulator-tables';
+import type { RowComponent, Tabulator } from 'tabulator-tables';
 
 export function cleanChildren(row: Row): Row {
 	let newRow = { ...row };

@@ -15,9 +15,10 @@
 	interface Props {
 		open: boolean;
 		dataset: Dataset;
+		reload?: boolean;
 	}
 
-	let { open = $bindable(), dataset }: Props = $props();
+	let { open = $bindable(), dataset, reload = $bindable() }: Props = $props();
 	let options = {
 		atime: 'on',
 		checksum: dataset.checksum || 'on',
@@ -50,6 +51,8 @@
 			aclinherit: properties.aclinherit,
 			aclmode: properties.aclmode
 		});
+
+		reload = true;
 
 		if (response.status === 'error') {
 			handleAPIError(response);

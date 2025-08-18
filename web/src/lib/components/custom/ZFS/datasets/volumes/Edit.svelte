@@ -31,11 +31,11 @@
 	let options = {
 		volsize: dataset.volsize ? bytesToHumanReadable(dataset.volsize) : '',
 		volblocksize: dataset.volblocksize ? dataset.volblocksize.toString() : '16384',
-		checksum: dataset.properties.checksum || 'on',
-		compression: dataset.properties.compression || 'on',
-		dedup: dataset.properties.dedup || 'off',
-		primarycache: dataset.properties.primarycache || 'metadata',
-		volmode: dataset.properties.volmode || 'dev'
+		checksum: dataset.checksum || 'on',
+		compression: dataset.compression || 'on',
+		dedup: dataset.dedup || 'off',
+		primarycache: dataset.primarycache || 'metadata',
+		volmode: dataset.volmode || 'dev'
 	};
 
 	let properties = $state(options);

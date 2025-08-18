@@ -42,7 +42,7 @@
 			.filter((dataset) => dataset.type === 'volume')
 			.map((dataset) => ({
 				name: dataset.name,
-				guid: dataset.properties.guid
+				guid: dataset.guid
 			}))
 			.filter((dataset) => {
 				return storages.some((storage) => {
@@ -244,12 +244,11 @@
 				options={datasets
 					.filter((dataset) => {
 						return (
-							dataset.type === 'volume' &&
-							!usedVolumes.some((used) => used.guid === dataset.properties.guid)
+							dataset.type === 'volume' && !usedVolumes.some((used) => used.guid === dataset.guid)
 						);
 					})
 					.map((dataset) => ({
-						value: dataset.properties.guid || dataset.name,
+						value: dataset.guid || dataset.name,
 						label: dataset.name
 					}))}
 				bind:value={properties.dataset}
@@ -265,11 +264,11 @@
 					.filter((dataset) => {
 						return (
 							dataset.type === 'filesystem' &&
-							!usedVolumes.some((used) => used.guid === dataset.properties.guid)
+							!usedVolumes.some((used) => used.guid === dataset.guid)
 						);
 					})
 					.map((dataset) => ({
-						value: dataset.properties.guid || dataset.name,
+						value: dataset.guid || dataset.name,
 						label: dataset.name
 					}))}
 				bind:value={properties.dataset}

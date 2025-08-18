@@ -39,7 +39,7 @@
 			queryFn: async () => {
 				return await getPools();
 			},
-			refetchInterval: 1000,
+			refetchInterval: false,
 			keepPreviousData: false,
 			initialData: data.pools,
 			onSuccess: (data: Zpool[]) => {
@@ -47,15 +47,15 @@
 			}
 		},
 		{
-			queryKey: ['zfs-filesystems'],
+			queryKey: ['zfs-datasets'],
 			queryFn: async () => {
-				return await getDatasets('filesystem');
+				return await getDatasets();
 			},
-			refetchInterval: 1000,
+			refetchInterval: false,
 			keepPreviousData: false,
 			initialData: data.datasets,
 			onSuccess: (data: Dataset[]) => {
-				updateCache('zfs-filesystems', data);
+				updateCache('zfs-datasets', data);
 			}
 		}
 	]);
@@ -129,7 +129,6 @@
 		return false;
 	});
 
-	let zfsProperties = $state(createFSProps);
 	let query: string = $state('');
 
 	let modals = $state({
@@ -344,8 +343,8 @@
 		customTitle={`Are you sure you want to rollback to the snapshot <b>${activeDataset.name}</b>? This action cannot be undone.`}
 		actions={{
 			onConfirm: async () => {
-				if (activeDataset.properties.guid) {
-					const response = await rollbackSnapshot(activeDataset.properties.guid);
+				if (activeDataset.guid) {
+					const response = await rollbackSnapshot(activeDataset.guid);
 
 					if (response.status === 'error') {
 						handleAPIError(response);
@@ -387,7 +386,7 @@
 		}}
 		actions={{
 			onConfirm: async () => {
-				if (activeDataset.properties.guid) {
+				if (activeDataset.guid) {
 					const response = await deleteFileSystem(activeDataset);
 
 					if (response.status === 'success') {

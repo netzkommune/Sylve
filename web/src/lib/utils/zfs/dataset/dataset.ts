@@ -36,6 +36,6 @@ export function getDatasetByGUID(
 		return undefined;
 	}
 
-	const dataset = datasets.find((dataset) => dataset.properties.guid === guid);
+	const dataset = datasets.find((dataset) => dataset.guid === guid);
 	return dataset;
 }

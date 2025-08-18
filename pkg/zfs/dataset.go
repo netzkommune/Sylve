@@ -11,6 +11,7 @@ import (
 type Dataset struct {
 	z             *zfs   `json:"-"`
 	Name          string `json:"name"`
+	GUID          string `json:"guid"`
 	Origin        string `json:"origin"`
 	Used          uint64 `json:"used"`
 	Avail         uint64 `json:"avail"`
@@ -24,8 +25,15 @@ type Dataset struct {
 	Usedbydataset uint64 `json:"usedbydataset"`
 	Quota         uint64 `json:"quota"`
 	Referenced    uint64 `json:"referenced"`
+	Mounted       string `json:"mounted"`
+	Checksum      string `json:"checksum"`
+	Dedup         string `json:"dedup"`
+	ACLInherit    string `json:"aclinherit"`
+	ACLMode       string `json:"aclmode"`
+	PrimaryCache  string `json:"primarycache"`
+	VolMode       string `json:"volmode"`
 
-	props map[string]string `json:"props"`
+	Props map[string]string `json:"properties"`
 }
 
 func (d *Dataset) Clone(dest string, properties map[string]string) (*Dataset, error) {
@@ -110,7 +118,7 @@ func (d *Dataset) SetProperty(key, val string) error {
 	if err := d.z.do("set", prop, d.Name); err != nil {
 		return err
 	}
-	d.props[strings.ToLower(key)] = val
+	d.Props[strings.ToLower(key)] = val
 	return nil
 }
 
@@ -132,13 +140,13 @@ func (d *Dataset) SetProperties(keyValPairs ...string) error {
 		return err
 	}
 	for k, v := range props {
-		d.props[k] = v
+		d.Props[k] = v
 	}
 	return nil
 }
 
 func (d *Dataset) GetProperty(key string) (string, error) {
-	if v, ok := d.props[strings.ToLower(key)]; ok {
+	if v, ok := d.Props[strings.ToLower(key)]; ok {
 		return v, nil
 	}
 	// custom properties does not return error
@@ -159,7 +167,7 @@ func (d *Dataset) GetProperties(keys ...string) ([]string, error) {
 	}
 	props, failed := make([]string, 0, len(keys)), false
 	for _, v := range keys {
-		val, ok := d.props[strings.ToLower(v)]
+		val, ok := d.Props[strings.ToLower(v)]
 		if failed = !ok && !strings.Contains(v, ":"); failed {
 			props = make([]string, 0, len(keys))
 			break
@@ -288,7 +296,7 @@ func (d *Dataset) Children(depth uint64) ([]*Dataset, error) {
 	for _, line := range out[1:] {
 		if name != line[0] {
 			name = line[0]
-			ds = &Dataset{z: d.z, Name: name, props: make(map[string]string)}
+			ds = &Dataset{z: d.z, Name: name, Props: make(map[string]string)}
 			datasets = append(datasets, ds)
 		}
 		if err := ds.parseProps([][]string{out[0], line}); err != nil {

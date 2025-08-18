@@ -8,9 +8,31 @@
 
 package zfsServiceInterfaces
 
-import "sylve/pkg/zfs"
+// type zDataset struct {
+// 	Dataset zfs.Dataset
+// }
 
 type Dataset struct {
-	zfs.Dataset
-	Properties map[string]string `json:"properties"`
+	Name          string `json:"name"`
+	Origin        string `json:"origin"`
+	GUID          string `json:"guid"`
+	Used          uint64 `json:"used"`
+	Avail         uint64 `json:"avail"`
+	Mountpoint    string `json:"mountpoint"`
+	Compression   string `json:"compression"`
+	Type          string `json:"type"`
+	Written       uint64 `json:"written"`
+	Volsize       uint64 `json:"volsize"`
+	VolBlockSize  uint64 `json:"volblocksize"`
+	Logicalused   uint64 `json:"logicalused"`
+	Usedbydataset uint64 `json:"usedbydataset"`
+	Quota         uint64 `json:"quota"`
+	Referenced    uint64 `json:"referenced"`
+	Mounted       string `json:"mounted"`
+	Checksum      string `json:"checksum"`
+	Dedup         string `json:"dedup"`
+	ACLInherit    string `json:"aclinherit"`
+	ACLMode       string `json:"aclmode"`
+	PrimaryCache  string `json:"primarycache"`
+	VolMode       string `json:"volmode"`
 }

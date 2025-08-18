@@ -16,8 +16,7 @@ import (
 	"sylve/pkg/zfs"
 )
 
-func (s *Service) GetDatasets(t string) ([]zfsServiceInterfaces.Dataset, error) {
-	var results []zfsServiceInterfaces.Dataset
+func (s *Service) GetDatasets(t string) ([]*zfsServiceInterfaces.Dataset, error) {
 	var datasets []*zfs.Dataset
 	var err error
 
@@ -35,50 +34,52 @@ func (s *Service) GetDatasets(t string) ([]zfsServiceInterfaces.Dataset, error) 
 		return nil, err
 	}
 
+	var results []*zfsServiceInterfaces.Dataset
+
 	for _, dataset := range datasets {
-		props, err := dataset.GetAllProperties()
-		if err != nil {
-			continue
-		}
-
-		propMap := make(map[string]string, len(props))
-		for k, v := range props {
-			propMap[k] = v
-		}
-
-		results = append(results, zfsServiceInterfaces.Dataset{
-			Dataset:    *dataset,
-			Properties: propMap,
+		results = append(results, &zfsServiceInterfaces.Dataset{
+			Name:          dataset.Name,
+			Origin:        dataset.Origin,
+			GUID:          dataset.GUID,
+			Used:          dataset.Used,
+			Avail:         dataset.Avail,
+			Mountpoint:    dataset.Mountpoint,
+			Compression:   dataset.Compression,
+			Type:          dataset.Type,
+			Written:       dataset.Written,
+			Volsize:       dataset.Volsize,
+			VolBlockSize:  dataset.VolBlockSize,
+			Logicalused:   dataset.Logicalused,
+			Usedbydataset: dataset.Usedbydataset,
+			Quota:         dataset.Quota,
+			Referenced:    dataset.Referenced,
+			Mounted:       dataset.Mounted,
+			Checksum:      dataset.Checksum,
+			Dedup:         dataset.Dedup,
+			ACLInherit:    dataset.ACLInherit,
+			ACLMode:       dataset.ACLMode,
+			PrimaryCache:  dataset.PrimaryCache,
+			VolMode:       dataset.VolMode,
 		})
 	}
 
 	return results, nil
 }
 
-func (s *Service) GetDatasetByGUID(guid string) (*zfsServiceInterfaces.Dataset, error) {
+func (s *Service) GetDatasetByGUID(guid string) (*zfs.Dataset, error) {
 	datasets, err := zfs.Datasets("")
 	if err != nil {
 		return nil, err
 	}
 
 	for _, dataset := range datasets {
-		properties, err := dataset.GetAllProperties()
+		gguid, err := dataset.GetProperty("guid")
 		if err != nil {
 			return nil, err
 		}
 
-		for _, v := range properties {
-			if v == guid {
-				propMap := make(map[string]string, len(properties))
-				for k, v := range properties {
-					propMap[k] = v
-				}
-
-				return &zfsServiceInterfaces.Dataset{
-					Dataset:    *dataset,
-					Properties: propMap,
-				}, nil
-			}
+		if gguid == guid {
+			return dataset, nil
 		}
 	}
 

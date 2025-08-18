@@ -20,7 +20,7 @@
 	}
 
 	async function onConfirm() {
-		if (dataset.properties.guid) {
+		if (dataset.guid) {
 			const response = await deleteSnapshot(dataset, recursive);
 
 			if (response.status === 'success') {

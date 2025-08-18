@@ -33,11 +33,11 @@
 
 	const results = useQueries([
 		{
-			queryKey: ['pools'],
+			queryKey: 'pools',
 			queryFn: async () => {
 				return await getPools();
 			},
-			refetchInterval: 1000,
+			refetchInterval: false,
 			keepPreviousData: false,
 			initialData: data.pools,
 			onSuccess: (data: Zpool[]) => {
@@ -45,23 +45,23 @@
 			}
 		},
 		{
-			queryKey: 'zfs-volumes',
+			queryKey: 'zfs-datasets',
 			queryFn: async () => {
-				return await getDatasets('volume');
+				return await getDatasets();
 			},
-			refetchInterval: 1000,
+			refetchInterval: false,
 			keepPreviousData: false,
 			initialData: data.datasets,
 			onSuccess: (data: Dataset[]) => {
-				updateCache('zfs-volumes', data);
+				updateCache('zfs-datasets', data);
 			}
 		},
 		{
-			queryKey: ['downloads'],
+			queryKey: 'downloads',
 			queryFn: async () => {
 				return await getDownloads();
 			},
-			refetchInterval: 1000,
+			refetchInterval: false,
 			keepPreviousData: true,
 			initialData: data.downloads,
 			onSuccess: (data: Download[]) => {
@@ -117,16 +117,6 @@
 		const volumes = $results[1].data?.filter((volume) => volume.type === 'volume');
 		const volume = volumes?.find((volume) => volume.name.endsWith(activeRow?.name));
 		return volume ?? null;
-	});
-
-	let activeVolumes: Dataset[] = $derived.by(() => {
-		if (activeRows && activeRows.length > 0) {
-			const volumes = $results[1].data?.filter((volume) => volume.type === 'volume');
-			return (
-				volumes?.filter((volume) => activeRows?.some((row) => row.name.endsWith(volume.name))) ?? []
-			);
-		}
-		return [];
 	});
 
 	let activeSnapshot: Dataset | null = $derived.by(() => {
@@ -376,7 +366,7 @@
 		}}
 		actions={{
 			onConfirm: async () => {
-				if (activeVolume.properties.guid) {
+				if (activeVolume.guid) {
 					const response = await deleteVolume(activeVolume);
 
 					if (response.status === 'success') {

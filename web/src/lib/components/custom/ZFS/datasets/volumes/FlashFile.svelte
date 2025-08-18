@@ -92,10 +92,7 @@
 						properties.loading = true;
 						await sleep(1000);
 
-						const response = await flashVolume(
-							dataset.properties.guid || '',
-							properties.select.uuid
-						);
+						const response = await flashVolume(dataset.guid || '', properties.select.uuid);
 
 						if (response.status === 'error') {
 							handleAPIError(response);

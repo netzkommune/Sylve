@@ -20,12 +20,12 @@
 	let { open = $bindable(), dataset }: Props = $props();
 	let options = {
 		atime: 'on',
-		checksum: dataset.properties.checksum || 'on',
-		compression: dataset.properties.compression || 'on',
-		dedup: dataset.properties.dedup || 'off',
-		quota: dataset.properties.quota ? bytesToHumanReadable(dataset.properties.quota) : '',
-		aclinherit: dataset.properties.aclinherit || 'passthrough',
-		aclmode: dataset.properties.aclmode || 'passthrough'
+		checksum: dataset.checksum || 'on',
+		compression: dataset.compression || 'on',
+		dedup: dataset.dedup || 'off',
+		quota: dataset.quota ? bytesToHumanReadable(dataset.quota) : '',
+		aclinherit: dataset.aclinherit || 'passthrough',
+		aclmode: dataset.aclmode || 'passthrough'
 	};
 
 	let zfsProperties = $state(createFSProps);
@@ -41,7 +41,7 @@
 			}
 		}
 
-		const response = await editFileSystem(dataset.properties.guid as string, {
+		const response = await editFileSystem(dataset.guid as string, {
 			atime: properties.atime,
 			checksum: properties.checksum,
 			compression: properties.compression,

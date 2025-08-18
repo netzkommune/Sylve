@@ -65,6 +65,7 @@
 	let datasets: Dataset[] = $derived.by(() => {
 		return $results[1].data?.filter((dataset) => dataset.type !== 'snapshot') || [];
 	});
+
 	let tableData = $derived(generateTableData(grouped));
 	let activePool: Zpool | null = $derived.by(() => {
 		if (activeRow) {

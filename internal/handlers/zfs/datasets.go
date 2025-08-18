@@ -75,7 +75,7 @@ type FlashVolumeRequest struct {
 // @Produce json
 // @Security BearerAuth
 // @Param type query string false "Filter for datasets"
-// @Success 200 {object} internal.APIResponse[[]zfsServiceInterfaces.Dataset] "OK"
+// @Success 200 {object} internal.APIResponse[[]*zfsServiceInterfaces.Dataset] "OK"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
 // @Router /zfs/datasets [get]
 func GetDatasets(zfsService *zfs.Service) gin.HandlerFunc {
@@ -94,7 +94,7 @@ func GetDatasets(zfsService *zfs.Service) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, internal.APIResponse[[]zfsServiceInterfaces.Dataset]{
+		c.JSON(http.StatusOK, internal.APIResponse[[]*zfsServiceInterfaces.Dataset]{
 			Status:  "success",
 			Message: "datasets",
 			Error:   "",

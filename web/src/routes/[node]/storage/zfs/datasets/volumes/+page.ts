@@ -8,7 +8,7 @@ export async function load() {
 	const cacheDuration = SEVEN_DAYS;
 
 	const [datasets, pools, downloads] = await Promise.all([
-		cachedFetch('datasets', async () => await getDatasets(), cacheDuration),
+		cachedFetch('zfs-volumes', async () => await getDatasets('volume'), cacheDuration),
 		cachedFetch('pools', getPools, cacheDuration),
 		cachedFetch('downloads', async () => getDownloads(), cacheDuration)
 	]);

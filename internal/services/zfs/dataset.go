@@ -16,10 +16,21 @@ import (
 	"sylve/pkg/zfs"
 )
 
-func (s *Service) GetDatasets() ([]zfsServiceInterfaces.Dataset, error) {
+func (s *Service) GetDatasets(t string) ([]zfsServiceInterfaces.Dataset, error) {
 	var results []zfsServiceInterfaces.Dataset
+	var datasets []*zfs.Dataset
+	var err error
 
-	datasets, err := zfs.Datasets("")
+	if t == "" || t == "all" {
+		datasets, err = zfs.Datasets("")
+	} else if t == "filesystem" {
+		datasets, err = zfs.Filesystems("")
+	} else if t == "snapshot" {
+		datasets, err = zfs.Snapshots("")
+	} else if t == "volume" {
+		datasets, err = zfs.Volumes("")
+	}
+
 	if err != nil {
 		return nil, err
 	}

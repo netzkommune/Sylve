@@ -8,8 +8,8 @@ import {
 
 import { apiRequest } from '$lib/utils/http';
 
-export async function getDatasets(): Promise<Dataset[]> {
-	return await apiRequest('/zfs/datasets', DatasetSchema.array(), 'GET');
+export async function getDatasets(type: string = 'all'): Promise<Dataset[]> {
+	return await apiRequest(`/zfs/datasets?type=${type}`, DatasetSchema.array(), 'GET');
 }
 
 export async function deleteSnapshot(

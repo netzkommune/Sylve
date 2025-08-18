@@ -45,15 +45,15 @@
 			}
 		},
 		{
-			queryKey: ['datasets'],
+			queryKey: 'zfs-volumes',
 			queryFn: async () => {
-				return await getDatasets();
+				return await getDatasets('volume');
 			},
 			refetchInterval: 1000,
 			keepPreviousData: false,
 			initialData: data.datasets,
 			onSuccess: (data: Dataset[]) => {
-				updateCache('datasets', data);
+				updateCache('zfs-volumes', data);
 			}
 		},
 		{

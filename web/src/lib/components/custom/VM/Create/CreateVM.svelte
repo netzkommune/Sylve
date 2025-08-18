@@ -51,9 +51,19 @@
 			refetchOnMount: 'always'
 		},
 		{
-			queryKey: ['datasetList-svm'],
+			queryKey: ['zfs-filesystems'],
 			queryFn: async () => {
-				return await getDatasets();
+				return await getDatasets('filesystem');
+			},
+			refetchInterval: 1000,
+			keepPreviousData: true,
+			initialData: [],
+			refetchOnMount: 'always'
+		},
+		{
+			queryKey: ['zfs-volumes'],
+			queryFn: async () => {
+				return await getDatasets('volume');
 			},
 			refetchInterval: 1000,
 			keepPreviousData: true,
@@ -143,23 +153,20 @@
 		}
 	]);
 
-	let vms: VM[] = $derived($results[7].data as VM[]);
-	let jails: Jail[] = $derived($results[9].data as Jail[]);
-	let datasets: Dataset[] = $derived($results[1].data as Dataset[]);
-	let volumes: Dataset[] = $derived(datasets.filter((dataset) => dataset.type === 'volume'));
-	let filesystems: Dataset[] = $derived(
-		datasets.filter((dataset) => dataset.type === 'filesystem')
-	);
+	let vms: VM[] = $derived($results[8].data as VM[]);
+	let jails: Jail[] = $derived($results[10].data as Jail[]);
+	let filesystems: Dataset[] = $derived($results[1].data as Dataset[]);
+	let volumes: Dataset[] = $derived($results[2].data as Dataset[]);
 
 	let networkSwitches: SwitchList = $derived($results[3].data as SwitchList);
-	let pciDevices: PCIDevice[] = $derived($results[4].data as PCIDevice[]);
-	let pptDevices: PPTDevice[] = $derived($results[5].data as PPTDevice[]);
-	let networkObjects = $derived($results[8].data as NetworkObject[]);
-	let passablePci: PCIDevice[] = $derived(
-		pciDevices.filter((device) => device.name.startsWith('ppt'))
-	);
+	let pciDevices: PCIDevice[] = $derived($results[5].data as PCIDevice[]);
+	let pptDevices: PPTDevice[] = $derived($results[6].data as PPTDevice[]);
+	let networkObjects = $derived($results[9].data as NetworkObject[]);
+	let passablePci: PCIDevice[] = $derived.by(() => {
+		return pciDevices.filter((device) => device.name.startsWith('ppt'));
+	});
 
-	let downloads = $derived($results[6].data as Download[]);
+	let downloads = $derived($results[7].data as Download[]);
 
 	const tabs = [
 		{ value: 'basic', label: 'Basic' },

@@ -47,15 +47,15 @@
 			}
 		},
 		{
-			queryKey: ['datasetList'],
+			queryKey: ['zfs-filesystems'],
 			queryFn: async () => {
-				return await getDatasets();
+				return await getDatasets('filesystem');
 			},
 			refetchInterval: 1000,
 			keepPreviousData: false,
 			initialData: data.datasets,
 			onSuccess: (data: Dataset[]) => {
-				updateCache('datasets', data);
+				updateCache('zfs-filesystems', data);
 			}
 		}
 	]);

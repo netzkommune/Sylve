@@ -2,7 +2,6 @@
 	import { bulkDelete, getDatasets, getPeriodicSnapshots } from '$lib/api/zfs/datasets';
 	import { getPools } from '$lib/api/zfs/pool';
 	import AlertDialogModal from '$lib/components/custom/Dialog/Alert.svelte';
-
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import Search from '$lib/components/custom/TreeTable/Search.svelte';
 	import CreateDetailed from '$lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte';
@@ -12,11 +11,12 @@
 	import type { Row } from '$lib/types/components/tree-table';
 	import type { Dataset, GroupedByPool, PeriodicSnapshot } from '$lib/types/zfs/dataset';
 	import type { Zpool } from '$lib/types/zfs/pool';
-	import { handleAPIError } from '$lib/utils/http';
+	import { handleAPIError, updateCache } from '$lib/utils/http';
 	import { groupByPool } from '$lib/utils/zfs/dataset/dataset';
 	import { generateTableData } from '$lib/utils/zfs/dataset/snapshot';
 	import Icon from '@iconify/svelte';
-	import { useQueries } from '@sveltestack/svelte-query';
+	import { useQueries, useQueryClient } from '@sveltestack/svelte-query';
+	import { untrack } from 'svelte';
 	import { toast } from 'svelte-sonner';
 
 	interface Data {
@@ -27,35 +27,56 @@
 
 	let { data }: { data: Data } = $props();
 	let tableName = 'tt-zfsSnapshots';
+	const queryClient = useQueryClient();
 	const results = useQueries([
 		{
-			queryKey: ['poolList'],
+			queryKey: 'pools',
 			queryFn: async () => {
 				return await getPools();
 			},
-			refetchInterval: 1000,
 			keepPreviousData: false,
-			initialData: data.pools
+			initialData: data.pools,
+			onSuccess: (data: Zpool[]) => {
+				updateCache('pools', data);
+			}
 		},
 		{
-			queryKey: ['datasetList'],
+			queryKey: 'zfs-datasets',
 			queryFn: async () => {
 				return await getDatasets();
 			},
-			refetchInterval: 1000,
 			keepPreviousData: false,
-			initialData: data.datasets
+			initialData: data.datasets,
+			onSuccess: (data: Dataset[]) => {
+				updateCache('zfs-datasets', data);
+			}
 		},
 		{
-			queryKey: ['periodicSnapshots'],
+			queryKey: 'periodic-snapshots',
 			queryFn: async () => {
 				return await getPeriodicSnapshots();
 			},
-			refetchInterval: 1000,
 			keepPreviousData: false,
-			initialData: data.periodicSnapshots
+			initialData: data.periodicSnapshots,
+			onSuccess: (data: PeriodicSnapshot[]) => {
+				updateCache('zfs-datasets', data);
+			}
 		}
 	]);
+
+	let reload = $state(false);
+
+	$effect(() => {
+		if (reload) {
+			queryClient.refetchQueries('pools');
+			queryClient.refetchQueries('zfs-datasets');
+			queryClient.refetchQueries('periodic-snapshots');
+
+			untrack(() => {
+				reload = false;
+			});
+		}
+	});
 
 	let activeRows: Row[] | null = $state(null);
 	let activeRow: Row | null = $derived(activeRows ? (activeRows[0] as Row) : ({} as Row));
@@ -65,6 +86,7 @@
 	let datasets: Dataset[] = $derived.by(() => {
 		return $results[1].data?.filter((dataset) => dataset.type !== 'snapshot') || [];
 	});
+
 	let tableData = $derived(generateTableData(grouped));
 	let activePool: Zpool | null = $derived.by(() => {
 		if (activeRow) {
@@ -108,11 +130,11 @@
 					const volumes = group.volumes;
 					const guids = fs
 						.map((fs) => ({
-							guid: fs.properties.guid
+							guid: fs.guid
 						}))
 						.concat(
 							volumes.map((volume) => ({
-								guid: volume.properties.guid
+								guid: volume.guid
 							}))
 						);
 
@@ -215,12 +237,12 @@
 
 <!-- Create Snapshot -->
 {#if modals.snapshot.create.open}
-	<CreateDetailed bind:open={modals.snapshot.create.open} {pools} {datasets} />
+	<CreateDetailed bind:open={modals.snapshot.create.open} {pools} {datasets} bind:reload />
 {/if}
 
 <!-- Delete Snapshot -->
 {#if modals.snapshot.delete.open && activeDatasets && activeDatasets.length === 1}
-	<DeleteSnapshot bind:open={modals.snapshot.delete.open} dataset={activeDatasets[0]} />
+	<DeleteSnapshot bind:open={modals.snapshot.delete.open} dataset={activeDatasets[0]} bind:reload />
 {/if}
 
 <!-- Bulk delete -->
@@ -231,6 +253,7 @@
 		actions={{
 			onConfirm: async () => {
 				const response = await bulkDelete(activeDatasets);
+				reload = true;
 				if (response.status === 'success') {
 					toast.success(
 						`Deleted ${activeDatasets.length} snapshot${activeDatasets.length > 1 ? 's' : ''}`,
@@ -260,5 +283,6 @@
 		{pools}
 		{datasets}
 		periodicSnapshots={activePeriodics}
+		bind:reload
 	/>
 {/if}

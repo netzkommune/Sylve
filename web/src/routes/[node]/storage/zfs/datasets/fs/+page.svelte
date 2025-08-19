@@ -21,7 +21,7 @@
 	import { groupByPool } from '$lib/utils/zfs/dataset/dataset';
 	import { createFSProps, generateTableData, handleError } from '$lib/utils/zfs/dataset/fs';
 	import Icon from '@iconify/svelte';
-	import { useQueries } from '@sveltestack/svelte-query';
+	import { useQueries, useQueryClient } from '@sveltestack/svelte-query';
 	import { untrack } from 'svelte';
 	import { toast } from 'svelte-sonner';
 
@@ -33,13 +33,14 @@
 	let { data }: { data: Data } = $props();
 	let tableName = 'tt-zfsDatasets';
 
+	const queryClient = useQueryClient();
 	const results = useQueries([
 		{
-			queryKey: ['poolList'],
+			queryKey: 'pools',
 			queryFn: async () => {
 				return await getPools();
 			},
-			refetchInterval: 1000,
+			refetchInterval: false,
 			keepPreviousData: false,
 			initialData: data.pools,
 			onSuccess: (data: Zpool[]) => {
@@ -47,18 +48,31 @@
 			}
 		},
 		{
-			queryKey: ['datasetList'],
+			queryKey: 'zfs-datasets',
 			queryFn: async () => {
 				return await getDatasets();
 			},
-			refetchInterval: 1000,
+			refetchInterval: false,
 			keepPreviousData: false,
 			initialData: data.datasets,
 			onSuccess: (data: Dataset[]) => {
-				updateCache('datasets', data);
+				updateCache('zfs-datasets', data);
 			}
 		}
 	]);
+
+	let reload = $state(false);
+
+	$effect(() => {
+		if (reload) {
+			queryClient.refetchQueries('pools');
+			queryClient.refetchQueries('zfs-datasets');
+
+			untrack(() => {
+				reload = false;
+			});
+		}
+	});
 
 	let pools: Zpool[] = $derived($results[0].data as Zpool[]);
 	let datasets: Dataset[] = $derived($results[1].data as Dataset[]);
@@ -129,7 +143,6 @@
 		return false;
 	});
 
-	let zfsProperties = $state(createFSProps);
 	let query: string = $state('');
 
 	let modals = $state({
@@ -162,6 +175,8 @@
 			}
 		}
 	});
+
+	async function realodData() {}
 </script>
 
 {#snippet button(type: string)}
@@ -332,6 +347,7 @@
 {#if modals.snapshot.create.open && activeDataset && activeDataset.type === 'filesystem'}
 	<CreateSnapshot
 		bind:open={modals.snapshot.create.open}
+		bind:reload
 		dataset={activeDataset}
 		recursion={true}
 	/>
@@ -344,8 +360,9 @@
 		customTitle={`Are you sure you want to rollback to the snapshot <b>${activeDataset.name}</b>? This action cannot be undone.`}
 		actions={{
 			onConfirm: async () => {
-				if (activeDataset.properties.guid) {
-					const response = await rollbackSnapshot(activeDataset.properties.guid);
+				if (activeDataset.guid) {
+					const response = await rollbackSnapshot(activeDataset.guid);
+					reload = true;
 
 					if (response.status === 'error') {
 						handleAPIError(response);
@@ -374,7 +391,7 @@
 
 <!-- Delete Snapshot -->
 {#if modals.snapshot.delete.open && activeDataset && activeDataset.type === 'snapshot'}
-	<DeleteSnapshot bind:open={modals.snapshot.delete.open} dataset={activeDataset} />
+	<DeleteSnapshot bind:open={modals.snapshot.delete.open} dataset={activeDataset} bind:reload />
 {/if}
 
 <!-- Delete FS -->
@@ -387,9 +404,9 @@
 		}}
 		actions={{
 			onConfirm: async () => {
-				if (activeDataset.properties.guid) {
+				if (activeDataset.guid) {
 					const response = await deleteFileSystem(activeDataset);
-
+					reload = true;
 					if (response.status === 'success') {
 						toast.success(`Deleted filesystem ${activeDataset.name}`, {
 							position: 'bottom-center'
@@ -423,6 +440,7 @@
 		actions={{
 			onConfirm: async () => {
 				const response = await bulkDelete(activeDatasets);
+				reload = true;
 				if (response.status === 'success') {
 					toast.success(`Deleted ${activeDatasets.length} datasets`, {
 						position: 'bottom-center'
@@ -445,10 +463,10 @@
 
 <!-- Create FS -->
 {#if modals.fs.create.open}
-	<CreateFS bind:open={modals.fs.create.open} {datasets} {grouped} />
+	<CreateFS bind:open={modals.fs.create.open} {datasets} {grouped} bind:reload />
 {/if}
 
 <!-- Edit FS -->
 {#if modals.fs.edit.open && activeDataset && activeDataset.type === 'filesystem'}
-	<EditFS bind:open={modals.fs.edit.open} dataset={activeDataset} />
+	<EditFS bind:open={modals.fs.edit.open} dataset={activeDataset} bind:reload />
 {/if}

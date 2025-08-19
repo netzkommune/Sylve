@@ -78,7 +78,7 @@ export function generateTableData(
 			for (const dataset of datasets) {
 				let found: Dataset | null = null;
 
-				if (dataset.properties['guid'] && dataset.properties['guid'] === storage.dataset) {
+				if (dataset.guid === storage.dataset) {
 					found = dataset;
 				}
 

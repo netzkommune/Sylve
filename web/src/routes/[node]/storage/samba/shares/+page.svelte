@@ -142,11 +142,11 @@
 		];
 
 		for (const share of shares) {
-			const dataset = datasets.find((ds) => ds.properties.guid === share.dataset);
+			const dataset = datasets.find((ds) => ds.guid === share.dataset);
 			const row: Row = {
 				id: share.id,
 				name: share.name,
-				mountpoint: dataset ? dataset.properties.mountpoint : '-',
+				mountpoint: dataset ? dataset.mountpoint : '-',
 				readOnlyGroups: share.readOnlyGroups || [],
 				writeableGroups: share.writeableGroups || [],
 				created: share.createdAt

@@ -55,17 +55,17 @@
 
 	let dVolumes = $derived.by(() => {
 		return volumes
-			.filter((v) => v.properties.volmode && v.properties.volmode === 'dev')
+			.filter((v) => v.volmode && v.volmode === 'dev')
 			.map((v) => ({
 				label: v.name,
-				value: v.properties.guid || ''
+				value: v.guid || ''
 			}));
 	});
 
 	let dFilesystems = $derived.by(() => {
 		return filesystems.map((fs) => ({
 			label: fs.name,
-			value: fs.properties.guid || ''
+			value: fs.guid || ''
 		}));
 	});
 
@@ -102,7 +102,6 @@
 		if (humanSize) {
 			try {
 				const parsed = humanFormat.parse.raw(humanSize);
-				console.log(parsed);
 				size = parsed.factor * parsed.value;
 			} catch (e) {
 				size = 1024;

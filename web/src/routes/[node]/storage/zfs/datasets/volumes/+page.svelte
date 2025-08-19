@@ -19,7 +19,8 @@
 	import { groupByPool } from '$lib/utils/zfs/dataset/dataset';
 	import { generateTableData } from '$lib/utils/zfs/dataset/volume';
 	import Icon from '@iconify/svelte';
-	import { useQueries } from '@sveltestack/svelte-query';
+	import { useQueries, useQueryClient } from '@sveltestack/svelte-query';
+	import { untrack } from 'svelte';
 	import { toast } from 'svelte-sonner';
 
 	interface Data {
@@ -31,13 +32,14 @@
 	let { data }: { data: Data } = $props();
 	let tableName = 'tt-zfsVolumes';
 
+	const queryClient = useQueryClient();
 	const results = useQueries([
 		{
-			queryKey: ['pools'],
+			queryKey: 'pools',
 			queryFn: async () => {
 				return await getPools();
 			},
-			refetchInterval: 1000,
+			refetchInterval: false,
 			keepPreviousData: false,
 			initialData: data.pools,
 			onSuccess: (data: Zpool[]) => {
@@ -45,23 +47,23 @@
 			}
 		},
 		{
-			queryKey: ['datasets'],
+			queryKey: 'zfs-datasets',
 			queryFn: async () => {
 				return await getDatasets();
 			},
-			refetchInterval: 1000,
+			refetchInterval: false,
 			keepPreviousData: false,
 			initialData: data.datasets,
 			onSuccess: (data: Dataset[]) => {
-				updateCache('datasets', data);
+				updateCache('zfs-datasets', data);
 			}
 		},
 		{
-			queryKey: ['downloads'],
+			queryKey: 'downloads',
 			queryFn: async () => {
 				return await getDownloads();
 			},
-			refetchInterval: 1000,
+			refetchInterval: false,
 			keepPreviousData: true,
 			initialData: data.downloads,
 			onSuccess: (data: Download[]) => {
@@ -69,6 +71,19 @@
 			}
 		}
 	]);
+
+	let reload = $state(false);
+	$effect(() => {
+		if (reload) {
+			queryClient.refetchQueries('pools');
+			queryClient.refetchQueries('zfs-datasets');
+			queryClient.refetchQueries('downloads');
+
+			untrack(() => {
+				reload = false;
+			});
+		}
+	});
 
 	let pools: Zpool[] = $derived($results[0].data as Zpool[]);
 	let downloads = $derived($results[2].data as Download[]);
@@ -117,16 +132,6 @@
 		const volumes = $results[1].data?.filter((volume) => volume.type === 'volume');
 		const volume = volumes?.find((volume) => volume.name.endsWith(activeRow?.name));
 		return volume ?? null;
-	});
-
-	let activeVolumes: Dataset[] = $derived.by(() => {
-		if (activeRows && activeRows.length > 0) {
-			const volumes = $results[1].data?.filter((volume) => volume.type === 'volume');
-			return (
-				volumes?.filter((volume) => activeRows?.some((row) => row.name.endsWith(volume.name))) ?? []
-			);
-		}
-		return [];
 	});
 
 	let activeSnapshot: Dataset | null = $derived.by(() => {
@@ -349,12 +354,17 @@
 
 <!-- Flash File to Volume -->
 {#if modals.volume.flash.open && activeVolume && activeVolume.type === 'volume'}
-	<FlashFile bind:open={modals.volume.flash.open} dataset={activeVolume} {downloads} />
+	<FlashFile bind:open={modals.volume.flash.open} dataset={activeVolume} {downloads} bind:reload />
 {/if}
 
 <!-- Create Snapshot -->
 {#if modals.snapshot.create.open && activeVolume && activeVolume.type === 'volume'}
-	<CreateSnapshot bind:open={modals.snapshot.create.open} dataset={activeVolume} recursion={true} />
+	<CreateSnapshot
+		bind:open={modals.snapshot.create.open}
+		dataset={activeVolume}
+		recursion={true}
+		bind:reload
+	/>
 {/if}
 
 <!-- Delete Snapshot -->
@@ -363,6 +373,7 @@
 		bind:open={modals.snapshot.delete.open}
 		dataset={activeSnapshot}
 		askRecursive={false}
+		bind:reload
 	/>
 {/if}
 
@@ -376,9 +387,9 @@
 		}}
 		actions={{
 			onConfirm: async () => {
-				if (activeVolume.properties.guid) {
+				if (activeVolume.guid) {
 					const response = await deleteVolume(activeVolume);
-
+					reload = true;
 					if (response.status === 'success') {
 						toast.success(`Deleted volume ${activeVolume.name}`, {
 							position: 'bottom-center'
@@ -413,6 +424,7 @@
 			onConfirm: async () => {
 				const activeSnapshot = $state.snapshot(activeDatasets);
 				const response = await bulkDelete(activeDatasets);
+				reload = true;
 				if (response.status === 'success') {
 					toast.success(`Deleted ${activeSnapshot.length} datasets`, {
 						position: 'bottom-center'
@@ -435,10 +447,10 @@
 
 <!-- Create Volume -->
 {#if modals.volume.create.open}
-	<CreateVolume bind:open={modals.volume.create.open} {pools} {grouped} />
+	<CreateVolume bind:open={modals.volume.create.open} {pools} {grouped} bind:reload />
 {/if}
 
 <!-- Edit Volume -->
 {#if modals.volume.edit.open && activeVolume && activeVolume.type === 'volume'}
-	<EditVolume bind:open={modals.volume.edit.open} dataset={activeVolume} />
+	<EditVolume bind:open={modals.volume.edit.open} dataset={activeVolume} bind:reload />
 {/if}

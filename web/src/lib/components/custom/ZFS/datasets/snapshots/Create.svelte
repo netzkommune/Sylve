@@ -15,9 +15,10 @@
 		open: boolean;
 		dataset: Dataset;
 		recursion?: boolean;
+		reload?: boolean;
 	}
 
-	let { open = $bindable(), dataset, recursion = false }: Props = $props();
+	let { open = $bindable(), dataset, recursion = false, reload = $bindable() }: Props = $props();
 	let options = {
 		name: '',
 		recursive: false
@@ -36,6 +37,7 @@
 
 		try {
 			const response = await createSnapshot(dataset, properties.name, properties.recursive);
+			reload = true;
 
 			if (response.status === 'success') {
 				toast.success(`Snapshot ${dataset.name}@${properties.name} created`, {

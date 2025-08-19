@@ -45,12 +45,12 @@
 		if (data.rows) {
 			untrack(async () => {
 				if (query && query !== '') return;
-
 				if (data.rows.length === 0) {
 					table?.clearData();
 					return;
 				}
 
+				const now = performance.now();
 				const selectedIds = table?.getSelectedRows().map((row) => row.getData().id) || [];
 				const treeExpands = getAllRows(table?.getRows() || []).map((row) => ({
 					id: row.getData().id,
@@ -63,17 +63,35 @@
 					}
 				}
 
-				selectedIds.forEach((id) => {
+				for (let i = 0; i < selectedIds.length; i++) {
+					const id = selectedIds[i];
 					const row = findRow(table?.getRows() || [], id);
 					if (row) row.select();
-				});
+				}
 
-				treeExpands.forEach((treeExpand) => {
-					const row = findRow(table?.getRows() || [], treeExpand.id);
+				const rowMap = new Map<number, RowComponent>();
+				const buildRowMap = (rows: RowComponent[]) => {
+					for (const row of rows) {
+						rowMap.set(row.getData().id, row);
+						const children = row.getTreeChildren();
+						if (children.length > 0) {
+							buildRowMap(children);
+						}
+					}
+				};
+
+				buildRowMap(table?.getRows() || []);
+
+				for (let i = 0; i < treeExpands.length; i++) {
+					const treeExpand = treeExpands[i];
+					const row = rowMap.get(treeExpand.id);
 					if (row) {
 						treeExpand.expanded ? row.treeExpand() : row.treeCollapse();
 					}
-				});
+				}
+
+				const end = performance.now();
+				console.log(`Performance ${end - now}ms`);
 
 				updateParentActiveRows();
 			});

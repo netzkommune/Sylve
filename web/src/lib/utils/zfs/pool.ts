@@ -366,8 +366,8 @@ export function getDatasetCompressionHist(
 	);
 
 	for (const dataset of related) {
-		const used = dataset.used || dataset.properties?.used;
-		const logicalUsed = dataset.logicalused || dataset.properties?.logicalused;
+		const used = dataset.used;
+		const logicalUsed = dataset.logicalused;
 
 		if (typeof used === 'number' && typeof logicalUsed === 'number' && logicalUsed > 0) {
 			if (dataset.name.includes('/')) {

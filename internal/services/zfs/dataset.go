@@ -12,62 +12,73 @@ import (
 	"fmt"
 	vmModels "sylve/internal/db/models/vm"
 	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
-	"sylve/pkg/utils"
 	"sylve/pkg/zfs"
 )
 
-func (s *Service) GetDatasets() ([]zfsServiceInterfaces.Dataset, error) {
-	var results []zfsServiceInterfaces.Dataset
+func (s *Service) GetDatasets(t string) ([]*zfsServiceInterfaces.Dataset, error) {
+	var datasets []*zfs.Dataset
+	var err error
 
-	datasets, err := zfs.Datasets("")
+	if t == "" || t == "all" {
+		datasets, err = zfs.Datasets("")
+	} else if t == "filesystem" {
+		datasets, err = zfs.Filesystems("")
+	} else if t == "snapshot" {
+		datasets, err = zfs.Snapshots("")
+	} else if t == "volume" {
+		datasets, err = zfs.Volumes("")
+	}
+
 	if err != nil {
 		return nil, err
 	}
 
+	var results []*zfsServiceInterfaces.Dataset
+
 	for _, dataset := range datasets {
-		props, err := dataset.GetAllProperties()
-		if err != nil {
-			continue
-		}
-
-		propMap := make(map[string]string, len(props))
-		for k, v := range props {
-			propMap[k] = v
-		}
-
-		results = append(results, zfsServiceInterfaces.Dataset{
-			Dataset:    *dataset,
-			Properties: propMap,
+		results = append(results, &zfsServiceInterfaces.Dataset{
+			Name:          dataset.Name,
+			Origin:        dataset.Origin,
+			GUID:          dataset.GUID,
+			Used:          dataset.Used,
+			Avail:         dataset.Avail,
+			Mountpoint:    dataset.Mountpoint,
+			Compression:   dataset.Compression,
+			Type:          dataset.Type,
+			Written:       dataset.Written,
+			Volsize:       dataset.Volsize,
+			VolBlockSize:  dataset.VolBlockSize,
+			Logicalused:   dataset.Logicalused,
+			Usedbydataset: dataset.Usedbydataset,
+			Quota:         dataset.Quota,
+			Referenced:    dataset.Referenced,
+			Mounted:       dataset.Mounted,
+			Checksum:      dataset.Checksum,
+			Dedup:         dataset.Dedup,
+			ACLInherit:    dataset.ACLInherit,
+			ACLMode:       dataset.ACLMode,
+			PrimaryCache:  dataset.PrimaryCache,
+			VolMode:       dataset.VolMode,
 		})
 	}
 
 	return results, nil
 }
 
-func (s *Service) GetDatasetByGUID(guid string) (*zfsServiceInterfaces.Dataset, error) {
+func (s *Service) GetDatasetByGUID(guid string) (*zfs.Dataset, error) {
 	datasets, err := zfs.Datasets("")
 	if err != nil {
 		return nil, err
 	}
 
 	for _, dataset := range datasets {
-		properties, err := dataset.GetAllProperties()
+		gguid, err := dataset.GetProperty("guid")
 		if err != nil {
 			return nil, err
 		}
 
-		for _, v := range properties {
-			if v == guid {
-				propMap := make(map[string]string, len(properties))
-				for k, v := range properties {
-					propMap[k] = v
-				}
-
-				return &zfsServiceInterfaces.Dataset{
-					Dataset:    *dataset,
-					Properties: propMap,
-				}, nil
-			}
+		if gguid == guid {
+			return dataset, nil
 		}
 	}
 
@@ -83,14 +94,8 @@ func (s *Service) BulkDeleteDataset(guids []string) error {
 	if err := s.DB.Model(&vmModels.Storage{}).Where("dataset IN ?", guids).Count(&count).Error; err != nil {
 		return fmt.Errorf("failed to check if datasets are in use: %w", err)
 	}
-
 	if count > 0 {
 		return fmt.Errorf("datasets_in_use_by_vm")
-	}
-
-	guidsMap := make(map[string]struct{})
-	for _, guid := range guids {
-		guidsMap[guid] = struct{}{}
 	}
 
 	datasets, err := zfs.Datasets("")
@@ -98,29 +103,19 @@ func (s *Service) BulkDeleteDataset(guids []string) error {
 		return err
 	}
 
-	matched := make(map[string]*zfs.Dataset)
+	available := make(map[string]*zfs.Dataset)
+	for _, ds := range datasets {
+		available[ds.GUID] = ds
+	}
 
-	for _, dataset := range datasets {
-		properties, err := dataset.GetAllProperties()
-		if err != nil {
-			return err
-		}
-
-		for _, v := range properties {
-			if _, ok := guidsMap[v]; ok {
-				matched[v] = dataset
-				delete(guidsMap, v)
-				break
-			}
+	for _, guid := range guids {
+		if _, ok := available[guid]; !ok {
+			return fmt.Errorf("dataset with guid %s not found", guid)
 		}
 	}
 
-	if len(guidsMap) > 0 {
-		return fmt.Errorf("datasets with guids %v not found", utils.MapKeys(guidsMap))
-	}
-
-	for guid, dataset := range matched {
-		if err := dataset.Destroy(zfs.DestroyDefault); err != nil {
+	for _, guid := range guids {
+		if err := available[guid].Destroy(zfs.DestroyDefault); err != nil {
 			return fmt.Errorf("failed to delete dataset with guid %s: %w", guid, err)
 		}
 	}

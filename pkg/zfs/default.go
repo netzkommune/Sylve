@@ -17,8 +17,16 @@ func Datasets(filter string) ([]*Dataset, error) {
 	return z.Datasets(filter)
 }
 
+func Filesystems(filter string) ([]*Dataset, error) {
+	return z.Filesystems(filter)
+}
+
 func Snapshots(filter string) ([]*Dataset, error) {
 	return z.Snapshots(filter)
+}
+
+func Volumes(filter string) ([]*Dataset, error) {
+	return z.Volumes(filter)
 }
 
 func GetZpool(name string) (*Zpool, error) {

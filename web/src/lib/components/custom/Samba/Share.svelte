@@ -33,15 +33,15 @@
 				options: datasets
 					.filter(
 						(dataset) =>
-							dataset.properties.mountpoint !== '-' &&
-							dataset.properties.mountpoint !== null &&
-							dataset.properties.mountpoint !== '' &&
-							dataset.properties.mountpoint !== '/' &&
-							dataset.properties.mounted
+							dataset.mountpoint !== '-' &&
+							dataset.mountpoint !== null &&
+							dataset.mountpoint !== '' &&
+							dataset.mountpoint !== '/' &&
+							dataset.mounted
 					)
 					.map((dataset) => ({
 						label: dataset.name,
-						value: dataset.properties.guid ? dataset.properties.guid : dataset.name
+						value: dataset.guid ? dataset.guid : dataset.name
 					}))
 			}
 		},

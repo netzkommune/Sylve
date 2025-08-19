@@ -93,7 +93,7 @@ func (z *zfs) GetDataset(name string) (*Dataset, error) {
 		return nil, err
 	}
 
-	ds := &Dataset{z: z, Name: name, props: make(map[string]string)}
+	ds := &Dataset{z: z, Name: name, Props: make(map[string]string)}
 	return ds, ds.parseProps(out)
 }
 

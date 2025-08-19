@@ -11,7 +11,7 @@ import (
 )
 
 func (z *zfs) listByType(t, filter string) ([]*Dataset, error) {
-	args := []string{"list", "-rp", "-t", t, "-o", "all"}
+	args := []string{"list", "-rp", "-t", t, "-o", strings.Join(dsPropList, ",")}
 
 	if filter != "" {
 		args = append(args, filter)
@@ -32,7 +32,7 @@ func (z *zfs) listByType(t, filter string) ([]*Dataset, error) {
 	for _, line := range out[1:] {
 		if name != line[0] {
 			name = line[0]
-			ds = &Dataset{z: z, Name: name, props: make(map[string]string)}
+			ds = &Dataset{z: z, Name: name, Props: make(map[string]string)}
 			datasets = append(datasets, ds)
 		}
 		if err := ds.parseProps([][]string{out[0], line}); err != nil {
@@ -49,46 +49,56 @@ func (d *Dataset) parseProps(out [][]string) error {
 	if len(out) != 2 {
 		return errors.New("output does not match what is expected on this platform")
 	}
+
 	for i, v := range out[0] {
 		val := "-"
 		if i < len(out[1]) {
 			val = out[1][i]
 		}
-		d.props[strings.ToLower(v)] = val
+		d.Props[strings.ToLower(v)] = val
 	}
 
-	if len(d.props) <= len(dsPropList) {
+	if len(d.Props) < len(dsPropList) {
 		return errors.New("output does not match what is expected on this platform")
 	}
-	setString(&d.Name, d.props["name"])
-	setString(&d.Origin, d.props["origin"])
 
-	if err = setUint(&d.Used, d.props["used"]); err != nil {
-		// return err
+	setString(&d.Name, d.Props["name"])
+	setString(&d.Origin, d.Props["origin"])
+	setString(&d.GUID, d.Props["guid"])
+	setString(&d.Mounted, d.Props["mounted"])
+	setString(&d.Checksum, d.Props["checksum"])
+	setString(&d.Dedup, d.Props["dedup"])
+	setString(&d.ACLInherit, d.Props["aclinherit"])
+	setString(&d.ACLMode, d.Props["aclmode"])
+	setString(&d.PrimaryCache, d.Props["primarycache"])
+	setString(&d.VolMode, d.Props["volmode"])
+
+	if err = setUint(&d.Used, d.Props["used"]); err != nil {
 		return fmt.Errorf("failed to parse used: %w", err)
 	}
-	if err = setUint(&d.Avail, d.props["avail"]); err != nil {
+
+	if err = setUint(&d.Avail, d.Props["avail"]); err != nil {
 		return fmt.Errorf("failed to parse avail: %w", err)
 	}
 
-	setString(&d.Mountpoint, d.props["mountpoint"])
-	setString(&d.Compression, d.props["compress"])
-	setString(&d.Type, d.props["type"])
+	setString(&d.Mountpoint, d.Props["mountpoint"])
+	setString(&d.Compression, d.Props["compress"])
+	setString(&d.Type, d.Props["type"])
 
-	if err = setUint(&d.Volsize, d.props["volsize"]); err != nil {
+	if err = setUint(&d.Volsize, d.Props["volsize"]); err != nil {
 		return fmt.Errorf("failed to parse volsize: %w", err)
 	}
 
-	if d.props["volblock"] != "" && d.props["volblock"] != "-" {
-		if err = setUint(&d.VolBlockSize, d.props["volblock"]); err != nil {
+	if d.Props["volblock"] != "" && d.Props["volblock"] != "-" {
+		if err = setUint(&d.VolBlockSize, d.Props["volblock"]); err != nil {
 			return fmt.Errorf("failed to parse volblock: %w", err)
 		}
 	}
 
-	if err = setUint(&d.Quota, d.props["quota"]); err != nil {
+	if err = setUint(&d.Quota, d.Props["quota"]); err != nil {
 		return fmt.Errorf("failed to parse quota: %w", err)
 	}
-	if err = setUint(&d.Referenced, d.props["refer"]); err != nil {
+	if err = setUint(&d.Referenced, d.Props["refer"]); err != nil {
 		return fmt.Errorf("failed to parse refer: %w", err)
 	}
 
@@ -96,13 +106,13 @@ func (d *Dataset) parseProps(out [][]string) error {
 		return nil
 	}
 
-	if err = setUint(&d.Written, d.props["written"]); err != nil {
+	if err = setUint(&d.Written, d.Props["written"]); err != nil {
 		return fmt.Errorf("failed to parse written: %w", err)
 	}
-	if err = setUint(&d.Logicalused, d.props["lused"]); err != nil {
+	if err = setUint(&d.Logicalused, d.Props["lused"]); err != nil {
 		return fmt.Errorf("failed to parse lused: %w", err)
 	}
-	if err = setUint(&d.Usedbydataset, d.props["usedds"]); err != nil {
+	if err = setUint(&d.Usedbydataset, d.Props["usedds"]); err != nil {
 		return fmt.Errorf("failed to parse usedds: %w", err)
 	}
 	return nil

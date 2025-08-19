@@ -8,8 +8,8 @@ import {
 
 import { apiRequest } from '$lib/utils/http';
 
-export async function getDatasets(): Promise<Dataset[]> {
-	return await apiRequest('/zfs/datasets', DatasetSchema.array(), 'GET');
+export async function getDatasets(type: string = 'all'): Promise<Dataset[]> {
+	return await apiRequest(`/zfs/datasets?type=${type}`, DatasetSchema.array(), 'GET');
 }
 
 export async function deleteSnapshot(
@@ -18,7 +18,7 @@ export async function deleteSnapshot(
 ): Promise<APIResponse> {
 	const param = recursive ? '?recursive=true' : '';
 	return await apiRequest(
-		`/zfs/datasets/snapshot/${snapshot.properties.guid}${param}`,
+		`/zfs/datasets/snapshot/${snapshot.guid}${param}`,
 		APIResponseSchema,
 		'DELETE'
 	);
@@ -32,7 +32,7 @@ export async function createSnapshot(
 	return await apiRequest('/zfs/datasets/snapshot', APIResponseSchema, 'POST', {
 		name: name,
 		recursive: recursive,
-		guid: dataset.properties.guid
+		guid: dataset.guid
 	});
 }
 
@@ -48,7 +48,7 @@ export async function createPeriodicSnapshot(
 	cronExpr: string
 ): Promise<APIResponse> {
 	return await apiRequest('/zfs/datasets/snapshot/periodic', APIResponseSchema, 'POST', {
-		guid: dataset.properties.guid,
+		guid: dataset.guid,
 		prefix: prefix,
 		recursive: recursive,
 		interval: interval,
@@ -83,11 +83,7 @@ export async function editFileSystem(
 }
 
 export async function deleteFileSystem(dataset: Dataset): Promise<APIResponse> {
-	return await apiRequest(
-		`/zfs/datasets/filesystem/${dataset.properties.guid}`,
-		APIResponseSchema,
-		'DELETE'
-	);
+	return await apiRequest(`/zfs/datasets/filesystem/${dataset.guid}`, APIResponseSchema, 'DELETE');
 }
 
 export async function rollbackSnapshot(guid: string): Promise<APIResponse> {
@@ -120,15 +116,11 @@ export async function editVolume(
 }
 
 export async function deleteVolume(dataset: Dataset): Promise<APIResponse> {
-	return await apiRequest(
-		`/zfs/datasets/volume/${dataset.properties.guid}`,
-		APIResponseSchema,
-		'DELETE'
-	);
+	return await apiRequest(`/zfs/datasets/volume/${dataset.guid}`, APIResponseSchema, 'DELETE');
 }
 
 export async function bulkDelete(datasets: Dataset[]): Promise<APIResponse> {
-	const guids = datasets.map((dataset) => dataset.properties.guid);
+	const guids = datasets.map((dataset) => dataset.guid);
 	return await apiRequest('/zfs/datasets/bulk-delete', APIResponseSchema, 'POST', {
 		guids: guids
 	});

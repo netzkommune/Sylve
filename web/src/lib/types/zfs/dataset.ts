@@ -4,6 +4,7 @@ import { ZpoolSchema } from './pool';
 export const DatasetSchema = z.object({
 	name: z.string(),
 	origin: z.string(),
+	guid: z.string(),
 	used: z.number(),
 	avail: z.number(),
 	mountpoint: z.string(),
@@ -16,6 +17,13 @@ export const DatasetSchema = z.object({
 	usedbydataset: z.number(),
 	quota: z.number(),
 	referenced: z.number(),
+	mounted: z.string(),
+	checksum: z.string(),
+	dedup: z.string(),
+	aclinherit: z.string(),
+	aclmode: z.string(),
+	primarycache: z.string(),
+	volmode: z.string(),
 	properties: z
 		.object({
 			aclinherit: z.string(),
@@ -28,7 +36,10 @@ export const DatasetSchema = z.object({
 			compression: z.string(),
 			compressratio: z.coerce.number(),
 			context: z.string(),
-			copies: z.coerce.number(),
+			copies: z.preprocess((val) => {
+				const num = Number(val);
+				return isNaN(num) ? null : num;
+			}, z.number().nullable()),
 			createtxg: z.coerce.number(),
 			creation: z.coerce.number(),
 			dedup: z.string(),
@@ -54,15 +65,18 @@ export const DatasetSchema = z.object({
 			normalization: z.string(),
 			objsetid: z.coerce.number(),
 			overlay: z.string(),
-			pbkdf2iters: z.coerce.number(),
+			pbkdf2iters: z.preprocess((val) => {
+				const num = Number(val);
+				return isNaN(num) ? null : num;
+			}, z.number().nullable()),
 			prefetch: z.string(),
 			primarycache: z.string(),
-			quota: z.coerce.number(),
+			quota: z.preprocess((val) => (val === '-' ? null : val), z.coerce.number().nullable()),
 			readonly: z.string(),
 			recordsize: z.coerce.number(),
 			refcompressratio: z.coerce.number(),
 			referenced: z.coerce.number(),
-			refquota: z.coerce.number(),
+			refquota: z.preprocess((val) => (val === '-' ? null : val), z.coerce.number().nullable()),
 			refreservation: z.coerce.number(),
 			relatime: z.string(),
 			reservation: z.coerce.number(),
@@ -75,7 +89,10 @@ export const DatasetSchema = z.object({
 			snapdir: z.string(),
 			snapshot_count: z.union([z.number(), z.literal('none')]),
 			snapshot_limit: z.union([z.number(), z.literal('none')]),
-			special_small_blocks: z.coerce.number(),
+			special_small_blocks: z.preprocess(
+				(val) => (val === '-' ? null : val),
+				z.coerce.number().nullable()
+			),
 			sync: z.string(),
 			type: z.string(),
 			used: z.coerce.number(),
@@ -84,13 +101,14 @@ export const DatasetSchema = z.object({
 			usedbyrefreservation: z.coerce.number(),
 			usedbysnapshots: z.coerce.number(),
 			utf8only: z.string(),
-			version: z.coerce.number(),
+			version: z.preprocess((val) => (val === '-' ? null : val), z.coerce.number().nullable()),
 			volmode: z.string(),
 			vscan: z.string(),
 			written: z.coerce.number(),
 			xattr: z.string()
 		})
 		.partial()
+		.optional()
 });
 
 export const PeriodicSnapshotSchema = z.object({

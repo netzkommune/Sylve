@@ -16,9 +16,16 @@
 		pools: Zpool[];
 		datasets: Dataset[];
 		periodicSnapshots: PeriodicSnapshot[];
+		reload?: boolean;
 	}
 
-	let { open = $bindable(), pools, datasets, periodicSnapshots }: Data = $props();
+	let {
+		open = $bindable(),
+		pools,
+		datasets,
+		periodicSnapshots,
+		reload = $bindable()
+	}: Data = $props();
 	let shadowDeleted: number[] = $state([]);
 
 	function close() {
@@ -61,6 +68,7 @@
 				const snapshot = periodicSnapshots.find((s) => s.id === id);
 				if (snapshot) {
 					const response = await deletePeriodicSnapshot(snapshot.guid);
+					reload = true;
 					if (response.error) {
 						handleAPIError(response);
 						toast.error('Failed to delete periodic snapshot', {

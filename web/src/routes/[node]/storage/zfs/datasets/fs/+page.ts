@@ -6,7 +6,7 @@ import { cachedFetch } from '$lib/utils/http';
 export async function load() {
 	const cacheDuration = SEVEN_DAYS;
 	const [datasets, pools] = await Promise.all([
-		cachedFetch('datasets', async () => await getDatasets(), cacheDuration),
+		cachedFetch('zfs-filesystems', async () => await getDatasets('filesystem'), cacheDuration),
 		cachedFetch('pools', getPools, cacheDuration)
 	]);
 

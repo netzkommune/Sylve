@@ -198,7 +198,7 @@
 
 		<div class="mt-4 w-full">
 			<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
-				<div class="space-y-1">
+				<div class="space-y-1.5">
 					<Label for="name" class="w-24 whitespace-nowrap text-sm">Name</Label>
 					<Input
 						type="text"

@@ -87,6 +87,7 @@
 			table = new Tabulator(tableComponent, {
 				ajaxURL: ajaxURL ? ajaxURL : undefined,
 				ajaxResponse: function (url, params, response) {
+					console.log(response.data);
 					return response.data;
 				},
 				reactiveData: true,

@@ -149,7 +149,6 @@ func (s *Service) GetAuditLogs(
 	}
 
 	lastPage := int(math.Ceil(float64(total) / float64(size)))
-
 	allowed := map[string]bool{
 		"id":         true,
 		"action":     true,
@@ -160,8 +159,14 @@ func (s *Service) GetAuditLogs(
 
 	field := "id"
 	direction := "DESC"
-	if allowed[sortField] {
-		field = sortField
+	normalized := strings.ToLower(sortField)
+
+	if normalized == "createdat" {
+		normalized = "created_at"
+	}
+
+	if allowed[normalized] {
+		field = normalized
 		dir := strings.ToUpper(sortDir)
 		if dir == "ASC" || dir == "DESC" {
 			direction = dir

@@ -9,7 +9,7 @@ import { cachedFetch } from '$lib/utils/http';
 export async function load() {
 	const cacheDuration = SEVEN_DAYS;
 	const [datasets, shares, groups] = await Promise.all([
-		cachedFetch('datasets', async () => await getDatasets(), cacheDuration),
+		cachedFetch('zfs-datasets', async () => await getDatasets(), cacheDuration),
 		cachedFetch('samba-shares', async () => await getSambaShares(), cacheDuration),
 		cachedFetch('groups', async () => await listGroups(), cacheDuration)
 	]);

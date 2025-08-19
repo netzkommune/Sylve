@@ -20,9 +20,18 @@
 		groups: Group[];
 		share?: SambaShare | null;
 		edit?: boolean;
+		reload?: boolean;
 	}
 
-	let { open = $bindable(), shares, datasets, groups, share, edit = false }: Props = $props();
+	let {
+		open = $bindable(),
+		shares,
+		datasets,
+		groups,
+		share,
+		edit = false,
+		reload = $bindable()
+	}: Props = $props();
 
 	let options = {
 		name: share ? share.name : '',
@@ -107,18 +116,7 @@
 			return;
 		}
 
-		// let func = edit ? updateSambaShare : createSambaShare;
 		let response: APIResponse;
-
-		// const response = await createSambaShare(
-		// 	properties.name,
-		// 	properties.dataset.combobox.value,
-		// 	properties.readOnlyGroups.combobox.value,
-		// 	properties.writeableGroups.combobox.value,
-		// 	properties.createMask,
-		// 	properties.directoryMask,
-		// 	properties.guestOk
-		// );
 
 		if (edit) {
 			response = await updateSambaShare(
@@ -143,6 +141,8 @@
 				properties.guestOk
 			);
 		}
+
+		reload = true;
 
 		if (response.status === 'error') {
 			toast.error(`Failed to ${edit ? 'edit' : 'create'} Samba share`, {

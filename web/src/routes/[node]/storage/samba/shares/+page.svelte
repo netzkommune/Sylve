@@ -14,7 +14,8 @@
 	import { handleAPIError, updateCache } from '$lib/utils/http';
 	import { convertDbTime } from '$lib/utils/time';
 	import Icon from '@iconify/svelte';
-	import { useQueries } from '@sveltestack/svelte-query';
+	import { useQueries, useQueryClient } from '@sveltestack/svelte-query';
+	import { untrack } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import type { CellComponent } from 'tabulator-tables';
 
@@ -26,25 +27,24 @@
 
 	let { data }: { data: Data } = $props();
 
+	const queryClient = useQueryClient();
 	const results = useQueries([
 		{
-			queryKey: ['datasetList'],
+			queryKey: 'zfs-datasets',
 			queryFn: async () => {
 				return await getDatasets();
 			},
-			refetchInterval: 1000,
 			keepPreviousData: false,
 			initialData: data.datasets,
 			onSuccess: (data: Dataset[]) => {
-				updateCache('datasets', data);
+				updateCache('zfs-datasets', data);
 			}
 		},
 		{
-			queryKey: ['samba-shares'],
+			queryKey: 'samba-shares',
 			queryFn: async () => {
 				return await getSambaShares();
 			},
-			refetchInterval: 1000,
 			keepPreviousData: false,
 			initialData: data.shares,
 			onSuccess: (data: SambaShare[]) => {
@@ -52,11 +52,10 @@
 			}
 		},
 		{
-			queryKey: ['groups'],
+			queryKey: 'groups',
 			queryFn: async () => {
 				return (await listGroups()) as Group[];
 			},
-			refetchInterval: 1000,
 			keepPreviousData: true,
 			initialData: data.groups,
 			onSuccess: (data: Group[]) => {
@@ -64,6 +63,20 @@
 			}
 		}
 	]);
+
+	let reload = $state(false);
+
+	$effect(() => {
+		if (reload) {
+			queryClient.refetchQueries('zfs-datasets');
+			queryClient.refetchQueries('samba-shares');
+			queryClient.refetchQueries('groups');
+
+			untrack(() => {
+				reload = false;
+			});
+		}
+	});
 
 	let datasets: Dataset[] = $derived($results[0].data as Dataset[]);
 	let shares: SambaShare[] = $derived($results[1].data as SambaShare[]);
@@ -233,7 +246,7 @@
 </div>
 
 {#if properties.create.open}
-	<Share bind:open={properties.create.open} {shares} {datasets} {groups} />
+	<Share bind:open={properties.create.open} {shares} {datasets} {groups} bind:reload />
 {/if}
 
 {#if properties.edit.open}
@@ -244,6 +257,7 @@
 		{groups}
 		share={properties.edit.share}
 		edit={properties.edit.open}
+		bind:reload
 	/>
 {/if}
 
@@ -269,6 +283,7 @@
 
 				properties.delete.open = false;
 				activeRows = null;
+				reload = true;
 			}
 		},
 		onCancel: () => {

@@ -6,6 +6,7 @@
 	import type { Dataset } from '$lib/types/zfs/dataset';
 	import { sha256 } from '$lib/utils/string';
 	import { renderWithIcon } from '$lib/utils/table';
+	import { convertDbTime } from '$lib/utils/time';
 	import { onMount } from 'svelte';
 	import type { CellComponent } from 'tabulator-tables';
 
@@ -60,6 +61,14 @@
 				field: 'target',
 				title: 'Target',
 				formatter: pathFormatter
+			},
+			{
+				field: 'createdAt',
+				title: 'Date',
+				formatter: (cell: CellComponent) => {
+					const value = cell.getValue();
+					return convertDbTime(value);
+				}
 			}
 		] as Column[],
 		rows: []

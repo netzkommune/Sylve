@@ -25,14 +25,21 @@ func (s *Service) WolTasks() {
 			for _, wol := range wols {
 				vm, err := s.FindVmByMac(wol.Mac)
 				if err != nil {
-					logger.L.Debug().Msgf("Failed to find VM associated with MAC: %s", wol.Mac)
+					var status string
 
-					if strings.Contains(err.Error(), "record not found") {
-						if err := s.DB.Model(&wol).Update("status", "not_found").Error; err != nil {
-							logger.L.Error().Msgf("failed_to_update_wol_status: %v", err)
-						}
-						continue
+					if strings.Contains(err.Error(), "vm_wol_disabled") {
+						logger.L.Debug().Msgf("Wake-on-LAN is disabled for VM: %s (%d)", vm.Name, vm.VmID)
+						status = "wol_disabled"
+					} else if strings.Contains(err.Error(), "record not found") {
+						logger.L.Debug().Msgf("Failed to find VM associated with MAC: %s", wol.Mac)
+						status = "vm_not_found"
 					}
+
+					if err := s.DB.Model(&wol).Update("status", status).Error; err != nil {
+						logger.L.Error().Msgf("failed_to_update_wol_status: %v", err)
+					}
+
+					continue
 				}
 
 				err = s.LvVMAction(vm, "start")

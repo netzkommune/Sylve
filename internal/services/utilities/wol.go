@@ -67,16 +67,12 @@ func (s *Service) StartWOLServer() error {
 					payload := app.Payload()
 					if len(payload) == 102 && utils.IsWOLPacket(payload) && shouldEmit(payload) {
 						mac := utils.FormatMAC(payload[6:12])
-						// ----- < update your DB here >  -----
-						// e.g. s.DB.Create(&models.WolEvent{Mac: mac, Timestamp: time.Now()})
-						// fmt.Println("⚡ WOL packet detected for MAC:", mac)
-						// ------------------------------------
 						s.DB.Create(&utilitiesModels.WoL{
 							Mac:    mac,
 							Status: "pending",
 						})
 
-						logger.L.Info().Msgf("⚡ WOL packet detected for MAC: %s", mac)
+						logger.L.Debug().Msgf("⚡ WOL packet detected for MAC: %s", mac)
 					}
 				}
 			}

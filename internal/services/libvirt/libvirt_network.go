@@ -360,5 +360,9 @@ func (s *Service) FindVmByMac(mac string) (vmModels.VM, error) {
 		return vm, fmt.Errorf("failed_to_find_vm: %w", err)
 	}
 
+	if vm.WoL == false {
+		return vm, fmt.Errorf("vm_wol_disabled: %s", vm.Name)
+	}
+
 	return vm, nil
 }

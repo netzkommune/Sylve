@@ -158,7 +158,7 @@
 	let filesystems: Dataset[] = $derived($results[1].data as Dataset[]);
 	let volumes: Dataset[] = $derived($results[2].data as Dataset[]);
 
-	let networkSwitches: SwitchList = $derived($results[3].data as SwitchList);
+	let networkSwitches: SwitchList = $derived($results[4].data as SwitchList);
 	let pciDevices: PCIDevice[] = $derived($results[5].data as PCIDevice[]);
 	let pptDevices: PPTDevice[] = $derived($results[6].data as PPTDevice[]);
 	let networkObjects = $derived($results[9].data as NetworkObject[]);

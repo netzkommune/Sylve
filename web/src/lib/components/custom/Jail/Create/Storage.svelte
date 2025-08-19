@@ -17,7 +17,7 @@
 			.filter((fs) => fs.name.includes('/') && fs.used < 1024 * 1024)
 			.map((fs) => ({
 				label: fs.name,
-				value: fs.properties.guid || ''
+				value: fs.guid || ''
 			}));
 	});
 

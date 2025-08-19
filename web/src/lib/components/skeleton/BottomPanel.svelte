@@ -53,7 +53,13 @@
 		'/api/system/file-explorer': 'File Explorer',
 		'/api/system/ppt-devices': 'PCI Passthrough',
 		'/api/zfs/datasets/filesystem': 'ZFS Filesystem',
-		'/api/zfs/datasets/volume': 'ZFS Volume'
+		'/api/zfs/datasets/volume': 'ZFS Volume',
+		'/api/samba/shares': 'Samba Share',
+		'/api/auth/groups': 'Auth Group',
+		'/api/auth/users': 'Auth User',
+		'/api/samba/config': 'Samba Config - Edit',
+		'/api/zfs/datasets/bulk-delete': 'ZFS Dataset - Bulk Delete',
+		'/api/zfs/datasets/snapshot': 'ZFS Snapshot'
 	});
 
 	let records = $derived.by(() => {

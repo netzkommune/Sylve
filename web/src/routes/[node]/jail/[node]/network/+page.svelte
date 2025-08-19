@@ -119,11 +119,7 @@
 			open: false,
 			sw: {
 				open: false,
-				value: '',
-				options: usableSwitches.map((s) => ({
-					label: s.name,
-					value: s.id.toString()
-				}))
+				value: ''
 			},
 			ipv4: {
 				open: false,
@@ -563,7 +559,10 @@
 				bind:open={modals.add.sw.open}
 				label="Switch"
 				bind:value={modals.add.sw.value}
-				data={modals.add.sw.options}
+				data={usableSwitches.map((s) => ({
+					label: s.name,
+					value: s.id.toString()
+				}))}
 				classes="flex-1 space-y-1"
 				placeholder="Select Switch"
 				width="w-full"

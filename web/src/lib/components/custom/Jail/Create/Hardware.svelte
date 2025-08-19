@@ -25,15 +25,6 @@
 	let humanSize = $state('1024 M');
 
 	$effect(() => {
-		if (!resourceLimits) {
-			humanSize = '0 M';
-			cpuCores = 0;
-			return;
-		} else {
-			cpuCores = 1;
-			humanSize = '1024 M';
-		}
-
 		if (cpuCores && cpuInfo) {
 			if (cpuCores > cpuInfo.logicalCores) {
 				cpuCores = cpuInfo.logicalCores - 1;

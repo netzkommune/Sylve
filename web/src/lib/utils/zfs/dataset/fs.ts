@@ -175,158 +175,75 @@ export const createFSProps = {
 export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; columns: Column[] } {
 	const rows: Row[] = [];
 	const columns: Column[] = [
-		{
-			field: 'id',
-			title: 'ID',
-			visible: false
-		},
+		{ field: 'id', title: 'ID', visible: false },
 		{
 			field: 'name',
 			title: 'Name',
 			formatter: (cell) => {
 				const value = cell.getValue();
-
-				if (value.includes('@')) {
-					const [, snapshot] = value.split('@');
-					return renderWithIcon('carbon:ibm-cloud-vpc-block-storage-snapshots', snapshot);
-				}
-
 				if (value.includes('/')) {
 					return renderWithIcon('material-symbols:files', value.substring(value.indexOf('/') + 1));
 				}
-
-				if (!value.includes('/') && !value.includes('@')) {
-					return renderWithIcon('bi:hdd-stack-fill', value);
-				}
-
-				return `<span class="whitespace-nowrap">${value}</span>`;
+				return renderWithIcon('bi:hdd-stack-fill', value);
 			}
 		},
-		{
-			field: 'used',
-			title: 'Used',
-			formatter: sizeFormatter
-		},
-		{
-			field: 'avail',
-			title: 'Available',
-			formatter: sizeFormatter
-		},
-		{
-			field: 'referenced',
-			title: 'Referenced',
-			formatter: sizeFormatter
-		},
-		{
-			field: 'mountpoint',
-			title: 'Mount Point'
-		},
-		{
-			field: 'type',
-			title: 'Type',
-			visible: false
-		}
+		{ field: 'used', title: 'Used', formatter: sizeFormatter },
+		{ field: 'avail', title: 'Available', formatter: sizeFormatter },
+		{ field: 'referenced', title: 'Referenced', formatter: sizeFormatter },
+		{ field: 'mountpoint', title: 'Mount Point' },
+		{ field: 'type', title: 'Type', visible: false }
 	];
 
 	for (const group of grouped) {
-		const poolLevelFilesystem = group.filesystems.find(
-			(fs: Dataset) => fs.type === 'filesystem' && fs.name === group.name
-		);
+		const poolNode: Row = {
+			id: generateNumberFromString(group.name),
+			name: group.name,
+			used: 0,
+			avail: 0,
+			referenced: 0,
+			mountpoint: '',
+			children: [],
+			type: 'pool'
+		};
 
-		const filesystemChildren = group.filesystems.filter(
-			(fs) => fs.type === 'filesystem' && fs.name !== group.name
-		);
+		for (const fs of group.filesystems) {
+			if (fs.name === group.name) {
+				poolNode.used = fs.used;
+				poolNode.avail = fs.avail;
+				poolNode.referenced = fs.referenced;
+				poolNode.mountpoint = fs.mountpoint || '';
+				continue;
+			}
 
-		const snapshotChildren = group.snapshots.filter(
-			(snapshot) => !snapshot.name.startsWith(group.name + '@')
-		);
+			const parts = fs.name.split('/');
+			let current = poolNode;
 
-		if (poolLevelFilesystem) {
-			const poolSnapshots = snapshotChildren.filter((snapshot) =>
-				snapshot.name.startsWith(group.name + '@')
-			);
+			for (let i = 1; i < parts.length; i++) {
+				const pathSoFar = parts.slice(0, i + 1).join('/');
+				let child = current.children!.find((c) => c.name === pathSoFar);
 
-			const childFilesystemsWithSnapshots = filesystemChildren.map((filesystem: Dataset) => ({
-				id: generateNumberFromString(filesystem.name) + 1,
-				name: filesystem.name,
-				used: filesystem.used,
-				avail: filesystem.avail,
-				referenced: filesystem.referenced,
-				mountpoint: filesystem.mountpoint || '',
-				children: snapshotChildren
-					.filter((snapshot) => snapshot.name.startsWith(filesystem.name + '@'))
-					.map((snapshot: Dataset) => ({
-						id: generateNumberFromString(snapshot.name) + 2,
-						name: snapshot.name,
-						used: snapshot.used,
-						avail: snapshot.avail,
-						referenced: snapshot.referenced,
-						mountpoint: snapshot.mountpoint || '',
-						children: []
-					})),
-				type: filesystem.type
-			}));
-
-			rows.push({
-				id: generateNumberFromString(group.name),
-				name: group.name,
-				used: poolLevelFilesystem.used,
-				avail: poolLevelFilesystem.avail,
-				referenced: poolLevelFilesystem.referenced,
-				mountpoint: poolLevelFilesystem.mountpoint || '',
-				children: [
-					...poolSnapshots.map((snapshot: Dataset) => ({
-						id: generateNumberFromString(snapshot.name) + 1,
-						name: snapshot.name,
-						used: snapshot.used,
-						avail: snapshot.avail,
-						referenced: snapshot.referenced,
-						mountpoint: snapshot.mountpoint || '',
+				if (!child) {
+					child = {
+						id: generateNumberFromString(pathSoFar),
+						name: pathSoFar,
+						used: fs.used,
+						avail: fs.avail,
+						referenced: fs.referenced,
+						mountpoint: fs.mountpoint || '',
 						children: [],
-						isPoolSnapshot: true
-					})),
-					...childFilesystemsWithSnapshots
-				].sort((a, b) => {
-					const aIsPoolSnapshot = a.hasOwnProperty('isPoolSnapshot');
-					const bIsPoolSnapshot = b.hasOwnProperty('isPoolSnapshot');
-					if (aIsPoolSnapshot && !bIsPoolSnapshot) return -1;
-					if (!aIsPoolSnapshot && bIsPoolSnapshot) return 1;
-					return a.name.localeCompare(b.name);
-				}),
-				type: 'pool'
-			});
-		} else if (group.filesystems.length > 0) {
-			rows.push(
-				...group.filesystems
-					.filter((fs) => fs.type === 'filesystem')
-					.map((filesystem: Dataset) => ({
-						id: generateNumberFromString(filesystem.name),
-						name: filesystem.name,
-						used: filesystem.used,
-						avail: filesystem.avail,
-						referenced: filesystem.referenced,
-						mountpoint: filesystem.mountpoint || '',
-						children: snapshotChildren
-							.filter((snapshot) => snapshot.name.startsWith(filesystem.name + '@'))
-							.map((snapshot: Dataset) => ({
-								id: generateNumberFromString(snapshot.name) + 1,
-								name: snapshot.name,
-								used: snapshot.used,
-								avail: snapshot.avail,
-								referenced: snapshot.referenced,
-								mountpoint: snapshot.mountpoint || '',
-								children: []
-							}))
-							.sort((a, b) => a.name.localeCompare(b.name))
-					}))
-			);
+						type: fs.type
+					};
+					current.children!.push(child);
+				}
+
+				current = child;
+			}
 		}
+
+		rows.push(cleanChildren(poolNode));
 	}
 
-	return {
-		rows: rows.map(cleanChildren),
-		columns
-	};
+	return { rows, columns };
 }
 
 export function handleError(error: APIResponse): void {

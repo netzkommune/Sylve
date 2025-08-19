@@ -1,18 +1,11 @@
 <script lang="ts">
-	import {
-		bulkDelete,
-		deleteFileSystem,
-		getDatasets,
-		rollbackSnapshot
-	} from '$lib/api/zfs/datasets';
+	import { bulkDelete, deleteFileSystem, getDatasets } from '$lib/api/zfs/datasets';
 	import { getPools } from '$lib/api/zfs/pool';
 	import AlertDialogModal from '$lib/components/custom/Dialog/Alert.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import Search from '$lib/components/custom/TreeTable/Search.svelte';
 	import CreateFS from '$lib/components/custom/ZFS/datasets/fs/Create.svelte';
 	import EditFS from '$lib/components/custom/ZFS/datasets/fs/Edit.svelte';
-	import CreateSnapshot from '$lib/components/custom/ZFS/datasets/snapshots/Create.svelte';
-	import DeleteSnapshot from '$lib/components/custom/ZFS/datasets/snapshots/Delete.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import type { Row } from '$lib/types/components/tree-table';
 	import { type Dataset } from '$lib/types/zfs/dataset';
@@ -146,17 +139,6 @@
 	let query: string = $state('');
 
 	let modals = $state({
-		snapshot: {
-			create: {
-				open: false
-			},
-			rollback: {
-				open: false
-			},
-			delete: {
-				open: false
-			}
-		},
 		fs: {
 			create: {
 				open: false
@@ -175,66 +157,10 @@
 			}
 		}
 	});
-
-	async function realodData() {}
 </script>
 
 {#snippet button(type: string)}
 	{#if activeRows && activeRows.length == 1}
-		{#if type === 'rollback-snapshot' && activeDataset?.type === 'snapshot'}
-			<Button
-				onclick={async () => {
-					if (activeDataset) {
-						modals.snapshot.rollback.open = true;
-					}
-				}}
-				size="sm"
-				variant="outline"
-				class="h-6.5"
-			>
-				<div class="flex items-center">
-					<Icon icon="mdi:history" class="mr-1 h-4 w-4" />
-					<span>Rollback To Snapshot</span>
-				</div>
-			</Button>
-		{/if}
-
-		{#if type === 'create-snapshot' && activeDataset?.type === 'filesystem'}
-			<Button
-				onclick={async () => {
-					if (activeDataset) {
-						modals.snapshot.create.open = true;
-					}
-				}}
-				size="sm"
-				variant="outline"
-				class="h-6.5"
-			>
-				<div class="flex items-center">
-					<Icon icon="carbon:ibm-cloud-vpc-block-storage-snapshots" class="mr-1 h-4 w-4" />
-					<span>Create Snapshot</span>
-				</div>
-			</Button>
-		{/if}
-
-		{#if type === 'delete-snapshot' && activeDataset?.type === 'snapshot'}
-			<Button
-				onclick={async () => {
-					if (activeDataset) {
-						modals.snapshot.delete.open = true;
-					}
-				}}
-				size="sm"
-				variant="outline"
-				class="h-6.5"
-			>
-				<div class="flex items-center">
-					<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
-					<span>Delete Snapshot</span>
-				</div>
-			</Button>
-		{/if}
-
 		{#if type === 'edit-filesystem' && activeDataset?.type === 'filesystem'}
 			<Button
 				onclick={async () => {
@@ -325,10 +251,6 @@
 				<span>New</span>
 			</div>
 		</Button>
-
-		{@render button('create-snapshot')}
-		{@render button('rollback-snapshot')}
-		{@render button('delete-snapshot')}
 		{@render button('edit-filesystem')}
 		{@render button('delete-filesystem')}
 		{@render button('bulk-delete')}
@@ -342,57 +264,6 @@
 		bind:query
 	/>
 </div>
-
-<!-- Create Snapshot -->
-{#if modals.snapshot.create.open && activeDataset && activeDataset.type === 'filesystem'}
-	<CreateSnapshot
-		bind:open={modals.snapshot.create.open}
-		bind:reload
-		dataset={activeDataset}
-		recursion={true}
-	/>
-{/if}
-
-<!-- Rollback to Snapshot -->
-{#if modals.snapshot.rollback.open && activeDataset && activeDataset.type === 'snapshot'}
-	<AlertDialogModal
-		bind:open={modals.snapshot.rollback.open}
-		customTitle={`Are you sure you want to rollback to the snapshot <b>${activeDataset.name}</b>? This action cannot be undone.`}
-		actions={{
-			onConfirm: async () => {
-				if (activeDataset.guid) {
-					const response = await rollbackSnapshot(activeDataset.guid);
-					reload = true;
-
-					if (response.status === 'error') {
-						handleAPIError(response);
-						toast.success(`Rolled back to snapshot ${activeDataset.name}`, {
-							position: 'bottom-center'
-						});
-					} else {
-						toast.error(`Failed to rollback to snapshot ${activeDataset.name}`, {
-							position: 'bottom-center'
-						});
-					}
-				} else {
-					toast.error('Snapshot GUID not found', {
-						position: 'bottom-center'
-					});
-				}
-
-				modals.snapshot.rollback.open = false;
-			},
-			onCancel: () => {
-				modals.snapshot.rollback.open = false;
-			}
-		}}
-	/>
-{/if}
-
-<!-- Delete Snapshot -->
-{#if modals.snapshot.delete.open && activeDataset && activeDataset.type === 'snapshot'}
-	<DeleteSnapshot bind:open={modals.snapshot.delete.open} dataset={activeDataset} bind:reload />
-{/if}
 
 <!-- Delete FS -->
 {#if modals.fs.delete.open && activeDataset && activeDataset.type === 'filesystem'}

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-22T11:34:22.984Z\n"
-"PO-Revision-Date: 2025-08-19T14:46:28.253Z\n"
+"PO-Revision-Date: 2025-08-19T19:07:03.105Z\n"
 "Last-Translator: \n"
 "Language: English\n"
 "Language-Team: \n"
@@ -393,9 +393,9 @@ msgstr "Action"
 
 #: src/routes/[node]/network/interfaces/+page.svelte
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
 #: src/lib/components/skeleton/BottomPanel.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Status"
 msgstr "Status"
 
@@ -520,8 +520,8 @@ msgstr "Terminal"
 
 #: src/lib/components/custom/Dialog/Alert.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Are you sure?"
 msgstr "Are you sure?"
 
@@ -532,8 +532,8 @@ msgstr "This action cannot be undone. This will permanently delete "
 #: src/lib/components/custom/Dialog/Alert.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -541,8 +541,8 @@ msgstr "Cancel"
 #: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Continue"
 msgstr "Continue"
 
@@ -722,8 +722,8 @@ msgstr "VM ID"
 #: src/lib/components/custom/Jail/Create/Basic.svelte
 #: src/lib/components/custom/VM/Create/Basic.svelte
 #: src/routes/[node]/network/interfaces/+page.svelte
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Description"
 msgstr "Description"
 
@@ -883,8 +883,8 @@ msgstr "View"
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 #: src/routes/[node]/notes/+page.svelte
 #: src/routes/[node]/network/switches/+page.svelte
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Delete"
 msgstr "Delete"
 
@@ -905,7 +905,6 @@ msgstr "Edit"
 msgid "Bulk Delete"
 msgstr "Bulk Delete"
 
-#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
@@ -920,6 +919,7 @@ msgstr "Bulk Delete"
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/routes/[node]/vm/[node]/storage/+page.svelte
 #: src/routes/[node]/jail/[node]/network/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 msgid "New"
 msgstr "New"
 
@@ -1563,17 +1563,14 @@ msgstr "No devices found"
 msgid "Error Status"
 msgstr "Error Status"
 
-#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
-msgid "Rollback To Snapshot"
-msgstr "Rollback To Snapshot"
+#~ msgid "Rollback To Snapshot"
+#~ msgstr "Rollback To Snapshot"
 
-#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "Create Snapshot"
 msgstr "Create Snapshot"
 
-#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "Delete Snapshot"
 msgstr "Delete Snapshot"
@@ -1586,24 +1583,20 @@ msgstr "Edit Filesystem"
 msgid "Delete Filesystem"
 msgstr "Delete Filesystem"
 
-#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 msgid "Delete Datasets"
 msgstr "Delete Datasets"
 
-#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
-msgid "Are you sure you want to rollback to the snapshot <b>{0}</b>? This action cannot be undone."
-msgstr "Are you sure you want to rollback to the snapshot <b>{0}</b>? This action cannot be undone."
+#~ msgid "Are you sure you want to rollback to the snapshot <b>{0}</b>? This action cannot be undone."
+#~ msgstr "Are you sure you want to rollback to the snapshot <b>{0}</b>? This action cannot be undone."
 
-#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
-msgid "Rolled back to snapshot {0}"
-msgstr "Rolled back to snapshot {0}"
+#~ msgid "Rolled back to snapshot {0}"
+#~ msgstr "Rolled back to snapshot {0}"
 
-#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
-msgid "Failed to rollback to snapshot {0}"
-msgstr "Failed to rollback to snapshot {0}"
+#~ msgid "Failed to rollback to snapshot {0}"
+#~ msgstr "Failed to rollback to snapshot {0}"
 
-#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
 msgid "Snapshot GUID not found"
 msgstr "Snapshot GUID not found"
@@ -1624,13 +1617,13 @@ msgstr "Filesystem GUID not found"
 msgid "Are you sure you want to delete {0}? This action cannot be undone."
 msgstr "Are you sure you want to delete {0}? This action cannot be undone."
 
-#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 msgid "Deleted {0} datasets"
 msgstr "Deleted {0} datasets"
 
-#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 msgid "Failed to delete datasets"
 msgstr "Failed to delete datasets"
 
@@ -1982,19 +1975,19 @@ msgstr "Save Snapshot Jobs"
 #: src/routes/[node]/summary/+page.svelte
 #: src/routes/[node]/summary/+page.svelte
 #: src/routes/[node]/summary/+page.svelte
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "CPU Usage"
 msgstr "CPU Usage"
 
 #: src/routes/[node]/summary/+page.svelte
 #: src/routes/[node]/summary/+page.svelte
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "RAM Usage"
 msgstr "RAM Usage"
 
@@ -2037,10 +2030,10 @@ msgid "Sylve Version"
 msgstr "Sylve Version"
 
 #: src/routes/[node]/summary/+page.svelte
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Memory Usage"
 msgstr "Memory Usage"
 
@@ -2066,13 +2059,13 @@ msgstr "Network TX"
 msgid "Running"
 msgstr "Running"
 
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Start"
 msgstr "Start"
 
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Stop"
 msgstr "Stop"
 
@@ -2131,8 +2124,8 @@ msgstr "Error stopping VM"
 msgid "VM stopped"
 msgstr "VM stopped"
 
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Started {0}"
 msgstr "Started {0}"
 
@@ -2140,17 +2133,17 @@ msgstr "Started {0}"
 msgid "Stopped"
 msgstr "Stopped"
 
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/routes/[node]/vm/[node]/storage/+page.svelte
 #: src/routes/[node]/vm/[node]/storage/+page.svelte
 #: src/routes/[node]/vm/[node]/console/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Shutoff"
 msgstr "Shutoff"
 
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Stopped {0}"
 msgstr "Stopped {0}"
 
@@ -3675,8 +3668,8 @@ msgstr "Resource limits {0}"
 msgid "This will permanently delete VM"
 msgstr "This will permanently delete VM"
 
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 msgid "Delete MAC Object(s)"
 msgstr "Delete MAC Object(s)"
 

@@ -237,7 +237,7 @@ func RegisterRoutes(r *gin.Engine,
 	vm.Use(middleware.EnsureAuthenticated(authService))
 	vm.Use(middleware.RequestLoggerMiddleware(db, authService))
 	{
-		vm.POST("/:id/:action", vmHandlers.VMActionHandler(libvirtService))
+		vm.POST("/:action/:id", vmHandlers.VMActionHandler(libvirtService))
 		vm.GET("/simple", vmHandlers.ListVMsSimple(libvirtService))
 		vm.GET("", vmHandlers.ListVMs(libvirtService))
 		vm.POST("", vmHandlers.CreateVM(libvirtService))
@@ -265,7 +265,7 @@ func RegisterRoutes(r *gin.Engine,
 		jail.GET("/simple", jailHandlers.ListJailsSimple(jailService))
 		jail.GET("/state", jailHandlers.ListJailStates(jailService))
 		jail.GET("", jailHandlers.ListJails(jailService))
-		jail.POST("/action/:ctId/:action", jailHandlers.JailAction(jailService))
+		jail.POST("/action/:action/:ctId", jailHandlers.JailAction(jailService))
 		jail.PUT("/description", jailHandlers.UpdateJailDescription(jailService))
 		jail.GET("/:id/logs", jailHandlers.GetJailLogs(jailService))
 		jail.PUT("/memory", jailHandlers.UpdateJailMemory(jailService))

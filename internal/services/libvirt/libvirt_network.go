@@ -341,3 +341,24 @@ func (s *Service) FindAndChangeMAC(vmId int, oldMac string, newMac string) error
 
 	return nil
 }
+
+func (s *Service) FindVmByMac(mac string) (vmModels.VM, error) {
+	mac = strings.ToLower(strings.TrimSpace(mac))
+	var netIf vmModels.Network
+	var vm vmModels.VM
+
+	err := s.DB.
+		Joins("LEFT JOIN objects ON networks.mac_id = objects.id").
+		Joins("LEFT JOIN object_entries ON object_entries.object_id = objects.id").
+		Where("LOWER(object_entries.value) = ?", mac).
+		First(&netIf).Error
+	if err != nil {
+		return vm, fmt.Errorf("failed_to_find_network: %w", err)
+	}
+
+	if err := s.DB.First(&vm, "id = ?", netIf.VMID).Error; err != nil {
+		return vm, fmt.Errorf("failed_to_find_vm: %w", err)
+	}
+
+	return vm, nil
+}

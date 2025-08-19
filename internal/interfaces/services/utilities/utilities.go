@@ -16,4 +16,6 @@ type UtilitiesServiceInterface interface {
 	GetMagnetDownloadAndFile(uuid, name string) (*utilitiesModels.Downloads, *utilitiesModels.DownloadedFile, error)
 	SyncDownloadProgress() error
 	DeleteDownload(id int) error
+
+	StartWOLServer() error
 }

@@ -59,7 +59,7 @@ export async function getVMDomain(id: number | string): Promise<VMDomain> {
 }
 
 export async function actionVm(id: number | string, action: string): Promise<APIResponse> {
-	return await apiRequest(`/vm/${id}/${action}`, APIResponseSchema, 'POST');
+	return await apiRequest(`/vm/${action}/${id}`, APIResponseSchema, 'POST');
 }
 
 export async function getStats(vmId: number, limit: number): Promise<VMStat[]> {

@@ -69,6 +69,8 @@ func main() {
 	}
 
 	go aS.ClearExpiredJWTTokens()
+	go uS.StartWOLServer()
+	go lvS.WolTasks()
 
 	gin.SetMode(gin.ReleaseMode)
 	gin.DefaultWriter = io.Discard
@@ -108,21 +110,17 @@ func main() {
 		TLSConfig: tlsConfig,
 	}
 
-	err = server.ListenAndServeTLS("", "")
-	if err != nil {
-		logger.L.Fatal().Err(err).Msg("Failed to start HTTPS server")
-	}
-
 	var wg sync.WaitGroup
 	wg.Add(1)
 
 	go func() {
 		defer wg.Done()
 		logger.L.Info().Msgf("Server started on %s:%d", cfg.IP, cfg.Port)
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := server.ListenAndServeTLS("", ""); err != nil && err != http.ErrServerClosed {
 			logger.L.Fatal().Err(err).Msg("Failed to start server")
 		}
 	}()
+
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 	<-sigChan

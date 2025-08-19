@@ -65,6 +65,7 @@ type VM struct {
 	StartAtBoot   bool   `json:"startAtBoot"`
 	TPMEmulation  bool   `json:"tpmEmulation"`
 	StartOrder    int    `json:"startOrder"`
+	WoL           bool   `json:"wol" gorm:"default:false"`
 
 	ISO        string    `json:"iso"`
 	Storages   []Storage `json:"storages" gorm:"foreignKey:VMID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`

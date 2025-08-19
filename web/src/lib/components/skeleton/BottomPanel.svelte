@@ -59,7 +59,11 @@
 		'/api/auth/users': 'Auth User',
 		'/api/samba/config': 'Samba Config - Edit',
 		'/api/zfs/datasets/bulk-delete': 'ZFS Dataset - Bulk Delete',
-		'/api/zfs/datasets/snapshot': 'ZFS Snapshot'
+		'/api/zfs/datasets/snapshot': 'ZFS Snapshot',
+		'/api/vm/start': 'VM - Start',
+		'/api/vm/stop': 'VM - Stop',
+		'/api/jail/action/start': 'Jail - Start',
+		'/api/jail/action/stop': 'Jail - Stop'
 	});
 
 	let records = $derived.by(() => {

@@ -8,6 +8,8 @@
 
 package libvirtServiceInterfaces
 
+import vmModels "sylve/internal/db/models/vm"
+
 type LibvirtServiceInterface interface {
 	CheckVersion() error
 	StartTPM() error
@@ -27,6 +29,9 @@ type LibvirtServiceInterface interface {
 
 	GetLvDomain(vmId int) (*LvDomain, error)
 	IsDomainInactive(vmId int) (bool, error)
+
+	FindVmByMac(mac string) (vmModels.VM, error)
+	WolTasks()
 }
 
 type LvDomain struct {

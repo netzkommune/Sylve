@@ -579,6 +579,43 @@ func (s *Service) StopTPM(vmId int) error {
 	return nil
 }
 
+func (s *Service) CheckPCIDevicesInUse(vm vmModels.VM) error {
+	if vm.PCIDevices == nil || len(vm.PCIDevices) == 0 {
+		return nil
+	}
+
+	vms, err := s.ListVMs()
+	if err != nil {
+		return fmt.Errorf("failed_to_list_vms: %w", err)
+	}
+
+	for _, other := range vms {
+		if other.VmID == vm.VmID {
+			continue
+		}
+
+		domain, err := s.Conn.DomainLookupByName(strconv.Itoa(other.VmID))
+		if err != nil {
+			continue
+		}
+
+		state, _, _ := s.Conn.DomainGetState(domain, 0)
+		if state != 1 {
+			continue
+		}
+
+		for _, pci := range vm.PCIDevices {
+			for _, o := range other.PCIDevices {
+				if pci == o {
+					return fmt.Errorf("pci_device_%d_in_use_by_vm_%d", pci, other.VmID)
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
 func (s *Service) LvVMAction(vm vmModels.VM, action string) error {
 	s.actionMutex.Lock()
 	defer s.actionMutex.Unlock()
@@ -586,6 +623,11 @@ func (s *Service) LvVMAction(vm vmModels.VM, action string) error {
 	domain, err := s.Conn.DomainLookupByName(strconv.Itoa(vm.VmID))
 	if err != nil {
 		return fmt.Errorf("failed_to_lookup_domain: %w", err)
+	}
+
+	err = s.CheckPCIDevicesInUse(vm)
+	if err != nil {
+		return err
 	}
 
 	switch action {

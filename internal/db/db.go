@@ -90,6 +90,7 @@ func SetupDatabase(cfg *internal.SylveConfig, isTest bool) *gorm.DB {
 
 		&utilitiesModels.DownloadedFile{},
 		&utilitiesModels.Downloads{},
+		&utilitiesModels.WoL{},
 
 		&sambaModels.SambaSettings{},
 		&sambaModels.SambaShare{},

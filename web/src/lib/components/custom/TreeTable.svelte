@@ -50,7 +50,6 @@
 					return;
 				}
 
-				const now = performance.now();
 				const selectedIds = table?.getSelectedRows().map((row) => row.getData().id) || [];
 				const treeExpands = getAllRows(table?.getRows() || []).map((row) => ({
 					id: row.getData().id,
@@ -89,9 +88,6 @@
 						treeExpand.expanded ? row.treeExpand() : row.treeCollapse();
 					}
 				}
-
-				const end = performance.now();
-				console.log(`Performance ${end - now}ms`);
 
 				updateParentActiveRows();
 			});

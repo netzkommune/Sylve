@@ -57,7 +57,7 @@ export async function getJailStates(): Promise<JailState[]> {
 }
 
 export async function jailAction(ctId: number, action: string): Promise<APIResponse> {
-	return await apiRequest(`/jail/action/${ctId}/${action}`, APIResponseSchema, 'POST');
+	return await apiRequest(`/jail/action/${action}/${ctId}`, APIResponseSchema, 'POST');
 }
 
 export async function updateDescription(id: number, description: string): Promise<APIResponse> {

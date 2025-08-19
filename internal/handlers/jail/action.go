@@ -58,7 +58,7 @@ func ListJails(jailService *jail.Service) gin.HandlerFunc {
 // @Success 200 {object} internal.APIResponse[string] "Success"
 // @Failure 400 {object} internal.APIResponse[any] "Bad Request"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
-// @Router /jail/action/{ctId}/{action} [post]
+// @Router /jail/action/{action}/{ctId} [post]
 func JailAction(jailService *jail.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctId, err := strconv.Atoi(c.Param("ctId"))

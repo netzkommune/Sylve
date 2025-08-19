@@ -247,7 +247,7 @@ func RemoveVM(libvirtService *libvirt.Service) gin.HandlerFunc {
 // @Failure 400 {object} internal.APIResponse[any] "Bad Request"
 // @Failure 404 {object} internal.APIResponse[any] "Not Found"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
-// @Router /vm/{id}/{action} [post]
+// @Router /vm/{action}/{id} [post]
 func VMActionHandler(libvirtService *libvirt.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		vmID := c.Param("id")

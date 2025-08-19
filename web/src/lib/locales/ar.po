@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-31T13:10:41.812Z\n"
-"PO-Revision-Date: 2025-08-19T13:20:49.358Z\n"
+"PO-Revision-Date: 2025-08-19T14:46:28.272Z\n"
 "Last-Translator: \n"
 "Language: Arabic\n"
 "Language-Team: \n"
@@ -394,8 +394,8 @@ msgstr ""
 msgid "VNC Wait"
 msgstr ""
 
-#: src/lib/components/custom/Jail/Create/Hardware.svelte
 #: src/lib/components/custom/VM/Create/Advanced.svelte
+#: src/lib/components/custom/Jail/Create/Hardware.svelte
 msgid "Start On Boot"
 msgstr ""
 
@@ -510,8 +510,8 @@ msgstr ""
 msgid "CPU Sockets"
 msgstr ""
 
-#: src/lib/components/custom/Jail/Create/Hardware.svelte
 #: src/lib/components/custom/VM/Create/Hardware.svelte
+#: src/lib/components/custom/Jail/Create/Hardware.svelte
 msgid "CPU Cores"
 msgstr ""
 
@@ -519,8 +519,8 @@ msgstr ""
 msgid "CPU Threads"
 msgstr ""
 
-#: src/lib/components/custom/Jail/Create/Hardware.svelte
 #: src/lib/components/custom/VM/Create/Hardware.svelte
+#: src/lib/components/custom/Jail/Create/Hardware.svelte
 msgid "Memory Size"
 msgstr ""
 
@@ -716,9 +716,9 @@ msgstr ""
 msgid "Object ({0} properties)"
 msgstr ""
 
-#: src/lib/components/custom/TreeTable.svelte
 #: src/routes/[node]/storage/zfs/dashboard/+page.svelte
 #: src/lib/components/custom/TreeTableRemote.svelte
+#: src/lib/components/custom/TreeTable.svelte
 msgid "No data available"
 msgstr ""
 
@@ -1821,9 +1821,9 @@ msgid "PCI devices modified"
 msgstr ""
 
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
-#: src/routes/[node]/jail/[node]/hardware/+page.svelte
-#: src/routes/[node]/jail/[node]/hardware/+page.svelte
 #: src/lib/components/custom/Jail/Hardware/CPU.svelte
+#: src/routes/[node]/jail/[node]/hardware/+page.svelte
+#: src/routes/[node]/jail/[node]/hardware/+page.svelte
 msgid "CPU"
 msgstr ""
 
@@ -1855,9 +1855,9 @@ msgstr ""
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
-#: src/routes/[node]/jail/[node]/hardware/+page.svelte
-#: src/routes/[node]/jail/[node]/hardware/+page.svelte
 #: src/lib/components/custom/Jail/Hardware/RAM.svelte
+#: src/routes/[node]/jail/[node]/hardware/+page.svelte
+#: src/routes/[node]/jail/[node]/hardware/+page.svelte
 msgid "RAM"
 msgstr ""
 
@@ -3609,4 +3609,20 @@ msgstr ""
 
 #: src/lib/components/skeleton/BottomPanel.svelte
 msgid "ZFS Snapshot"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "VM - Start"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "VM - Stop"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Jail - Start"
+msgstr ""
+
+#: src/lib/components/skeleton/BottomPanel.svelte
+msgid "Jail - Stop"
 msgstr ""

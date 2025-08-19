@@ -35,8 +35,7 @@ func (s *Service) ListVMs() ([]vmModels.VM, error) {
 	for i := range vms {
 		inactive, err := s.IsDomainInactive(vms[i].VmID)
 		if err != nil {
-			logger.L.Error().Err(err).Msg("ListVMs: failed to check domain state")
-			return nil, fmt.Errorf("failed_to_check_domain_state: %w", err)
+			vms[i].State = "UNKNOWN"
 		}
 
 		if inactive {
@@ -116,8 +115,9 @@ func validateCreate(data libvirtServiceInterfaces.CreateVMRequest, db *gorm.DB) 
 		if err != nil {
 			return fmt.Errorf("failed_to_check_storage_dataset_usage: %w", err)
 		}
-		if count > 0 {
-			return fmt.Errorf("storage_dataset_already_in_use")
+
+		if count > 0 && data.StorageType == "zvol" {
+			return fmt.Errorf("storage_dataset_zvol_already_in_use")
 		}
 
 		datasets, err := zfs.Datasets("")

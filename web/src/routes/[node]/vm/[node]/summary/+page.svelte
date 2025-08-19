@@ -113,6 +113,7 @@
 		await sleep(1000);
 		const result = await deleteVM(vm.id, modalState.deleteMACs);
 		modalState.loading.open = false;
+		reload.leftPanel = true;
 
 		if (result.status === 'error') {
 			toast.error('Error deleting VM', {

@@ -237,7 +237,9 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 			(fs) => fs.type === 'filesystem' && fs.name !== group.name
 		);
 
-		const snapshotChildren = group.snapshots;
+		const snapshotChildren = group.snapshots.filter(
+			(snapshot) => !snapshot.name.startsWith(group.name + '@')
+		);
 
 		if (poolLevelFilesystem) {
 			const poolSnapshots = snapshotChildren.filter((snapshot) =>

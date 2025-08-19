@@ -24,9 +24,10 @@
 	interface Props {
 		open: boolean;
 		dataset: Dataset;
+		reload?: boolean;
 	}
 
-	let { open = $bindable(), dataset }: Props = $props();
+	let { open = $bindable(), dataset, reload = $bindable() }: Props = $props();
 
 	let options = {
 		volsize: dataset.volsize ? bytesToHumanReadable(dataset.volsize) : '',
@@ -57,6 +58,8 @@
 			primarycache: properties.primarycache,
 			volmode: properties.volmode
 		});
+
+		reload = true;
 
 		if (response.status === 'error') {
 			if (response.error?.includes(`'volsize' must be a multiple of volume block size`)) {

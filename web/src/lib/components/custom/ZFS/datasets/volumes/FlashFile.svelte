@@ -15,9 +15,10 @@
 		open: boolean;
 		dataset: Dataset;
 		downloads: Download[];
+		reload?: boolean;
 	}
 
-	let { open = $bindable(), dataset, downloads }: Props = $props();
+	let { open = $bindable(), dataset, downloads, reload = $bindable() }: Props = $props();
 	let options = {
 		select: {
 			open: false,
@@ -93,6 +94,8 @@
 						await sleep(1000);
 
 						const response = await flashVolume(dataset.guid || '', properties.select.uuid);
+
+						reload = true;
 
 						if (response.status === 'error') {
 							handleAPIError(response);

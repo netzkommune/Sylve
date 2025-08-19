@@ -20,9 +20,10 @@
 		open: boolean;
 		pools: Zpool[];
 		grouped: GroupedByPool[];
+		reload?: boolean;
 	}
 
-	let { open = $bindable(), pools, grouped }: Props = $props();
+	let { open = $bindable(), pools, grouped, reload = $bindable() }: Props = $props();
 	let options = {
 		name: '',
 		parent: '',
@@ -108,6 +109,8 @@
 			primarycache: properties.primarycache,
 			volmode: properties.volmode
 		});
+
+		reload = true;
 
 		if (response.error) {
 			toast.error('Failed to create volume', {

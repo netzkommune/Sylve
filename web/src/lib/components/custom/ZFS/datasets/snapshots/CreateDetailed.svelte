@@ -18,9 +18,10 @@
 		open: boolean;
 		pools: Zpool[];
 		datasets: Dataset[];
+		reload?: boolean;
 	}
 
-	let { open = $bindable(), pools, datasets }: Props = $props();
+	let { open = $bindable(), pools, datasets, reload = $bindable() }: Props = $props();
 
 	let options = {
 		name: '',
@@ -110,6 +111,8 @@
 					properties.interval.values.cron
 				);
 			}
+
+			reload = true;
 
 			if (response?.error) {
 				handleAPIError(response);

@@ -11,7 +11,7 @@
 	import { handleAPIError, updateCache } from '$lib/utils/http';
 	import { convertDbTime, getLastUsage } from '$lib/utils/time';
 	import Icon from '@iconify/svelte';
-	import { useQueries } from '@sveltestack/svelte-query';
+	import { useQueries, useQueryClient } from '@sveltestack/svelte-query';
 	import { toast } from 'svelte-sonner';
 	import type { CellComponent } from 'tabulator-tables';
 
@@ -62,13 +62,13 @@
 		return { rows, columns };
 	}
 
+	const queryClient = useQueryClient();
 	const results = useQueries([
 		{
-			queryKey: ['users'],
+			queryKey: 'users',
 			queryFn: async () => {
 				return (await listUsers()) as User[];
 			},
-			refetchInterval: 1000,
 			keepPreviousData: true,
 			initialData: data.users,
 			onSuccess: (data: User[]) => {
@@ -76,6 +76,15 @@
 			}
 		}
 	]);
+
+	let reload = $state(false);
+
+	$effect(() => {
+		if (reload) {
+			queryClient.refetchQueries('users');
+			reload = false;
+		}
+	});
 
 	let users: User[] = $derived($results[0].data as User[]);
 	let tableData = $derived(generateTableData(users));
@@ -155,7 +164,7 @@
 </div>
 
 {#if modals.create.open}
-	<CreateOrEdit bind:open={modals.create.open} {users} />
+	<CreateOrEdit bind:open={modals.create.open} {users} bind:reload />
 {/if}
 
 {#if modals.edit.open}
@@ -164,6 +173,7 @@
 		{users}
 		edit={true}
 		user={activeRow ? (users.find((u) => u.id === activeRow.id) as User) : undefined}
+		bind:reload
 	/>
 {/if}
 
@@ -176,7 +186,7 @@
 	actions={{
 		onConfirm: async () => {
 			const response = await deleteUser(activeRow.id as string);
-			console.log(response);
+			reload = true;
 			if (response.error) {
 				handleAPIError(response);
 				toast.error('Failed to delete user', {

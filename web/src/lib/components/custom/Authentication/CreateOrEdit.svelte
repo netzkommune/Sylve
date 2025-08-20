@@ -17,9 +17,10 @@
 		users: User[];
 		user?: User;
 		edit?: boolean;
+		reload?: boolean;
 	}
 
-	let { open = $bindable(), users, user, edit = false }: Props = $props();
+	let { open = $bindable(), users, user, edit = false, reload = $bindable() }: Props = $props();
 	let options = {
 		username: edit && user ? user.username : '',
 		email: edit && user ? user.email : '',
@@ -57,6 +58,8 @@
 			properties.password,
 			properties.admin
 		);
+
+		reload = true;
 
 		if (response.error) {
 			handleAPIError(response);
@@ -105,6 +108,8 @@
 			properties.password,
 			properties.admin
 		);
+
+		reload = true;
 
 		if (response.error) {
 			handleAPIError(response);

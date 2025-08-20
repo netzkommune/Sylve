@@ -9,7 +9,7 @@
 	import { updateCache } from '$lib/utils/http';
 	import { generateTableData } from '$lib/utils/system/pci';
 	import Icon from '@iconify/svelte';
-	import { useQueries } from '@sveltestack/svelte-query';
+	import { useQueries, useQueryClient } from '@sveltestack/svelte-query';
 	import { toast } from 'svelte-sonner';
 
 	interface Data {
@@ -18,32 +18,41 @@
 	}
 
 	let { data }: { data: Data } = $props();
+	const queryClient = useQueryClient();
 	const results = useQueries([
 		{
-			queryKey: ['pciDevices'],
+			queryKey: 'pci-devices',
 			queryFn: async () => {
 				return (await getPCIDevices()) as PCIDevice[];
 			},
-			refetchInterval: 1000,
 			keepPreviousData: true,
 			initialData: data.pciDevices,
 			onSuccess: (data: PCIDevice[]) => {
-				updateCache('pciDevices', data);
+				updateCache('pci-devices', data);
 			}
 		},
 		{
-			queryKey: ['pptDevices'],
+			queryKey: 'ppt-devices',
 			queryFn: async () => {
 				return (await getPPTDevices()) as PPTDevice[];
 			},
-			refetchInterval: 1000,
 			keepPreviousData: true,
 			initialData: data.pptDevices,
 			onSuccess: (data: PPTDevice[]) => {
-				updateCache('pptDevices', data);
+				updateCache('ppt-devices', data);
 			}
 		}
 	]);
+
+	let reload = $state(false);
+
+	$effect(() => {
+		if (reload) {
+			queryClient.refetchQueries('pci-devices');
+			queryClient.refetchQueries('ppt-devices');
+			reload = false;
+		}
+	});
 
 	let pciDevices: PCIDevice[] = $derived($results[0].data as PCIDevice[]);
 	let pptDevices: PPTDevice[] = $derived($results[1].data as PPTDevice[]);
@@ -146,6 +155,7 @@
 		onConfirm: async () => {
 			if (modalState.action === 'add') {
 				const result = await addPPTDevice(modalState.add.domain, modalState.add.deviceId);
+				reload = true;
 				if (result.status === 'success') {
 					toast.success('Device added to passthrough', {
 						position: 'bottom-center'
@@ -161,7 +171,7 @@
 
 			if (modalState.action === 'remove') {
 				const result = await removePPTDevice(modalState.remove.id.toString());
-
+				reload = true;
 				if (result.status === 'success') {
 					toast.success('Device removed from passthrough', {
 						position: 'bottom-center'

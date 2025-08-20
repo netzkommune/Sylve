@@ -5,8 +5,8 @@ import { cachedFetch } from '$lib/utils/http';
 export async function load() {
 	const cacheDuration = SEVEN_DAYS;
 	const [pciDevices, pptDevices] = await Promise.all([
-		cachedFetch('pciDevices', async () => await getPCIDevices(), cacheDuration),
-		cachedFetch('pptDevices', async () => await getPPTDevices(), cacheDuration)
+		cachedFetch('pci-devices', async () => await getPCIDevices(), cacheDuration),
+		cachedFetch('ppt-devices', async () => await getPPTDevices(), cacheDuration)
 	]);
 
 	return {

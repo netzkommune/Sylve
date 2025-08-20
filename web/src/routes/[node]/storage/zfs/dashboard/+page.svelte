@@ -20,7 +20,7 @@
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
 	import type { Chart } from 'chart.js';
-	import { untrack } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 
 	interface Data {
 		pools: Zpool[];
@@ -164,7 +164,7 @@
 		}
 	});
 
-	$effect(() => {
+	onMount(() => {
 		if (pools) {
 			comboBoxes.poolUsage.value = pools[0]?.name || '';
 			comboBoxes.poolUsage.data = pools.map((pool) => ({

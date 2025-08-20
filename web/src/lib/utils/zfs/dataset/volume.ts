@@ -214,21 +214,13 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 			title: 'Name',
 			formatter: (cell) => {
 				const value = cell.getValue();
-				if (value.includes('@')) {
-					const [, snapshot] = value.split('@');
-					return renderWithIcon('carbon:ibm-cloud-vpc-block-storage-snapshots', snapshot);
-				}
 
 				if (value.includes('/')) {
 					const [, volume] = value.split('/');
 					return renderWithIcon('carbon:volume-block-storage', volume);
 				}
 
-				if (!value.includes('/') && !value.includes('@')) {
-					return renderWithIcon('bi:hdd-stack-fill', value);
-				}
-
-				return `<span class="whitespace-nowrap">${value}</span>`;
+				return renderWithIcon('bi:hdd-stack-fill', value);
 			}
 		},
 		{
@@ -252,43 +244,24 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 		const poolRow: Row = {
 			id: generateNumberFromString(group.name),
 			name: group.name,
-			size: 0,
+			size: group.pool?.size || 0,
 			referenced: '-',
 			guid: undefined,
 			children: [],
 			type: 'pool'
 		};
 
-		poolRow.size = group.pool?.size;
-
 		const volumeChildren = group.volumes
 			.filter((vol) => vol.name !== group.name)
-			.map((vol) => {
-				const volumeRow: Row = {
-					id: generateNumberFromString(vol.name),
-					name: vol.name,
-					size: vol.volsize,
-					referenced: vol.referenced,
-					guid: vol.properties?.guid,
-					children: [],
-					type: 'volume'
-				};
-
-				const snapshots = group.snapshots.filter((snap) => snap.name.startsWith(vol.name + '@'));
-				volumeRow.children?.push(
-					...snapshots.map((snap) => ({
-						id: generateNumberFromString(snap.name),
-						name: snap.name,
-						size: snap.used,
-						referenced: snap.referenced,
-						guid: snap.properties?.guid,
-						children: [],
-						type: 'snapshot'
-					}))
-				);
-
-				return volumeRow;
-			});
+			.map((vol) => ({
+				id: generateNumberFromString(vol.name),
+				name: vol.name,
+				size: vol.volsize,
+				referenced: vol.referenced,
+				guid: vol.properties?.guid,
+				children: [], // no snapshots anymore
+				type: 'volume'
+			}));
 
 		poolRow.children?.push(...volumeChildren);
 		rows.push(poolRow);

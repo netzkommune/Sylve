@@ -207,42 +207,6 @@
 			</Button>
 		{/if}
 
-		{#if type === 'create-snapshot' && activeVolume?.type === 'volume'}
-			<Button
-				onclick={async () => {
-					if (activeVolume) {
-						modals.snapshot.create.open = true;
-					}
-				}}
-				size="sm"
-				variant="outline"
-				class="h-6.5"
-			>
-				<div class="flex items-center">
-					<Icon icon="carbon:ibm-cloud-vpc-block-storage-snapshots" class="mr-1 h-4 w-4" />
-					<span>Create Snapshot</span>
-				</div>
-			</Button>
-		{/if}
-
-		{#if type === 'delete-snapshot' && activeSnapshot?.type === 'snapshot'}
-			<Button
-				onclick={() => {
-					if (activeSnapshot) {
-						modals.snapshot.delete.open = true;
-					}
-				}}
-				size="sm"
-				variant="outline"
-				class="h-6.5"
-			>
-				<div class="flex items-center">
-					<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
-					<span>Delete Snapshot</span>
-				</div>
-			</Button>
-		{/if}
-
 		{#if type === 'delete-volume' && activeVolume?.type === 'volume'}
 			<Button
 				onclick={() => {
@@ -310,7 +274,7 @@
 				>
 					<div class="flex items-center">
 						<Icon icon="mdi:delete" class="mr-1 h-4 w-4" />
-						<span>Delete Datasets</span>
+						<span>Delete Volumes</span>
 					</div>
 				</Button>
 			{/if}
@@ -335,8 +299,6 @@
 		</Button>
 
 		{@render button('flash-file')}
-		{@render button('create-snapshot')}
-		{@render button('delete-snapshot')}
 		{@render button('edit-volume')}
 		{@render button('delete-volume')}
 		{@render button('delete-volumes')}
@@ -355,26 +317,6 @@
 <!-- Flash File to Volume -->
 {#if modals.volume.flash.open && activeVolume && activeVolume.type === 'volume'}
 	<FlashFile bind:open={modals.volume.flash.open} dataset={activeVolume} {downloads} bind:reload />
-{/if}
-
-<!-- Create Snapshot -->
-{#if modals.snapshot.create.open && activeVolume && activeVolume.type === 'volume'}
-	<CreateSnapshot
-		bind:open={modals.snapshot.create.open}
-		dataset={activeVolume}
-		recursion={true}
-		bind:reload
-	/>
-{/if}
-
-<!-- Delete Snapshot -->
-{#if modals.snapshot.delete.open && activeSnapshot && activeSnapshot.type === 'snapshot'}
-	<DeleteSnapshot
-		bind:open={modals.snapshot.delete.open}
-		dataset={activeSnapshot}
-		askRecursive={false}
-		bind:reload
-	/>
 {/if}
 
 <!-- Delete Volume -->

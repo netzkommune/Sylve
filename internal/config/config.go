@@ -15,7 +15,8 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
-	"sylve/internal"
+
+	"github.com/alchemillahq/sylve/internal"
 )
 
 var ParsedConfig *internal.SylveConfig

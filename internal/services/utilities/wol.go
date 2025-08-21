@@ -10,10 +10,11 @@ package utilities
 
 import (
 	"net"
-	utilitiesModels "sylve/internal/db/models/utilities"
-	"sylve/internal/logger"
-	"sylve/pkg/utils"
 	"time"
+
+	utilitiesModels "github.com/alchemillahq/sylve/internal/db/models/utilities"
+	"github.com/alchemillahq/sylve/internal/logger"
+	"github.com/alchemillahq/sylve/pkg/utils"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"

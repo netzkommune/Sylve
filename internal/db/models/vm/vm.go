@@ -9,8 +9,9 @@
 package vmModels
 
 import (
-	networkModels "sylve/internal/db/models/network"
 	"time"
+
+	networkModels "github.com/alchemillahq/sylve/internal/db/models/network"
 )
 
 type Storage struct {

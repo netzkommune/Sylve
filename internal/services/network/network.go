@@ -9,9 +9,10 @@
 package network
 
 import (
-	libvirtServiceInterfaces "sylve/internal/interfaces/services/libvirt"
-	networkServiceInterfaces "sylve/internal/interfaces/services/network"
 	"sync"
+
+	libvirtServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/libvirt"
+	networkServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/network"
 
 	"gorm.io/gorm"
 )

@@ -2,7 +2,8 @@ package system
 
 import (
 	"fmt"
-	"sylve/pkg/utils"
+
+	"github.com/alchemillahq/sylve/pkg/utils"
 )
 
 func ServiceAction(name string, action string) error {

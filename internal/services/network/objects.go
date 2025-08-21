@@ -11,11 +11,12 @@ package network
 import (
 	"fmt"
 	"strconv"
-	"sylve/internal/db/models"
-	jailModels "sylve/internal/db/models/jail"
-	networkModels "sylve/internal/db/models/network"
-	vmModels "sylve/internal/db/models/vm"
-	utils "sylve/pkg/utils"
+
+	"github.com/alchemillahq/sylve/internal/db/models"
+	jailModels "github.com/alchemillahq/sylve/internal/db/models/jail"
+	networkModels "github.com/alchemillahq/sylve/internal/db/models/network"
+	vmModels "github.com/alchemillahq/sylve/internal/db/models/vm"
+	utils "github.com/alchemillahq/sylve/pkg/utils"
 )
 
 func (s *Service) GetObjects() ([]networkModels.Object, error) {

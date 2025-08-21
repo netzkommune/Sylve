@@ -9,10 +9,11 @@
 package crypto_test
 
 import (
-	"sylve/pkg/crypto"
-	"sylve/pkg/utils"
 	"testing"
 	"time"
+
+	"github.com/alchemillahq/sylve/pkg/crypto"
+	"github.com/alchemillahq/sylve/pkg/utils"
 )
 
 func TestGenerateSignature(t *testing.T) {

@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"sylve/pkg/disk"
-	"sylve/pkg/utils"
+
+	"github.com/alchemillahq/sylve/pkg/disk"
+	"github.com/alchemillahq/sylve/pkg/utils"
 )
 
 type RW struct {

@@ -11,8 +11,10 @@ package zfs
 import (
 	"fmt"
 	"os"
-	vmModels "sylve/internal/db/models/vm"
-	"sylve/pkg/zfs"
+
+	"github.com/alchemillahq/sylve/pkg/zfs"
+
+	vmModels "github.com/alchemillahq/sylve/internal/db/models/vm"
 )
 
 func (s *Service) CreateFilesystem(name string, props map[string]string) error {

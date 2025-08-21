@@ -11,9 +11,10 @@ package authHandlers
 import (
 	"net/http"
 	"strconv"
-	"sylve/internal"
-	"sylve/internal/db/models"
-	"sylve/internal/services/auth"
+
+	"github.com/alchemillahq/sylve/internal"
+	"github.com/alchemillahq/sylve/internal/db/models"
+	"github.com/alchemillahq/sylve/internal/services/auth"
 
 	"github.com/gin-gonic/gin"
 )

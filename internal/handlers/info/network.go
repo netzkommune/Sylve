@@ -10,9 +10,10 @@ package infoHandlers
 
 import (
 	"net/http"
-	"sylve/internal"
-	infoServiceInterfaces "sylve/internal/interfaces/services/info"
-	"sylve/internal/services/info"
+
+	"github.com/alchemillahq/sylve/internal"
+	infoServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/info"
+	"github.com/alchemillahq/sylve/internal/services/info"
 
 	"github.com/gin-gonic/gin"
 )

@@ -14,9 +14,10 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-	"sylve/internal/config"
-	jailModels "sylve/internal/db/models/jail"
-	"sylve/pkg/zfs"
+
+	"github.com/alchemillahq/sylve/internal/config"
+	jailModels "github.com/alchemillahq/sylve/internal/db/models/jail"
+	"github.com/alchemillahq/sylve/pkg/zfs"
 )
 
 func (s *Service) GetJailConfig(ctid uint) (string, error) {

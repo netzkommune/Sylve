@@ -13,12 +13,13 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	networkModels "sylve/internal/db/models/network"
-	vmModels "sylve/internal/db/models/vm"
-	"sylve/internal/logger"
-	iface "sylve/pkg/network/iface"
-	"sylve/pkg/utils"
 	"time"
+
+	networkModels "github.com/alchemillahq/sylve/internal/db/models/network"
+	vmModels "github.com/alchemillahq/sylve/internal/db/models/vm"
+	"github.com/alchemillahq/sylve/internal/logger"
+	iface "github.com/alchemillahq/sylve/pkg/network/iface"
+	"github.com/alchemillahq/sylve/pkg/utils"
 )
 
 func (s *Service) GetStandardSwitches() ([]networkModels.StandardSwitch, error) {

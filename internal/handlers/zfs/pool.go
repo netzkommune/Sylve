@@ -12,16 +12,18 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"sylve/internal"
-	"sylve/internal/db"
-	infoModels "sylve/internal/db/models/info"
-	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
-	"sylve/internal/services/info"
-	"sylve/internal/services/zfs"
+
+	"github.com/alchemillahq/sylve/internal"
+
+	"github.com/alchemillahq/sylve/internal/db"
+	infoModels "github.com/alchemillahq/sylve/internal/db/models/info"
+	zfsServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/zfs"
+	"github.com/alchemillahq/sylve/internal/services/info"
+	"github.com/alchemillahq/sylve/internal/services/zfs"
 
 	"github.com/gin-gonic/gin"
 
-	zfsUtils "sylve/pkg/zfs"
+	zfsUtils "github.com/alchemillahq/sylve/pkg/zfs"
 )
 
 type AvgIODelayResponse struct {

@@ -13,10 +13,11 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
-	"sylve/internal/config"
-	jailModels "sylve/internal/db/models/jail"
-	"sylve/pkg/utils"
 	"time"
+
+	"github.com/alchemillahq/sylve/internal/config"
+	jailModels "github.com/alchemillahq/sylve/internal/db/models/jail"
+	"github.com/alchemillahq/sylve/pkg/utils"
 )
 
 func (s *Service) JailAction(ctId int, action string) error {

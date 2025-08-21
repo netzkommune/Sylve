@@ -11,7 +11,8 @@ package libvirt
 import (
 	"encoding/xml"
 	"fmt"
-	libvirtServiceInterfaces "sylve/internal/interfaces/services/libvirt"
+
+	libvirtServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/libvirt"
 
 	"github.com/digitalocean/go-libvirt"
 )

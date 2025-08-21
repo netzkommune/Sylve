@@ -8,7 +8,7 @@
 
 package libvirtServiceInterfaces
 
-import vmModels "sylve/internal/db/models/vm"
+import vmModels "github.com/alchemillahq/sylve/internal/db/models/vm"
 
 type LibvirtServiceInterface interface {
 	CheckVersion() error

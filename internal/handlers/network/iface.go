@@ -10,18 +10,19 @@ package networkHandlers
 
 import (
 	"net/http"
-	"sylve/internal"
-	"sylve/internal/services/network"
-	iface "sylve/pkg/network/iface"
+
+	"github.com/alchemillahq/sylve/internal"
+	"github.com/alchemillahq/sylve/internal/services/network"
+	iface "github.com/alchemillahq/sylve/pkg/network/iface"
 
 	"github.com/gin-gonic/gin"
 )
 
 type InterfacesListResponse struct {
-    Status  string             `json:"status"`
-    Message string             `json:"message"`
-    Error   string             `json:"error"`
-    Data    []*iface.Interface `json:"data"`
+	Status  string             `json:"status"`
+	Message string             `json:"message"`
+	Error   string             `json:"error"`
+	Data    []*iface.Interface `json:"data"`
 }
 
 // @Summary List Network Interfaces

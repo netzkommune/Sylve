@@ -11,10 +11,11 @@ package zfs
 import (
 	"context"
 	"fmt"
-	zfsModels "sylve/internal/db/models/zfs"
-	"sylve/internal/logger"
-	"sylve/pkg/zfs"
 	"time"
+
+	zfsModels "github.com/alchemillahq/sylve/internal/db/models/zfs"
+	"github.com/alchemillahq/sylve/internal/logger"
+	"github.com/alchemillahq/sylve/pkg/zfs"
 
 	"github.com/robfig/cron/v3"
 )

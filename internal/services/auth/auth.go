@@ -12,11 +12,12 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"sylve/internal/db/models"
-	serviceInterfaces "sylve/internal/interfaces/services"
-	"sylve/internal/logger"
-	"sylve/pkg/utils"
 	"time"
+
+	"github.com/alchemillahq/sylve/internal/db/models"
+	serviceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services"
+	"github.com/alchemillahq/sylve/internal/logger"
+	"github.com/alchemillahq/sylve/pkg/utils"
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"

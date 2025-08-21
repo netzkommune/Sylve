@@ -10,10 +10,11 @@ package systemHandlers
 
 import (
 	"net/http"
-	"sylve/internal"
-	"sylve/internal/db/models"
-	"sylve/internal/services/system"
-	"sylve/pkg/system/pciconf"
+
+	"github.com/alchemillahq/sylve/internal"
+	"github.com/alchemillahq/sylve/internal/db/models"
+	"github.com/alchemillahq/sylve/internal/services/system"
+	"github.com/alchemillahq/sylve/pkg/system/pciconf"
 
 	"github.com/gin-gonic/gin"
 )

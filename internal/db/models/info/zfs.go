@@ -12,7 +12,8 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
-	"sylve/pkg/zfs"
+
+	"github.com/alchemillahq/sylve/pkg/zfs"
 )
 
 type ZpoolJSON zfs.Zpool

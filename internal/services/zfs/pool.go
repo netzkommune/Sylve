@@ -13,12 +13,13 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-	"sylve/internal/db"
-	infoModels "sylve/internal/db/models/info"
-	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
-	"sylve/pkg/disk"
-	"sylve/pkg/zfs"
 	"time"
+
+	"github.com/alchemillahq/sylve/internal/db"
+	infoModels "github.com/alchemillahq/sylve/internal/db/models/info"
+	zfsServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/zfs"
+	"github.com/alchemillahq/sylve/pkg/disk"
+	"github.com/alchemillahq/sylve/pkg/zfs"
 )
 
 func (s *Service) GetTotalIODelayHisorical() ([]infoModels.IODelay, error) {

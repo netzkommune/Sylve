@@ -10,8 +10,9 @@ package info
 
 import (
 	"errors"
-	infoModels "sylve/internal/db/models/info"
-	infoServiceInterfaces "sylve/internal/interfaces/services/info"
+
+	infoModels "github.com/alchemillahq/sylve/internal/db/models/info"
+	infoServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/info"
 
 	"gorm.io/gorm"
 )

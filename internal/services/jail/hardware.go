@@ -12,9 +12,10 @@ import (
 	"fmt"
 	"sort"
 	"strings"
-	jailModels "sylve/internal/db/models/jail"
-	"sylve/internal/logger"
-	"sylve/pkg/utils"
+
+	jailModels "github.com/alchemillahq/sylve/internal/db/models/jail"
+	"github.com/alchemillahq/sylve/internal/logger"
+	"github.com/alchemillahq/sylve/pkg/utils"
 
 	cpuid "github.com/klauspost/cpuid/v2"
 )

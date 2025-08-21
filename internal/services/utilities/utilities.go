@@ -9,9 +9,9 @@
 package utilities
 
 import (
-	"sylve/internal/config"
-	utilitiesServiceInterfaces "sylve/internal/interfaces/services/utilities"
-	"sylve/internal/logger"
+	"github.com/alchemillahq/sylve/internal/config"
+	utilitiesServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/utilities"
+	"github.com/alchemillahq/sylve/internal/logger"
 
 	"github.com/cavaliergopher/grab/v3"
 	"github.com/cenkalti/rain/v2/torrent"

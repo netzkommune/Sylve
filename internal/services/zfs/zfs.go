@@ -9,11 +9,12 @@
 package zfs
 
 import (
-	libvirtServiceInterfaces "sylve/internal/interfaces/services/libvirt"
-	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
-	"sylve/internal/logger"
-	"sylve/pkg/zfs"
 	"sync"
+
+	libvirtServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/libvirt"
+	zfsServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/zfs"
+	"github.com/alchemillahq/sylve/internal/logger"
+	"github.com/alchemillahq/sylve/pkg/zfs"
 
 	"gorm.io/gorm"
 )

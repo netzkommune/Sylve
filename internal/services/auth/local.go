@@ -10,11 +10,12 @@ package auth
 
 import (
 	"fmt"
-	"sylve/internal/db/models"
-	"sylve/pkg/system"
-	"sylve/pkg/system/samba"
-	"sylve/pkg/utils"
 	"time"
+
+	"github.com/alchemillahq/sylve/internal/db/models"
+	"github.com/alchemillahq/sylve/pkg/system"
+	"github.com/alchemillahq/sylve/pkg/system/samba"
+	"github.com/alchemillahq/sylve/pkg/utils"
 )
 
 func (s *Service) ListUsers() ([]models.User, error) {

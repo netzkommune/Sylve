@@ -10,9 +10,10 @@ package authHandlers
 
 import (
 	"net/http"
-	"sylve/internal"
-	"sylve/internal/services/auth"
-	"sylve/pkg/utils"
+
+	"github.com/alchemillahq/sylve/internal"
+	"github.com/alchemillahq/sylve/internal/services/auth"
+	"github.com/alchemillahq/sylve/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 )

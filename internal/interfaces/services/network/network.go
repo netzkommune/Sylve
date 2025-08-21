@@ -8,7 +8,7 @@
 
 package networkServiceInterfaces
 
-import networkModels "sylve/internal/db/models/network"
+import networkModels "github.com/alchemillahq/sylve/internal/db/models/network"
 
 type NetworkServiceInterface interface {
 	SyncStandardSwitches(previous *networkModels.StandardSwitch, action string) error

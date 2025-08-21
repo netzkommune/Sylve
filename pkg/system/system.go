@@ -3,7 +3,8 @@ package system
 import (
 	"fmt"
 	"strings"
-	"sylve/pkg/utils"
+
+	"github.com/alchemillahq/sylve/pkg/utils"
 )
 
 func UnixUserExists(name string) (bool, error) {

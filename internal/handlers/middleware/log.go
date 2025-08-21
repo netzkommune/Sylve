@@ -14,12 +14,14 @@ import (
 	"fmt"
 	"io"
 	"strings"
-	infoModels "sylve/internal/db/models/info"
-	authService "sylve/internal/services/auth"
 
-	"sylve/internal/logger"
-	"sylve/pkg/utils"
+	infoModels "github.com/alchemillahq/sylve/internal/db/models/info"
+	authService "github.com/alchemillahq/sylve/internal/services/auth"
+
 	"time"
+
+	"github.com/alchemillahq/sylve/internal/logger"
+	"github.com/alchemillahq/sylve/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"

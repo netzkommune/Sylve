@@ -11,19 +11,20 @@ package libvirt
 import (
 	"fmt"
 	"strings"
-	"sylve/internal/db/models"
-	networkModels "sylve/internal/db/models/network"
-	utilitiesModels "sylve/internal/db/models/utilities"
-	vmModels "sylve/internal/db/models/vm"
-	libvirtServiceInterfaces "sylve/internal/interfaces/services/libvirt"
-	"sylve/internal/logger"
-	"sylve/pkg/utils"
-	"sylve/pkg/zfs"
+
+	"github.com/alchemillahq/sylve/internal/db/models"
+	networkModels "github.com/alchemillahq/sylve/internal/db/models/network"
+	utilitiesModels "github.com/alchemillahq/sylve/internal/db/models/utilities"
+	vmModels "github.com/alchemillahq/sylve/internal/db/models/vm"
+	libvirtServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/libvirt"
+	"github.com/alchemillahq/sylve/internal/logger"
+	"github.com/alchemillahq/sylve/pkg/utils"
+	"github.com/alchemillahq/sylve/pkg/zfs"
 
 	"github.com/klauspost/cpuid/v2"
 	"gorm.io/gorm"
 
-	sdb "sylve/internal/db"
+	sdb "github.com/alchemillahq/sylve/internal/db"
 )
 
 func (s *Service) ListVMs() ([]vmModels.VM, error) {

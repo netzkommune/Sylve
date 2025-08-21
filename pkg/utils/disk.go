@@ -10,7 +10,8 @@ package utils
 
 import (
 	"strings"
-	"sylve/pkg/utils/sysctl"
+
+	"github.com/alchemillahq/sylve/pkg/utils/sysctl"
 )
 
 var getSysctlBytes = sysctl.GetBytes

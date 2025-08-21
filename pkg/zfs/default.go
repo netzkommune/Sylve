@@ -2,7 +2,8 @@ package zfs
 
 import (
 	"fmt"
-	"sylve/pkg/exe"
+
+	"github.com/alchemillahq/sylve/pkg/exe"
 )
 
 var z ZFS = &zfs{exec: exe.NewLocalExecutor(), sudo: false}

@@ -8,7 +8,7 @@
 
 package infoServiceInterfaces
 
-import infoModels "sylve/internal/db/models/info"
+import infoModels "github.com/alchemillahq/sylve/internal/db/models/info"
 
 type InfoServiceInterface interface {
 	GetBasicInfo() (basicInfo BasicInfo, err error)

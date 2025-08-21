@@ -14,10 +14,11 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"sylve/internal/logger"
 	"sync"
 	"syscall"
 	"unsafe"
+
+	"github.com/alchemillahq/sylve/internal/logger"
 
 	"github.com/creack/pty"
 	"github.com/gin-gonic/gin"

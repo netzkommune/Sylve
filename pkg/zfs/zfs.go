@@ -5,8 +5,9 @@ import (
 	"io"
 	"os"
 	"strconv"
-	"sylve/pkg/exe"
-	"sylve/pkg/utils"
+
+	"github.com/alchemillahq/sylve/pkg/exe"
+	"github.com/alchemillahq/sylve/pkg/utils"
 )
 
 type InodeType int

@@ -14,20 +14,21 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-	"sylve/internal/config"
-	jailModels "sylve/internal/db/models/jail"
-	networkModels "sylve/internal/db/models/network"
-	utilitiesModels "sylve/internal/db/models/utilities"
-	jailServiceInterfaces "sylve/internal/interfaces/services/jail"
-	networkServiceInterfaces "sylve/internal/interfaces/services/network"
-	"sylve/internal/logger"
-	"sylve/pkg/utils"
-	"sylve/pkg/zfs"
 	"sync"
+
+	"github.com/alchemillahq/sylve/internal/config"
+	jailModels "github.com/alchemillahq/sylve/internal/db/models/jail"
+	networkModels "github.com/alchemillahq/sylve/internal/db/models/network"
+	utilitiesModels "github.com/alchemillahq/sylve/internal/db/models/utilities"
+	jailServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/jail"
+	networkServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/network"
+	"github.com/alchemillahq/sylve/internal/logger"
+	"github.com/alchemillahq/sylve/pkg/utils"
+	"github.com/alchemillahq/sylve/pkg/zfs"
 
 	"gorm.io/gorm"
 
-	sdb "sylve/internal/db"
+	sdb "github.com/alchemillahq/sylve/internal/db"
 
 	cpuid "github.com/klauspost/cpuid/v2"
 )

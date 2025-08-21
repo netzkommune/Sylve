@@ -10,10 +10,11 @@ package zfsHandlers
 
 import (
 	"net/http"
-	"sylve/internal"
-	zfsModels "sylve/internal/db/models/zfs"
-	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
-	"sylve/internal/services/zfs"
+
+	"github.com/alchemillahq/sylve/internal"
+	zfsModels "github.com/alchemillahq/sylve/internal/db/models/zfs"
+	zfsServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/zfs"
+	"github.com/alchemillahq/sylve/internal/services/zfs"
 
 	"github.com/gin-gonic/gin"
 )

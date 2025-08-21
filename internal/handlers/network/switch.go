@@ -11,9 +11,10 @@ package networkHandlers
 import (
 	"net/http"
 	"strconv"
-	"sylve/internal"
-	networkModels "sylve/internal/db/models/network"
-	"sylve/internal/services/network"
+
+	"github.com/alchemillahq/sylve/internal"
+	networkModels "github.com/alchemillahq/sylve/internal/db/models/network"
+	"github.com/alchemillahq/sylve/internal/services/network"
 
 	"github.com/gin-gonic/gin"
 )

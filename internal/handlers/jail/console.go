@@ -15,11 +15,12 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
-	"sylve/internal/logger"
-	"sylve/pkg/utils"
 	"sync"
 	"syscall"
 	"unsafe"
+
+	"github.com/alchemillahq/sylve/internal/logger"
+	"github.com/alchemillahq/sylve/pkg/utils"
 
 	"github.com/creack/pty"
 	"github.com/gin-gonic/gin"

@@ -8,7 +8,7 @@
 
 package sambaServiceInterfaces
 
-import sambaModels "sylve/internal/db/models/samba"
+import sambaModels "github.com/alchemillahq/sylve/internal/db/models/samba"
 
 type SambaServiceInterface interface {
 	WriteConfig(reload bool) error

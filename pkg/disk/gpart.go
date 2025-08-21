@@ -13,7 +13,8 @@ import (
 	"os"
 	"regexp"
 	"strconv"
-	"sylve/pkg/utils"
+
+	"github.com/alchemillahq/sylve/pkg/utils"
 )
 
 func CheckDevice(device string) error {

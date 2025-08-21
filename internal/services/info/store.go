@@ -9,10 +9,11 @@
 package info
 
 import (
-	"sylve/internal/db"
-	infoModels "sylve/internal/db/models/info"
 	"sync"
 	"time"
+
+	"github.com/alchemillahq/sylve/internal/db"
+	infoModels "github.com/alchemillahq/sylve/internal/db/models/info"
 )
 
 func (s *Service) StoreStats() {

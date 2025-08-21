@@ -10,7 +10,8 @@ package network
 
 import (
 	"fmt"
-	networkModels "sylve/internal/db/models/network"
+
+	networkModels "github.com/alchemillahq/sylve/internal/db/models/network"
 )
 
 func (s *Service) GetBridgeNameByID(id uint) (string, error) {

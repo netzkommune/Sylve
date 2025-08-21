@@ -13,12 +13,13 @@ import (
 	"net/http"
 	"path"
 	"strconv"
-	"sylve/internal"
-	utilitiesModels "sylve/internal/db/models/utilities"
-	"sylve/internal/services/utilities"
-	"sylve/pkg/crypto"
-	"sylve/pkg/utils"
 	"time"
+
+	"github.com/alchemillahq/sylve/internal"
+	utilitiesModels "github.com/alchemillahq/sylve/internal/db/models/utilities"
+	"github.com/alchemillahq/sylve/internal/services/utilities"
+	"github.com/alchemillahq/sylve/pkg/crypto"
+	"github.com/alchemillahq/sylve/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 )

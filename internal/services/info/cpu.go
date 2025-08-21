@@ -9,10 +9,11 @@
 package info
 
 import (
-	"sylve/internal/db"
-	infoModels "sylve/internal/db/models/info"
-	infoServiceInterfaces "sylve/internal/interfaces/services/info"
 	"time"
+
+	"github.com/alchemillahq/sylve/internal/db"
+	infoModels "github.com/alchemillahq/sylve/internal/db/models/info"
+	infoServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/info"
 
 	cpuid "github.com/klauspost/cpuid/v2"
 	"github.com/shirou/gopsutil/cpu"

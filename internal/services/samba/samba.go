@@ -9,8 +9,8 @@
 package samba
 
 import (
-	sambaServiceInterfaces "sylve/internal/interfaces/services/samba"
-	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
+	sambaServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/samba"
+	zfsServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/zfs"
 
 	"gorm.io/gorm"
 )

@@ -10,11 +10,12 @@ package zfs
 
 import (
 	"encoding/json"
-	"sylve/internal/db"
-	infoModels "sylve/internal/db/models/info"
-	"sylve/internal/logger"
-	"sylve/pkg/zfs"
 	"time"
+
+	"github.com/alchemillahq/sylve/internal/db"
+	infoModels "github.com/alchemillahq/sylve/internal/db/models/info"
+	"github.com/alchemillahq/sylve/internal/logger"
+	"github.com/alchemillahq/sylve/pkg/zfs"
 )
 
 func (s *Service) StoreStats(interval int) {

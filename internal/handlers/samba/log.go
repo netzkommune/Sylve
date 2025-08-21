@@ -11,9 +11,10 @@ package sambaHandlers
 import (
 	"net/http"
 	"strconv"
-	"sylve/internal"
-	sambaServiceInterfaces "sylve/internal/interfaces/services/samba"
-	"sylve/internal/services/samba"
+
+	"github.com/alchemillahq/sylve/internal"
+	sambaServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/samba"
+	"github.com/alchemillahq/sylve/internal/services/samba"
 
 	"github.com/gin-gonic/gin"
 )

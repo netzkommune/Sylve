@@ -9,8 +9,9 @@
 package jailModels
 
 import (
-	networkModels "sylve/internal/db/models/network"
 	"time"
+
+	networkModels "github.com/alchemillahq/sylve/internal/db/models/network"
 )
 
 func (Network) TableName() string {

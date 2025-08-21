@@ -17,10 +17,15 @@ export const StandardSwitchSchema = z.object({
 	address6: z.string(),
 	addressObj: NetworkObjectSchema.nullable(),
 	address6Obj: NetworkObjectSchema.nullable(),
+	networkObj: NetworkObjectSchema.nullable(),
+	network6Obj: NetworkObjectSchema.nullable(),
+	gatewayAddressObj: NetworkObjectSchema.nullable(),
+	gateway6AddressObj: NetworkObjectSchema.nullable(),
 	ports: z.array(NetworkPortSchema).optional(),
 	dhcp: z.boolean().optional(),
 	slaac: z.boolean(),
-	disableIPv6: z.boolean()
+	disableIPv6: z.boolean(),
+	defaultRoute: z.boolean()
 });
 
 export const SwitchListSchema = z.object({

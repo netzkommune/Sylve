@@ -13,10 +13,11 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	vmModels "sylve/internal/db/models/vm"
-	systemServiceInterfaces "sylve/internal/interfaces/services/system"
-	"sylve/pkg/utils"
 	"time"
+
+	vmModels "github.com/alchemillahq/sylve/internal/db/models/vm"
+	systemServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/system"
+	"github.com/alchemillahq/sylve/pkg/utils"
 )
 
 func (s *Service) PruneOrphanedVMStats() error {

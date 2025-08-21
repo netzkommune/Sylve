@@ -10,10 +10,11 @@ package samba
 
 import (
 	"fmt"
-	"sylve/internal/db/models"
-	sambaModels "sylve/internal/db/models/samba"
-	"sylve/pkg/utils"
-	"sylve/pkg/zfs"
+
+	"github.com/alchemillahq/sylve/internal/db/models"
+	sambaModels "github.com/alchemillahq/sylve/internal/db/models/samba"
+	"github.com/alchemillahq/sylve/pkg/utils"
+	"github.com/alchemillahq/sylve/pkg/zfs"
 )
 
 func (s *Service) GetShares() ([]sambaModels.SambaShare, error) {

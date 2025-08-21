@@ -10,10 +10,11 @@ package libvirtHandlers
 
 import (
 	"strconv"
-	"sylve/internal"
-	vmModels "sylve/internal/db/models/vm"
-	libvirtServiceInterfaces "sylve/internal/interfaces/services/libvirt"
-	"sylve/internal/services/libvirt"
+
+	"github.com/alchemillahq/sylve/internal"
+	vmModels "github.com/alchemillahq/sylve/internal/db/models/vm"
+	libvirtServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/libvirt"
+	"github.com/alchemillahq/sylve/internal/services/libvirt"
 
 	"github.com/gin-gonic/gin"
 )

@@ -15,9 +15,10 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	sambaModels "sylve/internal/db/models/samba"
-	sambaServiceInterfaces "sylve/internal/interfaces/services/samba"
 	"time"
+
+	sambaModels "github.com/alchemillahq/sylve/internal/db/models/samba"
+	sambaServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/samba"
 )
 
 func (s *Service) ParseAuditLogs() error {

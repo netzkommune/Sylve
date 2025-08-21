@@ -11,11 +11,12 @@ package network
 import (
 	"fmt"
 	"strconv"
-	"sylve/internal/db/models"
-	jailModels "sylve/internal/db/models/jail"
-	networkModels "sylve/internal/db/models/network"
-	vmModels "sylve/internal/db/models/vm"
-	utils "sylve/pkg/utils"
+
+	"github.com/alchemillahq/sylve/internal/db/models"
+	jailModels "github.com/alchemillahq/sylve/internal/db/models/jail"
+	networkModels "github.com/alchemillahq/sylve/internal/db/models/network"
+	vmModels "github.com/alchemillahq/sylve/internal/db/models/vm"
+	utils "github.com/alchemillahq/sylve/pkg/utils"
 )
 
 func (s *Service) GetObjects() ([]networkModels.Object, error) {
@@ -147,20 +148,23 @@ func (s *Service) IsObjectUsed(id uint) (bool, error) {
 		var jailNetworks []jailModels.Network
 
 		if err := s.DB.
-			Preload("AddressObj.Entries").
-			Preload("Address6Obj.Entries").Find(&switches).Error; err != nil {
+			Preload("NetworkObj.Entries").
+			Preload("Network6Obj.Entries").
+			Preload("GatewayAddressObj.Entries").
+			Preload("Gateway6AddressObj.Entries").
+			Find(&switches).Error; err != nil {
 			return true, err
 		}
 
 		for _, sw := range switches {
-			if sw.AddressObj != nil {
-				if sw.AddressObj.ID == id {
+			if sw.GatewayAddressObj != nil {
+				if sw.GatewayAddressObj.ID == id {
 					return true, nil
 				}
 			}
 
-			if sw.Address6Obj != nil {
-				if sw.Address6Obj.ID == id {
+			if sw.Gateway6AddressObj != nil {
+				if sw.Gateway6AddressObj.ID == id {
 					return true, nil
 				}
 			}
@@ -220,6 +224,16 @@ func (s *Service) IsObjectUsed(id uint) (bool, error) {
 		}
 
 		if len(jailNetworks) > 0 {
+			return true, nil
+		}
+
+		var switches []networkModels.StandardSwitch
+
+		if err := s.DB.Where("network_object_id = ? OR network6_object_id = ?", id, id).Find(&switches).Error; err != nil {
+			return true, fmt.Errorf("failed to find switches using object %d: %w", id, err)
+		}
+
+		if len(switches) > 0 {
 			return true, nil
 		}
 	}
@@ -373,104 +387,6 @@ func (s *Service) EditObject(id uint, name string, oType string, values []string
 			}
 		}
 	} else {
-		if object.Type == "Host" {
-			var switches []networkModels.StandardSwitch
-			if err := s.DB.
-				Preload("AddressObj.Entries").
-				Preload("Address6Obj.Entries").
-				Find(&switches).Error; err != nil {
-				return fmt.Errorf("failed to find standard switches using object %d: %w", id, err)
-			}
-
-			/* IP Used in a switch */
-			if len(switches) > 0 && oType == "Host" {
-				if len(values) != 1 {
-					return fmt.Errorf("cannot edit object %d, it is used by %d standard switches, please ensure only one IP is provided", id, len(switches))
-				}
-
-				hasChange := false
-
-				object.Name = name
-				object.Type = oType
-
-				if object.Name != name || object.Type != oType {
-					hasChange = true
-				}
-
-				for _, value := range values {
-					for _, entry := range object.Entries {
-						if entry.Value == value && !hasChange {
-							return fmt.Errorf("no_detected_changes")
-						}
-					}
-				}
-
-				if err := s.DB.Save(&object).Error; err != nil {
-					return fmt.Errorf("failed to update object %d: %w", id, err)
-				}
-
-				if err := s.DB.Where("object_id = ?", id).Delete(&networkModels.ObjectEntry{}).Error; err != nil {
-					return fmt.Errorf("failed to delete existing entries for object %d: %w", id, err)
-				}
-
-				for _, value := range values {
-					entry := networkModels.ObjectEntry{
-						ObjectID: id,
-						Value:    value,
-					}
-
-					if err := s.DB.Create(&entry).Error; err != nil {
-						return fmt.Errorf("failed to create entry for object %d: %w", id, err)
-					}
-				}
-
-				err := s.SyncStandardSwitches(nil, "sync")
-				if err != nil {
-					return fmt.Errorf("failed to sync standard switches after editing object %d: %w", id, err)
-				}
-			}
-
-			/* Object Was used in a switch, but now we're changing it to something else, we can't do that */
-			if len(switches) > 0 && oType != "Host" {
-				return fmt.Errorf("cannot_change_object_type_host")
-			}
-
-			/* IP Used in Jail */
-			var jailNetworks []jailModels.Network
-			if err := s.DB.Where("ipv4_id = ? OR ipv4_gw_id = ? OR ipv6_id = ? OR ipv6_gw_id = ?", id, id, id, id).Find(&jailNetworks).Error; err != nil {
-				return fmt.Errorf("failed to find jail networks using object %d: %w", id, err)
-			}
-
-			if len(jailNetworks) > 0 && oType != "Host" {
-				return fmt.Errorf("cannot_change_object_type_jail")
-			}
-
-			if len(jailNetworks) > 0 && oType == "Host" {
-				err := s.AddNetworkObjectEditJailTrigger(id, values)
-				if err != nil {
-					return fmt.Errorf("failed to add network object edit jail trigger for object %d: %w", id, err)
-				}
-			}
-		}
-
-		if object.Type == "Network" {
-			var jailNetworks []jailModels.Network
-			if err := s.DB.Where("ipv4_id = ? OR ipv4_gw_id = ? OR ipv6_id = ? OR ipv6_gw_id = ?", id, id, id, id).Find(&jailNetworks).Error; err != nil {
-				return fmt.Errorf("failed to find jail networks using object %d: %w", id, err)
-			}
-
-			if len(jailNetworks) > 0 && oType != "Network" {
-				return fmt.Errorf("cannot_change_object_type_jail")
-			}
-
-			if len(jailNetworks) > 0 && oType == "Network" {
-				err := s.AddNetworkObjectEditJailTrigger(id, values)
-				if err != nil {
-					return fmt.Errorf("failed to add network object edit jail trigger for object %d: %w", id, err)
-				}
-			}
-		}
-
 		if object.Type == "Mac" {
 			var vmNetworks []vmModels.Network
 			if err := s.DB.Where("mac_id = ?", id).Find(&vmNetworks).Error; err != nil {
@@ -563,6 +479,170 @@ func (s *Service) EditObject(id uint, name string, oType string, values []string
 
 			/* MAC Used in a Jail */
 			if len(jailNetworks) > 0 && oType == "Mac" {
+				err := s.AddNetworkObjectEditJailTrigger(id, values)
+				if err != nil {
+					return fmt.Errorf("failed to add network object edit jail trigger for object %d: %w", id, err)
+				}
+			}
+		}
+
+		if object.Type == "Host" {
+			/* IP used by switches */
+			var switches []networkModels.StandardSwitch
+			if err := s.DB.
+				Preload("NetworkObj.Entries").
+				Preload("Network6Obj.Entries").
+				Preload("GatewayAddressObj.Entries").
+				Preload("Gateway6AddressObj.Entries").
+				Find(&switches).
+				Where("gateway_address_object_id = ? OR gateway6_address_object_id = ?", id, id).Error; err != nil {
+				return fmt.Errorf("failed to find standard switches using object %d: %w", id, err)
+			}
+
+			if len(switches) > 0 && oType != "Host" {
+				return fmt.Errorf("cannot_change_object_type_host_used_in_switches")
+			}
+
+			if len(switches) > 0 && oType == "Host" {
+				if len(values) != 1 {
+					return fmt.Errorf("cannot edit object %d, it is used by %d standard switches, please ensure only one IP is provided", id, len(switches))
+				}
+
+				hasChange := false
+
+				object.Name = name
+				object.Type = oType
+
+				if object.Name != name || object.Type != oType {
+					hasChange = true
+				}
+
+				for _, value := range values {
+					for _, entry := range object.Entries {
+						if entry.Value == value && !hasChange {
+							return fmt.Errorf("no_detected_changes")
+						}
+					}
+				}
+
+				if err := s.DB.Save(&object).Error; err != nil {
+					return fmt.Errorf("failed to update object %d: %w", id, err)
+				}
+
+				if err := s.DB.Where("object_id = ?", id).Delete(&networkModels.ObjectEntry{}).Error; err != nil {
+					return fmt.Errorf("failed to delete existing entries for object %d: %w", id, err)
+				}
+
+				for _, value := range values {
+					entry := networkModels.ObjectEntry{
+						ObjectID: id,
+						Value:    value,
+					}
+
+					if err := s.DB.Create(&entry).Error; err != nil {
+						return fmt.Errorf("failed to create entry for object %d: %w", id, err)
+					}
+				}
+
+				err := s.SyncStandardSwitches(nil, "sync")
+				if err != nil {
+					return fmt.Errorf("failed to sync standard switches after editing object %d: %w", id, err)
+				}
+			}
+
+			/* IP used by jails */
+			var jailNetworks []jailModels.Network
+			if err := s.DB.Where("ipv4_id = ? OR ipv4_gw_id = ? OR ipv6_id = ? OR ipv6_gw_id = ?", id, id, id, id).Find(&jailNetworks).Error; err != nil {
+				return fmt.Errorf("failed to find jail networks using object %d: %w", id, err)
+			}
+
+			if len(jailNetworks) > 0 && oType != "Host" {
+				return fmt.Errorf("cannot_change_object_type_jail")
+			}
+
+			if len(jailNetworks) > 0 && oType == "Host" {
+				err := s.AddNetworkObjectEditJailTrigger(id, values)
+				if err != nil {
+					return fmt.Errorf("failed to add network object edit jail trigger for object %d: %w", id, err)
+				}
+			}
+		}
+
+		if object.Type == "Network" {
+			/* Network used by switches */
+			var switches []networkModels.StandardSwitch
+			if err := s.DB.
+				Preload("NetworkObj.Entries").
+				Preload("Network6Obj.Entries").
+				Preload("GatewayAddressObj.Entries").
+				Preload("Gateway6AddressObj.Entries").
+				Find(&switches).
+				Where("networkId = ? OR network6Id = ?", id, id).Error; err != nil {
+				return fmt.Errorf("failed to find standard switches using object %d: %w", id, err)
+			}
+
+			if len(switches) > 0 && oType != "Network" {
+				return fmt.Errorf("cannot_change_object_type_network_used_in_switches")
+			}
+
+			if len(switches) > 0 && oType == "Network" {
+				if len(values) != 1 {
+					return fmt.Errorf("cannot edit object %d, it is used by %d standard switches, please ensure only one network is provided", id, len(switches))
+				}
+
+				hasChange := false
+
+				object.Name = name
+				object.Type = oType
+
+				if object.Name != name || object.Type != oType {
+					hasChange = true
+				}
+
+				for _, value := range values {
+					for _, entry := range object.Entries {
+						if entry.Value == value && !hasChange {
+							return fmt.Errorf("no_detected_changes")
+						}
+					}
+				}
+
+				if err := s.DB.Save(&object).Error; err != nil {
+					return fmt.Errorf("failed to update object %d: %w", id, err)
+				}
+
+				if err := s.DB.Where("object_id = ?", id).Delete(&networkModels.ObjectEntry{}).Error; err != nil {
+					return fmt.Errorf("failed to delete existing entries for object %d: %w", id, err)
+				}
+
+				for _, value := range values {
+					entry := networkModels.ObjectEntry{
+						ObjectID: id,
+						Value:    value,
+					}
+
+					if err := s.DB.Create(&entry).Error; err != nil {
+						return fmt.Errorf("failed to create entry for object %d: %w", id, err)
+					}
+				}
+
+				err := s.SyncStandardSwitches(nil, "sync")
+				if err != nil {
+					return fmt.Errorf("failed to sync standard switches after editing object %d: %w", id, err)
+				}
+			}
+
+			/* Network used by jails */
+			var jailNetworks []jailModels.Network
+			if err := s.DB.Where("ipv4_id = ? OR ipv4_gw_id = ? OR ipv6_id = ? OR ipv6_gw_id = ?", id, id, id, id).Find(&jailNetworks).Error; err != nil {
+				return fmt.Errorf("failed to find jail networks using object %d: %w", id, err)
+			}
+
+			if len(jailNetworks) > 0 && oType != "Network" {
+				return fmt.Errorf("cannot_change_object_type_jail")
+			}
+
+			if len(jailNetworks) > 0 && oType == "Network" {
 				err := s.AddNetworkObjectEditJailTrigger(id, values)
 				if err != nil {
 					return fmt.Errorf("failed to add network object edit jail trigger for object %d: %w", id, err)

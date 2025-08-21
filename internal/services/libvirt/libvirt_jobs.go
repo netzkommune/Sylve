@@ -11,9 +11,10 @@ package libvirt
 import (
 	"fmt"
 	"strings"
-	utilitiesModels "sylve/internal/db/models/utilities"
-	"sylve/internal/logger"
 	"time"
+
+	utilitiesModels "github.com/alchemillahq/sylve/internal/db/models/utilities"
+	"github.com/alchemillahq/sylve/internal/logger"
 )
 
 func (s *Service) WolTasks() {

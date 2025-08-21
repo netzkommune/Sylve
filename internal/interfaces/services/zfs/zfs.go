@@ -10,8 +10,9 @@ package zfsServiceInterfaces
 
 import (
 	"context"
-	infoModels "sylve/internal/db/models/info"
-	zfsModels "sylve/internal/db/models/zfs"
+
+	infoModels "github.com/alchemillahq/sylve/internal/db/models/info"
+	zfsModels "github.com/alchemillahq/sylve/internal/db/models/zfs"
 )
 
 type ZfsServiceInterface interface {

@@ -1,6 +1,6 @@
 package pkg
 
-import "sylve/pkg/utils"
+import "github.com/alchemillahq/sylve/pkg/utils"
 
 func IsPackageInstalled(packageName string) bool {
 	_, err := utils.RunCommand("pkg", "info", packageName)

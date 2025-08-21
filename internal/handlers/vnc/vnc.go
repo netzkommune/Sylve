@@ -14,8 +14,9 @@ import (
 	"net"
 	"net/http"
 	"strings"
-	"sylve/internal/logger"
 	"sync"
+
+	"github.com/alchemillahq/sylve/internal/logger"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"

@@ -11,10 +11,11 @@ package network
 import (
 	"fmt"
 	"strings"
-	jailModels "sylve/internal/db/models/jail"
-	utils "sylve/pkg/utils"
 
-	iface "sylve/pkg/network/iface"
+	jailModels "github.com/alchemillahq/sylve/internal/db/models/jail"
+	utils "github.com/alchemillahq/sylve/pkg/utils"
+
+	iface "github.com/alchemillahq/sylve/pkg/network/iface"
 )
 
 func (s *Service) CreateEpair(name string) error {

@@ -11,8 +11,9 @@ package db
 import (
 	"errors"
 	"fmt"
-	networkModels "sylve/internal/db/models/network"
-	vmModels "sylve/internal/db/models/vm"
+
+	networkModels "github.com/alchemillahq/sylve/internal/db/models/network"
+	vmModels "github.com/alchemillahq/sylve/internal/db/models/vm"
 
 	"gorm.io/gorm"
 )

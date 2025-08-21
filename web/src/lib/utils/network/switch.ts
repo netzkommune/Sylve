@@ -59,21 +59,41 @@ export function generateTableData(
 			formatter: (cell: CellComponent) => {
 				const row = cell.getRow();
 				const data = row.getData();
-				const value = cell.getValue();
 
-				if (value === '-' && data.dhcp) {
+				if (data.dhcp) {
 					return 'DHCP';
 				}
 
-				const addressObj = data.addressObj as NetworkObject;
+				let v4 = '';
+				let gw4 = '';
 
-				if (data.addressObj) {
-					if (addressObj && addressObj.entries) {
-						return addressObj.entries[0].value || '-';
+				const networkObj = data.networkObj as NetworkObject;
+				if (data.networkObj) {
+					if (networkObj && networkObj.entries) {
+						v4 = networkObj.entries[0].value || '-';
+					} else {
+						v4 = '-';
 					}
+				} else {
+					v4 = '-';
 				}
 
-				return value || '-';
+				const gatewayObj = data.gatewayAddressObj as NetworkObject;
+				if (data.gatewayAddressObj) {
+					if (gatewayObj && gatewayObj.entries) {
+						gw4 = gatewayObj.entries[0].value || '-';
+					} else {
+						gw4 = '-';
+					}
+				} else {
+					gw4 = '-';
+				}
+
+				if (v4 !== '-' && gw4 !== '-') {
+					return `<span>${v4}</span><br/><span>${gw4}</span>`;
+				} else {
+					return '-';
+				}
 			}
 		},
 		{
@@ -88,15 +108,36 @@ export function generateTableData(
 					return 'SLAAC';
 				}
 
-				const addressObj = data.address6Obj as NetworkObject;
+				let v6 = '';
+				let gw6 = '';
 
-				if (data.address6Obj) {
-					if (addressObj && addressObj.entries) {
-						return addressObj.entries[0].value || '-';
+				const networkObj = data.network6Obj as NetworkObject;
+				if (data.network6Obj) {
+					if (networkObj && networkObj.entries) {
+						v6 = networkObj.entries[0].value || '-';
+					} else {
+						v6 = '-';
 					}
+				} else {
+					v6 = '-';
 				}
 
-				return value || '-';
+				const gatewayObj = data.gateway6AddressObj as NetworkObject;
+				if (data.gateway6AddressObj) {
+					if (gatewayObj && gatewayObj.entries) {
+						gw6 = gatewayObj.entries[0].value || '-';
+					} else {
+						gw6 = '-';
+					}
+				} else {
+					gw6 = '-';
+				}
+
+				if (v6 !== '-' && gw6 !== '-') {
+					return `<span>${v6}</span><br/><span>${gw6}</span>`;
+				} else {
+					return '-';
+				}
 			}
 		},
 		{
@@ -118,6 +159,21 @@ export function generateTableData(
 			field: 'slaac',
 			title: 'SLAAC',
 			visible: false
+		},
+		{
+			field: 'defaultRoute',
+			title: 'Default Route',
+			visible: false,
+			formatter: (cell: CellComponent) => {
+				const row = cell.getRow();
+				const data = row.getData();
+
+				if (data.defaultRoute) {
+					return renderWithIcon('lets-icons:check-fill', 'Yes');
+				}
+
+				return renderWithIcon('gridicons:cross-circle', 'No');
+			}
 		}
 	];
 
@@ -139,12 +195,17 @@ export function generateTableData(
 				ipv6: sw.address6 || '-',
 				addressObj: sw.addressObj || '-',
 				address6Obj: sw.address6Obj || '-',
+				networkObj: sw.networkObj || '-',
+				gatewayAddressObj: sw.gatewayAddressObj || '-',
+				network6Obj: sw.network6Obj || '-',
+				gateway6AddressObj: sw.gateway6AddressObj || '-',
 				ports: sw.ports,
 				private: sw.private,
 				portsOnly: portsOnly,
 				dhcp: sw.dhcp || false,
 				disableIPv6: sw.disableIPv6 || false,
-				slaac: sw.slaac || false
+				slaac: sw.slaac || false,
+				defaultRoute: sw.defaultRoute || false
 			});
 		}
 	}

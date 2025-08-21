@@ -12,10 +12,11 @@ import (
 	"crypto/tls"
 	"fmt"
 	"os"
-	"sylve/internal/config"
-	"sylve/internal/db/models"
-	"sylve/pkg/crypto"
-	"sylve/pkg/utils"
+
+	"github.com/alchemillahq/sylve/internal/config"
+	"github.com/alchemillahq/sylve/internal/db/models"
+	"github.com/alchemillahq/sylve/pkg/crypto"
+	"github.com/alchemillahq/sylve/pkg/utils"
 )
 
 func (s *Service) GetSylveCertificate() (*tls.Config, error) {

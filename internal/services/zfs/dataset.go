@@ -10,9 +10,10 @@ package zfs
 
 import (
 	"fmt"
-	vmModels "sylve/internal/db/models/vm"
-	zfsServiceInterfaces "sylve/internal/interfaces/services/zfs"
-	"sylve/pkg/zfs"
+
+	vmModels "github.com/alchemillahq/sylve/internal/db/models/vm"
+	zfsServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/zfs"
+	"github.com/alchemillahq/sylve/pkg/zfs"
 )
 
 func (s *Service) GetDatasets(t string) ([]*zfsServiceInterfaces.Dataset, error) {

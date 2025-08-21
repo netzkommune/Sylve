@@ -10,9 +10,10 @@ package sambaHandlers
 
 import (
 	"net/http"
-	"sylve/internal"
-	sambaModels "sylve/internal/db/models/samba"
-	"sylve/internal/services/samba"
+
+	"github.com/alchemillahq/sylve/internal"
+	sambaModels "github.com/alchemillahq/sylve/internal/db/models/samba"
+	"github.com/alchemillahq/sylve/internal/services/samba"
 
 	"github.com/gin-gonic/gin"
 )

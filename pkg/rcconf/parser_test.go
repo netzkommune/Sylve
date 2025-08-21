@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"sylve/pkg/rcconf"
+	"github.com/alchemillahq/sylve/pkg/rcconf"
 )
 
 func TestParse(t *testing.T) {

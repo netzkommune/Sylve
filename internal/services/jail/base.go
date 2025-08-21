@@ -12,9 +12,10 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"sylve/internal/config"
-	utilitiesModels "sylve/internal/db/models/utilities"
-	"sylve/pkg/utils"
+
+	"github.com/alchemillahq/sylve/internal/config"
+	utilitiesModels "github.com/alchemillahq/sylve/internal/db/models/utilities"
+	"github.com/alchemillahq/sylve/pkg/utils"
 )
 
 func (s *Service) FindBaseByUUID(uuid string) (string, error) {

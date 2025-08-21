@@ -9,8 +9,9 @@
 package system
 
 import (
-	systemServiceInterfaces "sylve/internal/interfaces/services/system"
 	"sync"
+
+	systemServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/system"
 
 	"gorm.io/gorm"
 )

@@ -9,10 +9,10 @@
 package libvirtHandlers
 
 import (
-	"sylve/internal"
-	vmModels "sylve/internal/db/models/vm"
-	"sylve/internal/services/libvirt"
-	"sylve/pkg/utils"
+	"github.com/alchemillahq/sylve/internal"
+	vmModels "github.com/alchemillahq/sylve/internal/db/models/vm"
+	"github.com/alchemillahq/sylve/internal/services/libvirt"
+	"github.com/alchemillahq/sylve/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 )

@@ -21,8 +21,9 @@ import (
 	"fmt"
 	"math/big"
 	"net"
-	"sylve/pkg/utils"
 	"time"
+
+	"github.com/alchemillahq/sylve/pkg/utils"
 )
 
 func GenerateSelfSignedCertificate() (certPEM, keyPEM []byte, err error) {

@@ -12,12 +12,13 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"sylve/internal/logger"
-	"sylve/pkg/pkg"
-	"sylve/pkg/rcconf"
-	"sylve/pkg/utils"
-	sysctl "sylve/pkg/utils/sysctl"
 	"sync"
+
+	"github.com/alchemillahq/sylve/internal/logger"
+	"github.com/alchemillahq/sylve/pkg/pkg"
+	"github.com/alchemillahq/sylve/pkg/rcconf"
+	"github.com/alchemillahq/sylve/pkg/utils"
+	sysctl "github.com/alchemillahq/sylve/pkg/utils/sysctl"
 )
 
 func (s *Service) SysctlSync() error {

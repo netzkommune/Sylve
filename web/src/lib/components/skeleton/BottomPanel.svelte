@@ -12,7 +12,7 @@
 	const queryClient = useQueryClient();
 	const results = useQueries([
 		{
-			queryKey: ['auditRecord'],
+			queryKey: 'audit-record',
 			queryFn: async () => {
 				return await getAuditRecords();
 			},
@@ -21,7 +21,7 @@
 			initialData: [] as AuditRecord[]
 		},
 		{
-			queryKey: ['vms-list'],
+			queryKey: 'vms-list',
 			queryFn: async () => {
 				return await getVMs();
 			},
@@ -33,7 +33,7 @@
 
 	$effect(() => {
 		if (reload.auditLog) {
-			queryClient.refetchQueries(['auditRecord']);
+			queryClient.refetchQueries('audit-record');
 			reload.auditLog = false;
 		}
 	});
@@ -134,7 +134,7 @@
 			case 'client_error':
 				return 'Bad Request';
 			case 'server_error':
-				return 'Server Error';
+				return 'Error';
 			default:
 				return status;
 		}

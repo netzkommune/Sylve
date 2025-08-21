@@ -14,10 +14,11 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"sylve/internal/db/models"
-	vmModels "sylve/internal/db/models/vm"
-	"sylve/pkg/system/pciconf"
-	"sylve/pkg/utils"
+
+	"github.com/alchemillahq/sylve/internal/db/models"
+	vmModels "github.com/alchemillahq/sylve/internal/db/models/vm"
+	"github.com/alchemillahq/sylve/pkg/system/pciconf"
+	"github.com/alchemillahq/sylve/pkg/utils"
 
 	"gorm.io/gorm"
 )

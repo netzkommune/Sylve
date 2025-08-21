@@ -12,10 +12,11 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	networkModels "sylve/internal/db/models/network"
-	vmModels "sylve/internal/db/models/vm"
-	"sylve/internal/logger"
-	"sylve/pkg/utils"
+
+	networkModels "github.com/alchemillahq/sylve/internal/db/models/network"
+	vmModels "github.com/alchemillahq/sylve/internal/db/models/vm"
+	"github.com/alchemillahq/sylve/internal/logger"
+	"github.com/alchemillahq/sylve/pkg/utils"
 
 	"github.com/beevik/etree"
 )

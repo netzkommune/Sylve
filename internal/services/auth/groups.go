@@ -11,9 +11,10 @@ package auth
 import (
 	"errors"
 	"fmt"
-	"sylve/internal/db/models"
-	"sylve/pkg/system"
-	"sylve/pkg/utils"
+
+	"github.com/alchemillahq/sylve/internal/db/models"
+	"github.com/alchemillahq/sylve/pkg/system"
+	"github.com/alchemillahq/sylve/pkg/utils"
 
 	"gorm.io/gorm"
 )

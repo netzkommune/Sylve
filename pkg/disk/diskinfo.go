@@ -10,7 +10,8 @@ package disk
 
 import (
 	"strings"
-	"sylve/pkg/utils"
+
+	"github.com/alchemillahq/sylve/pkg/utils"
 )
 
 func GetDiskSize(device string) (uint64, error) {

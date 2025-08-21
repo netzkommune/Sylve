@@ -9,9 +9,9 @@
 package info
 
 import (
-	"sylve/internal/db"
-	infoModels "sylve/internal/db/models/info"
-	infoServiceInterfaces "sylve/internal/interfaces/services/info"
+	"github.com/alchemillahq/sylve/internal/db"
+	infoModels "github.com/alchemillahq/sylve/internal/db/models/info"
+	infoServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/info"
 
 	ram "github.com/shirou/gopsutil/mem"
 )

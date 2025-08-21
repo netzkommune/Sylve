@@ -11,13 +11,14 @@ package startup
 import (
 	"os"
 	"strings"
-	"sylve/internal/config"
-	sambaModels "sylve/internal/db/models/samba"
-	"sylve/internal/logger"
-	"sylve/pkg/system"
-	"sylve/pkg/utils"
 
-	sambaUtils "sylve/pkg/system/samba"
+	"github.com/alchemillahq/sylve/internal/config"
+	sambaModels "github.com/alchemillahq/sylve/internal/db/models/samba"
+	"github.com/alchemillahq/sylve/internal/logger"
+	"github.com/alchemillahq/sylve/pkg/system"
+	"github.com/alchemillahq/sylve/pkg/utils"
+
+	sambaUtils "github.com/alchemillahq/sylve/pkg/system/samba"
 )
 
 func (s *Service) InitSamba() error {

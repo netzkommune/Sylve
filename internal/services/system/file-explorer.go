@@ -14,7 +14,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	systemServiceInterfaces "sylve/internal/interfaces/services/system"
+
+	systemServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/system"
 )
 
 func (s *Service) Traverse(path string) ([]systemServiceInterfaces.FileNode, error) {

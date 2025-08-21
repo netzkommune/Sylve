@@ -3,8 +3,9 @@ package samba
 import (
 	"fmt"
 	"strings"
-	"sylve/pkg/system"
-	"sylve/pkg/utils"
+
+	"github.com/alchemillahq/sylve/pkg/system"
+	"github.com/alchemillahq/sylve/pkg/utils"
 )
 
 func SambaUserExists(name string) (bool, error) {

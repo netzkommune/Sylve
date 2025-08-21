@@ -7,6 +7,7 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
+	import { sleep } from '$lib/utils';
 	import Icon from '@iconify/svelte';
 	import { mode } from 'mode-watcher';
 	import { onDestroy, onMount } from 'svelte';
@@ -46,8 +47,6 @@
 				onLogin(username, password, authType, language, remember);
 			} catch (error) {
 				console.error('Login error:', error);
-			} finally {
-				loading = false;
 			}
 		}
 	}
@@ -150,6 +149,7 @@
 			</div>
 			<Button
 				onclick={() => {
+					loading = true;
 					onLogin(username, password, authType, language, remember);
 				}}
 				size="sm"

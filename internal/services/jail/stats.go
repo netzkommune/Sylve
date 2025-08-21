@@ -15,9 +15,10 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
-	jailModels "sylve/internal/db/models/jail"
-	jailServiceInterfaces "sylve/internal/interfaces/services/jail"
-	"sylve/pkg/utils"
+
+	jailModels "github.com/alchemillahq/sylve/internal/db/models/jail"
+	jailServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/jail"
+	"github.com/alchemillahq/sylve/pkg/utils"
 
 	cpuid "github.com/klauspost/cpuid/v2"
 )

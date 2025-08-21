@@ -9,8 +9,8 @@
 package libvirtHandlers
 
 import (
-	"sylve/internal"
-	"sylve/internal/services/libvirt"
+	"github.com/alchemillahq/sylve/internal"
+	"github.com/alchemillahq/sylve/internal/services/libvirt"
 
 	"github.com/gin-gonic/gin"
 )

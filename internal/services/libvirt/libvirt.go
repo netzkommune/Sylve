@@ -10,9 +10,10 @@ package libvirt
 
 import (
 	"net/url"
-	libvirtServiceInterfaces "sylve/internal/interfaces/services/libvirt"
-	"sylve/internal/logger"
 	"sync"
+
+	libvirtServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/libvirt"
+	"github.com/alchemillahq/sylve/internal/logger"
 
 	"github.com/digitalocean/go-libvirt"
 	"gorm.io/gorm"

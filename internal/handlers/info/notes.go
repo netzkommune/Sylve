@@ -11,10 +11,11 @@ package infoHandlers
 import (
 	"net/http"
 	"strings"
-	"sylve/internal"
-	infoModels "sylve/internal/db/models/info"
-	"sylve/internal/services/info"
-	"sylve/pkg/utils"
+
+	"github.com/alchemillahq/sylve/internal"
+	infoModels "github.com/alchemillahq/sylve/internal/db/models/info"
+	"github.com/alchemillahq/sylve/internal/services/info"
+	"github.com/alchemillahq/sylve/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"

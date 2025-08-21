@@ -10,12 +10,13 @@ package diskHandlers
 
 import (
 	"net/http"
-	"sylve/internal"
-	diskServiceInterfaces "sylve/internal/interfaces/services/disk"
-	"sylve/internal/services/disk"
-	"sylve/internal/services/info"
-	diskUtils "sylve/pkg/disk"
-	"sylve/pkg/utils"
+
+	"github.com/alchemillahq/sylve/internal"
+	diskServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/disk"
+	"github.com/alchemillahq/sylve/internal/services/disk"
+	"github.com/alchemillahq/sylve/internal/services/info"
+	diskUtils "github.com/alchemillahq/sylve/pkg/disk"
+	"github.com/alchemillahq/sylve/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 )

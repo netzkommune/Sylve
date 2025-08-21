@@ -16,7 +16,8 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
-	"sylve/pkg/utils/sysctl"
+
+	"github.com/alchemillahq/sylve/pkg/utils/sysctl"
 )
 
 func parseFlags(flags uint32, descriptors []FlagDescriptor) ([]string, uint32) {

@@ -10,25 +10,31 @@ export async function createSwitch(
 	name: string,
 	mtu: number,
 	vlan: number,
-	address: number,
-	address6: number,
+	network4: number,
+	gateway4: number,
+	network6: number,
+	gateway6: number,
 	privateSw: boolean,
 	dhcp: boolean,
 	ports: string[],
 	disableIPv6: boolean,
-	slaac: boolean
+	slaac: boolean,
+	defaultRoute: boolean
 ): Promise<APIResponse> {
 	const body = {
 		name,
 		mtu,
 		vlan,
-		address,
-		address6,
+		network4,
+		gateway4,
+		network6,
+		gateway6,
 		private: privateSw,
 		ports,
 		dhcp,
 		disableIPv6,
-		slaac
+		slaac,
+		defaultRoute
 	};
 
 	return await apiRequest('/network/switch/standard', APIResponseSchema, 'POST', body);
@@ -42,25 +48,31 @@ export async function updateSwitch(
 	id: number,
 	mtu: number,
 	vlan: number,
-	address: number,
-	address6: number,
+	network4: number,
+	gateway4: number,
+	network6: number,
+	gateway6: number,
 	privateSw: boolean,
 	ports: string[],
 	disableIPv6: boolean,
 	slaac: boolean,
-	dhcp: boolean
+	dhcp: boolean,
+	defaultRoute: boolean
 ): Promise<APIResponse> {
 	const body = {
 		id,
 		mtu,
 		vlan,
-		address,
-		address6,
+		network4,
+		gateway4,
+		network6,
+		gateway6,
 		private: privateSw,
 		ports,
 		disableIPv6,
 		slaac,
-		dhcp
+		dhcp,
+		defaultRoute
 	};
 
 	return await apiRequest('/network/switch/standard', APIResponseSchema, 'PUT', body);

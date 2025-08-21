@@ -12,12 +12,13 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	sambaModels "sylve/internal/db/models/samba"
-	"sylve/pkg/system"
-	"sylve/pkg/utils"
-	"sylve/pkg/zfs"
 
-	iface "sylve/pkg/network/iface"
+	sambaModels "github.com/alchemillahq/sylve/internal/db/models/samba"
+	"github.com/alchemillahq/sylve/pkg/system"
+	"github.com/alchemillahq/sylve/pkg/utils"
+	"github.com/alchemillahq/sylve/pkg/zfs"
+
+	iface "github.com/alchemillahq/sylve/pkg/network/iface"
 )
 
 func (s *Service) GetGlobalConfig() (sambaModels.SambaSettings, error) {

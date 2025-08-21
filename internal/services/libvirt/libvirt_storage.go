@@ -14,9 +14,10 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	vmModels "sylve/internal/db/models/vm"
-	"sylve/pkg/utils"
-	"sylve/pkg/zfs"
+
+	vmModels "github.com/alchemillahq/sylve/internal/db/models/vm"
+	"github.com/alchemillahq/sylve/pkg/utils"
+	"github.com/alchemillahq/sylve/pkg/zfs"
 
 	"github.com/beevik/etree"
 )

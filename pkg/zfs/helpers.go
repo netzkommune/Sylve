@@ -5,7 +5,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"sylve/pkg/utils"
+
+	"github.com/alchemillahq/sylve/pkg/utils"
 )
 
 const (

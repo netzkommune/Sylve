@@ -12,8 +12,9 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"sylve/internal/db/models"
-	"sylve/pkg/utils"
+
+	"github.com/alchemillahq/sylve/internal/db/models"
+	"github.com/alchemillahq/sylve/pkg/utils"
 
 	"github.com/beevik/etree"
 )

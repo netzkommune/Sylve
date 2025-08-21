@@ -10,7 +10,8 @@ package jail
 
 import (
 	"fmt"
-	jailModels "sylve/internal/db/models/jail"
+
+	jailModels "github.com/alchemillahq/sylve/internal/db/models/jail"
 )
 
 func (s *Service) GetJailLogs(id uint, start bool) (string, error) {

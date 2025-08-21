@@ -13,20 +13,23 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	networkModels "sylve/internal/db/models/network"
-	vmModels "sylve/internal/db/models/vm"
-	"sylve/internal/logger"
-	iface "sylve/pkg/network/iface"
-	"sylve/pkg/utils"
 	"time"
+
+	networkModels "github.com/alchemillahq/sylve/internal/db/models/network"
+	vmModels "github.com/alchemillahq/sylve/internal/db/models/vm"
+	"github.com/alchemillahq/sylve/internal/logger"
+	iface "github.com/alchemillahq/sylve/pkg/network/iface"
+	"github.com/alchemillahq/sylve/pkg/utils"
 )
 
 func (s *Service) GetStandardSwitches() ([]networkModels.StandardSwitch, error) {
 	var switches []networkModels.StandardSwitch
 	if err := s.DB.
 		Preload("Ports").
-		Preload("AddressObj.Entries").
-		Preload("Address6Obj.Entries").
+		Preload("NetworkObj.Entries").
+		Preload("Network6Obj.Entries").
+		Preload("GatewayAddressObj.Entries").
+		Preload("Gateway6AddressObj.Entries").
 		Find(&switches).Error; err != nil {
 		return nil, err
 	}
@@ -37,13 +40,16 @@ func (s *Service) NewStandardSwitch(
 	name string,
 	mtu int,
 	vlan int,
-	addressID uint,
-	address6ID uint,
+	network4Id uint,
+	network6Id uint,
+	gateway4Id uint,
+	gateway6Id uint,
 	ports []string,
 	private bool,
 	dhcp bool,
 	disableIPv6 bool,
 	slaac bool,
+	defaultRoute bool,
 ) error {
 	var existingPorts []networkModels.NetworkPort
 	if err := s.DB.Where("name IN ?", ports).Find(&existingPorts).Error; err != nil {
@@ -62,14 +68,14 @@ func (s *Service) NewStandardSwitch(
 		return fmt.Errorf("invalid_vlan")
 	}
 
-	if addressID != 0 {
+	if network4Id != 0 {
 		var o4 networkModels.Object
-		if err := s.DB.Preload("Entries").First(&o4, addressID).Error; err != nil {
+		if err := s.DB.Preload("Entries").First(&o4, network4Id).Error; err != nil {
 			return fmt.Errorf("invalid_address_object: %v", err)
 		}
 
-		if o4.Type != "Host" {
-			return fmt.Errorf("address_object must be Type=Host")
+		if o4.Type != "Network" {
+			return fmt.Errorf("address_object must be Type=Network")
 		}
 
 		if len(o4.Entries) == 0 {
@@ -81,9 +87,28 @@ func (s *Service) NewStandardSwitch(
 		}
 	}
 
-	if address6ID != 0 {
+	if gateway4Id != 0 {
+		var o4 networkModels.Object
+		if err := s.DB.Preload("Entries").First(&o4, gateway4Id).Error; err != nil {
+			return fmt.Errorf("invalid_gateway4_object: %v", err)
+		}
+
+		if o4.Type != "Host" {
+			return fmt.Errorf("gateway4_object must be Type=Host")
+		}
+
+		if len(o4.Entries) == 0 {
+			return fmt.Errorf("gateway4_object must have at least one entry")
+		}
+
+		if len(o4.Entries) > 1 {
+			return fmt.Errorf("gateway4_object must have only one entry")
+		}
+	}
+
+	if network6Id != 0 {
 		var o6 networkModels.Object
-		if err := s.DB.Preload("Entries").First(&o6, address6ID).Error; err != nil {
+		if err := s.DB.Preload("Entries").First(&o6, network6Id).Error; err != nil {
 			return fmt.Errorf("invalid_address6_object: %v", err)
 		}
 
@@ -100,26 +125,59 @@ func (s *Service) NewStandardSwitch(
 		}
 	}
 
+	if gateway6Id != 0 {
+		var o6 networkModels.Object
+		if err := s.DB.Preload("Entries").First(&o6, gateway6Id).Error; err != nil {
+			return fmt.Errorf("invalid_gateway6_object: %v", err)
+		}
+
+		if o6.Type != "Host" {
+			return fmt.Errorf("gateway6_object must be Type=Host")
+		}
+
+		if len(o6.Entries) == 0 {
+			return fmt.Errorf("gateway6_object must have at least one entry")
+		}
+
+		if len(o6.Entries) > 1 {
+			return fmt.Errorf("gateway6_object must have only one entry")
+		}
+	}
+
 	sw := &networkModels.StandardSwitch{
-		Name:        name,
-		MTU:         mtu,
-		VLAN:        vlan,
-		BridgeName:  utils.ShortHash("vm-" + name),
-		Private:     private,
-		DHCP:        dhcp,
-		DisableIPv6: disableIPv6,
-		SLAAC:       slaac,
-		AddressID:   nil,
-		Address6ID:  nil,
+		Name:              name,
+		MTU:               mtu,
+		VLAN:              vlan,
+		BridgeName:        utils.ShortHash("vm-" + name),
+		Private:           private,
+		DHCP:              dhcp,
+		DisableIPv6:       disableIPv6,
+		SLAAC:             slaac,
+		AddressID:         nil,
+		Address6ID:        nil,
+		NetworkID:         nil,
+		Network6ID:        nil,
+		GatewayAddressID:  nil,
+		Gateway6AddressID: nil,
 	}
 
-	if addressID != 0 {
-		sw.AddressID = &addressID
+	if network4Id != 0 {
+		sw.NetworkID = &network4Id
 	}
 
-	if address6ID != 0 {
-		sw.Address6ID = &address6ID
+	if gateway4Id != 0 {
+		sw.GatewayAddressID = &gateway4Id
 	}
+
+	if network6Id != 0 {
+		sw.Network6ID = &network6Id
+	}
+
+	if gateway6Id != 0 {
+		sw.Gateway6AddressID = &gateway6Id
+	}
+
+	sw.DefaultRoute = defaultRoute
 
 	if err := s.DB.Create(sw).Error; err != nil {
 		if strings.Contains(err.Error(), "UNIQUE constraint failed:") {
@@ -141,8 +199,10 @@ func (s *Service) NewStandardSwitch(
 	var fresh networkModels.StandardSwitch
 	if err := s.DB.
 		Preload("Ports").
-		Preload("AddressObj.Entries").
-		Preload("Address6Obj.Entries").
+		Preload("NetworkObj.Entries").
+		Preload("Network6Obj.Entries").
+		Preload("GatewayAddressObj.Entries").
+		Preload("Gateway6AddressObj.Entries").
 		First(&fresh, sw.ID).Error; err != nil {
 		return fmt.Errorf("reload switch: %v", err)
 	}
@@ -167,8 +227,10 @@ func (s *Service) DeleteStandardSwitch(id int) error {
 
 	var sw networkModels.StandardSwitch
 	if err := s.DB.Preload("Ports").
-		Preload("AddressObj.Entries").
-		Preload("Address6Obj.Entries").
+		Preload("NetworkObj.Entries").
+		Preload("Network6Obj.Entries").
+		Preload("GatewayAddressObj.Entries").
+		Preload("Gateway6AddressObj.Entries").
 		First(&sw, id).Error; err != nil {
 		return fmt.Errorf("switch_not_found")
 	}
@@ -232,13 +294,16 @@ func (s *Service) EditStandardSwitch(
 	id int,
 	mtu int,
 	vlan int,
-	addressID uint, // Object.ID for IPv4, 0 = none
-	address6ID uint, // Object.ID for IPv6, 0 = none
+	network4Id uint,
+	network6Id uint,
+	gateway4Id uint,
+	gateway6Id uint,
 	ports []string,
 	private bool,
 	dhcp bool,
 	disableIPv6 bool,
 	slaac bool,
+	defaultRoute bool,
 ) error {
 	var conflictingPorts []networkModels.NetworkPort
 	if err := s.DB.
@@ -260,41 +325,89 @@ func (s *Service) EditStandardSwitch(
 		return fmt.Errorf("invalid_vlan")
 	}
 
-	if addressID != 0 {
+	if network4Id != 0 {
 		var o4 networkModels.Object
-		if err := s.DB.
-			Preload("Entries").
-			First(&o4, addressID).Error; err != nil {
-			return fmt.Errorf("invalid_address_object: %v", err)
+		if err := s.DB.Preload("Entries").First(&o4, network4Id).Error; err != nil {
+			return fmt.Errorf("invalid_network4_object: %v", err)
 		}
-		if o4.Type != "Host" {
-			return fmt.Errorf("address_object must be Type=Host")
+
+		if o4.Type != "Network" {
+			return fmt.Errorf("network4_object must be Type=Network")
 		}
-		if len(o4.Entries) != 1 {
-			return fmt.Errorf("address_object must have exactly one entry")
+
+		if len(o4.Entries) == 0 {
+			return fmt.Errorf("network4_object must have at least one entry")
+		}
+
+		if len(o4.Entries) > 1 {
+			return fmt.Errorf("network4_object must have only one entry")
 		}
 	}
 
-	if address6ID != 0 {
+	if gateway4Id != 0 {
+		var o4 networkModels.Object
+		if err := s.DB.Preload("Entries").First(&o4, gateway4Id).Error; err != nil {
+			return fmt.Errorf("invalid_gateway4_object: %v", err)
+		}
+
+		if o4.Type != "Host" {
+			return fmt.Errorf("gateway4_object must be Type=Host")
+		}
+
+		if len(o4.Entries) == 0 {
+			return fmt.Errorf("gateway4_object must have at least one entry")
+		}
+
+		if len(o4.Entries) > 1 {
+			return fmt.Errorf("gateway4_object must have only one entry")
+		}
+	}
+
+	if network6Id != 0 {
 		var o6 networkModels.Object
-		if err := s.DB.
-			Preload("Entries").
-			First(&o6, address6ID).Error; err != nil {
-			return fmt.Errorf("invalid_address6_object: %v", err)
+		if err := s.DB.Preload("Entries").First(&o6, network6Id).Error; err != nil {
+			return fmt.Errorf("invalid_network6_object: %v", err)
 		}
+
+		if o6.Type != "Network" {
+			return fmt.Errorf("network6_object must be Type=Network")
+		}
+
+		if len(o6.Entries) == 0 {
+			return fmt.Errorf("network6_object must have at least one entry")
+		}
+
+		if len(o6.Entries) > 1 {
+			return fmt.Errorf("network6_object must have only one entry")
+		}
+	}
+
+	if gateway6Id != 0 {
+		var o6 networkModels.Object
+		if err := s.DB.Preload("Entries").First(&o6, gateway6Id).Error; err != nil {
+			return fmt.Errorf("invalid_gateway6_object: %v", err)
+		}
+
 		if o6.Type != "Host" {
-			return fmt.Errorf("address6_object must be Type=Host")
+			return fmt.Errorf("gateway6_object must be Type=Host")
 		}
-		if len(o6.Entries) != 1 {
-			return fmt.Errorf("address6_object must have exactly one entry")
+
+		if len(o6.Entries) == 0 {
+			return fmt.Errorf("gateway6_object must have at least one entry")
+		}
+
+		if len(o6.Entries) > 1 {
+			return fmt.Errorf("gateway6_object must have only one entry")
 		}
 	}
 
 	var loaded networkModels.StandardSwitch
 	if err := s.DB.
 		Preload("Ports").
-		Preload("AddressObj.Entries").
-		Preload("Address6Obj.Entries").
+		Preload("NetworkObj.Entries").
+		Preload("Network6Obj.Entries").
+		Preload("GatewayAddressObj.Entries").
+		Preload("Gateway6AddressObj.Entries").
 		First(&loaded, id).Error; err != nil {
 		return fmt.Errorf("switch_not_found")
 	}
@@ -308,20 +421,34 @@ func (s *Service) EditStandardSwitch(
 	loaded.DisableIPv6 = disableIPv6
 	loaded.SLAAC = slaac
 
-	if addressID != 0 {
-		loaded.AddressID = &addressID
+	if network4Id != 0 {
+		loaded.NetworkID = &network4Id
 	} else {
-		loaded.AddressID = nil
+		loaded.NetworkID = nil
 	}
 
-	if address6ID != 0 {
-		loaded.Address6ID = &address6ID
+	if gateway4Id != 0 {
+		loaded.GatewayAddressID = &gateway4Id
 	} else {
-		loaded.Address6ID = nil
+		loaded.GatewayAddressID = nil
 	}
+
+	if network6Id != 0 {
+		loaded.Network6ID = &network6Id
+	} else {
+		loaded.Network6ID = nil
+	}
+
+	if gateway6Id != 0 {
+		loaded.Gateway6AddressID = &gateway6Id
+	} else {
+		loaded.Gateway6AddressID = nil
+	}
+
+	loaded.DefaultRoute = defaultRoute
 
 	if err := s.DB.Model(&loaded).
-		Select("MTU", "VLAN", "Private", "DHCP", "DisableIPv6", "SLAAC", "AddressID", "Address6ID").
+		Select("MTU", "VLAN", "Private", "DHCP", "DisableIPv6", "SLAAC", "NetworkID", "GatewayAddressID", "Network6ID", "Gateway6AddressID", "DefaultRoute").
 		Updates(loaded).Error; err != nil {
 		return fmt.Errorf("failed_to_update_switch: %v", err)
 	}
@@ -352,8 +479,10 @@ func (s *Service) SyncStandardSwitches(sw *networkModels.StandardSwitch, action 
 	case "sync":
 		var switches []networkModels.StandardSwitch
 		if err := s.DB.Preload("Ports").
-			Preload("AddressObj.Entries").
-			Preload("Address6Obj.Entries").
+			Preload("NetworkObj.Entries").
+			Preload("Network6Obj.Entries").
+			Preload("GatewayAddressObj.Entries").
+			Preload("Gateway6AddressObj.Entries").
 			Find(&switches).Error; err != nil {
 			return fmt.Errorf("db_error_checking_switches: %v", err)
 		}
@@ -430,8 +559,11 @@ func (s *Service) SyncStandardSwitches(sw *networkModels.StandardSwitch, action 
 	case "edit":
 		var newSw networkModels.StandardSwitch
 		if err := s.DB.Preload("Ports").
-			Preload("AddressObj.Entries").
-			Preload("Address6Obj.Entries").First(&newSw, sw.ID).Error; err != nil {
+			Preload("NetworkObj.Entries").
+			Preload("Network6Obj.Entries").
+			Preload("GatewayAddressObj.Entries").
+			Preload("Gateway6AddressObj.Entries").
+			First(&newSw, sw.ID).Error; err != nil {
 			return fmt.Errorf("switch_not_found")
 		}
 		if err := editStandardBridge(*sw, newSw); err != nil {
@@ -464,15 +596,44 @@ func createStandardBridge(sw networkModels.StandardSwitch) error {
 		}
 	}
 
-	if sw.IPv4() != "" {
-		if _, err := utils.RunCommand("ifconfig", sw.BridgeName, "inet", sw.IPv4()); err != nil {
-			return fmt.Errorf("create_standard_bridge: failed_to_set_bridge_address: %v", err)
+	network4 := sw.Network(4)
+	gateway4 := sw.Gateway(4)
+
+	if network4 != "" && gateway4 != "" {
+		if _, err := utils.RunCommand("ifconfig", sw.BridgeName, "inet", sw.Network(4)); err != nil {
+			return fmt.Errorf("create_standard_bridge: failed_to_set_bridge_network: %v", err)
+		}
+
+		if gwOut, err := utils.RunCommand("route", "add", "-net", network4, gateway4); err != nil {
+			if !strings.Contains(gwOut, "route already in table") {
+				return fmt.Errorf("create_standard_bridge: failed_to_add_network_route: %v", err)
+			}
+		}
+
+		if sw.DefaultRoute {
+			dR, err := utils.RunCommand("route", "add", "default", gateway4)
+			if err != nil {
+				if !strings.Contains(dR, "route already in table") {
+					return fmt.Errorf("create_standard_bridge: failed_to_add_default_route: %v", err)
+				}
+			}
 		}
 	}
 
-	if sw.IPv6() != "" && !sw.DisableIPv6 {
+	network6 := sw.Network(6)
+	gateway6 := sw.Gateway(6)
+
+	if network6 != "" && gateway6 != "" && !sw.DisableIPv6 {
 		if _, err := utils.RunCommand("ifconfig", sw.BridgeName, "inet6", sw.IPv6()); err != nil {
 			return fmt.Errorf("create_standard_bridge: failed_to_set_bridge_address6: %v", err)
+		}
+
+		if !strings.HasPrefix(gateway6, "fe80::") {
+			if gwOut, err := utils.RunCommand("route", "-6", "add", "-net", network6, gateway6); err != nil {
+				if !strings.Contains(gwOut, "route already in table") {
+					return fmt.Errorf("create_standard_bridge: failed_to_add_network6_route: %v", err)
+				}
+			}
 		}
 	}
 
@@ -545,37 +706,84 @@ func editStandardBridge(oldSw, newSw networkModels.StandardSwitch) error {
 	if _, err := utils.RunCommand("ifconfig", br, "descr", newSw.Name); err != nil {
 		return fmt.Errorf("edit_standard_bridge: set descr: %v", err)
 	}
+
 	if oldSw.MTU != newSw.MTU && newSw.MTU > 0 {
 		if _, err := utils.RunCommand("ifconfig", br, "mtu", strconv.Itoa(newSw.MTU)); err != nil {
 			return fmt.Errorf("edit_standard_bridge: set mtu: %v", err)
 		}
 	}
 
-	oldIP4, newIP4 := oldSw.IPv4(), newSw.IPv4()
-	if oldIP4 != newIP4 {
-		if oldIP4 != "" {
-			if _, err := utils.RunCommand("ifconfig", br, "inet", oldIP4, "delete"); err != nil {
-				return fmt.Errorf("edit_standard_bridge: del old inet %s: %v", oldIP4, err)
+	// Replace the IPv4 handling section in editStandardBridge with this:
+
+	old4Network, new4Network := oldSw.Network(4), newSw.Network(4)
+	old4Gateway, new4Gateway := oldSw.Gateway(4), newSw.Gateway(4)
+
+	// Always clean up old IPv4 configuration
+	if old4Network != "" {
+		if _, err := utils.RunCommand("ifconfig", br, "inet", old4Network, "delete"); err != nil {
+			logger.L.Warn().Msgf("edit_standard_bridge: del old inet %s: %v", old4Network, err)
+		}
+	}
+
+	// Clean up old route if it existed
+	if old4Gateway != "" && old4Network != "" {
+		if _, err := utils.RunCommand("route", "delete", "-net", old4Network, old4Gateway); err != nil {
+			logger.L.Warn().Msgf("edit_standard_bridge: del route %s via %s: %v", old4Network, old4Gateway, err)
+		}
+	}
+
+	// Always apply new IPv4 address if specified
+	if new4Network != "" {
+		if _, err := utils.RunCommand("ifconfig", br, "inet", new4Network); err != nil {
+			return fmt.Errorf("edit_standard_bridge: set inet %s: %v", new4Network, err)
+		}
+	}
+
+	// Add route if both network and gateway are specified
+	if new4Network != "" && new4Gateway != "" {
+		if gwOut, err := utils.RunCommand("route", "add", "-net", new4Network, new4Gateway); err != nil {
+			if !strings.Contains(gwOut, "route already in table") {
+				return fmt.Errorf("edit_standard_bridge: add route %s via %s: %v", new4Network, new4Gateway, err)
 			}
 		}
 
-		if newIP4 != "" {
-			if _, err := utils.RunCommand("ifconfig", br, "inet", newIP4); err != nil {
-				return fmt.Errorf("edit_standard_bridge: set inet %s: %v", newIP4, err)
+		if newSw.DefaultRoute {
+			dR, err := utils.RunCommand("route", "add", "default", new4Gateway)
+			if err != nil {
+				if !strings.Contains(dR, "route already in table") {
+					return fmt.Errorf("create_standard_bridge: failed_to_add_default_route: %v", err)
+				}
 			}
 		}
 	}
 
-	oldIP6, newIP6 := oldSw.IPv6(), newSw.IPv6()
-	if oldIP6 != newIP6 {
-		if oldIP6 != "" {
-			if _, err := utils.RunCommand("ifconfig", br, "inet6", oldIP6, "delete"); err != nil {
-				return fmt.Errorf("edit_standard_bridge: del old inet6 %s: %v", oldIP6, err)
+	old6Network, new6Network := oldSw.Network(6), newSw.Network(6)
+	old6Gateway, new6Gateway := oldSw.Gateway(6), newSw.Gateway(6)
+
+	if old6Network != new6Network {
+		if old6Network != "" {
+			if _, err := utils.RunCommand("ifconfig", br, "inet6", old6Network, "delete"); err != nil {
+				logger.L.Warn().Msgf("edit_standard_bridge: del old inet6 %s: %v", old6Network, err)
 			}
 		}
-		if newIP6 != "" {
-			if _, err := utils.RunCommand("ifconfig", br, "inet6", newIP6); err != nil {
-				return fmt.Errorf("edit_standard_bridge: set inet6 %s: %v", newIP6, err)
+
+		if new6Network != "" {
+			if _, err := utils.RunCommand("ifconfig", br, "inet6", new6Network); err != nil {
+				logger.L.Warn().Msgf("edit_standard_bridge: set inet6 %s: %v", new6Network, err)
+			}
+		}
+	}
+
+	if old6Gateway != new6Gateway {
+		if old6Gateway != "" {
+			if _, err := utils.RunCommand("route", "-6", "delete", "-net", old6Network, old6Gateway); err != nil {
+				logger.L.Warn().Msgf("edit_standard_bridge: del route %s via %s: %v", old6Network, old6Gateway, err)
+			}
+		}
+
+		if new6Gateway != "" {
+			if _, err := utils.RunCommand("route", "-6", "add", "-net", new6Network, new6Gateway); err != nil {
+				logger.L.Warn().Msgf("edit_standard_bridge: add route %s via %s: %v", new6Network, new6Gateway, err)
 			}
 		}
 	}
@@ -630,7 +838,7 @@ func editStandardBridge(oldSw, newSw networkModels.StandardSwitch) error {
 	if newSw.DHCP {
 		runDhclient(newSw.BridgeName, 10)
 	} else {
-		if newSw.IPv4() == "" {
+		if newSw.Network(4) == "" {
 			ifaceObj, err := iface.Get(br)
 			if err != nil {
 				return fmt.Errorf("edit_standard_bridge: get %s: %v", br, err)

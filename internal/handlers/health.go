@@ -11,8 +11,8 @@ package handlers
 import (
 	"net/http"
 
-	"sylve/internal"
-	"sylve/pkg/utils"
+	"github.com/alchemillahq/sylve/internal"
+	"github.com/alchemillahq/sylve/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 )

@@ -9,8 +9,9 @@
 package sambaModels
 
 import (
-	"sylve/internal/db/models"
 	"time"
+
+	"github.com/alchemillahq/sylve/internal/db/models"
 )
 
 type SambaShare struct {

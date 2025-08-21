@@ -10,13 +10,14 @@ package infoHandlers
 
 import (
 	"net/http"
-	"sylve/internal"
-	"sylve/internal/services/info"
+
+	"github.com/alchemillahq/sylve/internal"
+	"github.com/alchemillahq/sylve/internal/services/info"
 
 	"github.com/gin-gonic/gin"
 
-	_ "sylve/internal/db/models/info"
-	_ "sylve/internal/interfaces/services/info"
+	_ "github.com/alchemillahq/sylve/internal/db/models/info"
+	_ "github.com/alchemillahq/sylve/internal/interfaces/services/info"
 )
 
 // @Summary Get Current CPU information

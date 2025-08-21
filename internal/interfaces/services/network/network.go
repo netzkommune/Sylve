@@ -8,13 +8,38 @@
 
 package networkServiceInterfaces
 
-import networkModels "sylve/internal/db/models/network"
+import networkModels "github.com/alchemillahq/sylve/internal/db/models/network"
 
 type NetworkServiceInterface interface {
 	SyncStandardSwitches(previous *networkModels.StandardSwitch, action string) error
 	GetStandardSwitches() ([]networkModels.StandardSwitch, error)
-	NewStandardSwitch(name string, mtu int, vlan int, address uint, address6 uint, ports []string, private bool, dhcp bool, disableIPv6 bool, slaac bool) error
-	EditStandardSwitch(id int, mtu int, vlan int, address uint, address6 uint, ports []string, private bool, dhcp bool, disableIPv6 bool, slaac bool) error
+	NewStandardSwitch(name string,
+		mtu int,
+		vlan int,
+		network4Id uint,
+		network6Id uint,
+		gateway4Id uint,
+		gateway6Id uint,
+		ports []string,
+		private bool,
+		dhcp bool,
+		disableIPv6 bool,
+		slaac bool,
+		defaultRoute bool) error
+
+	EditStandardSwitch(id int,
+		mtu int,
+		vlan int,
+		network4Id uint,
+		network6Id uint,
+		gateway4Id uint,
+		gateway6Id uint,
+		ports []string,
+		private bool,
+		dhcp bool,
+		disableIPv6 bool,
+		slaac bool,
+		defaultRoute bool) error
 	DeleteStandardSwitch(id int) error
 	IsObjectUsed(id uint) (bool, error)
 	GetObjectEntryByID(id uint) (string, error)

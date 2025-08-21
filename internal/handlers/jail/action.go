@@ -11,8 +11,9 @@ package jailHandlers
 import (
 	"fmt"
 	"strconv"
-	"sylve/internal"
-	"sylve/internal/services/jail"
+
+	"github.com/alchemillahq/sylve/internal"
+	"github.com/alchemillahq/sylve/internal/services/jail"
 
 	"github.com/gin-gonic/gin"
 )

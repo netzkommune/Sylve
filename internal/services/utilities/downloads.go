@@ -14,10 +14,11 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
-	"sylve/internal/config"
-	utilitiesModels "sylve/internal/db/models/utilities"
-	"sylve/internal/logger"
-	"sylve/pkg/utils"
+
+	"github.com/alchemillahq/sylve/internal/config"
+	utilitiesModels "github.com/alchemillahq/sylve/internal/db/models/utilities"
+	"github.com/alchemillahq/sylve/internal/logger"
+	"github.com/alchemillahq/sylve/pkg/utils"
 
 	valid "github.com/asaskevich/govalidator"
 	"github.com/cavaliergopher/grab/v3"

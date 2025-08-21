@@ -9,7 +9,7 @@
 package info
 
 import (
-	infoModels "sylve/internal/db/models/info"
+	infoModels "github.com/alchemillahq/sylve/internal/db/models/info"
 )
 
 func (s *Service) GetAuditRecords(limit int) ([]infoModels.AuditRecord, error) {

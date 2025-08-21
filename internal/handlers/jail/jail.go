@@ -11,10 +11,11 @@ package jailHandlers
 import (
 	"fmt"
 	"strconv"
-	"sylve/internal"
-	jailModels "sylve/internal/db/models/jail"
-	jailServiceInterfaces "sylve/internal/interfaces/services/jail"
-	"sylve/internal/services/jail"
+
+	"github.com/alchemillahq/sylve/internal"
+	jailModels "github.com/alchemillahq/sylve/internal/db/models/jail"
+	jailServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/jail"
+	"github.com/alchemillahq/sylve/internal/services/jail"
 
 	"github.com/gin-gonic/gin"
 )

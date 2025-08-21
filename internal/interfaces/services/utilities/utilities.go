@@ -8,7 +8,7 @@
 
 package utilitiesServiceInterfaces
 
-import utilitiesModels "sylve/internal/db/models/utilities"
+import utilitiesModels "github.com/alchemillahq/sylve/internal/db/models/utilities"
 
 type UtilitiesServiceInterface interface {
 	DownloadFile(url string, optFilename string) error

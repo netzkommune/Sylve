@@ -14,10 +14,11 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-	"sylve/internal"
-	systemServiceInterfaces "sylve/internal/interfaces/services/system"
-	"sylve/internal/services/system"
-	"sylve/pkg/utils"
+
+	"github.com/alchemillahq/sylve/internal"
+	systemServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/system"
+	"github.com/alchemillahq/sylve/internal/services/system"
+	"github.com/alchemillahq/sylve/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 )

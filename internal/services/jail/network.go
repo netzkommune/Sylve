@@ -14,11 +14,12 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sylve/internal/db/models"
-	jailModels "sylve/internal/db/models/jail"
-	networkModels "sylve/internal/db/models/network"
-	"sylve/internal/logger"
-	"sylve/pkg/utils"
+
+	"github.com/alchemillahq/sylve/internal/db/models"
+	jailModels "github.com/alchemillahq/sylve/internal/db/models/jail"
+	networkModels "github.com/alchemillahq/sylve/internal/db/models/network"
+	"github.com/alchemillahq/sylve/internal/logger"
+	"github.com/alchemillahq/sylve/pkg/utils"
 )
 
 func (s *Service) DisinheritNetwork(ctId uint) error {

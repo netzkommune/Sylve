@@ -11,10 +11,11 @@ package info
 import (
 	"encoding/json"
 	"fmt"
-	infoModels "sylve/internal/db/models/info"
-	infoServiceInterfaces "sylve/internal/interfaces/services/info"
-	"sylve/pkg/utils"
 	"time"
+
+	infoModels "github.com/alchemillahq/sylve/internal/db/models/info"
+	infoServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/info"
+	"github.com/alchemillahq/sylve/pkg/utils"
 )
 
 func (s *Service) GetNetworkInterfacesInfo() ([]infoServiceInterfaces.NetworkInterface, error) {

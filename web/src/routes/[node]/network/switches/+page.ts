@@ -5,14 +5,15 @@ import { cachedFetch } from '$lib/utils/http';
 
 export async function load() {
 	const cacheDuration = 1000 * 60000;
-	const [interfaces, switches, networkObjects] = await Promise.all([
-		cachedFetch('networkInterfaces', async () => await getInterfaces(), cacheDuration),
-		cachedFetch('networkSwitches', async () => await getSwitches(), cacheDuration),
-		cachedFetch('networkObjects', async () => await getNetworkObjects(), cacheDuration)
+	const [interfaces, switches, objects] = await Promise.all([
+		cachedFetch('network-interfaces', async () => await getInterfaces(), cacheDuration),
+		cachedFetch('network-switches', async () => await getSwitches(), cacheDuration),
+		cachedFetch('network-objects', async () => await getNetworkObjects(), cacheDuration)
 	]);
 
 	return {
 		interfaces,
-		switches
+		switches,
+		objects
 	};
 }

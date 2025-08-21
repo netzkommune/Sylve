@@ -12,8 +12,9 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"sylve/internal/config"
-	utilitiesModels "sylve/internal/db/models/utilities"
+
+	"github.com/alchemillahq/sylve/internal/config"
+	utilitiesModels "github.com/alchemillahq/sylve/internal/db/models/utilities"
 )
 
 func (s *Service) FindISOByUUID(uuid string, includeImg bool) (string, error) {

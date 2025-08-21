@@ -117,7 +117,8 @@
 			private: false,
 			ports: [] as string[],
 			dhcp: false,
-			slaac: false
+			slaac: false,
+			defaultRoute: false
 		},
 		editSwitch: {
 			oldName: '',
@@ -135,7 +136,8 @@
 			private: false,
 			ports: [] as string[],
 			dhcp: false,
-			slaac: false
+			slaac: false,
+			defaultRoute: false
 		},
 		deleteSwitch: {
 			open: false,
@@ -208,6 +210,24 @@
 				return;
 			}
 
+			if (
+				(confirmModals.active === 'newSwitch' || confirmModals.active === 'editSwitch') &&
+				!activeModal.dhcp &&
+				activeModal.defaultRoute
+			) {
+				const existingSwitch = switches?.standard?.find(
+					(sw) =>
+						sw.defaultRoute && !(confirmModals.active === 'editSwitch' && sw.id === activeRow?.id)
+				);
+
+				if (existingSwitch) {
+					toast.error('There is already a switch with a default route', {
+						position: 'bottom-center'
+					});
+					return;
+				}
+			}
+
 			activeModal.network4 = comboBoxes.ipv4.value;
 			activeModal.gwAddress4 = comboBoxes.ipv4Gw.value;
 			activeModal.network6 = comboBoxes.ipv6.value;
@@ -226,7 +246,8 @@
 					activeModal.dhcp,
 					comboBoxes.ports.value,
 					activeModal.disableIPv6,
-					activeModal.slaac
+					activeModal.slaac,
+					activeModal.defaultRoute
 				);
 
 				reloadData();
@@ -258,7 +279,8 @@
 					comboBoxes.ports.value,
 					activeModal.disableIPv6,
 					activeModal.slaac,
-					activeModal.dhcp
+					activeModal.dhcp,
+					activeModal.defaultRoute
 				);
 
 				reloadData();
@@ -343,8 +365,6 @@
 		confirmModals.newSwitch.name = '';
 		confirmModals.newSwitch.mtu = '';
 		confirmModals.newSwitch.vlan = '';
-		confirmModals.newSwitch.address = '0';
-		confirmModals.newSwitch.address6 = '0';
 		confirmModals.newSwitch.disableIPv6 = false;
 		confirmModals.newSwitch.private = false;
 		confirmModals.newSwitch.dhcp = false;
@@ -389,6 +409,7 @@
 		if (confirmModals.newSwitch.dhcp) {
 			comboBoxes.ipv4.value = '';
 			comboBoxes.ipv4Gw.value = '';
+			confirmModals.newSwitch.defaultRoute = false;
 		}
 	});
 
@@ -403,6 +424,7 @@
 		if (confirmModals.editSwitch.dhcp) {
 			comboBoxes.ipv4.value = '';
 			comboBoxes.ipv4Gw.value = '';
+			confirmModals.editSwitch.defaultRoute = false;
 		}
 	});
 
@@ -641,6 +663,14 @@
 					bind:checked={confirmModals[confirmModals.active].disableIPv6}
 					classes="flex items-center gap-2 mt-1"
 				></CustomCheckbox>
+
+				{#if !confirmModals[confirmModals.active].dhcp}
+					<CustomCheckbox
+						label={'Default Route'}
+						bind:checked={confirmModals[confirmModals.active].defaultRoute}
+						classes="flex items-center gap-2 mt-1"
+					></CustomCheckbox>
+				{/if}
 			</div>
 
 			<Dialog.Footer class="flex justify-between gap-2 ">

@@ -49,6 +49,7 @@ func (s *Service) NewStandardSwitch(
 	dhcp bool,
 	disableIPv6 bool,
 	slaac bool,
+	defaultRoute bool,
 ) error {
 	var existingPorts []networkModels.NetworkPort
 	if err := s.DB.Where("name IN ?", ports).Find(&existingPorts).Error; err != nil {
@@ -176,6 +177,8 @@ func (s *Service) NewStandardSwitch(
 		sw.Gateway6AddressID = &gateway6Id
 	}
 
+	sw.DefaultRoute = defaultRoute
+
 	if err := s.DB.Create(sw).Error; err != nil {
 		if strings.Contains(err.Error(), "UNIQUE constraint failed:") {
 			return fmt.Errorf("switch_name_already_exists")
@@ -300,6 +303,7 @@ func (s *Service) EditStandardSwitch(
 	dhcp bool,
 	disableIPv6 bool,
 	slaac bool,
+	defaultRoute bool,
 ) error {
 	var conflictingPorts []networkModels.NetworkPort
 	if err := s.DB.
@@ -441,8 +445,10 @@ func (s *Service) EditStandardSwitch(
 		loaded.Gateway6AddressID = nil
 	}
 
+	loaded.DefaultRoute = defaultRoute
+
 	if err := s.DB.Model(&loaded).
-		Select("MTU", "VLAN", "Private", "DHCP", "DisableIPv6", "SLAAC", "NetworkID", "GatewayAddressID", "Network6ID", "Gateway6AddressID").
+		Select("MTU", "VLAN", "Private", "DHCP", "DisableIPv6", "SLAAC", "NetworkID", "GatewayAddressID", "Network6ID", "Gateway6AddressID", "DefaultRoute").
 		Updates(loaded).Error; err != nil {
 		return fmt.Errorf("failed_to_update_switch: %v", err)
 	}
@@ -603,6 +609,14 @@ func createStandardBridge(sw networkModels.StandardSwitch) error {
 				return fmt.Errorf("create_standard_bridge: failed_to_add_network_route: %v", err)
 			}
 		}
+
+		if sw.DefaultRoute {
+			if dR, err := utils.RunCommand("route", "add", "default", gateway4); err != nil {
+				if !strings.Contains(dR, "route already in table") {
+					return fmt.Errorf("create_standard_bridge: failed_to_add_default_route: %v", err)
+				}
+			}
+		}
 	}
 
 	network6 := sw.Network(6)
@@ -729,6 +743,14 @@ func editStandardBridge(oldSw, newSw networkModels.StandardSwitch) error {
 		if gwOut, err := utils.RunCommand("route", "add", "-net", new4Network, new4Gateway); err != nil {
 			if !strings.Contains(gwOut, "route already in table") {
 				return fmt.Errorf("edit_standard_bridge: add route %s via %s: %v", new4Network, new4Gateway, err)
+			}
+		}
+
+		if newSw.DefaultRoute {
+			if dR, err := utils.RunCommand("route", "add", "default", new4Gateway); err != nil {
+				if !strings.Contains(dR, "route already in table") {
+					return fmt.Errorf("create_standard_bridge: failed_to_add_default_route: %v", err)
+				}
 			}
 		}
 	}

@@ -39,8 +39,9 @@ type StandardSwitch struct {
 	Gateway6AddressID  *uint   `json:"gateway6AddressId" gorm:"column:gateway6_address_object_id"`
 	Gateway6AddressObj *Object `json:"gateway6AddressObj" gorm:"foreignKey:Gateway6AddressID"`
 
-	DisableIPv6 bool `json:"disableIPv6" gorm:"default:false"`
-	Private     bool `json:"private" gorm:"default:false"`
+	DisableIPv6  bool `json:"disableIPv6" gorm:"default:false"`
+	Private      bool `json:"private" gorm:"default:false"`
+	DefaultRoute bool `json:"defaultRoute" gorm:"default:false"`
 
 	Ports []NetworkPort `json:"ports" gorm:"foreignKey:SwitchID;constraint:OnDelete:CASCADE"`
 

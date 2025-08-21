@@ -24,7 +24,8 @@ export const StandardSwitchSchema = z.object({
 	ports: z.array(NetworkPortSchema).optional(),
 	dhcp: z.boolean().optional(),
 	slaac: z.boolean(),
-	disableIPv6: z.boolean()
+	disableIPv6: z.boolean(),
+	defaultRoute: z.boolean()
 });
 
 export const SwitchListSchema = z.object({

@@ -18,7 +18,8 @@ export async function createSwitch(
 	dhcp: boolean,
 	ports: string[],
 	disableIPv6: boolean,
-	slaac: boolean
+	slaac: boolean,
+	defaultRoute: boolean
 ): Promise<APIResponse> {
 	const body = {
 		name,
@@ -32,7 +33,8 @@ export async function createSwitch(
 		ports,
 		dhcp,
 		disableIPv6,
-		slaac
+		slaac,
+		defaultRoute
 	};
 
 	return await apiRequest('/network/switch/standard', APIResponseSchema, 'POST', body);
@@ -54,7 +56,8 @@ export async function updateSwitch(
 	ports: string[],
 	disableIPv6: boolean,
 	slaac: boolean,
-	dhcp: boolean
+	dhcp: boolean,
+	defaultRoute: boolean
 ): Promise<APIResponse> {
 	const body = {
 		id,
@@ -68,7 +71,8 @@ export async function updateSwitch(
 		ports,
 		disableIPv6,
 		slaac,
-		dhcp
+		dhcp,
+		defaultRoute
 	};
 
 	return await apiRequest('/network/switch/standard', APIResponseSchema, 'PUT', body);

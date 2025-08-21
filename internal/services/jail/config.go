@@ -81,7 +81,7 @@ func (s *Service) AppendToConfig(ctid uint, current string, toAppend string) (st
 func (s *Service) GetJailMountPoint(ctid uint) (string, error) {
 	var jail jailModels.Jail
 
-	err := s.DB.First(&jail).Where("ct_id = ?", ctid).Error
+	err := s.DB.Where("ct_id = ?", ctid).First(&jail).Error
 	if err != nil {
 		return "", fmt.Errorf("failed_to_get_jail: %w", err)
 	}

@@ -25,7 +25,7 @@ import (
 func (s *Service) DisinheritNetwork(ctId uint) error {
 	var jail jailModels.Jail
 
-	if err := s.DB.Preload("Networks").First(&jail).Where("ct_id = ?", ctId).Error; err != nil {
+	if err := s.DB.Preload("Networks").Where("ct_id = ?", ctId).First(&jail).Error; err != nil {
 		return err
 	}
 
@@ -38,7 +38,7 @@ func (s *Service) DisinheritNetwork(ctId uint) error {
 func (s *Service) InheritNetwork(ctId uint, ipv4 bool, ipv6 bool) error {
 	var jail jailModels.Jail
 
-	if err := s.DB.Preload("Networks").First(&jail).Where("ct_id = ?", ctId).Error; err != nil {
+	if err := s.DB.Preload("Networks").Where("ct_id = ?", ctId).First(&jail).Error; err != nil {
 		return err
 	}
 
@@ -60,7 +60,7 @@ func (s *Service) AddNetwork(ctId uint,
 	var jail jailModels.Jail
 	var network jailModels.Network
 
-	if err := s.DB.Preload("Networks").First(&jail).Where("ct_id = ?", ctId).Error; err != nil {
+	if err := s.DB.Preload("Networks").Where("ct_id = ?", ctId).First(&jail).Error; err != nil {
 		return err
 	}
 
@@ -213,7 +213,7 @@ func (s *Service) DeleteNetwork(ctId uint, networkId uint) error {
 
 	var jail jailModels.Jail
 
-	err = s.DB.Preload("Networks").First(&jail).Where("ct_id = ?", ctId).Error
+	err = s.DB.Preload("Networks").Where("ct_id = ?", ctId).First(&jail).Error
 	if err != nil {
 		return err
 	}

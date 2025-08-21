@@ -182,7 +182,7 @@ func (s *Service) CreateVmXML(vm vmModels.VM, vmPath string) (string, error) {
 				var mac *libvirtServiceInterfaces.MACAddress
 				if network.MacID != nil && *network.MacID != 0 {
 					var macObj networkModels.Object
-					if err := s.DB.Preload("Entries").Find(&macObj).Where("id = ?", *network.MacID).Error; err != nil {
+					if err := s.DB.Preload("Entries").Where("id = ? and type = ?", *network.MacID, "Mac").Find(&macObj).Error; err != nil {
 						return "", fmt.Errorf("failed_to_find_mac_object: %w", err)
 					}
 

@@ -674,7 +674,7 @@ func (s *Service) DeleteJail(ctId uint, deleteMacs bool) error {
 	}
 
 	var jail jailModels.Jail
-	if err := s.DB.Where("ct_id = ?", ctId).Preload("Networks").First(&jail).Error; err != nil {
+	if err := s.DB.Preload("Networks").Where("ct_id = ?", ctId).First(&jail).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return fmt.Errorf("jail_not_found")
 		}

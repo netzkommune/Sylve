@@ -611,7 +611,8 @@ func createStandardBridge(sw networkModels.StandardSwitch) error {
 		}
 
 		if sw.DefaultRoute {
-			if dR, err := utils.RunCommand("route", "add", "default", gateway4); err != nil {
+			dR, err := utils.RunCommand("route", "add", "default", gateway4)
+			if err != nil {
 				if !strings.Contains(dR, "route already in table") {
 					return fmt.Errorf("create_standard_bridge: failed_to_add_default_route: %v", err)
 				}
@@ -747,7 +748,8 @@ func editStandardBridge(oldSw, newSw networkModels.StandardSwitch) error {
 		}
 
 		if newSw.DefaultRoute {
-			if dR, err := utils.RunCommand("route", "add", "default", new4Gateway); err != nil {
+			dR, err := utils.RunCommand("route", "add", "default", new4Gateway)
+			if err != nil {
 				if !strings.Contains(dR, "route already in table") {
 					return fmt.Errorf("create_standard_bridge: failed_to_add_default_route: %v", err)
 				}

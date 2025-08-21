@@ -16,7 +16,7 @@
 	import type { SwitchList } from '$lib/types/network/switch';
 	import { isAPIResponse, updateCache } from '$lib/utils/http';
 	import { generateComboboxOptions } from '$lib/utils/input';
-	import { generateIPOptions } from '$lib/utils/network/object';
+	import { generateIPOptions, generateNetworkOptions } from '$lib/utils/network/object';
 	import { generateTableData } from '$lib/utils/network/switch';
 	import { isValidMTU, isValidVLAN } from '$lib/utils/numbers';
 	import { isValidSwitchName } from '$lib/utils/string';
@@ -35,36 +35,36 @@
 	const queryClient = useQueryClient();
 	const results = useQueries([
 		{
-			queryKey: 'networkInterfaces',
+			queryKey: 'network-interfaces',
 			queryFn: async () => {
 				return await getInterfaces();
 			},
 			keepPreviousData: true,
 			initialData: data.interfaces,
 			onSuccess: (data: Iface[]) => {
-				updateCache('networkInterfaces', data);
+				updateCache('network-interfaces', data);
 			}
 		},
 		{
-			queryKey: 'networkSwitches',
+			queryKey: 'network-switches',
 			queryFn: async () => {
 				return await getSwitches();
 			},
 			keepPreviousData: true,
 			initialData: data.switches,
 			onSuccess: (data: SwitchList) => {
-				updateCache('networkSwitches', data);
+				updateCache('network-switches', data);
 			}
 		},
 		{
-			queryKey: 'networkObjects',
+			queryKey: 'network-objects',
 			queryFn: async () => {
 				return await getNetworkObjects();
 			},
 			keepPreviousData: true,
 			initialData: data.objects,
 			onSuccess: (data: NetworkObject[]) => {
-				updateCache('networkObjects', data);
+				updateCache('network-objects', data);
 			}
 		}
 	]);
@@ -109,8 +109,10 @@
 			name: '',
 			mtu: '',
 			vlan: '',
-			address: '0',
-			address6: '0',
+			network4: '0',
+			gwAddress4: '0',
+			network6: '0',
+			gwAddress6: '0',
 			disableIPv6: false,
 			private: false,
 			ports: [] as string[],
@@ -125,6 +127,10 @@
 			vlan: '',
 			address: '0',
 			address6: '0',
+			network4: '0',
+			gwAddress4: '0',
+			network6: '0',
+			gwAddress6: '0',
 			disableIPv6: false,
 			private: false,
 			ports: [] as string[],
@@ -143,7 +149,15 @@
 			open: false,
 			value: ''
 		},
+		ipv4Gw: {
+			open: false,
+			value: ''
+		},
 		ipv6: {
+			open: false,
+			value: ''
+		},
+		ipv6Gw: {
 			open: false,
 			value: ''
 		},
@@ -154,9 +168,9 @@
 	});
 
 	function reloadData() {
-		queryClient.refetchQueries('networkInterfaces');
-		queryClient.refetchQueries('networkSwitches');
-		queryClient.refetchQueries('networkObjects');
+		queryClient.refetchQueries('network-interfaces');
+		queryClient.refetchQueries('network-switches');
+		queryClient.refetchQueries('network-objects');
 	}
 
 	async function confirmAction() {
@@ -194,16 +208,20 @@
 				return;
 			}
 
-			activeModal.address = comboBoxes.ipv4.value;
-			activeModal.address6 = comboBoxes.ipv6.value;
+			activeModal.network4 = comboBoxes.ipv4.value;
+			activeModal.gwAddress4 = comboBoxes.ipv4Gw.value;
+			activeModal.network6 = comboBoxes.ipv6.value;
+			activeModal.gwAddress6 = comboBoxes.ipv6Gw.value;
 
 			if (confirmModals.active === 'newSwitch') {
 				const created = await createSwitch(
 					activeModal.name,
 					parseInt(activeModal.mtu),
 					parseInt(activeModal.vlan),
-					Number(activeModal.address),
-					Number(activeModal.address6),
+					Number(activeModal.network4),
+					Number(activeModal.gwAddress4),
+					Number(activeModal.network6),
+					Number(activeModal.gwAddress6),
 					activeModal.private,
 					activeModal.dhcp,
 					comboBoxes.ports.value,
@@ -223,15 +241,19 @@
 					});
 				}
 			} else {
-				activeModal.address = comboBoxes.ipv4.value;
-				activeModal.address6 = comboBoxes.ipv6.value;
+				activeModal.network4 = comboBoxes.ipv4.value;
+				activeModal.network6 = comboBoxes.ipv6.value;
+				activeModal.gwAddress4 = comboBoxes.ipv4Gw.value;
+				activeModal.gwAddress6 = comboBoxes.ipv6Gw.value;
 
 				const edited = await updateSwitch(
 					activeRow?.id as number,
 					parseInt(activeModal.mtu),
 					parseInt(activeModal.vlan),
-					Number(activeModal.address),
-					Number(activeModal.address6),
+					Number(activeModal.network4),
+					Number(activeModal.gwAddress4),
+					Number(activeModal.network6),
+					Number(activeModal.gwAddress6),
 					activeModal.private,
 					comboBoxes.ports.value,
 					activeModal.disableIPv6,
@@ -278,15 +300,27 @@
 			confirmModals.editSwitch.mtu = activeRow.mtu as string;
 			confirmModals.editSwitch.vlan = activeRow.vlan === '-' ? '' : (activeRow.vlan as string);
 
-			if (activeRow.addressObj) {
-				if (activeRow.addressObj.id) {
-					comboBoxes.ipv4.value = activeRow.addressObj.id.toString();
+			if (activeRow.networkObj) {
+				if (activeRow.networkObj.id) {
+					comboBoxes.ipv4.value = activeRow.networkObj.id.toString();
 				}
 			}
 
-			if (activeRow.address6Obj) {
-				if (activeRow.address6Obj.id) {
-					comboBoxes.ipv6.value = activeRow.address6Obj.id.toString();
+			if (activeRow.network6Obj) {
+				if (activeRow.network6Obj.id) {
+					comboBoxes.ipv6.value = activeRow.network6Obj.id.toString();
+				}
+			}
+
+			if (activeRow.gatewayAddressObj) {
+				if (activeRow.gatewayAddressObj.id) {
+					comboBoxes.ipv4Gw.value = activeRow.gatewayAddressObj.id.toString();
+				}
+			}
+
+			if (activeRow.gateway6AddressObj) {
+				if (activeRow.gateway6AddressObj.id) {
+					comboBoxes.ipv6Gw.value = activeRow.gateway6AddressObj.id.toString();
 				}
 			}
 
@@ -354,24 +388,28 @@
 	$effect(() => {
 		if (confirmModals.newSwitch.dhcp) {
 			comboBoxes.ipv4.value = '';
+			comboBoxes.ipv4Gw.value = '';
 		}
 	});
 
 	$effect(() => {
 		if (confirmModals.newSwitch.slaac) {
 			comboBoxes.ipv6.value = '';
+			comboBoxes.ipv6Gw.value = '';
 		}
 	});
 
 	$effect(() => {
 		if (confirmModals.editSwitch.dhcp) {
 			comboBoxes.ipv4.value = '';
+			comboBoxes.ipv4Gw.value = '';
 		}
 	});
 
 	$effect(() => {
 		if (confirmModals.editSwitch.slaac) {
 			comboBoxes.ipv6.value = '';
+			comboBoxes.ipv6Gw.value = '';
 		}
 	});
 </script>
@@ -500,23 +538,52 @@
 			<div class="flex gap-4">
 				<CustomComboBox
 					bind:open={comboBoxes.ipv4.open}
-					label={'IPv4'}
+					label={'IPv4 Network'}
 					bind:value={comboBoxes.ipv4.value}
-					data={generateIPOptions(networkObjects, 'IPv4')}
+					data={generateNetworkOptions(networkObjects, 'IPv4')}
 					classes="flex-1 space-y-1"
-					placeholder="Select IPv4"
+					placeholder="Select IPv4 Network"
 					width="w-3/4"
 					disabled={confirmModals[confirmModals.active].dhcp ? true : false}
 					multiple={false}
 				></CustomComboBox>
 
 				<CustomComboBox
+					bind:open={comboBoxes.ipv4Gw.open}
+					label={'IPv4 Gateway'}
+					bind:value={comboBoxes.ipv4Gw.value}
+					data={generateIPOptions(networkObjects, 'IPv4')}
+					classes="flex-1 space-y-1"
+					placeholder="Select IPv4 Gateway"
+					width="w-3/4"
+					disabled={confirmModals[confirmModals.active].dhcp ? true : false}
+					multiple={false}
+				></CustomComboBox>
+			</div>
+
+			<div class="flex gap-4">
+				<CustomComboBox
 					bind:open={comboBoxes.ipv6.open}
-					label={'IPv6'}
+					label={'IPv6 Network'}
 					bind:value={comboBoxes.ipv6.value}
+					data={generateNetworkOptions(networkObjects, 'IPv6')}
+					classes="flex-1 space-y-1"
+					placeholder="Select IPv6 Network"
+					width="w-3/4"
+					disabled={confirmModals[confirmModals.active].disableIPv6 ||
+					confirmModals[confirmModals.active].slaac
+						? true
+						: false}
+					multiple={false}
+				></CustomComboBox>
+
+				<CustomComboBox
+					bind:open={comboBoxes.ipv6Gw.open}
+					label={'IPv6 Gateway'}
+					bind:value={comboBoxes.ipv6Gw.value}
 					data={generateIPOptions(networkObjects, 'IPv6')}
 					classes="flex-1 space-y-1"
-					placeholder="Select IPv6"
+					placeholder="Select IPv6 Gateway"
 					width="w-3/4"
 					disabled={confirmModals[confirmModals.active].disableIPv6 ||
 					confirmModals[confirmModals.active].slaac

@@ -16,9 +16,6 @@ import (
 func (s *Service) GetBridgeNameByID(id uint) (string, error) {
 	var standardSwitches []networkModels.StandardSwitch
 	if err := s.DB.
-		Preload("Ports").
-		Preload("AddressObj.Entries").
-		Preload("Address6Obj.Entries").
 		Find(&standardSwitches).Error; err != nil {
 		return "", err
 	}

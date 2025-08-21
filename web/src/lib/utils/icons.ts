@@ -42,7 +42,9 @@ const icons = [
 	'file-icons:openzfs',
 	'carbon:volume-block-storage',
 	'mdi:file-plus',
-	'mdi:rename'
+	'mdi:rename',
+	'lets-icons:check-fill',
+	'gridicons:cross-circle'
 ];
 
 export async function preloadIcons() {

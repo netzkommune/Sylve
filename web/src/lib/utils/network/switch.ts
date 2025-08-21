@@ -159,6 +159,21 @@ export function generateTableData(
 			field: 'slaac',
 			title: 'SLAAC',
 			visible: false
+		},
+		{
+			field: 'defaultRoute',
+			title: 'Default Route',
+			visible: false,
+			formatter: (cell: CellComponent) => {
+				const row = cell.getRow();
+				const data = row.getData();
+
+				if (data.defaultRoute) {
+					return renderWithIcon('lets-icons:check-fill', 'Yes');
+				}
+
+				return renderWithIcon('gridicons:cross-circle', 'No');
+			}
 		}
 	];
 
@@ -189,7 +204,8 @@ export function generateTableData(
 				portsOnly: portsOnly,
 				dhcp: sw.dhcp || false,
 				disableIPv6: sw.disableIPv6 || false,
-				slaac: sw.slaac || false
+				slaac: sw.slaac || false,
+				defaultRoute: sw.defaultRoute || false
 			});
 		}
 	}

@@ -350,6 +350,7 @@
 			confirmModals.editSwitch.private = (activeRow.private as boolean) || false;
 			confirmModals.editSwitch.dhcp = (activeRow.dhcp as boolean) || false;
 			confirmModals.editSwitch.slaac = (activeRow.slaac as boolean) || false;
+			confirmModals.editSwitch.defaultRoute = (activeRow.defaultRoute as boolean) || false;
 
 			comboBoxes.ports.value = activeRow.ports.map((port: { name: string }) => port.name);
 		}

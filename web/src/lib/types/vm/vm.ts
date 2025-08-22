@@ -73,6 +73,7 @@ export const VMSchema = z.object({
 	vncWait: z.boolean(),
 	startAtBoot: z.boolean(),
 	startOrder: z.number().int(),
+	wol: z.boolean(),
 
 	state: z.enum(['ACTIVE', 'INACTIVE']),
 

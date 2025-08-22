@@ -491,7 +491,7 @@ func (s *Service) CreateJail(data jailServiceInterfaces.CreateJailRequest) error
 
 		if mac == 0 {
 			var sw networkModels.StandardSwitch
-			if err := s.DB.First(&sw).Where("id = ?", *data.SwitchId).Error; err != nil {
+			if err := s.DB.Where("id = ?", *data.SwitchId).First(&sw).Error; err != nil {
 				return fmt.Errorf("failed_to_find_switch: %w", err)
 			}
 

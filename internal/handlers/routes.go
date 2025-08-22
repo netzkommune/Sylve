@@ -256,6 +256,9 @@ func RegisterRoutes(r *gin.Engine,
 		vm.PUT("/hardware/ram/:vmid", vmHandlers.ModifyRAM(libvirtService))
 		vm.PUT("/hardware/vnc/:vmid", vmHandlers.ModifyVNC(libvirtService))
 		vm.PUT("/hardware/ppt/:vmid", vmHandlers.ModifyPassthroughDevices(libvirtService))
+
+		vm.PUT("/options/wol/:vmid", vmHandlers.ModifyWakeOnLan(libvirtService))
+		vm.PUT("/options/boot-order/:vmid", vmHandlers.ModifyBootOrder(libvirtService))
 	}
 
 	jail := api.Group("/jail")

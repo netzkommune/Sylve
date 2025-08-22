@@ -53,6 +53,11 @@
 					label: 'Network',
 					icon: 'mdi:network',
 					href: `/${node}/vm/${vmName}/network`
+				},
+				{
+					label: 'Options',
+					icon: 'mdi:settings',
+					href: `/${node}/vm/${vmName}/options`
 				}
 			];
 		} else if (page.url.pathname.startsWith(`/${$hostname}/jail`)) {

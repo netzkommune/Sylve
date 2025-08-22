@@ -383,9 +383,11 @@ func (s *Service) CreateVM(data libvirtServiceInterfaces.CreateVMRequest) error 
 	var networks []vmModels.Network
 	if data.SwitchID != nil && *data.SwitchID != 0 {
 		var sw networkModels.StandardSwitch
-		if err := s.DB.First(&sw).Where("id = ?", *data.SwitchID).Error; err != nil {
+		if err := s.DB.Where("id = ?", *data.SwitchID).First(&sw).Error; err != nil {
 			return fmt.Errorf("failed_to_find_switch: %w", err)
 		}
+
+		fmt.Println(sw.Name)
 
 		if macId == 0 {
 			base := fmt.Sprintf("%s-%s", data.Name, sw.Name)

@@ -13,7 +13,7 @@
 	import type { PCIDevice, PPTDevice } from '$lib/types/system/pci';
 	import type { Download } from '$lib/types/utilities/downloader';
 	import type { Dataset } from '$lib/types/zfs/dataset';
-	import { capitalizeFirstLetter, generatePassword } from '$lib/utils/string';
+	import { generatePassword } from '$lib/utils/string';
 	import { getNextId, isValidCreateData } from '$lib/utils/vm/vm';
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
@@ -30,7 +30,6 @@
 	import type { NetworkObject } from '$lib/types/network/object';
 	import { type CreateData, type VM } from '$lib/types/vm/vm';
 	import { handleAPIError } from '$lib/utils/http';
-	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
 
 	interface Props {
@@ -213,6 +212,7 @@
 
 	let nextId = $derived(getNextId(vms, jails));
 	let modal: CreateData = $state(options);
+	let loading = $state(false);
 
 	$effect(() => {
 		modal.id = nextId;
@@ -221,7 +221,9 @@
 	async function create() {
 		const data = $state.snapshot(modal);
 		if (isValidCreateData(data)) {
+			loading = true;
 			const response = await newVM(data);
+			loading = false;
 			if (response.status === 'success') {
 				toast.success(`Created VM ${modal.name}`, {
 					duration: 3000,
@@ -342,9 +344,13 @@
 
 		<Dialog.Footer>
 			<div class="flex w-full justify-end md:flex-row">
-				<Button size="sm" type="button" class="h-8" onclick={() => create()}
-					>Create Virtual Machine</Button
-				>
+				<Button size="sm" type="button" class="h-8" onclick={() => create()} disabled={loading}>
+					{#if loading}
+						<Icon icon="mdi:loading" class="h-4 w-4 animate-spin" />
+					{:else}
+						Create Virtual Machine
+					{/if}
+				</Button>
 			</div>
 		</Dialog.Footer>
 	</Dialog.Content>

@@ -72,3 +72,20 @@ export async function updateDescription(id: number, description: string): Promis
 		description
 	});
 }
+
+export async function modifyWoL(vmid: number, enabled: boolean): Promise<APIResponse> {
+	return await apiRequest(`/vm/options/wol/${vmid}`, APIResponseSchema, 'PUT', {
+		enabled
+	});
+}
+
+export async function modifyBootOrder(
+	vmid: number,
+	startAtBoot: boolean,
+	bootOrder: number
+): Promise<APIResponse> {
+	return await apiRequest(`/vm/options/boot-order/${vmid}`, APIResponseSchema, 'PUT', {
+		startAtBoot,
+		bootOrder
+	});
+}

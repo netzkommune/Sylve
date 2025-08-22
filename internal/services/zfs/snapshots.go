@@ -204,6 +204,11 @@ func (s *Service) StartSnapshotScheduler(ctx context.Context) {
 					dataset, err := s.GetDatasetByGUID(job.GUID)
 					if err != nil {
 						logger.L.Debug().Err(err).Msgf("Failed to get dataset for %s", job.GUID)
+						if err := s.DB.Delete(&job).Error; err != nil {
+							logger.L.Debug().Err(err).Msgf("Failed to delete job %s", job.GUID)
+						}
+
+						logger.L.Debug().Msgf("Deleted job %s due to missing dataset", job.GUID)
 						continue
 					}
 

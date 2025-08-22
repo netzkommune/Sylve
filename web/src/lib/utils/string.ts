@@ -239,3 +239,10 @@ export function generateUnicastMAC() {
 		.map((b) => b.toString(16).padStart(2, '0'))
 		.join(':');
 }
+
+export function isBoolean(value: any): boolean {
+	return (
+		typeof value === 'boolean' ||
+		(typeof value === 'string' && (value === 'true' || value === 'false'))
+	);
+}

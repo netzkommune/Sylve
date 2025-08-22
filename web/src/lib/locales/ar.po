@@ -3,7 +3,11 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-31T13:10:41.812Z\n"
+<<<<<<< HEAD
 "PO-Revision-Date: 2025-08-22T16:45:00.093Z\n"
+=======
+"PO-Revision-Date: 2025-08-22T21:16:37.869Z\n"
+>>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
 "Last-Translator: \n"
 "Language: Arabic\n"
 "Language-Team: \n"
@@ -86,6 +90,10 @@ msgstr ""
 #: src/lib/components/ui/custom-input/combobox-bindable.svelte
 #: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/Terminal.svelte
+<<<<<<< HEAD
+=======
+#: src/lib/components/ui/custom-input/combobox-bindable.svelte
+>>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
 #: src/lib/components/ui/custom-input/combobox.svelte
 msgid "Enter"
 msgstr ""
@@ -131,6 +139,7 @@ msgstr ""
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 #: src/routes/[node]/network/switches/+page.svelte
 #: src/routes/[node]/network/switches/+page.svelte
+<<<<<<< HEAD
 #: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 #: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
@@ -143,6 +152,8 @@ msgstr ""
 #: src/lib/components/custom/FileExplorer/FilepondModal.svelte
 #: src/lib/components/custom/FileExplorer/RenameModal.svelte
 #: src/lib/components/custom/FileExplorer/RenameModal.svelte
+=======
+>>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
 #: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 #: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 #: src/lib/components/custom/Terminal.svelte
@@ -151,7 +162,36 @@ msgstr ""
 #: src/lib/components/custom/VM/Create/CreateVM.svelte
 #: src/lib/components/custom/VM/Create/CreateVM.svelte
 #: src/lib/components/ui/sheet/sheet-content.svelte
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/notes/+page.svelte
+#: src/lib/components/custom/VM/Options/StartOrder.svelte
+#: src/lib/components/custom/VM/Options/StartOrder.svelte
+#: src/lib/components/custom/VM/Options/WoL.svelte
+#: src/lib/components/custom/VM/Options/WoL.svelte
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+#: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/lib/components/custom/FileExplorer/FilepondModal.svelte
+#: src/lib/components/custom/FileExplorer/FilepondModal.svelte
+#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
+#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
+#: src/lib/components/custom/FileExplorer/RenameModal.svelte
+#: src/lib/components/custom/FileExplorer/RenameModal.svelte
+#: src/lib/components/disk/CreatePartition.svelte
+#: src/lib/components/disk/CreatePartition.svelte
 #: src/lib/components/ui/dialog/dialog-content.svelte
+<<<<<<< HEAD
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
@@ -170,6 +210,10 @@ msgstr ""
 #: src/lib/components/custom/VM/Options/WoL.svelte
 #: src/lib/components/custom/VM/Options/StartOrder.svelte
 #: src/lib/components/custom/VM/Options/StartOrder.svelte
+=======
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+>>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
 msgid "Close"
 msgstr ""
 
@@ -218,6 +262,11 @@ msgstr ""
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
 #: src/routes/[node]/+layout.svelte
 #: src/lib/components/skeleton/BottomPanel.svelte
+<<<<<<< HEAD
+=======
+#: src/routes/[node]/+layout.svelte
+#: src/routes/datacenter/+layout.svelte
+>>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
 msgid "Notes"
 msgstr ""
 
@@ -248,11 +297,18 @@ msgid "Login - Create"
 msgstr ""
 
 #: src/routes/[node]/+layout.svelte
+#: src/routes/datacenter/+layout.svelte
 msgid "Difuse-sidebar"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/routes/[node]/+layout.svelte
 #: src/lib/components/skeleton/LeftPanel.svelte
+=======
+#: src/lib/components/skeleton/LeftPanel.svelte
+#: src/routes/[node]/+layout.svelte
+#: src/routes/datacenter/+layout.svelte
+>>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
 msgid "Data Center"
 msgstr ""
 
@@ -350,9 +406,9 @@ msgstr ""
 
 #: src/routes/[node]/jail/[node]/hardware/+page.svelte
 #: src/routes/[node]/storage/samba/settings/+page.svelte
-#: src/routes/[node]/storage/disks/+page.svelte
 #: src/lib/components/custom/Charts/Area.svelte
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
+<<<<<<< HEAD
 #: src/routes/[node]/vm/[node]/options/+page.svelte
 msgid "Value"
 msgstr ""
@@ -360,6 +416,15 @@ msgstr ""
 #: src/lib/components/ui/custom-input/combobox-bindable.svelte
 #: src/lib/components/ui/custom-input/combobox.svelte
 #: src/lib/components/custom/TreeTable/Search.svelte
+=======
+#: src/routes/[node]/storage/disks/+page.svelte
+msgid "Value"
+msgstr ""
+
+#: src/lib/components/custom/TreeTable/Search.svelte
+#: src/lib/components/ui/custom-input/combobox-bindable.svelte
+#: src/lib/components/ui/custom-input/combobox.svelte
+>>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
 msgid "Search..."
 msgstr ""
 
@@ -466,6 +531,7 @@ msgstr ""
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 #: src/routes/[node]/network/switches/+page.svelte
 #: src/routes/[node]/network/switches/+page.svelte
+<<<<<<< HEAD
 #: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 #: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
@@ -476,6 +542,8 @@ msgstr ""
 #: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
 #: src/lib/components/custom/FileExplorer/RenameModal.svelte
 #: src/lib/components/custom/FileExplorer/RenameModal.svelte
+=======
+>>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
 #: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 #: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 #: src/lib/components/custom/Jail/Create/CreateJail.svelte
@@ -488,18 +556,33 @@ msgstr ""
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
-#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
-#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
+<<<<<<< HEAD
 #: src/routes/[node]/notes/+page.svelte
 #: src/routes/[node]/notes/+page.svelte
 #: src/lib/components/custom/VM/Options/WoL.svelte
 #: src/lib/components/custom/VM/Options/WoL.svelte
 #: src/lib/components/custom/VM/Options/StartOrder.svelte
 #: src/lib/components/custom/VM/Options/StartOrder.svelte
+=======
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+#: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
+#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
+#: src/lib/components/custom/FileExplorer/RenameModal.svelte
+#: src/lib/components/custom/FileExplorer/RenameModal.svelte
+#: src/lib/components/disk/CreatePartition.svelte
+#: src/lib/components/disk/CreatePartition.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+>>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
 msgid "Reset"
 msgstr ""
 
@@ -602,12 +685,17 @@ msgid "None"
 msgstr ""
 
 #: src/routes/[node]/+layout.svelte
+#: src/routes/datacenter/+layout.svelte
 msgid "Help"
 msgstr ""
 
 #: src/routes/[node]/+layout.svelte
 #: src/routes/[node]/+layout.svelte
 #: src/routes/[node]/+layout.svelte
+<<<<<<< HEAD
+=======
+#: src/routes/datacenter/+layout.svelte
+>>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
 msgid "Summary"
 msgstr ""
 
@@ -658,9 +746,9 @@ msgstr ""
 msgid "Disks"
 msgstr ""
 
-#: src/routes/[node]/storage/disks/+page.svelte
-#: src/routes/[node]/storage/disks/+page.svelte
 #: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/storage/disks/+page.svelte
+#: src/routes/[node]/storage/disks/+page.svelte
 msgid "ZFS"
 msgstr ""
 
@@ -746,23 +834,33 @@ msgstr ""
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/routes/[node]/network/interfaces/+page.svelte
 #: src/routes/[node]/network/switches/+page.svelte
+<<<<<<< HEAD
 #: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 #: src/lib/components/disk/CreatePartition.svelte
 #: src/lib/components/custom/FileExplorer/ListView.svelte
+=======
+>>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
 #: src/routes/[node]/settings/authentication/users/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
+<<<<<<< HEAD
 #: src/routes/[node]/notes/+page.svelte
 #: src/routes/[node]/notes/+page.svelte
+=======
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
+#: src/lib/components/custom/FileExplorer/ListView.svelte
+#: src/lib/components/disk/CreatePartition.svelte
+>>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
 msgid "Name"
 msgstr ""
 
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
-#: src/lib/components/disk/CreatePartition.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/lib/components/custom/FileExplorer/ListView.svelte
 #: src/lib/components/custom/FileExplorer/Toolbar.svelte
-#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/disk/CreatePartition.svelte
 msgid "Size"
 msgstr ""
 
@@ -856,13 +954,21 @@ msgstr ""
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 #: src/routes/[node]/network/switches/+page.svelte
+<<<<<<< HEAD
 #: src/routes/[node]/network/objects/+page.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
+=======
+>>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
 #: src/routes/[node]/settings/authentication/users/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/routes/[node]/vm/[node]/storage/+page.svelte
+<<<<<<< HEAD
 #: src/routes/[node]/notes/+page.svelte
 #: src/routes/[node]/notes/+page.svelte
+=======
+#: src/routes/[node]/network/objects/+page.svelte
+#: src/routes/[node]/utilities/downloader/+page.svelte
+>>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
 msgid "New"
 msgstr ""
 
@@ -893,12 +999,16 @@ msgstr ""
 #: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
-#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
+<<<<<<< HEAD
 #: src/routes/[node]/notes/+page.svelte
 #: src/lib/components/custom/VM/Options/WoL.svelte
 #: src/lib/components/custom/VM/Options/StartOrder.svelte
+=======
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+>>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
 msgid "Save"
 msgstr ""
 
@@ -1003,9 +1113,15 @@ msgstr ""
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/routes/[node]/network/switches/+page.svelte
+<<<<<<< HEAD
 #: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 #: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
 #: src/lib/components/custom/Authentication/CreateOrEdit.svelte
+=======
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
+>>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
 msgid "Create"
 msgstr ""
 
@@ -1173,9 +1289,15 @@ msgstr ""
 msgid "First Modified"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 #: src/lib/components/custom/FileExplorer/Toolbar.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
+=======
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+#: src/lib/components/custom/FileExplorer/Toolbar.svelte
+>>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
 msgid "Type"
 msgstr ""
 
@@ -1506,8 +1628,8 @@ msgstr ""
 
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
-#: src/routes/[node]/storage/disks/+page.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/routes/[node]/storage/disks/+page.svelte
 msgid "NVMe"
 msgstr ""
 
@@ -3717,3 +3839,50 @@ msgstr ""
 #: src/routes/[node]/vm/[node]/options/+page.svelte
 msgid "Start At Boot / Start Order"
 msgstr ""
+<<<<<<< HEAD
+=======
+
+#: src/routes/notes/+page.svelte
+#: src/routes/datacenter/notes/+page.svelte
+msgid "Data center notes"
+msgstr ""
+
+#: src/routes/summary/+page.svelte
+#: src/routes/datacenter/summary/+page.svelte
+msgid "data center Summary"
+msgstr ""
+
+#~ msgid "Summarytest"
+#~ msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+msgid "Intel Corporation Ethernet Controller I225-V"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+msgid "Intel Corporation 82599ES 10-Gigabit SFI/SFP+ Network Connection"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+msgid "Realtek Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet Controller"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+msgid "Broadcom Inc. BCM57416 NetXtreme-E Dual-Media 10G RDMA Ethernet Controller"
+msgstr ""
+
+#~ msgid "s {0}"
+#~ msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+msgid "Intel1 Corporation Ethernet Controller I225-V"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+msgid "Realtek Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet ControllerRealtek Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet Controller"
+msgstr ""
+>>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)

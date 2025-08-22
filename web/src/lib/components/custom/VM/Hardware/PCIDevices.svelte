@@ -3,6 +3,7 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import CustomComboBox from '$lib/components/ui/custom-input/combobox.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import Label from '$lib/components/ui/label/label.svelte';
 	import type { PCIDevice, PPTDevice } from '$lib/types/system/pci';
 	import type { VM } from '$lib/types/vm/vm';
 	import { handleAPIError } from '$lib/utils/http';
@@ -80,7 +81,7 @@
 </script>
 
 <Dialog.Root bind:open>
-	<Dialog.Content class="w-1/3 overflow-hidden p-5 lg:max-w-2xl">
+	<Dialog.Content class="w-full min-w-0 p-5  sm:max-w-3xl">
 		<Dialog.Header class="">
 			<Dialog.Title class="flex items-center justify-between">
 				<div class="flex items-center gap-2">
@@ -118,20 +119,22 @@
 			</Dialog.Title>
 		</Dialog.Header>
 
-		<CustomComboBox
-			bind:open={properties.combobox.open}
-			bind:value={properties.combobox.value}
-			data={properties.combobox.options}
-			onValueChange={(value) => {
-				properties.combobox.value = value as string[];
-			}}
-			placeholder="Select PCI Devices"
-			disabled={false}
-			disallowEmpty={false}
-			multiple={true}
-			width="w-full"
-		/>
-
+		<div class="min-w-0 overflow-x-auto">
+			<CustomComboBox
+				bind:open={properties.combobox.open}
+				bind:value={properties.combobox.value}
+				data={properties.combobox.options}
+				onValueChange={(value) => {
+					properties.combobox.value = value as string[];
+				}}
+				placeholder="Select PCI Devices"
+				disabled={false}
+				disallowEmpty={false}
+				multiple={true}
+				width="w-full "
+				commandClasses="max-w-3xl "
+			/>
+		</div>
 		<Dialog.Footer class="flex justify-end">
 			<div class="flex w-full items-center justify-end gap-2">
 				<Button onclick={modify} type="submit" size="sm">{'Save'}</Button>

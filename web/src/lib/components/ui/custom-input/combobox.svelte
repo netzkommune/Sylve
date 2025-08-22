@@ -15,6 +15,7 @@
 		placeholder?: string;
 		disabled?: boolean;
 		classes?: string;
+		commandClasses?: string;
 		triggerWidth?: string;
 		width?: string;
 		disallowEmpty?: boolean;
@@ -29,6 +30,7 @@
 		placeholder = '',
 		disabled = false,
 		classes = 'space-y-1',
+		commandClasses = '',
 		triggerWidth = 'w-full',
 		width = 'w-1/2',
 		disallowEmpty = false,
@@ -81,7 +83,7 @@
 
 <div class={classes}>
 	{#if label}
-		<Label class="w-full whitespace-nowrap text-sm" for={label.toLowerCase()}>
+		<Label class="w-full text-sm whitespace-nowrap" for={label.toLowerCase()}>
 			{label}
 		</Label>
 	{/if}
@@ -91,20 +93,20 @@
 				variant="outline"
 				role="combobox"
 				aria-expanded={open}
-				class="w-full flex-nowrap justify-between gap-1 overflow-hidden"
+				class="h-full !max-h-40 w-full flex-nowrap justify-between gap-1 overflow-y-auto"
 				{disabled}
 			>
 				<div class="flex min-w-0 flex-1 flex-wrap items-center gap-1 overflow-hidden">
 					{#if selectedLabels.length > 0}
 						{#each selectedLabels as lbl, i}
-							<span
+							<p
 								class={multiple
-									? 'bg-secondary/100 max-w-full truncate rounded px-2 py-0.5 text-sm'
-									: 'truncate rounded px-2 text-sm'}
+									? 'bg-secondary/100 = max-w-full rounded px-2 py-0.5 text-left text-sm whitespace-break-spaces'
+									: ' rounded px-2 text-sm'}
 								title={lbl}
 							>
 								{lbl}
-							</span>
+							</p>
 						{/each}
 					{:else}
 						<span class="truncate opacity-50">{placeholder}</span>
@@ -123,6 +125,7 @@
 					<Command.Group>
 						{#each filteredData as element}
 							<Command.Item
+								class={commandClasses}
 								value={element.value}
 								onSelect={() => selectItem(element.value)}
 								onkeydown={(e) => {

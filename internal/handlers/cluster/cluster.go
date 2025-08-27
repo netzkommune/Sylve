@@ -3,6 +3,7 @@ package clusterHandlers
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/alchemillahq/sylve/internal"
 	clusterServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/cluster"
@@ -22,6 +23,13 @@ type JoinClusterRequest struct {
 	NodeIP     string `json:"nodeIp" binding:"required,ip"`
 	NodePort   int    `json:"nodePort" binding:"required,min=1024,max=65535"`
 	LeaderAPI  string `json:"leaderApi" binding:"required"`
+	ClusterKey string `json:"clusterKey" binding:"required"`
+}
+
+type AcceptJoinRequest struct {
+	NodeID     string `json:"nodeId" binding:"required"`
+	NodeIP     string `json:"nodeIp" binding:"required,ip"`
+	NodePort   int    `json:"nodePort" binding:"required,min=1024,max=65535"`
 	ClusterKey string `json:"clusterKey" binding:"required"`
 }
 
@@ -109,7 +117,7 @@ func CreateCluster(cS *cluster.Service, fsm raft.FSM) gin.HandlerFunc {
 // @Failure 400 {object} internal.APIResponse[any] "Bad Request"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
 // @Router /cluster/join [post]
-func JoinCluster(cS *cluster.Service) gin.HandlerFunc {
+func JoinCluster(cS *cluster.Service, fsm raft.FSM) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req JoinClusterRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
@@ -142,7 +150,36 @@ func JoinCluster(cS *cluster.Service) gin.HandlerFunc {
 		if err := utils.HTTPPostJSON(healthURL, req, headers); err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 				Status:  "error",
-				Message: "error_joining_cluster_bad_leader_response",
+				Message: "error_pinging_cluster_bad_leader_response",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		err := cS.StartAsJoiner(fsm, req.NodeIP, req.NodePort, req.ClusterKey)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "error_starting_joiner",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		acceptURL := fmt.Sprintf("https://%s/api/cluster/accept?clusterkey=%s", req.LeaderAPI, req.ClusterKey)
+		payload := map[string]any{
+			"nodeId":     req.NodeID,
+			"nodeIp":     req.NodeIP,
+			"raftPort":   req.NodePort,
+			"clusterKey": req.ClusterKey,
+		}
+
+		if err := utils.HTTPPostJSON(acceptURL, payload, headers); err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "error_pinging_cluster_bad_leader_response",
 				Error:   err.Error(),
 				Data:    nil,
 			})
@@ -152,6 +189,48 @@ func JoinCluster(cS *cluster.Service) gin.HandlerFunc {
 		c.JSON(http.StatusOK, internal.APIResponse[any]{
 			Status:  "success",
 			Message: "cluster_joined",
+			Error:   "",
+			Data:    nil,
+		})
+	}
+}
+
+func AcceptJoin(cS *cluster.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var req AcceptJoinRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request_payload",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		if err := cS.AcceptJoin(req.NodeID, req.NodeIP, req.NodePort, req.ClusterKey); err != nil {
+			if strings.HasPrefix(err.Error(), "not_leader;") {
+				c.JSON(http.StatusConflict, internal.APIResponse[any]{
+					Status:  "error",
+					Message: "not_leader",
+					Error:   err.Error(),
+					Data:    nil,
+				})
+				return
+			}
+
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "cluster_join_failed",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "node_added_to_cluster",
 			Error:   "",
 			Data:    nil,
 		})

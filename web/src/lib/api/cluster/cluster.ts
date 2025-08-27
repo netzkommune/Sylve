@@ -12,3 +12,19 @@ export async function createCluster(ip: string, port: number): Promise<APIRespon
 		port: port
 	});
 }
+
+export async function joinCluster(
+	nodeId: string,
+	nodeIp: string,
+	nodePort: number,
+	leaderApi: string,
+	clusterKey: string
+): Promise<APIResponse> {
+	return await apiRequest('/cluster/join', APIResponseSchema, 'POST', {
+		nodeId: nodeId,
+		nodeIp: nodeIp,
+		nodePort: nodePort,
+		leaderApi: leaderApi,
+		clusterKey: clusterKey
+	});
+}

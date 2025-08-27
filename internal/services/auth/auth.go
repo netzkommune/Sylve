@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/alchemillahq/sylve/internal/db/models"
+	clusterModels "github.com/alchemillahq/sylve/internal/db/models/cluster"
 	serviceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services"
 	"github.com/alchemillahq/sylve/internal/logger"
 	"github.com/alchemillahq/sylve/pkg/utils"
@@ -325,4 +326,10 @@ func (s *Service) GetTokenBySHA256(hash string) (string, error) {
 	}
 
 	return "", fmt.Errorf("token_not_found")
+}
+
+func (s *Service) IsValidClusterKey(clusterKey string) bool {
+	var count int64
+	s.DB.Model(&clusterModels.Cluster{}).Where("key = ?", clusterKey).Count(&count)
+	return count > 0
 }

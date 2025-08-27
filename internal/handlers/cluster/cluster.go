@@ -18,12 +18,11 @@ type CreateClusterRequest struct {
 }
 
 type JoinClusterRequest struct {
-	NodeID              string `json:"nodeId" binding:"required"`
-	NodeIP              string `json:"nodeIp" binding:"required,ip"`
-	NodePort            int    `json:"nodePort" binding:"required,min=1024,max=65535"`
-	LeaderAPI           string `json:"leaderApi" binding:"required"`
-	LeaderAdminPassword string `json:"leaderAdminPassword" binding:"required"`
-	ClusterKey          string `json:"clusterKey" binding:"required"`
+	NodeID     string `json:"nodeId" binding:"required"`
+	NodeIP     string `json:"nodeIp" binding:"required,ip"`
+	NodePort   int    `json:"nodePort" binding:"required,min=1024,max=65535"`
+	LeaderAPI  string `json:"leaderApi" binding:"required"`
+	ClusterKey string `json:"clusterKey" binding:"required"`
 }
 
 // @Summary Get Cluster
@@ -123,7 +122,7 @@ func JoinCluster(cS *cluster.Service) gin.HandlerFunc {
 			return
 		}
 
-		if utils.IsValidIPPort(req.LeaderAPI) {
+		if !utils.IsValidIPPort(req.LeaderAPI) {
 			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
 				Status:  "error",
 				Message: "invalid_leader_api",
@@ -135,10 +134,12 @@ func JoinCluster(cS *cluster.Service) gin.HandlerFunc {
 
 		headers := utils.FlatHeaders(c)
 		healthURL := fmt.Sprintf(
-			"https://%s/api/health/basic?hash=%s",
+			"https://%s/api/health/basic?clusterkey=%s",
 			req.LeaderAPI,
-			utils.PasswordQueryHash(req.LeaderAdminPassword),
+			req.ClusterKey,
 		)
+
+		fmt.Println(healthURL)
 
 		if err := utils.HTTPPostJSON(healthURL, req, headers); err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{

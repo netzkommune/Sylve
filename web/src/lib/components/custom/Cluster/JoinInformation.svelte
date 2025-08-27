@@ -4,7 +4,6 @@
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { nodeId } from '$lib/stores/basic';
 	import type { ClusterDetails } from '$lib/types/cluster/cluster';
-	import { toBase64 } from '$lib/utils/string';
 	import Icon from '@iconify/svelte';
 	import { toast } from 'svelte-sonner';
 

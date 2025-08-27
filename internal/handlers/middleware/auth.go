@@ -34,6 +34,15 @@ func EnsureAuthenticated(authService *authService.Service) gin.HandlerFunc {
 		var token string
 		var err error
 
+		if clusterKey := c.Query("clusterkey"); clusterKey != "" && strings.HasPrefix(path, "/api/cluster") {
+			if !authService.IsValidClusterKey(clusterKey) {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"status": "error", "error": "invalid_cluster_key"})
+				return
+			}
+
+			c.Next()
+		}
+
 		if hash := c.Query("hash"); hash != "" {
 			token, err = authService.GetTokenBySHA256(hash)
 			if err != nil {

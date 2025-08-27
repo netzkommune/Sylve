@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getDetails } from '$lib/api/cluster/cluster';
 	import Create from '$lib/components/custom/Cluster/Create.svelte';
+	import Join from '$lib/components/custom/Cluster/Join.svelte';
 	import JoinInformation from '$lib/components/custom/Cluster/JoinInformation.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import Search from '$lib/components/custom/TreeTable/Search.svelte';
@@ -48,11 +49,18 @@
 		dataCenter?.cluster.raftBootstrap === null && dataCenter?.cluster.enabled === false
 	);
 
+	let canJoin = $derived(
+		dataCenter?.cluster.raftBootstrap !== true && dataCenter?.cluster.enabled === false
+	);
+
 	let modals = $state({
 		create: {
 			open: false
 		},
 		view: {
+			open: false
+		},
+		join: {
 			open: false
 		}
 	});
@@ -133,6 +141,9 @@
 				case 'create':
 					modals.create.open = true;
 					break;
+				case 'join':
+					modals.join.open = true;
+					break;
 			}
 		}}
 		size="sm"
@@ -163,6 +174,10 @@
 		{#if canCreate}
 			{@render button('create', 'oui:ml-create-population-job', 'Create Cluster', !canCreate)}
 		{/if}
+
+		{#if canJoin}
+			{@render button('join', 'grommet-icons:cluster', 'Join Cluster', !canJoin)}
+		{/if}
 	</div>
 
 	<TreeTable
@@ -176,3 +191,4 @@
 
 <Create bind:open={modals.create.open} bind:reload />
 <JoinInformation bind:open={modals.view.open} cluster={dataCenter} />
+<Join bind:open={modals.join.open} bind:reload />

@@ -88,6 +88,7 @@ func RegisterRoutes(r *gin.Engine,
 	health.Use(middleware.RequestLoggerMiddleware(db, authService))
 	{
 		health.GET("/basic", BasicHealthCheckHandler)
+		health.POST("/basic", BasicHealthCheckHandler)
 		health.GET("/http", HTTPHealthCheckHandler)
 	}
 
@@ -338,6 +339,7 @@ func RegisterRoutes(r *gin.Engine,
 	{
 		cluster.GET("", clusterHandlers.GetCluster(clusterService))
 		cluster.POST("", clusterHandlers.CreateCluster(clusterService, fsm))
+		cluster.POST("/join", clusterHandlers.JoinCluster(clusterService))
 	}
 
 	vnc := api.Group("/vnc")

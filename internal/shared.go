@@ -19,7 +19,7 @@ type TLSConfig struct {
 }
 
 type Raft struct {
-	RemoveAllNodes bool `json:"removeAllNodes"`
+	Bootstrap bool `json:"bootstrap"`
 }
 
 type SylveConfig struct {

@@ -9,6 +9,6 @@
   "logLevel": 0,
   "port": 8181,
   "raft": {
-    "removeAllNodes": false
+    "bootstrap": false
   }
 }

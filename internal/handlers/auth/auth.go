@@ -28,6 +28,7 @@ type LoginRequest struct {
 type SuccessfulLogin struct {
 	Token    string `json:"token"`
 	Hostname string `json:"hostname"`
+	NodeID   string `json:"nodeId"`
 }
 
 // @Summary Login
@@ -82,11 +83,26 @@ func LoginHandler(authService *auth.Service) gin.HandlerFunc {
 			return
 		}
 
+		nodeId, err := utils.GetSystemUUID()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
 		c.JSON(http.StatusOK, internal.APIResponse[any]{
 			Status:  "success",
 			Message: "login_successful",
 			Error:   "",
-			Data:    SuccessfulLogin{Token: token, Hostname: hostname},
+			Data: SuccessfulLogin{
+				Token:    token,
+				Hostname: hostname,
+				NodeID:   nodeId,
+			},
 		})
 	}
 }

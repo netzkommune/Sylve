@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getDetails } from '$lib/api/cluster/cluster';
 	import Create from '$lib/components/custom/Cluster/Create.svelte';
+	import JoinInformation from '$lib/components/custom/Cluster/JoinInformation.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import Search from '$lib/components/custom/TreeTable/Search.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -49,6 +50,9 @@
 
 	let modals = $state({
 		create: {
+			open: false
+		},
+		view: {
 			open: false
 		}
 	});
@@ -147,6 +151,15 @@
 	<div class="flex h-10 w-full items-center gap-2 border-b p-2">
 		<Search bind:query />
 
+		{#if !canCreate}
+			<Button onclick={() => (modals.view.open = true)} size="sm" class="h-6  ">
+				<div class="flex items-center">
+					<Icon icon="mdi:eye" class="mr-1 h-4 w-4" />
+					<span>View Join Information</span>
+				</div>
+			</Button>
+		{/if}
+
 		{#if canCreate}
 			{@render button('create', 'oui:ml-create-population-job', 'Create Cluster', !canCreate)}
 		{/if}
@@ -162,3 +175,4 @@
 </div>
 
 <Create bind:open={modals.create.open} bind:reload />
+<JoinInformation bind:open={modals.view.open} cluster={dataCenter} />

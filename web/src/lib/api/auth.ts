@@ -11,7 +11,7 @@
 import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
 import { oldStore, store } from '$lib/stores/auth';
-import { hostname, language as langStore } from '$lib/stores/basic';
+import { hostname, language as langStore, nodeId } from '$lib/stores/basic';
 import type { JWTClaims } from '$lib/types/auth';
 import type { APIResponse } from '$lib/types/common';
 import { handleAPIError } from '$lib/utils/http';
@@ -57,6 +57,7 @@ export async function login(
 			if (response.data.data?.hostname && response.data.data?.token) {
 				langStore.set(language);
 				hostname.set(response.data.data.hostname);
+				nodeId.set(response.data.data.nodeId || '');
 				store.set(response.data.data.token);
 				return true;
 			} else {
@@ -117,6 +118,9 @@ export async function isTokenValid(): Promise<boolean> {
 			if (response.data?.hostname) {
 				hostname.set(response.data.hostname);
 			}
+			if (response.data?.nodeId) {
+				nodeId.set(response.data.nodeId);
+			}
 			return true;
 		}
 	} catch (_e: unknown) {
@@ -134,10 +138,12 @@ export async function logOut() {
 
 	store.set('');
 	hostname.set('');
+	nodeId.set('');
 
 	if (browser) {
 		localStorage.removeItem('token');
 		localStorage.removeItem('hostname');
+		localStorage.removeItem('nodeId');
 	}
 
 	goto('/', {

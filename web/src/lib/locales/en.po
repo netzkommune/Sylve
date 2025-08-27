@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-22T21:29:52.875Z\n"
-"PO-Revision-Date: 2025-08-27T12:18:08.253Z\n"
+"PO-Revision-Date: 2025-08-27T15:15:09.851Z\n"
 "Last-Translator: \n"
 "Language: English\n"
 "Language-Team: \n"
@@ -152,6 +152,8 @@ msgstr "Minimize"
 #: src/lib/components/custom/VM/Options/WoL.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/lib/components/custom/Cluster/JoinInformation.svelte
+#: src/lib/components/custom/Cluster/JoinInformation.svelte
 msgid "Close"
 msgstr "Close"
 
@@ -851,6 +853,7 @@ msgstr "Date"
 #: src/lib/components/custom/Charts/Area.svelte
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/routes/[node]/vm/[node]/options/+page.svelte
+#: src/lib/components/custom/Cluster/JoinInformation.svelte
 msgid "Value"
 msgstr "Value"
 
@@ -1444,6 +1447,7 @@ msgstr "Failed to create cluster"
 msgid "Cluster created"
 msgstr "Cluster created"
 
+#: src/lib/components/custom/Cluster/JoinInformation.svelte
 #: src/routes/datacenter/cluster/+page.svelte
 msgid "Node ID"
 msgstr "Node ID"
@@ -1764,6 +1768,7 @@ msgstr "PCI Devices"
 
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/routes/[node]/vm/[node]/options/+page.svelte
+#: src/lib/components/custom/Cluster/JoinInformation.svelte
 msgid "Property"
 msgstr "Property"
 
@@ -1946,3 +1951,36 @@ msgstr "Download failed"
 #: src/routes/[node]/utilities/downloader/+page.svelte
 msgid "Failed to get download link"
 msgstr "Failed to get download link"
+
+#~ msgid "View Cluster Info"
+#~ msgstr "View Cluster Info"
+
+#: src/lib/components/custom/Cluster/JoinInformation.svelte
+msgid "Cluster Information"
+msgstr "Cluster Information"
+
+#~ msgid "Leader API"
+#~ msgstr "Leader API"
+
+#: src/lib/components/custom/Cluster/JoinInformation.svelte
+msgid "Cluster Key"
+msgstr "Cluster Key"
+
+#: src/lib/components/custom/Cluster/JoinInformation.svelte
+msgid "Copy"
+msgstr "Copy"
+
+#~ msgid "Cluster information copied"
+#~ msgstr "Cluster information copied"
+
+#: src/lib/components/custom/Cluster/JoinInformation.svelte
+msgid "Cluster key copied"
+msgstr "Cluster key copied"
+
+#: src/lib/components/custom/Cluster/JoinInformation.svelte
+msgid "Leader Node"
+msgstr "Leader Node"
+
+#: src/routes/datacenter/cluster/+page.svelte
+msgid "View Join Information"
+msgstr "View Join Information"

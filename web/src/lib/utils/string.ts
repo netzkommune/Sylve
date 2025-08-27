@@ -255,3 +255,12 @@ export function isValidPortNumber(port: number | string): boolean {
 
 	return port > 0 && port < 65536;
 }
+
+export function toBase64(input: string): string {
+	return btoa(String.fromCharCode(...new TextEncoder().encode(input)));
+}
+
+export function fromBase64(input: string): string {
+	const decoded = atob(input);
+	return new TextDecoder().decode(Uint8Array.from(decoded.split('').map((c) => c.charCodeAt(0))));
+}

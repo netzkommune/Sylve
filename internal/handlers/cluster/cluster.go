@@ -139,8 +139,6 @@ func JoinCluster(cS *cluster.Service) gin.HandlerFunc {
 			req.ClusterKey,
 		)
 
-		fmt.Println(healthURL)
-
 		if err := utils.HTTPPostJSON(healthURL, req, headers); err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 				Status:  "error",

@@ -246,3 +246,12 @@ export function isBoolean(value: any): boolean {
 		(typeof value === 'string' && (value === 'true' || value === 'false'))
 	);
 }
+
+export function isValidPortNumber(port: number | string): boolean {
+	if (typeof port === 'string') {
+		const parsed = parseInt(port, 10);
+		return !isNaN(parsed) && isValidPortNumber(parsed);
+	}
+
+	return port > 0 && port < 65536;
+}

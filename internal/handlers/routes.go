@@ -17,7 +17,9 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/alchemillahq/sylve/internal/assets"
+	clusterModels "github.com/alchemillahq/sylve/internal/db/models/cluster"
 	authHandlers "github.com/alchemillahq/sylve/internal/handlers/auth"
+	clusterHandlers "github.com/alchemillahq/sylve/internal/handlers/cluster"
 	diskHandlers "github.com/alchemillahq/sylve/internal/handlers/disk"
 	infoHandlers "github.com/alchemillahq/sylve/internal/handlers/info"
 	jailHandlers "github.com/alchemillahq/sylve/internal/handlers/jail"
@@ -29,6 +31,7 @@ import (
 	vmHandlers "github.com/alchemillahq/sylve/internal/handlers/vm"
 	vncHandler "github.com/alchemillahq/sylve/internal/handlers/vnc"
 	authService "github.com/alchemillahq/sylve/internal/services/auth"
+	"github.com/alchemillahq/sylve/internal/services/cluster"
 	diskService "github.com/alchemillahq/sylve/internal/services/disk"
 	infoService "github.com/alchemillahq/sylve/internal/services/info"
 	"github.com/alchemillahq/sylve/internal/services/jail"
@@ -74,6 +77,8 @@ func RegisterRoutes(r *gin.Engine,
 	libvirtService *libvirt.Service,
 	sambaService *samba.Service,
 	jailService *jail.Service,
+	clusterService *cluster.Service,
+	fsm *clusterModels.FSMDispatcher,
 	db *gorm.DB,
 ) {
 	api := r.Group("/api")
@@ -308,6 +313,8 @@ func RegisterRoutes(r *gin.Engine,
 	}
 
 	users := auth.Group("/users")
+	users.Use(middleware.EnsureAuthenticated(authService))
+	users.Use(middleware.RequestLoggerMiddleware(db, authService))
 	{
 		users.GET("", authHandlers.ListUsersHandler(authService))
 		users.POST("", authHandlers.CreateUserHandler(authService))
@@ -316,11 +323,21 @@ func RegisterRoutes(r *gin.Engine,
 	}
 
 	groups := auth.Group("/groups")
+	groups.Use(middleware.EnsureAuthenticated(authService))
+	groups.Use(middleware.RequestLoggerMiddleware(db, authService))
 	{
 		groups.GET("", authHandlers.ListGroupsHandler(authService))
 		groups.POST("", authHandlers.CreateGroupHandler(authService))
 		groups.DELETE("/:id", authHandlers.DeleteGroupHandler(authService))
 		groups.POST("/users", authHandlers.AddUsersToGroupHandler(authService))
+	}
+
+	cluster := api.Group("/cluster")
+	cluster.Use(middleware.EnsureAuthenticated(authService))
+	cluster.Use(middleware.RequestLoggerMiddleware(db, authService))
+	{
+		cluster.GET("", clusterHandlers.GetCluster(clusterService))
+		cluster.POST("", clusterHandlers.CreateCluster(clusterService, fsm))
 	}
 
 	vnc := api.Group("/vnc")

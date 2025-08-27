@@ -9,11 +9,16 @@
 package utils
 
 import (
+	"bytes"
+	"crypto/tls"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -46,4 +51,52 @@ func GetIdFromParam(c *gin.Context) (int, error) {
 		return 0, err
 	}
 	return id, nil
+}
+
+func FlatHeaders(c *gin.Context) map[string]string {
+	var flatHeaders = make(map[string]string)
+	for key, value := range c.Request.Header {
+		if len(value) > 0 {
+			flatHeaders[key] = value[0]
+		}
+	}
+	return flatHeaders
+}
+
+func HTTPPostJSON(url string, payload any, headers map[string]string) error {
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+
+	client := &http.Client{
+		Timeout:   10 * time.Second,
+		Transport: tr,
+	}
+
+	req, err := http.NewRequest("POST", url, bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+
+	for key, value := range headers {
+		req.Header.Set(key, value)
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		respBody, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("http error %d: %s", resp.StatusCode, string(respBody))
+	}
+
+	return nil
 }

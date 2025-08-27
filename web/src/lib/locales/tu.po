@@ -3,11 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-31T13:10:41.877Z\n"
-<<<<<<< HEAD
-"PO-Revision-Date: 2025-08-22T16:45:00.220Z\n"
-=======
-"PO-Revision-Date: 2025-08-22T21:16:37.897Z\n"
->>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
+"PO-Revision-Date: 2025-08-27T11:20:12.473Z\n"
 "Last-Translator: \n"
 "Language: Türkçe\n"
 "Language-Team: \n"
@@ -16,18 +12,18 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n == 1 ? 0 : 1;\n"
 "MIME-Version: 1.0\n"
 
+#: src/lib/components/custom/Header.svelte
+#: src/lib/components/custom/Header.svelte
+#: src/lib/components/custom/Header.svelte
 #: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/Login.svelte
-#: src/lib/components/custom/Header.svelte
-#: src/lib/components/custom/Header.svelte
-#: src/lib/components/custom/Header.svelte
 msgid "Sylve Logo"
 msgstr ""
 
+#: src/lib/components/custom/Header.svelte
+#: src/lib/components/custom/Header.svelte
 #: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/Throbber.svelte
-#: src/lib/components/custom/Header.svelte
-#: src/lib/components/custom/Header.svelte
 msgid "SYLVE"
 msgstr ""
 
@@ -68,8 +64,8 @@ msgid "Enter your username"
 msgstr ""
 
 #: src/lib/components/custom/Authentication/CreateOrEdit.svelte
-#: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/Login.svelte
 msgid "Password"
 msgstr ""
 
@@ -87,14 +83,10 @@ msgstr ""
 msgid "Sylve"
 msgstr ""
 
-#: src/lib/components/ui/custom-input/combobox-bindable.svelte
+#: src/lib/components/ui/custom-input/combobox.svelte
 #: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/Terminal.svelte
-<<<<<<< HEAD
-=======
 #: src/lib/components/ui/custom-input/combobox-bindable.svelte
->>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
-#: src/lib/components/ui/custom-input/combobox.svelte
 msgid "Enter"
 msgstr ""
 
@@ -103,10 +95,6 @@ msgid "Minimize"
 msgstr ""
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
-#: src/lib/components/custom/Jail/Hardware/CPU.svelte
-#: src/lib/components/custom/Jail/Hardware/CPU.svelte
-#: src/lib/components/custom/Jail/Hardware/RAM.svelte
-#: src/lib/components/custom/Jail/Hardware/RAM.svelte
 #: src/routes/[node]/jail/[node]/network/+page.svelte
 #: src/routes/[node]/jail/[node]/network/+page.svelte
 #: src/routes/[node]/jail/[node]/network/+page.svelte
@@ -137,11 +125,6 @@ msgstr ""
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
-#: src/routes/[node]/network/switches/+page.svelte
-#: src/routes/[node]/network/switches/+page.svelte
-<<<<<<< HEAD
-#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
-#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
 #: src/lib/components/disk/CreatePartition.svelte
@@ -152,18 +135,8 @@ msgstr ""
 #: src/lib/components/custom/FileExplorer/FilepondModal.svelte
 #: src/lib/components/custom/FileExplorer/RenameModal.svelte
 #: src/lib/components/custom/FileExplorer/RenameModal.svelte
-=======
->>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
 #: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 #: src/lib/components/custom/Authentication/CreateOrEdit.svelte
-#: src/lib/components/custom/Terminal.svelte
-#: src/lib/components/custom/Jail/Create/CreateJail.svelte
-#: src/lib/components/custom/Jail/Create/CreateJail.svelte
-#: src/lib/components/custom/VM/Create/CreateVM.svelte
-#: src/lib/components/custom/VM/Create/CreateVM.svelte
-#: src/lib/components/ui/sheet/sheet-content.svelte
-#: src/routes/[node]/notes/+page.svelte
-#: src/routes/[node]/notes/+page.svelte
 #: src/lib/components/custom/VM/Options/StartOrder.svelte
 #: src/lib/components/custom/VM/Options/StartOrder.svelte
 #: src/lib/components/custom/VM/Options/WoL.svelte
@@ -178,8 +151,6 @@ msgstr ""
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
-#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
-#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
 #: src/lib/components/custom/FileExplorer/FilepondModal.svelte
@@ -190,30 +161,43 @@ msgstr ""
 #: src/lib/components/custom/FileExplorer/RenameModal.svelte
 #: src/lib/components/disk/CreatePartition.svelte
 #: src/lib/components/disk/CreatePartition.svelte
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+#: src/lib/components/custom/VM/Hardware/CPU.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/VM/Options/WoL.svelte
+#: src/lib/components/custom/VM/Options/WoL.svelte
+#: src/lib/components/custom/VM/Options/StartOrder.svelte
+#: src/lib/components/custom/VM/Options/StartOrder.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
+#: src/lib/components/custom/Jail/Hardware/CPU.svelte
+#: src/lib/components/custom/Jail/Hardware/CPU.svelte
+#: src/lib/components/custom/Jail/Hardware/RAM.svelte
+#: src/lib/components/custom/Jail/Hardware/RAM.svelte
+#: src/lib/components/custom/Jail/Create/CreateJail.svelte
+#: src/lib/components/custom/Jail/Create/CreateJail.svelte
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
 #: src/lib/components/ui/dialog/dialog-content.svelte
-<<<<<<< HEAD
-#: src/lib/components/custom/VM/Hardware/Network.svelte
-#: src/lib/components/custom/VM/Hardware/Network.svelte
-#: src/lib/components/custom/VM/Hardware/Storage.svelte
-#: src/lib/components/custom/VM/Hardware/Storage.svelte
-#: src/lib/components/custom/VM/Hardware/CPU.svelte
-#: src/lib/components/custom/VM/Hardware/CPU.svelte
-#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
-#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
-#: src/lib/components/custom/VM/Hardware/RAM.svelte
-#: src/lib/components/custom/VM/Hardware/RAM.svelte
-#: src/lib/components/custom/VM/Hardware/VNC.svelte
-#: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/ui/sheet/sheet-content.svelte
+#: src/lib/components/custom/Terminal.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/network/switches/+page.svelte
 #: src/routes/[node]/notes/+page.svelte
 #: src/routes/[node]/notes/+page.svelte
-#: src/lib/components/custom/VM/Options/WoL.svelte
-#: src/lib/components/custom/VM/Options/WoL.svelte
-#: src/lib/components/custom/VM/Options/StartOrder.svelte
-#: src/lib/components/custom/VM/Options/StartOrder.svelte
-=======
-#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
-#: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
->>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
+#: src/lib/components/custom/Cluster/Create.svelte
+#: src/lib/components/custom/Cluster/Create.svelte
 msgid "Close"
 msgstr ""
 
@@ -246,11 +230,11 @@ msgstr ""
 msgid "Action"
 msgstr ""
 
-#: src/routes/[node]/jail/[node]/summary/+page.svelte
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
-#: src/routes/[node]/network/interfaces/+page.svelte
-#: src/lib/components/skeleton/BottomPanel.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
+#: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
 msgid "Status"
 msgstr ""
 
@@ -259,28 +243,24 @@ msgstr ""
 msgid "Login"
 msgstr ""
 
-#: src/routes/[node]/jail/[node]/summary/+page.svelte
-#: src/routes/[node]/+layout.svelte
 #: src/lib/components/skeleton/BottomPanel.svelte
-<<<<<<< HEAD
-=======
 #: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/jail/[node]/summary/+page.svelte
 #: src/routes/datacenter/+layout.svelte
->>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
 msgid "Notes"
 msgstr ""
 
 #: src/routes/[node]/jail/[node]/network/+page.svelte
 #: src/routes/[node]/jail/[node]/network/+page.svelte
-#: src/lib/components/skeleton/BottomPanel.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
 msgid "Switch"
 msgstr ""
 
-#: src/lib/components/skeleton/BottomPanel.svelte
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
 msgid "VNC"
 msgstr ""
 
@@ -299,35 +279,30 @@ msgstr ""
 #: src/routes/[node]/+layout.svelte
 #: src/routes/datacenter/+layout.svelte
 msgid "Difuse-sidebar"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
-<<<<<<< HEAD
 #: src/routes/[node]/+layout.svelte
 #: src/lib/components/skeleton/LeftPanel.svelte
-=======
-#: src/lib/components/skeleton/LeftPanel.svelte
-#: src/routes/[node]/+layout.svelte
 #: src/routes/datacenter/+layout.svelte
->>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
 msgid "Data Center"
 msgstr ""
 
-#: src/routes/[node]/jail/[node]/summary/+page.svelte
-#: src/routes/[node]/jail/[node]/summary/+page.svelte
-#: src/routes/[node]/jail/[node]/summary/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/summary/+page.svelte
 #: src/routes/[node]/summary/+page.svelte
 #: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/jail/[node]/summary/+page.svelte
 msgid "CPU Usage"
 msgstr ""
 
-#: src/routes/[node]/jail/[node]/summary/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/summary/+page.svelte
 #: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/jail/[node]/summary/+page.svelte
 msgid "RAM Usage"
 msgstr ""
 
@@ -369,11 +344,11 @@ msgstr ""
 msgid "Sylve Version"
 msgstr ""
 
-#: src/routes/[node]/jail/[node]/summary/+page.svelte
-#: src/routes/[node]/jail/[node]/summary/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/jail/[node]/summary/+page.svelte
 msgid "Memory Usage"
 msgstr ""
 
@@ -404,27 +379,14 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
-#: src/routes/[node]/jail/[node]/hardware/+page.svelte
-#: src/routes/[node]/storage/samba/settings/+page.svelte
-#: src/lib/components/custom/Charts/Area.svelte
-#: src/routes/[node]/vm/[node]/hardware/+page.svelte
-<<<<<<< HEAD
-#: src/routes/[node]/vm/[node]/options/+page.svelte
-msgid "Value"
-msgstr ""
-
-#: src/lib/components/ui/custom-input/combobox-bindable.svelte
-#: src/lib/components/ui/custom-input/combobox.svelte
-#: src/lib/components/custom/TreeTable/Search.svelte
-=======
 #: src/routes/[node]/storage/disks/+page.svelte
+#: src/lib/components/custom/Charts/Area.svelte
 msgid "Value"
 msgstr ""
 
+#: src/lib/components/ui/custom-input/combobox.svelte
 #: src/lib/components/custom/TreeTable/Search.svelte
 #: src/lib/components/ui/custom-input/combobox-bindable.svelte
-#: src/lib/components/ui/custom-input/combobox.svelte
->>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
 msgid "Search..."
 msgstr ""
 
@@ -446,13 +408,13 @@ msgstr ""
 msgid "Enter or generate passphrase"
 msgstr ""
 
-#: src/lib/components/custom/VM/Create/Advanced.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/VM/Create/Advanced.svelte
 msgid "VNC Resolution"
 msgstr ""
 
-#: src/lib/components/custom/VM/Create/Advanced.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/VM/Create/Advanced.svelte
 msgid "Select VNC resolution"
 msgstr ""
 
@@ -481,11 +443,11 @@ msgstr ""
 msgid "VM ID"
 msgstr ""
 
-#: src/routes/[node]/jail/[node]/summary/+page.svelte
-#: src/routes/[node]/network/interfaces/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/lib/components/custom/Jail/Create/Basic.svelte
 #: src/lib/components/custom/VM/Create/Basic.svelte
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
 msgid "Description"
 msgstr ""
 
@@ -499,10 +461,6 @@ msgid "<0/> Create Virtual Machine"
 msgstr ""
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/Rollback.svelte
-#: src/lib/components/custom/Jail/Hardware/CPU.svelte
-#: src/lib/components/custom/Jail/Hardware/CPU.svelte
-#: src/lib/components/custom/Jail/Hardware/RAM.svelte
-#: src/lib/components/custom/Jail/Hardware/RAM.svelte
 #: src/routes/[node]/jail/[node]/network/+page.svelte
 #: src/routes/[node]/jail/[node]/network/+page.svelte
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
@@ -529,11 +487,6 @@ msgstr ""
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
-#: src/routes/[node]/network/switches/+page.svelte
-#: src/routes/[node]/network/switches/+page.svelte
-<<<<<<< HEAD
-#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
-#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
 #: src/lib/components/disk/CreatePartition.svelte
@@ -542,14 +495,8 @@ msgstr ""
 #: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
 #: src/lib/components/custom/FileExplorer/RenameModal.svelte
 #: src/lib/components/custom/FileExplorer/RenameModal.svelte
-=======
->>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
 #: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 #: src/lib/components/custom/Authentication/CreateOrEdit.svelte
-#: src/lib/components/custom/Jail/Create/CreateJail.svelte
-#: src/lib/components/custom/Jail/Create/CreateJail.svelte
-#: src/lib/components/custom/VM/Create/CreateVM.svelte
-#: src/lib/components/custom/VM/Create/CreateVM.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
@@ -560,18 +507,12 @@ msgstr ""
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
-<<<<<<< HEAD
-#: src/routes/[node]/notes/+page.svelte
-#: src/routes/[node]/notes/+page.svelte
 #: src/lib/components/custom/VM/Options/WoL.svelte
 #: src/lib/components/custom/VM/Options/WoL.svelte
 #: src/lib/components/custom/VM/Options/StartOrder.svelte
 #: src/lib/components/custom/VM/Options/StartOrder.svelte
-=======
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
-#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
-#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
 #: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
@@ -582,7 +523,22 @@ msgstr ""
 #: src/lib/components/disk/CreatePartition.svelte
 #: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
 #: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
->>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
+#: src/lib/components/custom/Jail/Hardware/CPU.svelte
+#: src/lib/components/custom/Jail/Hardware/CPU.svelte
+#: src/lib/components/custom/Jail/Hardware/RAM.svelte
+#: src/lib/components/custom/Jail/Hardware/RAM.svelte
+#: src/lib/components/custom/Jail/Create/CreateJail.svelte
+#: src/lib/components/custom/Jail/Create/CreateJail.svelte
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+#: src/lib/components/custom/VM/Create/CreateVM.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/notes/+page.svelte
+#: src/lib/components/custom/Cluster/Create.svelte
+#: src/lib/components/custom/Cluster/Create.svelte
 msgid "Reset"
 msgstr ""
 
@@ -616,31 +572,31 @@ msgstr ""
 msgid "Memory Size"
 msgstr ""
 
-#: src/lib/components/custom/VM/Create/Hardware.svelte
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
+#: src/lib/components/custom/VM/Create/Hardware.svelte
 msgid "CPU Pinning"
 msgstr ""
 
-#: src/routes/[node]/+layout.svelte
-#: src/lib/components/skeleton/BottomPanel.svelte
 #: src/lib/components/custom/VM/Create/Hardware.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
+#: src/routes/[node]/+layout.svelte
 msgid "PCI Passthrough"
 msgstr ""
 
-#: src/lib/components/custom/VM/Create/Hardware.svelte
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
+#: src/lib/components/custom/VM/Create/Hardware.svelte
 msgid "You can only pin up to {0} vCPU{1}"
 msgstr ""
 
-#: src/lib/components/custom/VM/Create/Hardware.svelte
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
+#: src/lib/components/custom/VM/Create/Hardware.svelte
 msgid "At least one CPU must be left unpinned"
 msgstr ""
 
-#: src/lib/components/skeleton/BottomPanel.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/lib/components/custom/VM/Create/Storage.svelte
-#: src/lib/components/custom/VM/Hardware/Storage.svelte
-#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
 msgid "ZFS Volume"
 msgstr ""
 
@@ -692,10 +648,8 @@ msgstr ""
 #: src/routes/[node]/+layout.svelte
 #: src/routes/[node]/+layout.svelte
 #: src/routes/[node]/+layout.svelte
-<<<<<<< HEAD
-=======
 #: src/routes/datacenter/+layout.svelte
->>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
+#: src/routes/datacenter/summary/+page.svelte
 msgid "Summary"
 msgstr ""
 
@@ -714,11 +668,11 @@ msgstr ""
 msgid "Hardware"
 msgstr ""
 
-#: src/routes/[node]/+layout.svelte
-#: src/routes/[node]/+layout.svelte
-#: src/routes/[node]/+layout.svelte
 #: src/lib/components/custom/Jail/Create/Network.svelte
 #: src/lib/components/custom/Jail/Create/Network.svelte
+#: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/+layout.svelte
 msgid "Network"
 msgstr ""
 
@@ -746,9 +700,9 @@ msgstr ""
 msgid "Disks"
 msgstr ""
 
+#: src/routes/[node]/storage/disks/+page.svelte
+#: src/routes/[node]/storage/disks/+page.svelte
 #: src/routes/[node]/+layout.svelte
-#: src/routes/[node]/storage/disks/+page.svelte
-#: src/routes/[node]/storage/disks/+page.svelte
 msgid "ZFS"
 msgstr ""
 
@@ -832,26 +786,18 @@ msgstr ""
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
-#: src/routes/[node]/network/interfaces/+page.svelte
-#: src/routes/[node]/network/switches/+page.svelte
-<<<<<<< HEAD
-#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 #: src/lib/components/disk/CreatePartition.svelte
 #: src/lib/components/custom/FileExplorer/ListView.svelte
-=======
->>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
 #: src/routes/[node]/settings/authentication/users/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
-<<<<<<< HEAD
-#: src/routes/[node]/notes/+page.svelte
-#: src/routes/[node]/notes/+page.svelte
-=======
-#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
-#: src/routes/[node]/network/interfaces/+page.svelte
 #: src/lib/components/custom/FileExplorer/ListView.svelte
 #: src/lib/components/disk/CreatePartition.svelte
->>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/notes/+page.svelte
 msgid "Name"
 msgstr ""
 
@@ -919,12 +865,12 @@ msgid "View"
 msgstr ""
 
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
-#: src/routes/[node]/jail/[node]/summary/+page.svelte
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
-#: src/routes/[node]/network/switches/+page.svelte
-#: src/routes/[node]/network/objects/+page.svelte
 #: src/routes/[node]/settings/authentication/users/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/network/objects/+page.svelte
+#: src/routes/[node]/network/switches/+page.svelte
 #: src/routes/[node]/notes/+page.svelte
 msgid "Delete"
 msgstr ""
@@ -934,9 +880,9 @@ msgstr ""
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
-#: src/routes/[node]/network/switches/+page.svelte
-#: src/routes/[node]/network/objects/+page.svelte
 #: src/routes/[node]/settings/authentication/users/+page.svelte
+#: src/routes/[node]/network/objects/+page.svelte
+#: src/routes/[node]/network/switches/+page.svelte
 #: src/routes/[node]/notes/+page.svelte
 #: src/routes/[node]/notes/+page.svelte
 msgid "Edit"
@@ -953,22 +899,15 @@ msgstr ""
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
-#: src/routes/[node]/network/switches/+page.svelte
-<<<<<<< HEAD
-#: src/routes/[node]/network/objects/+page.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
-=======
->>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
 #: src/routes/[node]/settings/authentication/users/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/routes/[node]/vm/[node]/storage/+page.svelte
-<<<<<<< HEAD
-#: src/routes/[node]/notes/+page.svelte
-#: src/routes/[node]/notes/+page.svelte
-=======
-#: src/routes/[node]/network/objects/+page.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
->>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
+#: src/routes/[node]/network/objects/+page.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/notes/+page.svelte
+#: src/routes/[node]/notes/+page.svelte
 msgid "New"
 msgstr ""
 
@@ -989,26 +928,22 @@ msgstr ""
 msgid "This is a note"
 msgstr ""
 
-#: src/lib/components/custom/Jail/Hardware/CPU.svelte
-#: src/lib/components/custom/Jail/Hardware/RAM.svelte
 #: src/routes/[node]/jail/[node]/network/+page.svelte
 #: src/routes/[node]/jail/[node]/network/+page.svelte
 #: src/lib/components/custom/Dialog/SingleValue.svelte
-#: src/routes/[node]/network/switches/+page.svelte
-#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 #: src/lib/components/custom/Authentication/CreateOrEdit.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
-<<<<<<< HEAD
-#: src/routes/[node]/notes/+page.svelte
 #: src/lib/components/custom/VM/Options/WoL.svelte
 #: src/lib/components/custom/VM/Options/StartOrder.svelte
-=======
-#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 #: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
->>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
+#: src/lib/components/custom/Jail/Hardware/CPU.svelte
+#: src/lib/components/custom/Jail/Hardware/RAM.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
+#: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/[node]/notes/+page.svelte
 msgid "Save"
 msgstr ""
 
@@ -1039,9 +974,9 @@ msgstr ""
 #: src/routes/[node]/settings/authentication/groups/+page.svelte
 #: src/routes/[node]/storage/samba/shares/+page.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
-#: src/routes/[node]/network/interfaces/+page.svelte
 #: src/routes/[node]/settings/authentication/users/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
 #: src/routes/[node]/notes/+page.svelte
 msgid "ID"
 msgstr ""
@@ -1054,10 +989,10 @@ msgstr ""
 msgid "Updated"
 msgstr ""
 
-#: src/routes/[node]/jail/[node]/summary/+page.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
-#: src/lib/components/custom/Dialog/Alert.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/lib/components/custom/Dialog/Alert.svelte
+#: src/routes/[node]/jail/[node]/summary/+page.svelte
 msgid "Are you sure?"
 msgstr ""
 
@@ -1065,20 +1000,20 @@ msgstr ""
 msgid "This action cannot be undone. This will permanently delete "
 msgstr ""
 
-#: src/routes/[node]/jail/[node]/summary/+page.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
-#: src/lib/components/custom/Dialog/Alert.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/lib/components/custom/Dialog/Alert.svelte
+#: src/routes/[node]/jail/[node]/summary/+page.svelte
 msgid "Cancel"
 msgstr ""
 
-#: src/routes/[node]/jail/[node]/summary/+page.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Delete.svelte
-#: src/lib/components/custom/Dialog/Alert.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/lib/components/custom/Dialog/Alert.svelte
+#: src/routes/[node]/jail/[node]/summary/+page.svelte
 msgid "Continue"
 msgstr ""
 
@@ -1112,16 +1047,13 @@ msgstr ""
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
+#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
+#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 #: src/routes/[node]/network/switches/+page.svelte
-<<<<<<< HEAD
-#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
-#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
-#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
-=======
-#: src/lib/components/custom/Authentication/CreateOrEdit.svelte
-#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
-#: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
->>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
+#: src/lib/components/custom/Cluster/Create.svelte
 msgid "Create"
 msgstr ""
 
@@ -1287,17 +1219,13 @@ msgstr ""
 
 #: src/lib/components/custom/FileExplorer/Toolbar.svelte
 msgid "First Modified"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
-<<<<<<< HEAD
-#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 #: src/lib/components/custom/FileExplorer/Toolbar.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
-=======
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
-#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 #: src/lib/components/custom/FileExplorer/Toolbar.svelte
->>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
+#: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 msgid "Type"
 msgstr ""
 
@@ -1400,10 +1328,10 @@ msgid "Model"
 msgstr ""
 
 #: src/routes/[node]/jail/[node]/network/+page.svelte
-#: src/routes/[node]/network/interfaces/+page.svelte
+#: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/lib/components/custom/Jail/Create/Network.svelte
 #: src/lib/components/custom/VM/Create/Network.svelte
-#: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/routes/[node]/network/interfaces/+page.svelte
 msgid "MAC Address"
 msgstr ""
 
@@ -1450,11 +1378,11 @@ msgstr ""
 
 #: src/routes/[node]/jail/[node]/network/+page.svelte
 #: src/routes/[node]/jail/[node]/network/+page.svelte
+#: src/lib/components/custom/Jail/Create/Network.svelte
+#: src/lib/components/custom/Jail/Create/Network.svelte
+#: src/lib/components/custom/Jail/Create/Network.svelte
 #: src/routes/[node]/network/switches/+page.svelte
 #: src/routes/[node]/network/switches/+page.svelte
-#: src/lib/components/custom/Jail/Create/Network.svelte
-#: src/lib/components/custom/Jail/Create/Network.svelte
-#: src/lib/components/custom/Jail/Create/Network.svelte
 msgid "IPv4"
 msgstr ""
 
@@ -1465,11 +1393,11 @@ msgstr ""
 
 #: src/routes/[node]/jail/[node]/network/+page.svelte
 #: src/routes/[node]/jail/[node]/network/+page.svelte
+#: src/lib/components/custom/Jail/Create/Network.svelte
+#: src/lib/components/custom/Jail/Create/Network.svelte
+#: src/lib/components/custom/Jail/Create/Network.svelte
 #: src/routes/[node]/network/switches/+page.svelte
 #: src/routes/[node]/network/switches/+page.svelte
-#: src/lib/components/custom/Jail/Create/Network.svelte
-#: src/lib/components/custom/Jail/Create/Network.svelte
-#: src/lib/components/custom/Jail/Create/Network.svelte
 msgid "IPv6"
 msgstr ""
 
@@ -1494,15 +1422,15 @@ msgstr ""
 
 #: src/routes/[node]/jail/[node]/network/+page.svelte
 #: src/routes/[node]/jail/[node]/network/+page.svelte
-#: src/routes/[node]/network/switches/+page.svelte
 #: src/lib/components/custom/Jail/Create/Network.svelte
+#: src/routes/[node]/network/switches/+page.svelte
 msgid "DHCP"
 msgstr ""
 
 #: src/routes/[node]/jail/[node]/network/+page.svelte
 #: src/routes/[node]/jail/[node]/network/+page.svelte
-#: src/routes/[node]/network/switches/+page.svelte
 #: src/lib/components/custom/Jail/Create/Network.svelte
+#: src/routes/[node]/network/switches/+page.svelte
 msgid "SLAAC"
 msgstr ""
 
@@ -1868,9 +1796,9 @@ msgstr ""
 msgid "Select MAC address"
 msgstr ""
 
+#: src/lib/components/custom/VM/Hardware/Network.svelte
 #: src/lib/components/custom/Jail/Create/Network.svelte
 #: src/lib/components/custom/VM/Create/Network.svelte
-#: src/lib/components/custom/VM/Hardware/Network.svelte
 msgid "Mac"
 msgstr ""
 
@@ -1910,8 +1838,8 @@ msgstr ""
 msgid "MAC"
 msgstr ""
 
-#: src/lib/components/custom/Jail/Create/Network.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/Jail/Create/Network.svelte
 msgid "Select MAC"
 msgstr ""
 
@@ -1951,10 +1879,10 @@ msgstr ""
 msgid "PCI devices modified"
 msgstr ""
 
-#: src/lib/components/custom/Jail/Hardware/CPU.svelte
 #: src/routes/[node]/jail/[node]/hardware/+page.svelte
 #: src/routes/[node]/jail/[node]/hardware/+page.svelte
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
+#: src/lib/components/custom/Jail/Hardware/CPU.svelte
 msgid "CPU"
 msgstr ""
 
@@ -1983,37 +1911,37 @@ msgstr ""
 msgid "VM not found"
 msgstr ""
 
-#: src/lib/components/custom/Jail/Hardware/RAM.svelte
 #: src/routes/[node]/jail/[node]/hardware/+page.svelte
 #: src/routes/[node]/jail/[node]/hardware/+page.svelte
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/routes/[node]/vm/[node]/hardware/+page.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/Jail/Hardware/RAM.svelte
 msgid "RAM"
 msgstr ""
 
-#: src/lib/components/custom/Jail/Hardware/RAM.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/Jail/Hardware/RAM.svelte
 msgid "RAM value must be greater than 0"
 msgstr ""
 
-#: src/lib/components/custom/Jail/Hardware/RAM.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/Jail/Hardware/RAM.svelte
 msgid "RAM value exceeds available memory"
 msgstr ""
 
-#: src/lib/components/custom/Jail/Hardware/RAM.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/Jail/Hardware/RAM.svelte
 msgid "RAM value is too high, at least 1 GiB must be reserved for the host"
 msgstr ""
 
-#: src/lib/components/custom/Jail/Hardware/RAM.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/Jail/Hardware/RAM.svelte
 msgid "Failed to modify RAM"
 msgstr ""
 
-#: src/lib/components/custom/Jail/Hardware/RAM.svelte
 #: src/lib/components/custom/VM/Hardware/RAM.svelte
+#: src/lib/components/custom/Jail/Hardware/RAM.svelte
 msgid "RAM modified"
 msgstr ""
 
@@ -2045,8 +1973,8 @@ msgstr ""
 msgid "Select ZFS Volume"
 msgstr ""
 
-#: src/lib/components/skeleton/BottomPanel.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/skeleton/BottomPanel.svelte
 msgid "ZFS Filesystem"
 msgstr ""
 
@@ -2175,6 +2103,8 @@ msgstr ""
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/lib/components/custom/ZFS/pools/Edit.svelte
 #: src/routes/[node]/vm/[node]/options/+page.svelte
+#: src/routes/datacenter/cluster/+page.svelte
+#: src/routes/datacenter/cluster/+page.svelte
 msgid "Yes"
 msgstr ""
 
@@ -2723,13 +2653,13 @@ msgstr ""
 msgid "Running"
 msgstr ""
 
-#: src/routes/[node]/jail/[node]/summary/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/jail/[node]/summary/+page.svelte
 msgid "Start"
 msgstr ""
 
-#: src/routes/[node]/jail/[node]/summary/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/jail/[node]/summary/+page.svelte
 msgid "Stop"
 msgstr ""
 
@@ -2788,8 +2718,8 @@ msgstr ""
 msgid "VM stopped"
 msgstr ""
 
-#: src/routes/[node]/jail/[node]/summary/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/jail/[node]/summary/+page.svelte
 msgid "Started {0}"
 msgstr ""
 
@@ -2797,8 +2727,8 @@ msgstr ""
 msgid "Stopped"
 msgstr ""
 
-#: src/routes/[node]/jail/[node]/summary/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/jail/[node]/summary/+page.svelte
 msgid "Stopped {0}"
 msgstr ""
 
@@ -3353,26 +3283,26 @@ msgstr ""
 #~ msgstr ""
 
 #: src/routes/[node]/jail/[node]/network/+page.svelte
-#: src/routes/[node]/network/switches/+page.svelte
 #: src/lib/components/custom/Jail/Create/Network.svelte
+#: src/routes/[node]/network/switches/+page.svelte
 msgid "IPv4 Network"
 msgstr ""
 
 #: src/routes/[node]/jail/[node]/network/+page.svelte
-#: src/routes/[node]/network/switches/+page.svelte
 #: src/lib/components/custom/Jail/Create/Network.svelte
+#: src/routes/[node]/network/switches/+page.svelte
 msgid "IPv6 Network"
 msgstr ""
 
 #: src/routes/[node]/jail/[node]/network/+page.svelte
-#: src/routes/[node]/network/switches/+page.svelte
 #: src/lib/components/custom/Jail/Create/Network.svelte
+#: src/routes/[node]/network/switches/+page.svelte
 msgid "IPv4 Gateway"
 msgstr ""
 
 #: src/routes/[node]/jail/[node]/network/+page.svelte
-#: src/routes/[node]/network/switches/+page.svelte
 #: src/lib/components/custom/Jail/Create/Network.svelte
+#: src/routes/[node]/network/switches/+page.svelte
 msgid "IPv6 Gateway"
 msgstr ""
 
@@ -3596,14 +3526,14 @@ msgid "Host network disinherited"
 msgstr ""
 
 #: src/routes/[node]/jail/[node]/network/+page.svelte
-#: src/routes/[node]/network/switches/+page.svelte
 #: src/lib/components/custom/Jail/Create/Network.svelte
+#: src/routes/[node]/network/switches/+page.svelte
 msgid "Select IPv4 Gateway"
 msgstr ""
 
 #: src/routes/[node]/jail/[node]/network/+page.svelte
-#: src/routes/[node]/network/switches/+page.svelte
 #: src/lib/components/custom/Jail/Create/Network.svelte
+#: src/routes/[node]/network/switches/+page.svelte
 msgid "Select IPv6 Gateway"
 msgstr ""
 
@@ -3701,8 +3631,8 @@ msgstr ""
 msgid "This will permanently delete VM"
 msgstr ""
 
-#: src/routes/[node]/jail/[node]/summary/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/jail/[node]/summary/+page.svelte
 msgid "Delete MAC Object(s)"
 msgstr ""
 
@@ -3838,9 +3768,7 @@ msgstr ""
 #: src/routes/[node]/vm/[node]/options/+page.svelte
 #: src/routes/[node]/vm/[node]/options/+page.svelte
 msgid "Start At Boot / Start Order"
-msgstr ""
-<<<<<<< HEAD
-=======
+msgstr "<<<<<<< HEAD======="
 
 #: src/routes/notes/+page.svelte
 #: src/routes/datacenter/notes/+page.svelte
@@ -3848,7 +3776,6 @@ msgid "Data center notes"
 msgstr ""
 
 #: src/routes/summary/+page.svelte
-#: src/routes/datacenter/summary/+page.svelte
 msgid "data center Summary"
 msgstr ""
 
@@ -3884,5 +3811,61 @@ msgstr ""
 
 #: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
 msgid "Realtek Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet ControllerRealtek Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet Controller"
+msgstr ">>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)"
+
+#: src/routes/datacenter/+layout.svelte
+msgid "Cluster"
 msgstr ""
->>>>>>> f2c358a (feat: add data center PCI devices and combobox improvements)
+
+#~ msgid "Cluster!"
+#~ msgstr ""
+
+#: src/lib/components/custom/Cluster/Create.svelte
+msgid "Create Cluster"
+msgstr ""
+
+#: src/lib/components/custom/Cluster/Create.svelte
+msgid "Node IP"
+msgstr ""
+
+#: src/lib/components/custom/Cluster/Create.svelte
+msgid "Node Port"
+msgstr ""
+
+#: src/lib/components/custom/Cluster/Create.svelte
+msgid "Invalid IP address"
+msgstr ""
+
+#: src/lib/components/custom/Cluster/Create.svelte
+msgid "Invalid port number"
+msgstr ""
+
+#: src/lib/components/custom/Cluster/Create.svelte
+msgid "Failed to create cluster"
+msgstr ""
+
+#: src/lib/components/custom/Cluster/Create.svelte
+msgid "Cluster created"
+msgstr ""
+
+#: src/routes/datacenter/cluster/+page.svelte
+msgid "Node ID"
+msgstr ""
+
+#~ msgid "Hostname"
+#~ msgstr ""
+
+#: src/routes/datacenter/cluster/+page.svelte
+msgid "Address"
+msgstr ""
+
+#~ msgid "Sufferage"
+#~ msgstr ""
+
+#: src/routes/datacenter/cluster/+page.svelte
+msgid "Suffrage"
+msgstr ""
+
+#: src/routes/datacenter/cluster/+page.svelte
+msgid "Leader"
+msgstr ""

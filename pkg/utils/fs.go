@@ -178,3 +178,17 @@ func CopyDirContents(source, destination string) error {
 	_, err := RunCommand("cp", "-a", source+"/.", destination)
 	return err
 }
+
+func RemoveDirContents(dir string) error {
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return fmt.Errorf("failed_to_list_dir: %w", err)
+	}
+	for _, entry := range entries {
+		err = os.RemoveAll(filepath.Join(dir, entry.Name()))
+		if err != nil {
+			return fmt.Errorf("failed_to_remove %s: %w", entry.Name(), err)
+		}
+	}
+	return nil
+}

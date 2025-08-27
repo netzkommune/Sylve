@@ -1,0 +1,160 @@
+package clusterHandlers
+
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/alchemillahq/sylve/internal"
+	clusterServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/cluster"
+	"github.com/alchemillahq/sylve/internal/services/cluster"
+	"github.com/alchemillahq/sylve/pkg/utils"
+	"github.com/gin-gonic/gin"
+	"github.com/hashicorp/raft"
+)
+
+type CreateClusterRequest struct {
+	IP   string `json:"ip" binding:"required,ip"`
+	Port int    `json:"port" binding:"required,min=1024,max=65535"`
+}
+
+type JoinClusterRequest struct {
+	NodeID              string `json:"nodeId" binding:"required"`
+	NodeIP              string `json:"nodeIp" binding:"required,ip"`
+	NodePort            int    `json:"nodePort" binding:"required,min=1024,max=65535"`
+	LeaderAPI           string `json:"leaderApi" binding:"required"`
+	LeaderAdminPassword string `json:"leaderAdminPassword" binding:"required"`
+	ClusterKey          string `json:"clusterKey" binding:"required"`
+}
+
+// @Summary Get Cluster
+// @Description Get cluster details with information about RAFT nodes too
+// @Tags Cluster
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} internal.APIResponse[clusterServiceInterfaces.ClusterDetails] "Success"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /cluster [get]
+func GetCluster(cS *cluster.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		details, err := cS.GetClusterDetails()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "error_finding_cluster",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[*clusterServiceInterfaces.ClusterDetails]{
+			Status:  "success",
+			Message: "cluster_fetched",
+			Error:   "",
+			Data:    details,
+		})
+	}
+}
+
+// @Summary Create Cluster
+// @Description Create a cluster given a bootstrapping nodes IP and Port
+// @Tags Cluster
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Failure 400 {object} internal.APIResponse[any] "Bad Request"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /cluster [post]
+func CreateCluster(cS *cluster.Service, fsm raft.FSM) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var req CreateClusterRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request_payload",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		if err := cS.CreateCluster(req.IP, req.Port, fsm); err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "error_creating_cluster",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusCreated, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "cluster_created",
+			Error:   "",
+			Data:    nil,
+		})
+	}
+}
+
+// @Summary Join Cluster
+// @Description Join an existing cluster
+// @Tags Cluster
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body JoinClusterRequest true "Join Cluster Request"
+// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Failure 400 {object} internal.APIResponse[any] "Bad Request"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /cluster/join [post]
+func JoinCluster(cS *cluster.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var req JoinClusterRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request_payload",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		if utils.IsValidIPPort(req.LeaderAPI) {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_leader_api",
+				Error:   "leader_api_must_be_in_host_port_format",
+				Data:    nil,
+			})
+			return
+		}
+
+		headers := utils.FlatHeaders(c)
+		healthURL := fmt.Sprintf(
+			"https://%s/api/health/basic?hash=%s",
+			req.LeaderAPI,
+			utils.PasswordQueryHash(req.LeaderAdminPassword),
+		)
+
+		if err := utils.HTTPPostJSON(healthURL, req, headers); err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "error_joining_cluster_bad_leader_response",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "cluster_joined",
+			Error:   "",
+			Data:    nil,
+		})
+	}
+}

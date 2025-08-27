@@ -10,6 +10,7 @@ package services
 
 import (
 	serviceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services"
+	clusterServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/cluster"
 	diskServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/disk"
 	infoServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/info"
 	jailServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/jail"
@@ -20,6 +21,7 @@ import (
 	utilitiesServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/utilities"
 	zfsServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/zfs"
 	"github.com/alchemillahq/sylve/internal/services/auth"
+	"github.com/alchemillahq/sylve/internal/services/cluster"
 	"github.com/alchemillahq/sylve/internal/services/disk"
 	"github.com/alchemillahq/sylve/internal/services/info"
 	"github.com/alchemillahq/sylve/internal/services/jail"
@@ -46,6 +48,7 @@ type ServiceRegistry struct {
 	SystemService    systemServiceInterfaces.SystemServiceInterface
 	SambaService     sambaServiceInterfaces.SambaServiceInterface
 	JailService      jailServiceInterfaces.JailServiceInterface
+	ClusterService   clusterServiceInterfaces.ClusterServiceInterface
 }
 
 func NewService[T any](db *gorm.DB, dependencies ...interface{}) interface{} {
@@ -83,6 +86,8 @@ func NewService[T any](db *gorm.DB, dependencies ...interface{}) interface{} {
 	case *jail.Service:
 		networkService := dependencies[0].(networkServiceInterfaces.NetworkServiceInterface)
 		return jail.NewJailService(db, networkService)
+	case *cluster.Service:
+		return cluster.NewClusterService(db)
 	default:
 		return nil
 	}
@@ -98,6 +103,7 @@ func NewServiceRegistry(db *gorm.DB) *ServiceRegistry {
 	sambaService := NewService[samba.Service](db, zfsService)
 	networkService := NewService[network.Service](db, libvirtService)
 	jailService := NewService[jail.Service](db, networkService)
+	clusterService := NewService[cluster.Service](db)
 
 	return &ServiceRegistry{
 		AuthService:      authService.(serviceInterfaces.AuthServiceInterface),
@@ -111,5 +117,6 @@ func NewServiceRegistry(db *gorm.DB) *ServiceRegistry {
 		SystemService:    systemService.(systemServiceInterfaces.SystemServiceInterface),
 		SambaService:     sambaService.(sambaServiceInterfaces.SambaServiceInterface),
 		JailService:      jailService.(jailServiceInterfaces.JailServiceInterface),
+		ClusterService:   clusterService.(clusterServiceInterfaces.ClusterServiceInterface),
 	}
 }

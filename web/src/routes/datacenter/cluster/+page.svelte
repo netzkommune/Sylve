@@ -1,0 +1,164 @@
+<script lang="ts">
+	import { getDetails } from '$lib/api/cluster/cluster';
+	import Create from '$lib/components/custom/Cluster/Create.svelte';
+	import TreeTable from '$lib/components/custom/TreeTable.svelte';
+	import Search from '$lib/components/custom/TreeTable/Search.svelte';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import type { ClusterDetails } from '$lib/types/cluster/cluster';
+	import type { Column, Row } from '$lib/types/components/tree-table';
+	import { updateCache } from '$lib/utils/http';
+	import { renderWithIcon } from '$lib/utils/table';
+	import Icon from '@iconify/svelte';
+	import { useQueries, useQueryClient } from '@sveltestack/svelte-query';
+	import type { CellComponent } from 'tabulator-tables';
+
+	interface Data {
+		cluster: ClusterDetails;
+	}
+
+	let { data }: { data: Data } = $props();
+	let reload = $state(false);
+	let queryClient = useQueryClient();
+	const results = useQueries([
+		{
+			queryKey: 'cluster-info',
+			queryFn: async () => {
+				return await getDetails();
+			},
+			keepPreviousData: true,
+			initialData: data.cluster,
+			refetchOnMount: 'always',
+			onSuccess: (data: ClusterDetails) => {
+				updateCache('cluster-info', data);
+			}
+		}
+	]);
+
+	$effect(() => {
+		if (reload) {
+			queryClient.refetchQueries('cluster-info');
+
+			reload = false;
+		}
+	});
+
+	let dataCenter = $derived($results[0].data);
+	let canCreate = $derived(
+		dataCenter?.cluster.raftBootstrap === null && dataCenter?.cluster.enabled === false
+	);
+
+	let modals = $state({
+		create: {
+			open: false
+		}
+	});
+
+	let query = $state('');
+	let activeRows: Row[] | null = $state(null);
+	let activeRow: Row | null = $derived(activeRows ? (activeRows[0] as Row) : ({} as Row));
+
+	let table = $derived.by(() => {
+		const rows: Row[] = [];
+		const columns: Column[] = [
+			{
+				field: 'id',
+				title: 'Node ID',
+				formatter: (cell: CellComponent) => {
+					const row = cell.getRow();
+					const data = row.getData();
+
+					if (data.leader) {
+						return renderWithIcon('fluent-mdl2:party-leader', cell.getValue());
+					} else {
+						return cell.getValue();
+					}
+				}
+			},
+			{
+				field: 'address',
+				title: 'Address'
+			},
+			{
+				field: 'suffrage',
+				title: 'Suffrage',
+				formatter: (cell: CellComponent) => {
+					let value = '';
+					switch (cell.getValue()) {
+						case 'voter':
+							value = 'Voter';
+							break;
+						case 'nonvoter':
+							value = 'Non Voter';
+							break;
+						case 'staging':
+							value = 'Staging';
+							break;
+						default:
+							value = 'Unknown';
+					}
+
+					return value;
+				}
+			}
+		];
+
+		if (dataCenter?.nodes) {
+			for (const node of dataCenter.nodes) {
+				rows.push({
+					id: node.id,
+					leader: node.isLeader,
+					address: node.address,
+					suffrage: node.suffrage
+				});
+			}
+		}
+
+		return {
+			rows,
+			columns
+		};
+	});
+
+	$inspect(dataCenter);
+</script>
+
+{#snippet button(type: string, icon: string, title: string, disabled: boolean)}
+	<Button
+		onclick={() => {
+			switch (type) {
+				case 'create':
+					modals.create.open = true;
+					break;
+			}
+		}}
+		size="sm"
+		variant="outline"
+		class="h-6.5"
+		{disabled}
+	>
+		<div class="flex items-center">
+			<Icon {icon} class="mr-1 h-4 w-4" />
+			<span>{title}</span>
+		</div>
+	</Button>
+{/snippet}
+
+<div class="flex h-full w-full flex-col">
+	<div class="flex h-10 w-full items-center gap-2 border-b p-2">
+		<Search bind:query />
+
+		{#if canCreate}
+			{@render button('create', 'oui:ml-create-population-job', 'Create Cluster', !canCreate)}
+		{/if}
+	</div>
+
+	<TreeTable
+		data={table}
+		name="cluster-nodes-tt"
+		bind:query
+		bind:parentActiveRow={activeRows}
+		multipleSelect={false}
+	/>
+</div>
+
+<Create bind:open={modals.create.open} bind:reload />

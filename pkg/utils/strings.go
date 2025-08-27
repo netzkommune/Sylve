@@ -65,6 +65,10 @@ func SHA256(input string, count int) string {
 	return hex.EncodeToString(sum)
 }
 
+func PasswordQueryHash(input string) string {
+	return SHA256(input, 1)
+}
+
 func RemoveSpaces(input string) string {
 	return strings.ReplaceAll(input, " ", "")
 }

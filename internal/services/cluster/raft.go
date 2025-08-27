@@ -2,6 +2,7 @@ package cluster
 
 import (
 	"fmt"
+	"net"
 	"os"
 	"path/filepath"
 	"time"
@@ -55,7 +56,12 @@ func (s *Service) SetupRaft(bootstrap bool, fsm raft.FSM) (*raft.Raft, error) {
 	}
 
 	bindAddr := fmt.Sprintf("%s:%d", c.RaftIP, c.RaftPort)
-	t, err := raft.NewTCPTransport(bindAddr, nil, 3, 10*time.Second, os.Stdout)
+	tcpAddr, err := net.ResolveTCPAddr("tcp", bindAddr)
+	if err != nil {
+		return nil, fmt.Errorf("Could not resolve address: %s", err)
+	}
+
+	t, err := raft.NewTCPTransport(bindAddr, tcpAddr, 3, 10*time.Second, os.Stdout)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed_to_create_transport: %v", err)

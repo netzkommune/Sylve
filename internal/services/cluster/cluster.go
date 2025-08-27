@@ -152,6 +152,10 @@ func (s *Service) StartAsJoiner(fsm raft.FSM, ip string, port int, clusterKey st
 		return errors.New("invalid_port_number")
 	}
 
+	if err := network.TryBindToPort(ip, port, "tcp"); err != nil {
+		return fmt.Errorf("failed_to_bind_to_port: %v", err)
+	}
+
 	details, err := s.GetClusterDetails()
 	if err != nil {
 		return err

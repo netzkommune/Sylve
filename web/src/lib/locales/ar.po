@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-31T13:10:41.812Z\n"
-"PO-Revision-Date: 2025-08-27T15:41:42.483Z\n"
+"PO-Revision-Date: 2025-08-27T23:52:06.050Z\n"
 "Last-Translator: \n"
 "Language: Arabic\n"
 "Language-Team: \n"
@@ -3876,17 +3876,15 @@ msgstr ""
 msgid "Leader API (192.168.1.1:8181)"
 msgstr ""
 
-#: src/lib/components/custom/Cluster/Join.svelte
-msgid "Leader Admin Password"
-msgstr ""
+#~ msgid "Leader Admin Password"
+#~ msgstr ""
 
 #: src/lib/components/custom/Cluster/Join.svelte
 msgid "Leader API is required"
 msgstr ""
 
-#: src/lib/components/custom/Cluster/Join.svelte
-msgid "Leader Password is required"
-msgstr ""
+#~ msgid "Leader Password is required"
+#~ msgstr ""
 
 #: src/lib/components/custom/Cluster/Join.svelte
 msgid "Cluster Key is required"
@@ -3898,4 +3896,19 @@ msgstr ""
 
 #: src/lib/components/custom/Cluster/Join.svelte
 msgid "Joined cluster"
+msgstr ""
+
+#: src/routes/datacenter/cluster/+page.svelte
+msgid "This will reset clustering data on this node"
+msgstr ""
+
+#: src/routes/datacenter/cluster/+page.svelte
+msgid "Failed to reset cluster"
+msgstr ""
+
+#~ msgid "Cluster reset"
+#~ msgstr ""
+
+#: src/routes/datacenter/cluster/+page.svelte
+msgid "Cluster reset on node"
 msgstr ""

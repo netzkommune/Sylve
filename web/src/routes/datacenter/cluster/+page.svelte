@@ -1,17 +1,19 @@
 <script lang="ts">
-	import { getDetails } from '$lib/api/cluster/cluster';
+	import { getDetails, resetCluster } from '$lib/api/cluster/cluster';
 	import Create from '$lib/components/custom/Cluster/Create.svelte';
 	import Join from '$lib/components/custom/Cluster/Join.svelte';
 	import JoinInformation from '$lib/components/custom/Cluster/JoinInformation.svelte';
+	import AlertDialog from '$lib/components/custom/Dialog/Alert.svelte';
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import Search from '$lib/components/custom/TreeTable/Search.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import type { ClusterDetails } from '$lib/types/cluster/cluster';
 	import type { Column, Row } from '$lib/types/components/tree-table';
-	import { updateCache } from '$lib/utils/http';
+	import { handleAPIError, updateCache } from '$lib/utils/http';
 	import { renderWithIcon } from '$lib/utils/table';
 	import Icon from '@iconify/svelte';
 	import { useQueries, useQueryClient } from '@sveltestack/svelte-query';
+	import { toast } from 'svelte-sonner';
 	import type { CellComponent } from 'tabulator-tables';
 
 	interface Data {
@@ -45,6 +47,11 @@
 	});
 
 	let dataCenter = $derived($results[0].data);
+
+	let canReset = $derived(
+		dataCenter?.nodeId !== dataCenter?.leaderId && dataCenter?.cluster.enabled === true
+	);
+
 	let canCreate = $derived(
 		dataCenter?.cluster.raftBootstrap === null && dataCenter?.cluster.enabled === false
 	);
@@ -61,6 +68,9 @@
 			open: false
 		},
 		join: {
+			open: false
+		},
+		reset: {
 			open: false
 		}
 	});
@@ -144,6 +154,9 @@
 				case 'join':
 					modals.join.open = true;
 					break;
+				case 'reset':
+					modals.reset.open = true;
+					break;
 			}
 		}}
 		size="sm"
@@ -178,6 +191,10 @@
 		{#if canJoin}
 			{@render button('join', 'grommet-icons:cluster', 'Join Cluster', !canJoin)}
 		{/if}
+
+		{#if canReset}
+			{@render button('reset', 'mdi:refresh', 'Reset Cluster', !canReset)}
+		{/if}
 	</div>
 
 	<TreeTable
@@ -192,3 +209,29 @@
 <Create bind:open={modals.create.open} bind:reload />
 <JoinInformation bind:open={modals.view.open} cluster={dataCenter} />
 <Join bind:open={modals.join.open} bind:reload />
+
+<AlertDialog
+	open={modals.reset.open}
+	customTitle={`This will reset clustering data on this node`}
+	actions={{
+		onConfirm: async () => {
+			const response = await resetCluster();
+			reload = true;
+			if (response.error) {
+				handleAPIError(response);
+				toast.error('Failed to reset cluster', {
+					position: 'bottom-center'
+				});
+				return;
+			}
+
+			toast.success('Cluster reset on node', {
+				position: 'bottom-center'
+			});
+			modals.reset.open = false;
+		},
+		onCancel: () => {
+			modals.reset.open = false;
+		}
+	}}
+></AlertDialog>

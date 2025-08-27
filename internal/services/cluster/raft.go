@@ -26,6 +26,8 @@ func (s *Service) SetupRaft(bootstrap bool, fsm raft.FSM) (*raft.Raft, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed_to_reset_raft: %w", err)
 		}
+
+		bootstrap = true
 	}
 
 	detail := s.Detail()

@@ -28,3 +28,7 @@ export async function joinCluster(
 		clusterKey: clusterKey
 	});
 }
+
+export async function resetCluster(): Promise<APIResponse> {
+	return await apiRequest('/cluster/reset-node', APIResponseSchema, 'DELETE');
+}

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-22T21:29:52.875Z\n"
-"PO-Revision-Date: 2025-08-27T16:01:19.605Z\n"
+"PO-Revision-Date: 2025-08-27T23:52:06.038Z\n"
 "Last-Translator: \n"
 "Language: English\n"
 "Language-Team: \n"
@@ -2872,3 +2872,18 @@ msgstr "Unable to join cluster"
 #: src/lib/components/custom/Cluster/Join.svelte
 msgid "Joined cluster"
 msgstr "Joined cluster"
+
+#: src/routes/datacenter/cluster/+page.svelte
+msgid "This will reset clustering data on this node"
+msgstr "This will reset clustering data on this node"
+
+#: src/routes/datacenter/cluster/+page.svelte
+msgid "Failed to reset cluster"
+msgstr "Failed to reset cluster"
+
+#~ msgid "Cluster reset"
+#~ msgstr "Cluster reset"
+
+#: src/routes/datacenter/cluster/+page.svelte
+msgid "Cluster reset on node"
+msgstr "Cluster reset on node"

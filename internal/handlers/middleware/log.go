@@ -125,11 +125,20 @@ func RequestLoggerMiddleware(db *gorm.DB, authService *authService.Service) gin.
 
 		var claims claim
 		claims, err := getClaims(c, authService)
-		if err != nil && (c.Request.URL.Path == "/api/auth/login" || c.Request.URL.Path == "/api/utilities/downloads/signed-url") {
-			claims = claim{
-				UserID:   nil,
-				Username: "anonymous",
-				AuthType: "none",
+		if err != nil && (c.Request.URL.Path == "/api/auth/login" || c.Request.URL.Path == "/api/utilities/downloads/signed-url" || strings.HasPrefix(c.Request.URL.Path, "/api/cluster")) {
+
+			if strings.HasPrefix(c.Request.URL.Path, "/api/cluster") {
+				claims = claim{
+					UserID:   nil,
+					Username: "cluster",
+					AuthType: "cluster-key",
+				}
+			} else {
+				claims = claim{
+					UserID:   nil,
+					Username: "anonymous",
+					AuthType: "none",
+				}
 			}
 		} else if err != nil {
 			logger.L.Error().Msgf("%s, Failed to get claims: %v", c.Request.URL.Path, err)

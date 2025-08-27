@@ -174,8 +174,27 @@ func (s *Service) StartAsJoiner(fsm raft.FSM, ip string, port int, clusterKey st
 		return err
 	}
 
+	var c clusterModels.Cluster
+	if err := s.DB.First(&c).Error; err != nil {
+		return err
+	}
+
+	c.RaftIP = ip
+	c.RaftPort = port
+
+	if err := s.DB.Save(&c).Error; err != nil {
+		return err
+	}
+
 	_, err = s.SetupRaft(false, fsm)
 	if err != nil {
+		c.RaftIP = ""
+		c.RaftPort = 0
+
+		if err := s.DB.Save(&c).Error; err != nil {
+			return err
+		}
+
 		return err
 	}
 

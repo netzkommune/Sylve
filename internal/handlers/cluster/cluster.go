@@ -247,3 +247,34 @@ func AcceptJoin(cS *cluster.Service) gin.HandlerFunc {
 		})
 	}
 }
+
+// @Summary Reset Raft Node
+// @Description Reset a Raft node by shutting it down and cleaning up its state
+// @Tags Cluster
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Failure 400 {object} internal.APIResponse[any] "Bad Request"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /cluster/reset-node [delete]
+func ResetRaftNode(cS *cluster.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if err := cS.ResetRaftNode(); err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "error_resetting_raft_node",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "raft_node_reset",
+			Error:   "",
+			Data:    nil,
+		})
+	}
+}

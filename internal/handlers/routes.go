@@ -341,6 +341,7 @@ func RegisterRoutes(r *gin.Engine,
 		cluster.POST("", clusterHandlers.CreateCluster(clusterService, fsm))
 		cluster.POST("/join", clusterHandlers.JoinCluster(clusterService, fsm))
 		cluster.POST("/accept-join", clusterHandlers.AcceptJoin(clusterService))
+		cluster.DELETE("/reset-node", clusterHandlers.ResetRaftNode(clusterService))
 	}
 
 	vnc := api.Group("/vnc")

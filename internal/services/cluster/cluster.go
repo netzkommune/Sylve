@@ -278,3 +278,22 @@ func (s *Service) MarkClustered() error {
 
 	return nil
 }
+
+func (s *Service) MarkDeclustered() error {
+	var c clusterModels.Cluster
+	if err := s.DB.First(&c).Error; err != nil {
+		return err
+	}
+
+	c.Enabled = false
+	c.Key = ""
+	c.RaftBootstrap = nil
+	c.RaftIP = ""
+	c.RaftPort = 0
+
+	if err := s.DB.Save(&c).Error; err != nil {
+		return err
+	}
+
+	return nil
+}

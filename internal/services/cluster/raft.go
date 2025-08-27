@@ -148,6 +148,24 @@ func (s *Service) InitRaft(fsm raft.FSM) error {
 	return err
 }
 
+func (s *Service) ResetRaftNode() error {
+	if s.Raft != nil && s.Raft.State() != raft.Shutdown && s.Raft.State() != raft.Leader {
+		s.Raft.Shutdown()
+		s.Raft = nil
+	}
+
+	if s.Transport != nil {
+		s.Transport.Close()
+		s.Transport = nil
+	}
+
+	if err := s.MarkDeclustered(); err != nil {
+		return err
+	}
+
+	return s.CleanRaftDir()
+}
+
 func (s *Service) CleanRaftDir() error {
 	raftDir, _ := config.GetRaftPath()
 	err := utils.RemoveDirContents(raftDir)

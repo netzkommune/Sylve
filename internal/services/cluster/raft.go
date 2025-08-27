@@ -17,6 +17,17 @@ import (
 )
 
 func (s *Service) SetupRaft(bootstrap bool, fsm raft.FSM) (*raft.Raft, error) {
+	if config.ParsedConfig.Raft.Reset {
+		if err := s.CleanRaftDir(); err != nil {
+			return nil, fmt.Errorf("failed_to_clean_raft_dir: %w", err)
+		}
+
+		err := config.ResetRaftReset()
+		if err != nil {
+			return nil, fmt.Errorf("failed_to_reset_raft: %w", err)
+		}
+	}
+
 	detail := s.Detail()
 	if detail == nil {
 		return nil, fmt.Errorf("unable_to_get_node_detail")
@@ -74,7 +85,7 @@ func (s *Service) SetupRaft(bootstrap bool, fsm raft.FSM) (*raft.Raft, error) {
 		return nil, fmt.Errorf("failed_to_create_raft: %v", err)
 	}
 
-	if bootstrap || config.ParsedConfig.Raft.Bootstrap {
+	if bootstrap {
 		cfg := raft.Configuration{
 			Servers: []raft.Server{{
 				ID:      raft.ServerID(detail.NodeID),

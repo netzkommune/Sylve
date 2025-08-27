@@ -9,6 +9,6 @@
   "logLevel": 0,
   "port": 8181,
   "raft": {
-    "bootstrap": false
+    "reset": false
   }
 }

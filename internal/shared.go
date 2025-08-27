@@ -19,7 +19,7 @@ type TLSConfig struct {
 }
 
 type Raft struct {
-	Bootstrap bool `json:"bootstrap"`
+	Reset bool `json:"reset"`
 }
 
 type SylveConfig struct {

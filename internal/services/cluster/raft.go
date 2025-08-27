@@ -85,6 +85,23 @@ func (s *Service) SetupRaft(bootstrap bool, fsm raft.FSM) (*raft.Raft, error) {
 	}
 
 	s.Raft = r
+
+	if config.ParsedConfig.Raft.RemoveAllNodes {
+		future := r.GetConfiguration()
+		if err := future.Error(); err != nil {
+			return nil, fmt.Errorf("failed_to_get_config: %w", err)
+		}
+
+		for _, srv := range future.Configuration().Servers {
+			if srv.ID != raft.ServerID(detail.NodeID) {
+				f := r.RemoveServer(srv.ID, 0, 0)
+				if err := f.Error(); err != nil {
+					return nil, fmt.Errorf("failed_to_remove_peer %s: %w", srv.ID, err)
+				}
+			}
+		}
+	}
+
 	return r, nil
 }
 

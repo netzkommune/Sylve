@@ -181,6 +181,8 @@ func (s *Service) StartAsJoiner(fsm raft.FSM, ip string, port int, clusterKey st
 
 	c.RaftIP = ip
 	c.RaftPort = port
+	c.Enabled = true
+	c.Key = clusterKey
 
 	if err := s.DB.Save(&c).Error; err != nil {
 		return err
@@ -190,6 +192,8 @@ func (s *Service) StartAsJoiner(fsm raft.FSM, ip string, port int, clusterKey st
 	if err != nil {
 		c.RaftIP = ""
 		c.RaftPort = 0
+		c.Enabled = false
+		c.Key = ""
 
 		if err := s.DB.Save(&c).Error; err != nil {
 			return err

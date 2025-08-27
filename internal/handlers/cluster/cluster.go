@@ -168,18 +168,18 @@ func JoinCluster(cS *cluster.Service, fsm raft.FSM) gin.HandlerFunc {
 			return
 		}
 
-		acceptURL := fmt.Sprintf("https://%s/api/cluster/accept?clusterkey=%s", req.LeaderAPI, req.ClusterKey)
+		acceptURL := fmt.Sprintf("https://%s/api/cluster/accept-join?clusterkey=%s", req.LeaderAPI, req.ClusterKey)
 		payload := map[string]any{
 			"nodeId":     req.NodeID,
 			"nodeIp":     req.NodeIP,
-			"raftPort":   req.NodePort,
+			"nodePort":   req.NodePort,
 			"clusterKey": req.ClusterKey,
 		}
 
 		if err := utils.HTTPPostJSON(acceptURL, payload, headers); err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 				Status:  "error",
-				Message: "error_pinging_cluster_bad_leader_response",
+				Message: "error_accepting_bad_leader_response",
 				Error:   err.Error(),
 				Data:    nil,
 			})
@@ -195,6 +195,17 @@ func JoinCluster(cS *cluster.Service, fsm raft.FSM) gin.HandlerFunc {
 	}
 }
 
+// @Summary Accept Join
+// @Description Accept a join request from a cluster node
+// @Tags Cluster
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body AcceptJoinRequest true "Accept Join Request"
+// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Failure 400 {object} internal.APIResponse[any] "Bad Request"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /cluster/accept-join [post]
 func AcceptJoin(cS *cluster.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req AcceptJoinRequest

@@ -26,9 +26,10 @@ type LoginRequest struct {
 }
 
 type SuccessfulLogin struct {
-	Token    string `json:"token"`
-	Hostname string `json:"hostname"`
-	NodeID   string `json:"nodeId"`
+	Token        string `json:"token"`
+	ClusterToken string `json:"clusterToken"`
+	Hostname     string `json:"hostname"`
+	NodeID       string `json:"nodeId"`
 }
 
 // @Summary Login
@@ -59,7 +60,7 @@ func LoginHandler(authService *auth.Service) gin.HandlerFunc {
 			return
 		}
 
-		token, err := authService.CreateJWT(r.Username, r.Password, r.AuthType, r.Remember)
+		userId, token, err := authService.CreateJWT(r.Username, r.Password, r.AuthType, r.Remember)
 
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, internal.APIResponse[any]{
@@ -71,6 +72,7 @@ func LoginHandler(authService *auth.Service) gin.HandlerFunc {
 			return
 		}
 
+		clusterToken, _ := authService.CreateClusterJWT(userId, r.Username, r.AuthType, "")
 		hostname, err := utils.GetSystemHostname()
 
 		if err != nil {
@@ -99,9 +101,10 @@ func LoginHandler(authService *auth.Service) gin.HandlerFunc {
 			Message: "login_successful",
 			Error:   "",
 			Data: SuccessfulLogin{
-				Token:    token,
-				Hostname: hostname,
-				NodeID:   nodeId,
+				Token:        token,
+				ClusterToken: clusterToken,
+				Hostname:     hostname,
+				NodeID:       nodeId,
 			},
 		})
 	}

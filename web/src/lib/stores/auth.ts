@@ -21,6 +21,10 @@ export const oldStore = localStore('oldToken', '', {
 	expiry: addDays(new Date(), 1)
 });
 
+export const clusterStore = localStore('clusterToken', '', {
+	expiry: addDays(new Date(), 1)
+});
+
 export function getUsername(): string {
 	try {
 		const token = get(store);

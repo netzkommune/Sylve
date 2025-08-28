@@ -45,6 +45,31 @@ func GetTokenFromHeader(r http.Header) (string, error) {
 	return "", errors.New("no token provided")
 }
 
+func GetClusterTokenFromHeader(r http.Header) (string, error) {
+	if v := r.Get("ClusterToken"); v != "" {
+		if len(v) < 8 || !strings.HasPrefix(v, "Bearer ") {
+			return "", fmt.Errorf("invalid ClusterToken header format")
+		}
+		return RemoveSpaces(v[7:]), nil
+	}
+
+	if v := r.Get("X-Cluster-Authorization"); v != "" {
+		if len(v) < 8 || !strings.HasPrefix(v, "Bearer ") {
+			return "", fmt.Errorf("invalid X-Cluster-Authorization header format")
+		}
+		return RemoveSpaces(v[7:]), nil
+	}
+
+	if v := r.Get("X-Cluster-Token"); v != "" {
+		if len(v) < 8 || !strings.HasPrefix(v, "Bearer ") {
+			return "", fmt.Errorf("invalid X-Cluster-Token header format")
+		}
+		return RemoveSpaces(v[7:]), nil
+	}
+
+	return "", errors.New("no cluster token provided")
+}
+
 func GetIdFromParam(c *gin.Context) (int, error) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)

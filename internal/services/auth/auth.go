@@ -51,36 +51,45 @@ func (s *Service) GetJWTSecret() (string, error) {
 	return secret.Data, nil
 }
 
-func (s *Service) CreateJWT(username, password, authType string, remember bool) (string, error) {
+func (s *Service) GetClusterKey() (string, error) {
+	var c clusterModels.Cluster
+	if err := s.DB.First(&c).Error; err != nil {
+		return "", fmt.Errorf("cluster_key_not_found")
+	}
+
+	return c.Key, nil
+}
+
+func (s *Service) CreateJWT(username, password, authType string, remember bool) (uint, string, error) {
 	var user models.User
 
 	if authType == "sylve" {
 		if err := s.DB.Where("username = ?", username).First(&user).Error; err != nil {
-			return "", fmt.Errorf("invalid_credentials")
+			return 0, "", fmt.Errorf("invalid_credentials")
 		}
 
 		if !utils.CheckPasswordHash(password, user.Password) {
-			return "", fmt.Errorf("invalid_credentials")
+			return 0, "", fmt.Errorf("invalid_credentials")
 		}
 
 		if !user.Admin {
-			return "", fmt.Errorf("only_admin_allowed")
+			return 0, "", fmt.Errorf("only_admin_allowed")
 		}
 	} else if authType == "pam" {
 		valid, err := s.AuthenticatePAM(username, password)
 
 		if err != nil {
-			return "", fmt.Errorf("pam_auth_error")
+			return 0, "", fmt.Errorf("pam_auth_error")
 		}
 
 		if !valid {
-			return "", fmt.Errorf("invalid_credentials")
+			return 0, "", fmt.Errorf("invalid_credentials")
 		}
 
 		user.ID = utils.StringToUintId(username)
 		user.Username = username
 	} else {
-		return "", fmt.Errorf("invalid_auth_type")
+		return 0, "", fmt.Errorf("invalid_auth_type")
 	}
 
 	var expiry time.Time
@@ -106,13 +115,13 @@ func (s *Service) CreateJWT(username, password, authType string, remember bool) 
 	secret, err := s.GetJWTSecret()
 
 	if err != nil {
-		return "", fmt.Errorf("jwt_secret_not_found")
+		return 0, "", fmt.Errorf("jwt_secret_not_found")
 	}
 
 	token, err := (jwt.NewWithClaims(jwt.SigningMethodHS256, data)).SignedString([]byte(secret))
 
 	if err != nil {
-		return "", fmt.Errorf("jwt_signing_failed")
+		return 0, "", fmt.Errorf("jwt_signing_failed")
 	}
 
 	tokenRecord := models.Token{
@@ -128,18 +137,75 @@ func (s *Service) CreateJWT(username, password, authType string, remember bool) 
 			if updateErr := s.DB.Model(&tokenRecord).
 				Where("token = ?", tokenRecord.Token).
 				Updates(models.Token{UserID: tokenRecord.UserID}).Error; updateErr != nil {
-				return "", fmt.Errorf("token_update_failed: %v", updateErr)
+				return 0, "", fmt.Errorf("token_update_failed: %v", updateErr)
 			}
 		} else {
-			return "", fmt.Errorf("token_save_failed: %v", err)
+			return 0, "", fmt.Errorf("token_save_failed: %v", err)
 		}
 	}
 
+	return user.ID, token, nil
+}
+
+func (s *Service) CreateClusterJWT(userId uint, username string, authType string, forceSecret string) (string, error) {
+	var clusterKey string
+
+	if forceSecret != "" {
+		clusterKey = forceSecret
+	} else {
+		var err error
+
+		clusterKey, err = s.GetClusterKey()
+		if err != nil {
+			return "", fmt.Errorf("failed_to_get_cluster_key: %w", err)
+		}
+	}
+
+	data := JWT{
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
+			ID:        uuid.NewString(),
+		},
+		CustomClaims: serviceInterfaces.CustomClaims{
+			UserID:   userId,
+			Username: username,
+			AuthType: authType,
+		},
+	}
+
+	token, err := (jwt.NewWithClaims(jwt.SigningMethodHS256, data)).SignedString([]byte(clusterKey))
 	if err != nil {
-		return "", fmt.Errorf("hostname_fetch_failed")
+		return "", fmt.Errorf("failed_to_sign_jwt: %w", err)
 	}
 
 	return token, nil
+}
+
+func (s *Service) VerifyClusterJWT(tokenString string) (serviceInterfaces.CustomClaims, error) {
+	clusterKey, err := s.GetClusterKey()
+	if err != nil {
+		return serviceInterfaces.CustomClaims{}, fmt.Errorf("failed_to_get_cluster_key: %w", err)
+	}
+
+	token, err := jwt.ParseWithClaims(tokenString, &JWT{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(clusterKey), nil
+	})
+
+	if err != nil {
+		return serviceInterfaces.CustomClaims{}, fmt.Errorf("jwt_invalid: %w", err)
+	}
+
+	claims, ok := token.Claims.(*JWT)
+
+	if !ok || !token.Valid {
+		return serviceInterfaces.CustomClaims{}, fmt.Errorf("jwt_invalid")
+	}
+
+	if time.Now().After(claims.ExpiresAt.Time) {
+		return serviceInterfaces.CustomClaims{}, fmt.Errorf("jwt_expired")
+	}
+
+	return claims.CustomClaims, nil
 }
 
 func (s *Service) RevokeJWT(token string) error {

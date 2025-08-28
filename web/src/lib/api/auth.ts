@@ -10,7 +10,7 @@
 
 import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
-import { oldStore, store } from '$lib/stores/auth';
+import { clusterStore, oldStore, store } from '$lib/stores/auth';
 import { hostname, language as langStore, nodeId } from '$lib/stores/basic';
 import type { JWTClaims } from '$lib/types/auth';
 import type { APIResponse } from '$lib/types/common';
@@ -59,6 +59,7 @@ export async function login(
 				hostname.set(response.data.data.hostname);
 				nodeId.set(response.data.data.nodeId || '');
 				store.set(response.data.data.token);
+				clusterStore.set(response.data.data.clusterToken || '');
 				return true;
 			} else {
 				toast.error('Invalid response received', {

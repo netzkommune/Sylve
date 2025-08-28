@@ -10,7 +10,7 @@
 
 import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
-import { store as token } from '$lib/stores/auth';
+import { clusterStore, store as token } from '$lib/stores/auth';
 import type { APIResponse } from '$lib/types/common';
 import adze from 'adze';
 import axios, { AxiosError, type AxiosInstance, type InternalAxiosRequestConfig } from 'axios';
@@ -37,6 +37,10 @@ api.interceptors.request.use(
 		if (browser) {
 			if (get(token)) {
 				config.headers['Authorization'] = `Bearer ${get(token)}`;
+			}
+
+			if (get(clusterStore)) {
+				config.headers['X-Cluster-Token'] = `Bearer ${get(clusterStore)}`;
 			}
 		}
 		return config;

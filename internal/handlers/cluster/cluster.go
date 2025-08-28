@@ -7,6 +7,7 @@ import (
 
 	"github.com/alchemillahq/sylve/internal"
 	clusterServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/cluster"
+	"github.com/alchemillahq/sylve/internal/services/auth"
 	"github.com/alchemillahq/sylve/internal/services/cluster"
 	"github.com/alchemillahq/sylve/pkg/utils"
 	"github.com/gin-gonic/gin"
@@ -113,11 +114,11 @@ func CreateCluster(cS *cluster.Service, fsm raft.FSM) gin.HandlerFunc {
 // @Produce json
 // @Security BearerAuth
 // @Param request body JoinClusterRequest true "Join Cluster Request"
-// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Success 200 {object} internal.APIResponse[string] "Success"
 // @Failure 400 {object} internal.APIResponse[any] "Bad Request"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
 // @Router /cluster/join [post]
-func JoinCluster(cS *cluster.Service, fsm raft.FSM) gin.HandlerFunc {
+func JoinCluster(aS *auth.Service, cS *cluster.Service, fsm raft.FSM) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req JoinClusterRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
@@ -140,11 +141,17 @@ func JoinCluster(cS *cluster.Service, fsm raft.FSM) gin.HandlerFunc {
 			return
 		}
 
+		userId := c.GetUint("UserID")
+		username := c.GetString("Username")
+		authType := c.GetString("AuthType")
+
+		clusterToken, err := aS.CreateClusterJWT(userId, username, authType, req.ClusterKey)
 		headers := utils.FlatHeaders(c)
+		headers["X-Cluster-Token"] = clusterToken
+
 		healthURL := fmt.Sprintf(
-			"https://%s/api/health/basic?clusterkey=%s",
+			"https://%s/api/health/basic",
 			req.LeaderAPI,
-			req.ClusterKey,
 		)
 
 		if err := utils.HTTPPostJSON(healthURL, req, headers); err != nil {
@@ -157,7 +164,7 @@ func JoinCluster(cS *cluster.Service, fsm raft.FSM) gin.HandlerFunc {
 			return
 		}
 
-		err := cS.StartAsJoiner(fsm, req.NodeIP, req.NodePort, req.ClusterKey)
+		err = cS.StartAsJoiner(fsm, req.NodeIP, req.NodePort, req.ClusterKey)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 				Status:  "error",
@@ -168,7 +175,7 @@ func JoinCluster(cS *cluster.Service, fsm raft.FSM) gin.HandlerFunc {
 			return
 		}
 
-		acceptURL := fmt.Sprintf("https://%s/api/cluster/accept-join?clusterkey=%s", req.LeaderAPI, req.ClusterKey)
+		acceptURL := fmt.Sprintf("https://%s/api/cluster/accept-join", req.LeaderAPI)
 		payload := map[string]any{
 			"nodeId":     req.NodeID,
 			"nodeIp":     req.NodeIP,
@@ -186,11 +193,11 @@ func JoinCluster(cS *cluster.Service, fsm raft.FSM) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, internal.APIResponse[any]{
+		c.JSON(http.StatusOK, internal.APIResponse[string]{
 			Status:  "success",
 			Message: "cluster_joined",
 			Error:   "",
-			Data:    nil,
+			Data:    clusterToken,
 		})
 	}
 }

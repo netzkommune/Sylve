@@ -12,6 +12,7 @@ import (
 	"github.com/alchemillahq/sylve/internal/logger"
 	"github.com/alchemillahq/sylve/pkg/network"
 	"github.com/alchemillahq/sylve/pkg/utils"
+	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/raft"
 	raftboltdb "github.com/hashicorp/raft-boltdb"
 )
@@ -48,6 +49,12 @@ func (s *Service) SetupRaft(bootstrap bool, fsm raft.FSM) (*raft.Raft, error) {
 	cfg := raft.DefaultConfig()
 	cfg.LocalID = raft.ServerID(detail.NodeID)
 
+	raftLog := logger.NewZerologHCLog(logger.L, "raft")
+	raftLog.SetLevel(hclog.Warn) // or hclog.Error
+	cfg.Logger = raftLog
+
+	rw := logger.StandardWriterAdapter(logger.L)
+
 	dataDir, err := config.GetRaftPath()
 	if err != nil {
 		return nil, fmt.Errorf("no_raft_path")
@@ -63,7 +70,7 @@ func (s *Service) SetupRaft(bootstrap bool, fsm raft.FSM) (*raft.Raft, error) {
 		return nil, fmt.Errorf("failed_to_create_stable_store")
 	}
 
-	snapStore, err := raft.NewFileSnapshotStore(dataDir, 2, os.Stdout)
+	snapStore, err := raft.NewFileSnapshotStore(dataDir, 2, rw)
 	if err != nil {
 		return nil, fmt.Errorf("failed_to_create_snap_store")
 	}
@@ -151,13 +158,13 @@ func (s *Service) InitRaft(fsm raft.FSM) error {
 }
 
 func (s *Service) ResetRaftNode() error {
-	if s.Raft != nil && s.Raft.State() != raft.Shutdown && s.Raft.State() != raft.Leader {
-		s.Raft.Shutdown()
+	if r := s.Raft; r != nil {
+		_ = r.Shutdown().Error()
 		s.Raft = nil
 	}
 
-	if s.Transport != nil {
-		s.Transport.Close()
+	if t := s.Transport; t != nil {
+		_ = t.Close()
 		s.Transport = nil
 	}
 

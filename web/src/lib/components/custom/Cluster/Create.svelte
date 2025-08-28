@@ -3,6 +3,7 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import { clusterStore } from '$lib/stores/auth';
 	import { handleAPIError } from '$lib/utils/http';
 	import { isValidIPv4, isValidIPv6, isValidPortNumber } from '$lib/utils/string';
 	import Icon from '@iconify/svelte';
@@ -54,12 +55,17 @@
 
 		const response = await createCluster(properties.ip, properties.port);
 		reload = true;
+		loading = false;
 		if (response.error) {
 			handleAPIError(response);
 			toast.error('Failed to create cluster', {
 				position: 'bottom-center'
 			});
 		} else {
+			if (typeof response.data === 'string') {
+				clusterStore.set(response.data);
+			}
+
 			toast.success('Cluster created', {
 				position: 'bottom-center'
 			});

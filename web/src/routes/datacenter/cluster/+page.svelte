@@ -7,6 +7,7 @@
 	import TreeTable from '$lib/components/custom/TreeTable.svelte';
 	import Search from '$lib/components/custom/TreeTable/Search.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import { clusterStore } from '$lib/stores/auth';
 	import type { ClusterDetails } from '$lib/types/cluster/cluster';
 	import type { Column, Row } from '$lib/types/components/tree-table';
 	import { handleAPIError, updateCache } from '$lib/utils/http';
@@ -214,6 +215,7 @@
 	actions={{
 		onConfirm: async () => {
 			const response = await resetCluster();
+			clusterStore.set('');
 			reload = true;
 			if (response.error) {
 				handleAPIError(response);

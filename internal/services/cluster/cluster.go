@@ -169,7 +169,7 @@ func (s *Service) backfillPreClusterState() error {
 }
 
 func (s *Service) CreateCluster(ip string, port int, fsm raft.FSM) error {
-	if s.Raft != nil && s.Raft.State() != raft.Shutdown {
+	if s.Raft != nil {
 		return errors.New("raft_already_initialized")
 	}
 

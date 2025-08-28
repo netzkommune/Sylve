@@ -183,7 +183,7 @@ func (s *Service) CreateClusterJWT(userId uint, username string, authType string
 
 func (s *Service) VerifyClusterJWT(tokenString string) (serviceInterfaces.CustomClaims, error) {
 	clusterKey, err := s.GetClusterKey()
-	if err != nil {
+	if err != nil || clusterKey == "" {
 		return serviceInterfaces.CustomClaims{}, fmt.Errorf("failed_to_get_cluster_key: %w", err)
 	}
 

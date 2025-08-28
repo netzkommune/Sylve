@@ -71,11 +71,11 @@ func GetCluster(cS *cluster.Service) gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Success 200 {object} internal.APIResponse[string] "Success"
 // @Failure 400 {object} internal.APIResponse[any] "Bad Request"
 // @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
 // @Router /cluster [post]
-func CreateCluster(cS *cluster.Service, fsm raft.FSM) gin.HandlerFunc {
+func CreateCluster(as *auth.Service, cS *cluster.Service, fsm raft.FSM) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req CreateClusterRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
@@ -98,11 +98,37 @@ func CreateCluster(cS *cluster.Service, fsm raft.FSM) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusCreated, internal.APIResponse[any]{
+		details, err := cS.GetClusterDetails()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "error_fetching_cluster_details",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		userId := c.GetUint("UserID")
+		username := c.GetString("Username")
+		authType := c.GetString("AuthType")
+
+		clusterToken, err := as.CreateClusterJWT(userId, username, authType, details.Cluster.Key)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "error_creating_cluster_token",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusCreated, internal.APIResponse[string]{
 			Status:  "success",
 			Message: "cluster_created",
 			Error:   "",
-			Data:    nil,
+			Data:    clusterToken,
 		})
 	}
 }

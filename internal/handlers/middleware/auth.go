@@ -35,6 +35,7 @@ func EnsureAuthenticated(authService *authService.Service) gin.HandlerFunc {
 
 		if clusterJWT, err := utils.GetClusterTokenFromHeader(c.Request.Header); err == nil && clusterJWT != "" {
 			clusterClaims, err := authService.VerifyClusterJWT(clusterJWT)
+
 			if err != nil {
 				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"status": "error", "error": "invalid_cluster_token"})
 				return

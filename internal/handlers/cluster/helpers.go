@@ -62,6 +62,7 @@ func ReverseProxy(c *gin.Context, backend string) {
 	clusterKey := c.GetString("ClusterKey")
 	if clusterKey != "" {
 		q.Set("clusterkey", clusterKey)
+		c.Request.URL.RawQuery = q.Encode()
 	}
 
 	c.Request.Body = io.NopCloser(bytes.NewReader(bodyBytes))

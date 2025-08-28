@@ -313,8 +313,6 @@ func RegisterRoutes(r *gin.Engine,
 	}
 
 	users := auth.Group("/users")
-	users.Use(middleware.EnsureAuthenticated(authService))
-	users.Use(middleware.RequestLoggerMiddleware(db, authService))
 	{
 		users.GET("", authHandlers.ListUsersHandler(authService))
 		users.POST("", authHandlers.CreateUserHandler(authService))
@@ -323,8 +321,6 @@ func RegisterRoutes(r *gin.Engine,
 	}
 
 	groups := auth.Group("/groups")
-	groups.Use(middleware.EnsureAuthenticated(authService))
-	groups.Use(middleware.RequestLoggerMiddleware(db, authService))
 	{
 		groups.GET("", authHandlers.ListGroupsHandler(authService))
 		groups.POST("", authHandlers.CreateGroupHandler(authService))

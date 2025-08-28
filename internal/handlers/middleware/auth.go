@@ -42,6 +42,7 @@ func EnsureAuthenticated(authService *authService.Service) gin.HandlerFunc {
 				return
 			}
 
+			c.Set("ClusterKey", clusterKey)
 			c.Next()
 		}
 

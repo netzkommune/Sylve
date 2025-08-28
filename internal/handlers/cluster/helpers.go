@@ -50,10 +50,18 @@ func ReverseProxy(c *gin.Context, backend string) {
 	proxy.Transport = &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
+
 	proxy.ErrorHandler = func(writer http.ResponseWriter, request *http.Request, err error) {
 		if !strings.Contains(err.Error(), "context canceled") {
 			c.JSON(http.StatusBadGateway, gin.H{"error": err.Error()})
 		}
+	}
+
+	q := c.Request.URL.Query()
+
+	clusterKey := c.GetString("ClusterKey")
+	if clusterKey != "" {
+		q.Set("clusterkey", clusterKey)
 	}
 
 	c.Request.Body = io.NopCloser(bytes.NewReader(bodyBytes))

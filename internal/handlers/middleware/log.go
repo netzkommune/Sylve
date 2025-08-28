@@ -125,7 +125,9 @@ func RequestLoggerMiddleware(db *gorm.DB, authService *authService.Service) gin.
 
 		var claims claim
 		claims, err := getClaims(c, authService)
-		if err != nil && (c.Request.URL.Path == "/api/auth/login" || c.Request.URL.Path == "/api/utilities/downloads/signed-url" || strings.HasPrefix(c.Request.URL.Path, "/api/cluster")) {
+		if err != nil && (c.Request.URL.Path == "/api/auth/login" ||
+			c.Request.URL.Path == "/api/utilities/downloads/signed-url" ||
+			strings.HasPrefix(c.Request.URL.Path, "/api/cluster")) {
 
 			if strings.HasPrefix(c.Request.URL.Path, "/api/cluster") {
 				claims = claim{

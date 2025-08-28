@@ -85,7 +85,6 @@ func RegisterRoutes(r *gin.Engine,
 
 	health := api.Group("/health")
 	health.Use(middleware.EnsureAuthenticated(authService))
-	health.Use(middleware.RequestLoggerMiddleware(db, authService))
 	{
 		health.GET("/basic", BasicHealthCheckHandler)
 		health.POST("/basic", BasicHealthCheckHandler)

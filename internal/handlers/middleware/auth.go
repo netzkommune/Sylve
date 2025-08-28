@@ -42,8 +42,8 @@ func EnsureAuthenticated(authService *authService.Service) gin.HandlerFunc {
 				return
 			}
 
-			c.Set("ClusterKey", clusterKey)
 			c.Next()
+			return
 		}
 
 		if hash := c.Query("hash"); hash != "" {

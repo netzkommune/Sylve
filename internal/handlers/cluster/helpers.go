@@ -32,7 +32,7 @@ func mapRaftAddrToAPI(raftAddr string) (string, error) {
 	}).String(), nil
 }
 
-func ReverseProxy(c *gin.Context, backend string) {
+func ReverseProxy(c *gin.Context, backend string, clusterKey string) {
 	remote, err := url.Parse(backend)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse proxy URL"})
@@ -58,8 +58,6 @@ func ReverseProxy(c *gin.Context, backend string) {
 	}
 
 	q := c.Request.URL.Query()
-
-	clusterKey := c.GetString("ClusterKey")
 	if clusterKey != "" {
 		q.Set("clusterkey", clusterKey)
 		c.Request.URL.RawQuery = q.Encode()
@@ -87,5 +85,13 @@ func forwardToLeader(c *gin.Context, cS *cluster.Service) {
 		return
 	}
 
-	ReverseProxy(c, base)
+	details, err := cS.GetClusterDetails()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+			Status: "error", Message: "get_cluster_details_failed", Error: err.Error(),
+		})
+		return
+	}
+
+	ReverseProxy(c, base, details.Cluster.Key)
 }

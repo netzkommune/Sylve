@@ -387,8 +387,6 @@ func (s *Service) CreateVM(data libvirtServiceInterfaces.CreateVMRequest) error 
 			return fmt.Errorf("failed_to_find_switch: %w", err)
 		}
 
-		fmt.Println(sw.Name)
-
 		if macId == 0 {
 			base := fmt.Sprintf("%s-%s", data.Name, sw.Name)
 			name := base

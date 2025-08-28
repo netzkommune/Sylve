@@ -27,7 +27,7 @@
 	const queryClient = useQueryClient();
 	let results = useQueries([
 		{
-			queryKey: 'dc-notes',
+			queryKey: 'cluster-notes',
 			queryFn: async () => {
 				return (await getNotes()) as Note[];
 			},
@@ -36,7 +36,7 @@
 			initialData: data.notes,
 			refetchOnMount: 'always',
 			onSuccess: (data: Note[]) => {
-				updateCache('dc-notes', data);
+				updateCache('cluster-notes', data);
 			}
 		}
 	]);
@@ -76,7 +76,7 @@
 		if (!modalState.title.trim() || !modalState.content.trim()) return;
 		if (modalState.isEditMode && selectedId !== null) {
 			// const response = await editDCNote(selectedId, modalState.title, modalState.content);
-			// queryClient.refetchQueries('dc-notes');
+			// queryClient.refetchQueries('cluster-notes');
 			// if (response.status === 'success') {
 			// 	toast.success('Note updated', { position: 'bottom-center' });
 			// 	handleNote(undefined, false, true);
@@ -88,7 +88,7 @@
 			// }
 		} else {
 			const response = await createNote(modalState.title, modalState.content);
-			queryClient.refetchQueries('dc-notes');
+			queryClient.refetchQueries('cluster-notes');
 			if (response.status === 'success') {
 				toast.success('Note created', { position: 'bottom-center' });
 				handleNote(undefined, false, true);
@@ -131,7 +131,7 @@
 		}
 	}
 
-	let tableName = 'tt-dc-notes';
+	let tableName = 'tt-cluster-notes';
 	let columns: Column[] = $derived([
 		{
 			field: 'id',
@@ -358,7 +358,7 @@
 				const id = activeRow ? activeRow[0]?.id : null;
 				const result = await deleteNote(id as number);
 
-				queryClient.refetchQueries('dc-notes');
+				queryClient.refetchQueries('cluster-notes');
 				if (isAPIResponse(result) && result.status === 'success') {
 					toast.success('Note deleted', { position: 'bottom-center' });
 					handleNote(undefined, false, true);
@@ -384,7 +384,7 @@
 					? activeRow.map((row) => (typeof row.id === 'number' ? row.id : parseInt(row.id)))
 					: [];
 				const result = await deleteNote(ids[0]);
-				queryClient.refetchQueries('dc-notes');
+				queryClient.refetchQueries('cluster-notes');
 				if (isAPIResponse(result) && result.status === 'success') {
 					toast.success('Notes deleted', { position: 'bottom-center' });
 					handleNote(undefined, false, true);

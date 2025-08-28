@@ -282,11 +282,11 @@ func (s *Service) StartAsJoiner(fsm raft.FSM, ip string, port int, clusterKey st
 		return err
 	}
 
-	if err := s.DB.Delete(&clusterModels.ClusterNote{}).Error; err != nil {
+	if err := s.DB.Exec("DELETE FROM cluster_notes").Error; err != nil {
 		return err
 	}
 
-	if err := s.DB.Delete(&clusterModels.ClusterOption{}).Error; err != nil {
+	if err := s.DB.Exec("DELETE FROM cluster_options").Error; err != nil {
 		return err
 	}
 

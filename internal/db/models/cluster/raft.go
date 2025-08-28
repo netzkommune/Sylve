@@ -23,6 +23,7 @@ type HandlerFn func(db *gorm.DB, action string, raw json.RawMessage) error
 type FSMDispatcher struct {
 	DB       *gorm.DB
 	mu       sync.RWMutex
+	sm       sync.Mutex
 	handlers map[string]HandlerFn
 }
 
@@ -43,21 +44,23 @@ func (f *FSMDispatcher) Apply(l *raft.Log) any {
 	if l.Type != raft.LogCommand {
 		return nil
 	}
-
 	var cmd Command
 	if err := json.Unmarshal(l.Data, &cmd); err != nil {
-		return fmt.Errorf("[FSM] failed to unmarshal command: %w", err)
+		return fmt.Errorf("unmarshal: %w", err)
 	}
 
 	f.mu.RLock()
 	h, ok := f.handlers[cmd.Type]
 	f.mu.RUnlock()
 	if !ok {
-		return fmt.Errorf("[FSM] no handler for type=%s", cmd.Type)
+		return fmt.Errorf("no handler for %s", cmd.Type)
 	}
 
+	f.sm.Lock()
+	defer f.sm.Unlock()
+
 	if err := h(f.DB, cmd.Action, cmd.Data); err != nil {
-		return fmt.Errorf("[FSM] handler failed for type=%s action=%s: %w", cmd.Type, cmd.Action, err)
+		return fmt.Errorf("handler: %w", err)
 	}
 	return nil
 }
@@ -70,9 +73,15 @@ type ClusterSnapshot struct {
 }
 
 func (f *FSMDispatcher) Snapshot() (raft.FSMSnapshot, error) {
+	f.sm.Lock()
+	defer f.sm.Unlock()
 	var snap ClusterSnapshot
-	_ = f.DB.Find(&snap.Notes).Error
-	_ = f.DB.Find(&snap.Options).Error
+	if err := f.DB.Find(&snap.Notes).Error; err != nil {
+		return nil, err
+	}
+	if err := f.DB.Find(&snap.Options).Error; err != nil {
+		return nil, err
+	}
 	return &snap, nil
 }
 

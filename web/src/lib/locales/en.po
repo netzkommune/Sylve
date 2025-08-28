@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-22T21:29:52.875Z\n"
-"PO-Revision-Date: 2025-08-28T00:23:32.426Z\n"
+"PO-Revision-Date: 2025-08-28T14:58:53.514Z\n"
 "Last-Translator: \n"
 "Language: English\n"
 "Language-Team: \n"
@@ -174,6 +174,14 @@ msgstr "Minimize"
 #: src/lib/components/custom/Cluster/Join.svelte
 #: src/routes/datacenter/notes/+page.svelte
 #: src/routes/datacenter/notes/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
 msgid "Close"
 msgstr "Close"
 
@@ -371,6 +379,14 @@ msgstr "Login - Create"
 #: src/lib/components/custom/Cluster/Join.svelte
 #: src/routes/datacenter/notes/+page.svelte
 #: src/routes/datacenter/notes/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
 msgid "Reset"
 msgstr "Reset"
 
@@ -584,6 +600,7 @@ msgstr "VNC Password"
 
 #: src/lib/components/custom/VM/Create/Advanced.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 msgid "Enter or generate passphrase"
 msgstr "Enter or generate passphrase"
 
@@ -1096,6 +1113,7 @@ msgstr "Please wait while Jail <b>{0} ({1})</b> is being started"
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 #: src/routes/datacenter/notes/+page.svelte
 #: src/routes/datacenter/notes/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
 msgid "Edit"
 msgstr "Edit"
 
@@ -1110,6 +1128,7 @@ msgstr "Edit"
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
 #: src/routes/datacenter/notes/+page.svelte
 #: src/routes/datacenter/notes/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "New"
 msgstr "New"
 
@@ -1146,6 +1165,8 @@ msgstr "Create Object"
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/routes/datacenter/notes/+page.svelte
 #: src/routes/datacenter/notes/+page.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 msgid "Name"
 msgstr "Name"
 
@@ -1217,6 +1238,8 @@ msgstr "Select MACs"
 #: src/lib/components/custom/FileExplorer/CreateFileOrFolderModal.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 msgid "Create"
 msgstr "Create"
 
@@ -1713,6 +1736,8 @@ msgstr "Select ZFS Filesystem"
 #: src/lib/components/custom/FileExplorer/ListView.svelte
 #: src/lib/components/custom/FileExplorer/Toolbar.svelte
 #: src/lib/components/disk/CreatePartition.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
 msgid "Size"
 msgstr "Size"
 
@@ -1784,6 +1809,7 @@ msgstr "Invalid size"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
 msgid "Invalid name"
 msgstr "Invalid name"
 
@@ -2733,10 +2759,12 @@ msgid "Are you sure you want to delete {0}? This action cannot be undone."
 msgstr "Are you sure you want to delete {0}? This action cannot be undone."
 
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "Deleted {0} datasets"
 msgstr "Deleted {0} datasets"
 
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 msgid "Failed to delete datasets"
 msgstr "Failed to delete datasets"
 
@@ -2801,6 +2829,7 @@ msgid "Select Encryption"
 msgstr "Select Encryption"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 msgid "Passphrase"
 msgstr "Passphrase"
 
@@ -2834,6 +2863,7 @@ msgid "No parent selected"
 msgstr "No parent selected"
 
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 msgid "Encryption key is required"
 msgstr "Encryption key is required"
 
@@ -2922,3 +2952,128 @@ msgstr "Note deleted"
 #: src/routes/datacenter/notes/+page.svelte
 msgid "Notes deleted"
 msgstr "Notes deleted"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Flash File"
+msgstr "Flash File"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Delete Volume"
+msgstr "Delete Volume"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Edit Volume"
+msgstr "Edit Volume"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Delete Volumes"
+msgstr "Delete Volumes"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Deleted volume {0}"
+msgstr "Deleted volume {0}"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Failed to delete volume {0}"
+msgstr "Failed to delete volume {0}"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "Volume GUID not found"
+msgstr "Volume GUID not found"
+
+#: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
+msgid "This will delete {0}. This action cannot be undone."
+msgstr "This will delete {0}. This action cannot be undone."
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+msgid "Snapshot - {0}"
+msgstr "Snapshot - {0}"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+msgid "Prefix"
+msgstr "Prefix"
+
+#: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
+msgid "Recursive"
+msgstr "Recursive"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Create Volume"
+msgstr "Create Volume"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Pool"
+msgstr "Pool"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Select Pool"
+msgstr "Select Pool"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Invalid volume name"
+msgstr "Invalid volume name"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Please select a pool"
+msgstr "Please select a pool"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+msgid "Invalid volume size"
+msgstr "Invalid volume size"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Parent not found"
+msgstr "Parent not found"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Volume size is greater than available space"
+msgstr "Volume size is greater than available space"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Failed to create volume"
+msgstr "Failed to create volume"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
+msgid "Volume {0} created"
+msgstr "Volume {0} created"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+msgid "<0/>Edit Volume - {0}"
+msgstr "<0/>Edit Volume - {0}"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+msgid "Size must be a multiple of volume block size ({0}K)"
+msgstr "Size must be a multiple of volume block size ({0}K)"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+msgid "Failed to edit volume"
+msgstr "Failed to edit volume"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/Edit.svelte
+msgid "Volume edited successfully"
+msgstr "Volume edited successfully"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+msgid "<0/> Flash File to {0}"
+msgstr "<0/> Flash File to {0}"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+msgid "Select File"
+msgstr "Select File"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+msgid "File"
+msgstr "File"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+msgid "Error flashing volume"
+msgstr "Error flashing volume"
+
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+msgid "Volume "
+msgstr "Volume "
+
+#: src/lib/components/custom/ZFS/datasets/volumes/FlashFile.svelte
+msgid "Flash"
+msgstr "Flash"

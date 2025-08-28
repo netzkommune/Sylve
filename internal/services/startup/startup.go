@@ -15,6 +15,7 @@ import (
 	"time"
 
 	serviceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services"
+	clusterServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/cluster"
 	infoServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/info"
 	jailServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/jail"
 	libvirtServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/libvirt"
@@ -40,6 +41,7 @@ type Service struct {
 	System    systemServiceInterfaces.SystemServiceInterface
 	Samba     sambaServiceInterfaces.SambaServiceInterface
 	Jail      jailServiceInterfaces.JailServiceInterface
+	Cluster   clusterServiceInterfaces.ClusterServiceInterface
 }
 
 func NewStartupService(db *gorm.DB,
@@ -51,6 +53,7 @@ func NewStartupService(db *gorm.DB,
 	system systemServiceInterfaces.SystemServiceInterface,
 	samba sambaServiceInterfaces.SambaServiceInterface,
 	jail jailServiceInterfaces.JailServiceInterface,
+	cluster clusterServiceInterfaces.ClusterServiceInterface,
 ) serviceInterfaces.StartupServiceInterface {
 	return &Service{
 		DB:        db,
@@ -62,6 +65,7 @@ func NewStartupService(db *gorm.DB,
 		System:    system,
 		Samba:     samba,
 		Jail:      jail,
+		Cluster:   cluster,
 	}
 }
 
@@ -197,6 +201,16 @@ func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface)
 			}
 
 			time.Sleep(1 * time.Second)
+		}
+	}()
+
+	go func() {
+		for {
+			if err := s.Cluster.PopulateClusterNodes(); err != nil {
+				logger.L.Error().Msgf("Failed to populate cluster nodes: %v", err)
+			}
+
+			time.Sleep(2 * time.Second)
 		}
 	}()
 

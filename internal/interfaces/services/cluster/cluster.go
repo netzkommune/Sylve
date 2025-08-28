@@ -33,4 +33,5 @@ type ClusterServiceInterface interface {
 	CreateCluster(ip string, port int, fsm raft.FSM) error
 	SetupRaft(bootstrap bool, fsm raft.FSM) (*raft.Raft, error)
 	GetClusterDetails() (*ClusterDetails, error)
+	PopulateClusterNodes() error
 }

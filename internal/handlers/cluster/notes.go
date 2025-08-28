@@ -80,6 +80,14 @@ func CreateNote(cS *cluster.Service) gin.HandlerFunc {
 					Data:    nil,
 				})
 			}
+
+			c.JSON(200, internal.APIResponse[any]{
+				Status:  "success",
+				Message: "note_created",
+				Error:   "",
+				Data:    nil,
+			})
+
 			return
 		}
 
@@ -121,21 +129,6 @@ func CreateNote(cS *cluster.Service) gin.HandlerFunc {
 // @Router /info/notes/{id} [delete]
 func DeleteNote(cS *cluster.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if cS.Raft == nil {
-			c.JSON(400, internal.APIResponse[any]{
-				Status:  "error",
-				Message: "raft_not_initialized",
-				Error:   "raft_not_initialized",
-				Data:    nil,
-			})
-			return
-		}
-
-		if cS.Raft.State() != raft.Leader {
-			forwardToLeader(c, cS)
-			return
-		}
-
 		idStr := c.Param("id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil || id <= 0 {
@@ -148,8 +141,32 @@ func DeleteNote(cS *cluster.Service) gin.HandlerFunc {
 			return
 		}
 
-		// Propose delete through Raft
-		if err := cS.ProposeNoteDelete(id); err != nil {
+		if cS.Raft == nil {
+			err := cS.ProposeNoteDelete(id, true)
+			if err != nil {
+				c.JSON(500, internal.APIResponse[any]{
+					Status:  "error",
+					Message: "note_delete_failed",
+					Error:   err.Error(),
+					Data:    nil,
+				})
+			}
+
+			c.JSON(200, internal.APIResponse[any]{
+				Status:  "success",
+				Message: "note_deleted",
+				Error:   "",
+				Data:    nil,
+			})
+			return
+		}
+
+		if cS.Raft.State() != raft.Leader {
+			forwardToLeader(c, cS)
+			return
+		}
+
+		if err := cS.ProposeNoteDelete(id, false); err != nil {
 			c.JSON(500, internal.APIResponse[any]{
 				Status:  "error",
 				Message: "note_delete_failed",

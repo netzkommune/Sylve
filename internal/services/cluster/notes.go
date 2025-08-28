@@ -64,7 +64,15 @@ func (s *Service) ProposeNoteCreate(title, content string, bypassRaft bool) erro
 	return nil
 }
 
-func (s *Service) ProposeNoteUpdate(id int, title, content string) error {
+func (s *Service) ProposeNoteUpdate(id int, title, content string, bypassRaft bool) error {
+	if bypassRaft {
+		return s.DB.Model(&clusterModels.ClusterNote{}).Where("id = ?", id).
+			Updates(clusterModels.ClusterNote{
+				Title:   title,
+				Content: content,
+			}).Error
+	}
+
 	if s.Raft == nil {
 		return fmt.Errorf("raft_not_initialized")
 	}
@@ -107,7 +115,11 @@ func (s *Service) ProposeNoteUpdate(id int, title, content string) error {
 	return nil
 }
 
-func (s *Service) ProposeNoteDelete(id int) error {
+func (s *Service) ProposeNoteDelete(id int, bypassRaft bool) error {
+	if bypassRaft {
+		return s.DB.Delete(&clusterModels.ClusterNote{}, id).Error
+	}
+
 	if s.Raft == nil {
 		return fmt.Errorf("raft_not_initialized")
 	}
@@ -144,7 +156,11 @@ func (s *Service) ProposeNoteDelete(id int) error {
 	return nil
 }
 
-func (s *Service) ProposeNoteBulkDelete(ids []int) error {
+func (s *Service) ProposeNoteBulkDelete(ids []int, bypassRaft bool) error {
+	if bypassRaft {
+		return s.DB.Delete(&clusterModels.ClusterNote{}, ids).Error
+	}
+
 	if s.Raft == nil {
 		return fmt.Errorf("raft_not_initialized")
 	}

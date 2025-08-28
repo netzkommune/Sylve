@@ -9,6 +9,9 @@
 package middleware
 
 import (
+	"bytes"
+	"encoding/json"
+	"io"
 	"net/http"
 	"strings"
 
@@ -31,6 +34,26 @@ func EnsureAuthenticated(authService *authService.Service) gin.HandlerFunc {
 		if path == "/api/auth/login" {
 			c.Next()
 			return
+		}
+
+		if (path == "/api/cluster/accept-join" || strings.HasPrefix(path, "/api/health/basic")) &&
+			c.Request.Method == http.MethodPost {
+
+			raw, err := io.ReadAll(c.Request.Body)
+			if err == nil {
+				c.Request.Body = io.NopCloser(bytes.NewBuffer(raw))
+
+				var body struct {
+					ClusterKey string `json:"clusterKey"`
+				}
+
+				if json.Unmarshal(raw, &body) == nil && body.ClusterKey != "" && authService.IsValidClusterKey(body.ClusterKey) {
+					c.Next()
+					return
+				}
+			} else {
+				c.Request.Body = io.NopCloser(bytes.NewBuffer(nil))
+			}
 		}
 
 		if clusterJWT, err := utils.GetClusterTokenFromHeader(c.Request.Header); err == nil && clusterJWT != "" {

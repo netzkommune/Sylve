@@ -59,21 +59,6 @@ func Notes(cS *cluster.Service) gin.HandlerFunc {
 // @Router /info/notes [post]
 func CreateNote(cS *cluster.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if cS.Raft == nil {
-			c.JSON(400, internal.APIResponse[any]{
-				Status:  "error",
-				Message: "raft_not_initialized",
-				Error:   "raft_not_initialized",
-				Data:    nil,
-			})
-			return
-		}
-
-		if cS.Raft.State() != raft.Leader {
-			forwardToLeader(c, cS)
-			return
-		}
-
 		var req CreateNoteRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(400, internal.APIResponse[any]{
@@ -85,7 +70,25 @@ func CreateNote(cS *cluster.Service) gin.HandlerFunc {
 			return
 		}
 
-		err := cS.ProposeNoteCreate(req.Title, req.Content)
+		if cS.Raft == nil {
+			err := cS.ProposeNoteCreate(req.Title, req.Content, true)
+			if err != nil {
+				c.JSON(500, internal.APIResponse[any]{
+					Status:  "error",
+					Message: "note_create_failed",
+					Error:   err.Error(),
+					Data:    nil,
+				})
+			}
+			return
+		}
+
+		if cS.Raft.State() != raft.Leader {
+			forwardToLeader(c, cS)
+			return
+		}
+
+		err := cS.ProposeNoteCreate(req.Title, req.Content, false)
 		if err != nil {
 			c.JSON(500, internal.APIResponse[any]{
 				Status:  "error",

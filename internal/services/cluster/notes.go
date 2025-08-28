@@ -14,7 +14,16 @@ func (s *Service) ListNotes() ([]clusterModels.ClusterNote, error) {
 	return notes, err
 }
 
-func (s *Service) ProposeNoteCreate(title, content string) error {
+func (s *Service) ProposeNoteCreate(title, content string, bypassRaft bool) error {
+	if bypassRaft {
+		note := clusterModels.ClusterNote{
+			Title:   title,
+			Content: content,
+		}
+
+		return s.DB.Create(&note).Error
+	}
+
 	if s.Raft == nil {
 		return fmt.Errorf("raft_not_initialized")
 	}

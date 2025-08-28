@@ -343,6 +343,13 @@ func RegisterRoutes(r *gin.Engine,
 		cluster.DELETE("/reset-node", clusterHandlers.ResetRaftNode(clusterService))
 	}
 
+	clusterNotes := cluster.Group("/notes")
+	{
+		clusterNotes.GET("", clusterHandlers.Notes(clusterService))
+		clusterNotes.POST("", clusterHandlers.CreateNote(clusterService))
+		clusterNotes.DELETE("/:id", clusterHandlers.DeleteNote(clusterService))
+	}
+
 	vnc := api.Group("/vnc")
 	vnc.Use(middleware.EnsureAuthenticated(authService))
 	vnc.Use(middleware.RequestLoggerMiddleware(db, authService))

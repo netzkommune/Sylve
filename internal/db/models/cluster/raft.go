@@ -125,12 +125,17 @@ func RegisterDefaultHandlers(fsm *FSMDispatcher) {
 		var note ClusterNote
 		switch action {
 		case "create":
+			if err := json.Unmarshal(raw, &note); err != nil {
+				return err
+			}
 			return upsertNote(db, &note)
 		case "update":
 			if err := json.Unmarshal(raw, &note); err != nil {
 				return err
 			}
-			return db.Model(&ClusterNote{}).Where("id = ?", note.ID).Updates(note).Error
+			return db.Model(&ClusterNote{}).
+				Where("id = ?", note.ID).
+				Updates(note).Error
 		case "delete":
 			var payload struct{ ID int }
 			if err := json.Unmarshal(raw, &payload); err != nil {

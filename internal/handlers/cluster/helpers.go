@@ -11,7 +11,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/alchemillahq/sylve/internal"
 	"github.com/alchemillahq/sylve/internal/config"
+	"github.com/alchemillahq/sylve/internal/services/cluster"
 	"github.com/gin-gonic/gin"
 )
 
@@ -56,4 +58,25 @@ func ReverseProxy(c *gin.Context, backend string) {
 
 	c.Request.Body = io.NopCloser(bytes.NewReader(bodyBytes))
 	proxy.ServeHTTP(c.Writer, c.Request)
+}
+
+func forwardToLeader(c *gin.Context, cS *cluster.Service) {
+	leaderAddr, _ := cS.Raft.LeaderWithID()
+	if leaderAddr == "" {
+		_ = cS.Raft.VerifyLeader().Error()
+		c.JSON(http.StatusServiceUnavailable, internal.APIResponse[any]{
+			Status: "error", Message: "leader_unknown",
+		})
+		return
+	}
+
+	base, err := mapRaftAddrToAPI(string(leaderAddr))
+	if err != nil {
+		c.JSON(http.StatusBadGateway, internal.APIResponse[any]{
+			Status: "error", Message: "map_leader_api_failed", Error: err.Error(),
+		})
+		return
+	}
+
+	ReverseProxy(c, base)
 }

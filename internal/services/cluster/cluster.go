@@ -1,12 +1,15 @@
 package cluster
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/alchemillahq/sylve/internal/config"
 	clusterModels "github.com/alchemillahq/sylve/internal/db/models/cluster"
 	clusterServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/cluster"
+	"github.com/alchemillahq/sylve/internal/logger"
 	"github.com/alchemillahq/sylve/pkg/network"
 	"github.com/alchemillahq/sylve/pkg/utils"
 	"github.com/hashicorp/raft"
@@ -49,7 +52,7 @@ func (s *Service) GetClusterDetails() (*clusterServiceInterfaces.ClusterDetails,
 
 	out.NodeID = detail.NodeID
 
-	if s.Raft == nil {
+	if s.Raft == nil || c.Enabled == false {
 		return out, nil
 	}
 
@@ -90,6 +93,79 @@ func (s *Service) GetClusterDetails() (*clusterServiceInterfaces.ClusterDetails,
 	}
 
 	return out, nil
+}
+
+func (s *Service) waitUntilLeader(timeout time.Duration) (bool, raft.ServerAddress, error) {
+	deadline := time.Now().Add(timeout)
+
+	if s.Raft.State() == raft.Leader {
+		return true, s.Raft.Leader(), nil
+	}
+	if addr := s.Raft.Leader(); addr != "" {
+		return false, addr, nil
+	}
+
+	for time.Now().Before(deadline) {
+		if s.Raft.State() == raft.Leader {
+			return true, s.Raft.Leader(), nil
+		}
+		if addr := s.Raft.Leader(); addr != "" {
+			return false, addr, nil
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
+
+	return false, "", fmt.Errorf("timeout waiting for leader election")
+}
+
+func (s *Service) backfillPreClusterState() error {
+	{
+		var notes []clusterModels.ClusterNote
+		if err := s.DB.Order("id ASC").Find(&notes).Error; err != nil {
+			return fmt.Errorf("scan_existing_notes: %w", err)
+		}
+		for _, n := range notes {
+			payloadStruct := struct {
+				ID      uint   `json:"id"`
+				Title   string `json:"title"`
+				Content string `json:"content"`
+			}{ID: n.ID, Title: n.Title, Content: n.Content}
+
+			data, _ := json.Marshal(payloadStruct)
+			cmd := clusterModels.Command{Type: "note", Action: "create", Data: data}
+			if err := s.Raft.Apply(utils.MustJSON(cmd), 5*time.Second).Error(); err != nil {
+				return fmt.Errorf("apply_synth_create_note id=%d: %w", n.ID, err)
+			}
+		}
+	}
+
+	{
+		var opts []clusterModels.ClusterOption
+		if err := s.DB.Order("id ASC").Find(&opts).Error; err != nil {
+			return fmt.Errorf("scan_existing_options: %w", err)
+		}
+
+		for _, o := range opts {
+			payloadStruct := struct {
+				ID             uint   `json:"id"`
+				KeyboardLayout string `json:"keyboardLayout"`
+			}{ID: o.ID, KeyboardLayout: o.KeyboardLayout}
+
+			data, _ := json.Marshal(payloadStruct)
+			cmd := clusterModels.Command{Type: "options", Action: "set", Data: data}
+			if err := s.Raft.Apply(utils.MustJSON(cmd), 5*time.Second).Error(); err != nil {
+				return fmt.Errorf("apply_synth_set_options id=%d: %w", o.ID, err)
+			}
+
+			break
+		}
+	}
+
+	if err := s.Raft.Barrier(10 * time.Second).Error(); err != nil {
+		return fmt.Errorf("barrier_after_backfill: %w", err)
+	}
+
+	return nil
 }
 
 func (s *Service) CreateCluster(ip string, port int, fsm raft.FSM) error {
@@ -140,6 +216,24 @@ func (s *Service) CreateCluster(ip string, port int, fsm raft.FSM) error {
 	c.RaftIP = ip
 	c.RaftPort = port
 
+	becameLeader, leaderAddr, err := s.waitUntilLeader(10 * time.Second)
+	if err != nil {
+		logger.L.Warn().Err(err).Msg("Leader not elected yet; skipping immediate snapshot")
+		return nil
+	}
+
+	if becameLeader {
+		if err := s.backfillPreClusterState(); err != nil {
+			return err
+		}
+
+		if err := s.Raft.Snapshot().Error(); err != nil && !errors.Is(err, raft.ErrNothingNewToSnapshot) {
+			return fmt.Errorf("raft_snapshot_failed: %w", err)
+		}
+	} else {
+		logger.L.Info().Str("leader", string(leaderAddr)).Msg("not leader after bootstrap; skipping local snapshot")
+	}
+
 	return nil
 }
 
@@ -185,6 +279,14 @@ func (s *Service) StartAsJoiner(fsm raft.FSM, ip string, port int, clusterKey st
 	c.Key = clusterKey
 
 	if err := s.DB.Save(&c).Error; err != nil {
+		return err
+	}
+
+	if err := s.DB.Delete(&clusterModels.ClusterNote{}).Error; err != nil {
+		return err
+	}
+
+	if err := s.DB.Delete(&clusterModels.ClusterOption{}).Error; err != nil {
 		return err
 	}
 

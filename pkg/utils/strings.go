@@ -649,3 +649,8 @@ func UintSliceToJSON(slice []uint) (string, error) {
 func FormatMAC(mac []byte) string {
 	return net.HardwareAddr(mac).String()
 }
+
+func MustJSON(v any) []byte {
+	b, _ := json.Marshal(v)
+	return b
+}

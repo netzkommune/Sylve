@@ -48,9 +48,7 @@
 
 	let dataCenter = $derived($results[0].data);
 
-	let canReset = $derived(
-		dataCenter?.nodeId !== dataCenter?.leaderId && dataCenter?.cluster.enabled === true
-	);
+	let canReset = $derived(dataCenter?.cluster.enabled === true);
 
 	let canCreate = $derived(
 		dataCenter?.cluster.raftBootstrap === null && dataCenter?.cluster.enabled === false

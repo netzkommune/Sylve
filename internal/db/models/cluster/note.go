@@ -8,7 +8,7 @@ import (
 )
 
 type ClusterNote struct {
-	ID        int       `json:"id"`
+	ID        uint      `gorm:"primaryKey" json:"id"`
 	Title     string    `json:"title"`
 	Content   string    `json:"content"`
 	CreatedAt time.Time `gorm:"autoCreateTime" json:"createdAt"`

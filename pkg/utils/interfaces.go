@@ -9,6 +9,7 @@
 package utils
 
 import (
+	"net"
 	"reflect"
 
 	"github.com/go-playground/validator/v10"
@@ -46,4 +47,26 @@ func GetJSONFieldName(structType interface{}, fieldName string) string {
 	}
 
 	return jsonTag
+}
+
+func IsLocalIP(host string) bool {
+	ips, _ := net.LookupIP(host)
+
+	if len(ips) == 0 {
+		if ip := net.ParseIP(host); ip != nil {
+			ips = []net.IP{ip}
+		}
+	}
+
+	ifaces, _ := net.InterfaceAddrs()
+	for _, ia := range ifaces {
+		if ipnet, ok := ia.(*net.IPNet); ok {
+			for _, ip := range ips {
+				if ipnet.IP.Equal(ip) {
+					return true
+				}
+			}
+		}
+	}
+	return host == "localhost" || host == "127.0.0.1"
 }

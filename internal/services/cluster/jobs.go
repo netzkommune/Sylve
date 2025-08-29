@@ -36,6 +36,10 @@ func (s *Service) fetchCanonicalHostname(host string, port int) (string, bool) {
 		return "", false
 	}
 
+	if utils.IsLocalIP(host) {
+		return selfHostname, true
+	}
+
 	clusterToken, err := s.AuthService.CreateClusterJWT(0, selfHostname, "", "")
 	if err != nil {
 		return "", false

@@ -11,17 +11,25 @@ package utils
 import (
 	"bytes"
 	"compress/gzip"
+	"context"
 	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
+)
+
+var (
+	once         sync.Once
+	sharedClient *http.Client
 )
 
 func GetTokenFromHeader(r http.Header) (string, error) {
@@ -97,19 +105,41 @@ func FlatHeaders(c *gin.Context) map[string]string {
 	return flatHeaders
 }
 
+func intraClusterClient() *http.Client {
+	once.Do(func() {
+		tr := &http.Transport{
+			MaxIdleConns:        200,
+			MaxIdleConnsPerHost: 100,
+			MaxConnsPerHost:     100,
+			IdleConnTimeout:     90 * time.Second,
+			DisableKeepAlives:   false,
+			DialContext: (&net.Dialer{
+				Timeout:   5 * time.Second,
+				KeepAlive: 30 * time.Second,
+			}).DialContext,
+			TLSHandshakeTimeout:   5 * time.Second,
+			ExpectContinueTimeout: 1 * time.Second,
+			TLSClientConfig:       &tls.Config{InsecureSkipVerify: true},
+		}
+		sharedClient = &http.Client{
+			Timeout:   8 * time.Second,
+			Transport: tr,
+		}
+	})
+	return sharedClient
+}
+
+func withTimeout(ctx context.Context, d time.Duration) (context.Context, context.CancelFunc) {
+	if ctx != nil {
+		return context.WithTimeout(ctx, d)
+	}
+	return context.WithTimeout(context.Background(), d)
+}
+
 func HTTPPostJSON(url string, payload any, headers map[string]string) error {
 	body, err := json.Marshal(payload)
 	if err != nil {
 		return err
-	}
-
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-
-	client := &http.Client{
-		Timeout:   10 * time.Second,
-		Transport: tr,
 	}
 
 	req, err := http.NewRequest("POST", url, bytes.NewReader(body))
@@ -117,15 +147,17 @@ func HTTPPostJSON(url string, payload any, headers map[string]string) error {
 		return err
 	}
 
-	for key, value := range headers {
-		req.Header.Set(key, value)
+	for k, v := range headers {
+		req.Header.Set(k, v)
 	}
-
 	if req.Header.Get("Accept-Encoding") == "" {
 		req.Header.Set("Accept-Encoding", "gzip")
 	}
+	if req.Header.Get("Content-Type") == "" {
+		req.Header.Set("Content-Type", "application/json")
+	}
 
-	resp, err := client.Do(req)
+	resp, err := intraClusterClient().Do(req)
 	if err != nil {
 		return err
 	}
@@ -158,20 +190,10 @@ func HTTPPostJSONRead(url string, payload any, headers map[string]string) ([]byt
 		return nil, 0, err
 	}
 
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-
-	client := &http.Client{
-		Timeout:   6 * time.Second,
-		Transport: tr,
-	}
-
 	req, err := http.NewRequest("POST", url, bytes.NewReader(body))
 	if err != nil {
 		return nil, 0, err
 	}
-
 	for k, v := range headers {
 		req.Header.Set(k, v)
 	}
@@ -182,7 +204,7 @@ func HTTPPostJSONRead(url string, payload any, headers map[string]string) ([]byt
 		req.Header.Set("Content-Type", "application/json")
 	}
 
-	resp, err := client.Do(req)
+	resp, err := intraClusterClient().Do(req)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -208,20 +230,10 @@ func HTTPPostJSONRead(url string, payload any, headers map[string]string) ([]byt
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		return nil, resp.StatusCode, fmt.Errorf("http error %d: %s", resp.StatusCode, string(b))
 	}
-
 	return b, resp.StatusCode, nil
 }
 
 func HTTPGetJSONRead(url string, headers map[string]string) ([]byte, int, error) {
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // intra-cluster
-	}
-
-	client := &http.Client{
-		Timeout:   8 * time.Second,
-		Transport: tr,
-	}
-
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, 0, err
@@ -236,7 +248,7 @@ func HTTPGetJSONRead(url string, headers map[string]string) ([]byte, int, error)
 		req.Header.Set("Accept", "application/json")
 	}
 
-	resp, err := client.Do(req)
+	resp, err := intraClusterClient().Do(req)
 	if err != nil {
 		return nil, 0, err
 	}

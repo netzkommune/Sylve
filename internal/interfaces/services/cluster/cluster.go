@@ -2,6 +2,8 @@ package clusterServiceInterfaces
 
 import (
 	clusterModels "github.com/alchemillahq/sylve/internal/db/models/cluster"
+	jailServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/jail"
+	libvirtServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/libvirt"
 	"github.com/hashicorp/raft"
 )
 
@@ -25,6 +27,13 @@ type ClusterDetails struct {
 	LeaderID      string                 `json:"leaderId"`
 	LeaderAddress string                 `json:"leaderAddress"`
 	Partial       bool                   `json:"partial"`
+}
+
+type NodeResources struct {
+	NodeUUID string                                `json:"nodeUUID"`
+	Hostname string                                `json:"hostname"`
+	Jails    []jailServiceInterfaces.SimpleList    `json:"jails"`
+	VMs      []libvirtServiceInterfaces.SimpleList `json:"vms"`
 }
 
 type ClusterServiceInterface interface {

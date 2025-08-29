@@ -5,18 +5,26 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Resizable from '$lib/components/ui/resizable';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
-	import { hostname } from '$lib/stores/basic';
+	import { currentHostname } from '$lib/stores/auth';
 	import { triggers } from '$lib/utils/keyboard-shortcuts';
 	import { shortcut, type ShortcutTrigger } from '@svelte-put/shortcut';
 	import CircleHelp from 'lucide-svelte/icons/circle-help';
-
 	let openCategories: { [key: string]: boolean } = $state({});
 
 	const toggleCategory = (label: string) => {
 		openCategories[label] = !openCategories[label];
 	};
 
-	let node = $hostname;
+	let node = $derived.by(() => {
+		let url = page.url.pathname;
+		return url.split('/')[1];
+	});
+
+	$effect(() => {
+		if (node) {
+			currentHostname.set(node);
+		}
+	});
 
 	interface NodeItem {
 		label: string;
@@ -26,7 +34,7 @@
 	}
 
 	let nodeItems: NodeItem[] = $derived.by(() => {
-		if (page.url.pathname.startsWith(`/${$hostname}/vm`)) {
+		if (page.url.pathname.startsWith(`/${node}/vm`)) {
 			const vmName = page.url.pathname.split('/')[3];
 			return [
 				{
@@ -60,7 +68,7 @@
 					href: `/${node}/vm/${vmName}/options`
 				}
 			];
-		} else if (page.url.pathname.startsWith(`/${$hostname}/jail`)) {
+		} else if (page.url.pathname.startsWith(`/${node}/jail`)) {
 			const jailName = page.url.pathname.split('/')[3];
 			return [
 				{
@@ -240,14 +248,14 @@
 	let { children }: Props = $props();
 
 	$effect(() => {
-		if (page.url.pathname === `/${$hostname}`) {
+		if (page.url.pathname === `/${node}`) {
 			goto(`/${node}/summary`);
-		} else if (page.url.pathname.startsWith(`/${$hostname}/vm`)) {
+		} else if (page.url.pathname.startsWith(`/${node}/vm`)) {
 			const vmId = page.url.pathname.split('/')[3];
 			if (page.url.pathname === `/${node}/vm/${vmId}`) {
 				goto(`/${node}/vm/${vmId}/summary`, { replaceState: true });
 			}
-		} else if (page.url.pathname.startsWith(`/${$hostname}/jail`)) {
+		} else if (page.url.pathname.startsWith(`/${node}/jail`)) {
 			const jailId = page.url.pathname.split('/')[3];
 			if (page.url.pathname === `/${node}/jail/${jailId}`) {
 				goto(`/${node}/jail/${jailId}/summary`, { replaceState: true });

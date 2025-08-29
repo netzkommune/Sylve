@@ -2,7 +2,6 @@ package cluster
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net"
 
@@ -11,49 +10,61 @@ import (
 	clusterModels "github.com/alchemillahq/sylve/internal/db/models/cluster"
 	"github.com/alchemillahq/sylve/pkg/utils"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type basicHealthData struct {
 	Hostname string `json:"hostname"`
 }
 
-func (s *Service) fetchCanonicalHostname(host string, port int) (string, error) {
+type curInfo struct {
+	nodeUUID  string
+	api       string
+	canonHost string
+	rawHost   string
+	healthOK  bool
+}
+
+func (s *Service) fetchCanonicalHostname(host string, port int) (string, bool) {
 	cluster, err := s.GetClusterDetails()
 	if err != nil {
-		return "", fmt.Errorf("failed to get cluster details: %w", err)
+		return "", false
 	}
 
-	hostname, err := utils.GetSystemHostname()
+	selfHostname, err := utils.GetSystemHostname()
 	if err != nil {
-		return "", fmt.Errorf("failed to get system hostname: %w", err)
+		return "", false
+	}
+
+	clusterToken, err := s.AuthService.CreateClusterJWT(0, selfHostname, "", "")
+	if err != nil {
+		return "", false
 	}
 
 	url := fmt.Sprintf("https://%s:%d/api/health/basic", host, port)
-	clusterToken, err := s.AuthService.CreateClusterJWT(0, hostname, "", "cluster-token")
-	if err != nil {
-		return "", fmt.Errorf("failed to create cluster JWT: %w", err)
-	}
 
-	b, _, err := utils.HTTPPostJSONRead(url, map[string]any{
-		"clusterKey": cluster.Cluster.Key,
-	}, map[string]string{
-		"Accept":          "application/json",
-		"X-Cluster-Token": fmt.Sprintf("Bearer %s", clusterToken),
-	})
-
+	body, _, err := utils.HTTPPostJSONRead(
+		url,
+		map[string]any{"clusterKey": cluster.Cluster.Key},
+		map[string]string{
+			"Accept":          "application/json",
+			"Content-Type":    "application/json",
+			"X-Cluster-Token": fmt.Sprintf("Bearer %s", clusterToken),
+		},
+	)
 	if err != nil {
-		return "", fmt.Errorf("https request failed: %w", err)
+		return "", false
 	}
 
 	var resp internal.APIResponse[basicHealthData]
-	if err := json.Unmarshal(b, &resp); err != nil {
-		return "", fmt.Errorf("unmarshal failed: %w", err)
-	}
-	if resp.Status == "success" && resp.Data.Hostname != "" {
-		return resp.Data.Hostname, nil
+	if err := json.Unmarshal(body, &resp); err != nil {
+		return "", false
 	}
 
-	return "", fmt.Errorf("hostname not returned by %s", url)
+	if resp.Status == "success" && resp.Data.Hostname != "" {
+		return resp.Data.Hostname, true
+	}
+	return "", false
 }
 
 func (s *Service) PopulateClusterNodes() error {
@@ -74,32 +85,25 @@ func (s *Service) PopulateClusterNodes() error {
 	}
 	cfg := fut.Configuration()
 
-	current := make(map[string]struct {
-		api      string
-		hostname string
-	})
+	current := make(map[string]curInfo, len(cfg.Servers))
 
 	for _, server := range cfg.Servers {
+		uuid := string(server.ID)
 		addr := string(server.Address)
 
 		host, _, err := net.SplitHostPort(addr)
 		if err != nil {
 			host = addr
 		}
-
 		api := fmt.Sprintf("%s:%d", host, config.ParsedConfig.Port)
-		canon, err := s.fetchCanonicalHostname(host, config.ParsedConfig.Port)
+		canon, ok := s.fetchCanonicalHostname(host, config.ParsedConfig.Port)
 
-		if err != nil {
-			canon = host
-		}
-
-		current[host] = struct {
-			api      string
-			hostname string
-		}{
-			api:      api,
-			hostname: canon,
+		current[uuid] = curInfo{
+			nodeUUID:  uuid,
+			api:       api,
+			canonHost: canon,
+			rawHost:   host,
+			healthOK:  ok,
 		}
 	}
 
@@ -108,58 +112,66 @@ func (s *Service) PopulateClusterNodes() error {
 		if err := tx.Find(&existing).Error; err != nil {
 			return err
 		}
-
-		exByHost := make(map[string]clusterModels.ClusterNode, len(existing))
+		exByUUID := make(map[string]clusterModels.ClusterNode, len(existing))
 		for _, n := range existing {
-			exByHost[n.Hostname] = n
+			exByUUID[n.NodeUUID] = n
 		}
 
-		for raftHost, cur := range current {
-			hostKey := cur.hostname
-			if hostKey == "" {
-				hostKey = raftHost
+		for _, cur := range current {
+			// Decide desired status from health check
+			status := "offline"
+			if cur.healthOK {
+				status = "online"
 			}
 
-			if _, ok := exByHost[hostKey]; ok {
-				if err := tx.Model(&clusterModels.ClusterNode{}).
-					Where("hostname = ?", hostKey).
-					Updates(map[string]any{
-						"api":    cur.api,
-						"status": "online",
-					}).Error; err != nil {
-					return err
-				}
-				delete(exByHost, hostKey)
-			} else {
-				n := clusterModels.ClusterNode{
-					Hostname: hostKey,
-					API:      cur.api,
-					Status:   "online",
-				}
-				if err := tx.Create(&n).Error; err != nil {
-					if !errors.Is(err, gorm.ErrDuplicatedKey) {
-						return err
+			// Build insert (for new rows)
+			insertRow := clusterModels.ClusterNode{
+				NodeUUID: cur.nodeUUID,
+				// For new nodes: prefer canonical hostname if known, else use raft host
+				Hostname: func() string {
+					if cur.canonHost != "" {
+						return cur.canonHost
 					}
-					if err := tx.Model(&clusterModels.ClusterNode{}).
-						Where("hostname = ?", hostKey).
-						Updates(map[string]any{
-							"api":    cur.api,
-							"status": "online",
-						}).Error; err != nil {
-						return err
-					}
-				}
+					return cur.rawHost
+				}(),
+				API:    cur.api,
+				Status: status,
 			}
+
+			// Build selective updates:
+			updates := map[string]any{
+				"api":        cur.api,
+				"status":     status,
+				"updated_at": gorm.Expr("CURRENT_TIMESTAMP"),
+			}
+			// Only overwrite hostname if we actually resolved it
+			if cur.canonHost != "" {
+				updates["hostname"] = cur.canonHost
+			}
+
+			// Upsert by node_uuid with selective updates
+			if err := tx.Clauses(clause.OnConflict{
+				Columns:   []clause.Column{{Name: "node_uuid"}},
+				DoUpdates: clause.Assignments(updates),
+			}).Create(&insertRow).Error; err != nil {
+				return err
+			}
+
+			delete(exByUUID, cur.nodeUUID)
 		}
 
-		if len(exByHost) > 0 {
-			hosts := make([]string, 0, len(exByHost))
-			for h := range exByHost {
-				hosts = append(hosts, h)
+		// Anything not in Raft config -> mark offline (removed/evicted)
+		if len(exByUUID) > 0 {
+			ids := make([]string, 0, len(exByUUID))
+			for uuid := range exByUUID {
+				ids = append(ids, uuid)
 			}
 			if err := tx.Model(&clusterModels.ClusterNode{}).
-				Where("hostname IN ?", hosts).
-				Update("status", "offline").Error; err != nil {
+				Where("node_uuid IN ?", ids).
+				Updates(map[string]any{
+					"status":     "offline",
+					"updated_at": gorm.Expr("CURRENT_TIMESTAMP"), // <-- add this
+				}).Error; err != nil {
 				return err
 			}
 		}

@@ -210,7 +210,7 @@ func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface)
 				logger.L.Error().Msgf("Failed to populate cluster nodes: %v", err)
 			}
 
-			time.Sleep(2 * time.Second)
+			time.Sleep(5 * time.Second)
 		}
 	}()
 

@@ -2,14 +2,26 @@
 	import Header from '$lib/components/custom/Header.svelte';
 	import * as Resizable from '$lib/components/ui/resizable';
 
+	import { getDetails } from '$lib/api/cluster/cluster';
 	import Terminal from '$lib/components/custom/Terminal.svelte';
 	import BottomPanel from '$lib/components/skeleton/BottomPanel.svelte';
 	import LeftPanel from '$lib/components/skeleton/LeftPanel.svelte';
+	import { onMount } from 'svelte';
+	import LeftPanelClustered from './LeftPanelClustered.svelte';
+
 	interface Props {
 		children?: import('svelte').Snippet;
 	}
 
 	let { children }: Props = $props();
+	let clustered = $state(false);
+
+	onMount(async () => {
+		const details = await getDetails();
+		if (details.cluster.enabled === true) {
+			clustered = true;
+		}
+	});
 </script>
 
 <div class="flex min-h-screen w-full flex-col">
@@ -28,7 +40,11 @@
 						autoSaveId="child-left-pane-auto-save"
 					>
 						<Resizable.Pane defaultSize={12} class="border-l">
-							<LeftPanel />
+							{#if clustered}
+								<LeftPanelClustered />
+							{:else}
+								<LeftPanel />
+							{/if}
 						</Resizable.Pane>
 
 						<Resizable.Handle withHandle />

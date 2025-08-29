@@ -1,4 +1,6 @@
 import { z } from 'zod/v4';
+import { SimpleJailSchema } from '../jail/jail';
+import { SimpleVmSchema } from '../vm/vm';
 
 export const ClusterSchema = z.object({
 	id: z.number(),
@@ -25,6 +27,25 @@ export const ClusterDetailsSchema = z.object({
 	partial: z.boolean()
 });
 
+export const ClusterNodeSchema = z.object({
+	id: z.number(),
+	nodeUUID: z.string(),
+	status: z.string(),
+	hostname: z.string(),
+	api: z.string(),
+	createdAt: z.string(),
+	updatedAt: z.string()
+});
+
+export const NodeResourceSchema = z.object({
+	nodeUUID: z.string(),
+	hostname: z.string(),
+	jails: z.array(SimpleJailSchema).nullable().default([]),
+	vms: z.array(SimpleVmSchema).nullable().default([])
+});
+
 export type Cluster = z.infer<typeof ClusterSchema>;
 export type RaftNode = z.infer<typeof RaftNodeSchema>;
 export type ClusterDetails = z.infer<typeof ClusterDetailsSchema>;
+export type ClusterNode = z.infer<typeof ClusterNodeSchema>;
+export type NodeResource = z.infer<typeof NodeResourceSchema>;

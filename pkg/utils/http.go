@@ -70,6 +70,14 @@ func GetClusterTokenFromHeader(r http.Header) (string, error) {
 	return "", errors.New("no cluster token provided")
 }
 
+func GetCurrentHostnameFromHeader(r http.Header) (string, error) {
+	if v := r.Get("X-Current-Hostname"); v != "" {
+		return RemoveSpaces(v), nil
+	}
+
+	return "", errors.New("no_current_hostname_provided")
+}
+
 func GetIdFromParam(c *gin.Context) (int, error) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -202,4 +210,56 @@ func HTTPPostJSONRead(url string, payload any, headers map[string]string) ([]byt
 	}
 
 	return b, resp.StatusCode, nil
+}
+
+func HTTPGetJSONRead(url string, headers map[string]string) ([]byte, int, error) {
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // intra-cluster
+	}
+
+	client := &http.Client{
+		Timeout:   8 * time.Second,
+		Transport: tr,
+	}
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, 0, err
+	}
+	for k, v := range headers {
+		req.Header.Set(k, v)
+	}
+	if req.Header.Get("Accept-Encoding") == "" {
+		req.Header.Set("Accept-Encoding", "gzip")
+	}
+	if req.Header.Get("Accept") == "" {
+		req.Header.Set("Accept", "application/json")
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer resp.Body.Close()
+
+	var reader io.ReadCloser
+	if resp.Header.Get("Content-Encoding") == "gzip" {
+		gz, err := gzip.NewReader(resp.Body)
+		if err != nil {
+			return nil, resp.StatusCode, fmt.Errorf("failed to create gzip reader: %w", err)
+		}
+		defer gz.Close()
+		reader = gz
+	} else {
+		reader = resp.Body
+	}
+
+	data, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, resp.StatusCode, err
+	}
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return nil, resp.StatusCode, fmt.Errorf("http error %d: %s", resp.StatusCode, string(data))
+	}
+	return data, resp.StatusCode, nil
 }

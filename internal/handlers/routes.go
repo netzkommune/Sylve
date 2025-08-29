@@ -92,7 +92,7 @@ func RegisterRoutes(r *gin.Engine,
 	}
 
 	info := api.Group("/info")
-
+	info.Use(EnsureCorrectHost(db))
 	info.Use(middleware.EnsureAuthenticated(authService))
 	info.Use(middleware.RequestLoggerMiddleware(db, authService))
 	{
@@ -123,6 +123,7 @@ func RegisterRoutes(r *gin.Engine,
 	}
 
 	zfs := api.Group("/zfs")
+	zfs.Use(EnsureCorrectHost(db))
 	zfs.Use(middleware.EnsureAuthenticated(authService))
 	zfs.Use(middleware.RequestLoggerMiddleware(db, authService))
 	{
@@ -166,6 +167,7 @@ func RegisterRoutes(r *gin.Engine,
 	}
 
 	samba := api.Group("/samba")
+	samba.Use(EnsureCorrectHost(db))
 	samba.Use(middleware.EnsureAuthenticated(authService))
 	samba.Use(middleware.RequestLoggerMiddleware(db, authService))
 	{
@@ -181,6 +183,7 @@ func RegisterRoutes(r *gin.Engine,
 	}
 
 	disk := api.Group("/disk")
+	disk.Use(EnsureCorrectHost(db))
 	disk.Use(middleware.EnsureAuthenticated(authService))
 	disk.Use(middleware.RequestLoggerMiddleware(db, authService))
 	{
@@ -192,6 +195,7 @@ func RegisterRoutes(r *gin.Engine,
 	}
 
 	network := api.Group("/network")
+	network.Use(EnsureCorrectHost(db))
 	network.Use(middleware.EnsureAuthenticated(authService))
 	network.Use(middleware.RequestLoggerMiddleware(db, authService))
 	{
@@ -209,6 +213,7 @@ func RegisterRoutes(r *gin.Engine,
 	}
 
 	system := api.Group("/system")
+	system.Use(EnsureCorrectHost(db))
 	system.Use(middleware.EnsureAuthenticated(authService))
 	system.Use(middleware.RequestLoggerMiddleware(db, authService))
 	{
@@ -219,6 +224,7 @@ func RegisterRoutes(r *gin.Engine,
 	}
 
 	fileExplorer := system.Group("/file-explorer")
+	fileExplorer.Use(EnsureCorrectHost(db))
 	fileExplorer.Use(middleware.EnsureAuthenticated(authService))
 	fileExplorer.Use(middleware.RequestLoggerMiddleware(db, authService))
 	{
@@ -239,6 +245,7 @@ func RegisterRoutes(r *gin.Engine,
 	}
 
 	vm := api.Group("/vm")
+	vm.Use(EnsureCorrectHost(db))
 	vm.Use(middleware.EnsureAuthenticated(authService))
 	vm.Use(middleware.RequestLoggerMiddleware(db, authService))
 	{
@@ -293,6 +300,7 @@ func RegisterRoutes(r *gin.Engine,
 	}
 
 	utilities := api.Group("/utilities")
+	utilities.Use(EnsureCorrectHost(db))
 	utilities.Use(middleware.EnsureAuthenticated(authService))
 	utilities.Use(middleware.RequestLoggerMiddleware(db, authService))
 	{
@@ -313,6 +321,7 @@ func RegisterRoutes(r *gin.Engine,
 	}
 
 	users := auth.Group("/users")
+	users.Use(EnsureCorrectHost(db))
 	{
 		users.GET("", authHandlers.ListUsersHandler(authService))
 		users.POST("", authHandlers.CreateUserHandler(authService))
@@ -321,6 +330,7 @@ func RegisterRoutes(r *gin.Engine,
 	}
 
 	groups := auth.Group("/groups")
+	groups.Use(EnsureCorrectHost(db))
 	{
 		groups.GET("", authHandlers.ListGroupsHandler(authService))
 		groups.POST("", authHandlers.CreateGroupHandler(authService))
@@ -332,6 +342,9 @@ func RegisterRoutes(r *gin.Engine,
 	cluster.Use(middleware.EnsureAuthenticated(authService))
 	cluster.Use(middleware.RequestLoggerMiddleware(db, authService))
 	{
+		cluster.GET("/nodes", clusterHandlers.Nodes(clusterService))
+		cluster.GET("/resources", clusterHandlers.Resources(clusterService))
+
 		cluster.GET("", clusterHandlers.GetCluster(clusterService))
 		cluster.POST("", clusterHandlers.CreateCluster(authService, clusterService, fsm))
 		cluster.POST("/join", clusterHandlers.JoinCluster(authService, clusterService, fsm))
@@ -347,6 +360,7 @@ func RegisterRoutes(r *gin.Engine,
 	}
 
 	vnc := api.Group("/vnc")
+	vnc.Use(EnsureCorrectHost(db))
 	vnc.Use(middleware.EnsureAuthenticated(authService))
 	vnc.Use(middleware.RequestLoggerMiddleware(db, authService))
 	vnc.GET("/:port", vncHandler.VNCProxyHandler)

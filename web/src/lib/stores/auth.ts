@@ -25,6 +25,10 @@ export const clusterStore = localStore('clusterToken', '', {
 	expiry: addDays(new Date(), 1)
 });
 
+export const currentHostname = localStore('currentHostname', '', {
+	expiry: addDays(new Date(), 1280)
+});
+
 export function getUsername(): string {
 	try {
 		const token = get(store);

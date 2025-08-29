@@ -38,7 +38,6 @@ func EnsureAuthenticated(authService *authService.Service) gin.HandlerFunc {
 
 		if (path == "/api/cluster/accept-join" || strings.HasPrefix(path, "/api/health/basic")) &&
 			c.Request.Method == http.MethodPost {
-
 			raw, err := io.ReadAll(c.Request.Body)
 			if err == nil {
 				c.Request.Body = io.NopCloser(bytes.NewBuffer(raw))

@@ -8,6 +8,7 @@ import (
 
 	"github.com/alchemillahq/sylve/internal/config"
 	clusterModels "github.com/alchemillahq/sylve/internal/db/models/cluster"
+	serviceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services"
 	clusterServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/cluster"
 	"github.com/alchemillahq/sylve/internal/logger"
 	"github.com/alchemillahq/sylve/pkg/network"
@@ -19,14 +20,16 @@ import (
 var _ clusterServiceInterfaces.ClusterServiceInterface = (*Service)(nil)
 
 type Service struct {
-	DB        *gorm.DB
-	Raft      *raft.Raft
-	Transport *raft.NetworkTransport
+	DB          *gorm.DB
+	Raft        *raft.Raft
+	Transport   *raft.NetworkTransport
+	AuthService serviceInterfaces.AuthServiceInterface
 }
 
-func NewClusterService(db *gorm.DB) clusterServiceInterfaces.ClusterServiceInterface {
+func NewClusterService(db *gorm.DB, authService serviceInterfaces.AuthServiceInterface) clusterServiceInterfaces.ClusterServiceInterface {
 	return &Service{
-		DB: db,
+		DB:          db,
+		AuthService: authService,
 	}
 }
 

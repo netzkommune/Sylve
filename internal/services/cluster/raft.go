@@ -50,7 +50,7 @@ func (s *Service) SetupRaft(bootstrap bool, fsm raft.FSM) (*raft.Raft, error) {
 	cfg.LocalID = raft.ServerID(detail.NodeID)
 
 	raftLog := logger.NewZerologHCLog(logger.L, "raft")
-	raftLog.SetLevel(hclog.Warn) // or hclog.Error
+	raftLog.SetLevel(hclog.Error)
 	cfg.Logger = raftLog
 
 	rw := logger.StandardWriterAdapter(logger.L)

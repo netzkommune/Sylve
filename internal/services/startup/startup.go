@@ -12,6 +12,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	serviceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services"
@@ -205,11 +206,14 @@ func (s *Service) Initialize(authService serviceInterfaces.AuthServiceInterface)
 	}()
 
 	go func() {
+		firstRun := true
 		for {
 			if err := s.Cluster.PopulateClusterNodes(); err != nil {
-				logger.L.Error().Msgf("Failed to populate cluster nodes: %v", err)
+				if !strings.Contains(err.Error(), "raft_not_initialized") || !firstRun {
+					logger.L.Error().Err(err).Msg("Failed to populate cluster nodes")
+				}
 			}
-
+			firstRun = false
 			time.Sleep(5 * time.Second)
 		}
 	}()

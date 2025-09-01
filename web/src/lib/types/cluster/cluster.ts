@@ -33,6 +33,12 @@ export const ClusterNodeSchema = z.object({
 	status: z.string(),
 	hostname: z.string(),
 	api: z.string(),
+	cpu: z.number(),
+	cpuUsage: z.number(),
+	memory: z.number(),
+	memoryUsage: z.number(),
+	disk: z.number(),
+	diskUsage: z.number(),
 	createdAt: z.string(),
 	updatedAt: z.string()
 });

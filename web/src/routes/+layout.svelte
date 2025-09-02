@@ -3,7 +3,7 @@
 	import '@fontsource/noto-sans/700.css';
 
 	import { goto } from '$app/navigation';
-	import { isTokenValid, login } from '$lib/api/auth';
+	import { isClusterTokenValid, isTokenValid, login } from '$lib/api/auth';
 	import Login from '$lib/components/custom/Login.svelte';
 	import Throbber from '$lib/components/custom/Throbber.svelte';
 	import Shell from '$lib/components/skeleton/Shell.svelte';
@@ -53,7 +53,7 @@
 
 		if ($token) {
 			try {
-				if (await isTokenValid()) {
+				if ((await isTokenValid()) && (await isClusterTokenValid())) {
 					isLoggedIn = true;
 				} else {
 					$token = '';

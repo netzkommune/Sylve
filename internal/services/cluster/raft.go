@@ -172,6 +172,10 @@ func (s *Service) ResetRaftNode() error {
 		return err
 	}
 
+	if err := s.DB.Exec("DELETE FROM cluster_nodes").Error; err != nil {
+		return fmt.Errorf("failed_to_clean_cluster_nodes: %v", err)
+	}
+
 	return s.CleanRaftDir()
 }
 

@@ -1,10 +1,17 @@
 <script lang="ts">
-	import { getNodes } from '$lib/api/cluster/cluster';
+	import { getDetails, getNodes } from '$lib/api/cluster/cluster';
+	import { getCPUInfo } from '$lib/api/info/cpu';
+	import { getRAMInfo } from '$lib/api/info/ram';
+	import { getPoolsDiskUsage, getPoolsDiskUsageFull } from '$lib/api/zfs/pool';
 	import Arc from '$lib/components/custom/Charts/Arc.svelte';
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
-	import type { ClusterNode } from '$lib/types/cluster/cluster';
+	import type { ClusterDetails, ClusterNode } from '$lib/types/cluster/cluster';
+	import type { CPUInfo, CPUInfoHistorical } from '$lib/types/info/cpu';
+	import type { RAMInfo, RAMInfoHistorical } from '$lib/types/info/ram';
+	import type { PoolsDiskUsage } from '$lib/types/zfs/pool';
+	import { getQuorumStatus } from '$lib/utils/cluster';
 	import { updateCache } from '$lib/utils/http';
 	import { capitalizeFirstLetter } from '$lib/utils/string';
 	import { dateToAgo } from '$lib/utils/time';
@@ -14,6 +21,10 @@
 
 	interface Data {
 		nodes: ClusterNode[];
+		details: ClusterDetails;
+		cpu: CPUInfo;
+		ram: RAMInfo;
+		disk: PoolsDiskUsage;
 	}
 
 	let { data }: { data: Data } = $props();
@@ -32,10 +43,61 @@
 			onSuccess: (data: ClusterNode[]) => {
 				updateCache('cluster-nodes', data);
 			}
+		},
+		{
+			queryKey: 'cluster-details',
+			queryFn: async () => {
+				return (await getDetails()) as ClusterDetails;
+			},
+			refetchInterval: 1000,
+			keepPreviousData: true,
+			initialData: data.details,
+			refetchOnMount: 'always',
+			onSuccess: (data: ClusterDetails) => {
+				updateCache('cluster-details', data);
+			}
+		},
+		{
+			queryKey: 'cpu-info',
+			queryFn: getCPUInfo,
+			keepPreviousData: true,
+			initialData: data.cpu,
+			refetchOnMount: 'always',
+			onSuccess: (data: CPUInfo | CPUInfoHistorical) => {
+				updateCache('cpu-info', data as CPUInfo);
+			}
+		},
+		{
+			queryKey: 'ram-info',
+			queryFn: getRAMInfo,
+			keepPreviousData: true,
+			initialData: data.ram,
+			onSuccess: (data: RAMInfo | RAMInfoHistorical) => {
+				updateCache('ram-info', data);
+			},
+			refetchOnMount: true,
+			refetchOnWindowFocus: true
+		},
+		{
+			queryKey: 'total-disk-usage',
+			queryFn: getPoolsDiskUsageFull,
+			keepPreviousData: true,
+			initialData: data.disk,
+			onSuccess: (data: PoolsDiskUsage) => {
+				updateCache('total-disk-usage', data);
+			},
+			refetchOnMount: true,
+			refetchOnWindowFocus: true
 		}
 	]);
 
 	let nodes = $derived($results[0].data ?? []);
+	let clusterDetails = $derived($results[1].data);
+	let cpuInfo = $derived($results[2].data as CPUInfo);
+	let ramInfo = $derived($results[3].data as RAMInfo);
+	let diskInfo = $derived($results[4].data as PoolsDiskUsage);
+	let clustered = $derived(clusterDetails?.cluster.enabled || false);
+
 	let total = $derived.by(() => {
 		if (nodes.length === 0) {
 			return {
@@ -72,23 +134,89 @@
 			}
 		};
 	});
+
+	let quorumStatus = $derived(getQuorumStatus(clusterDetails as ClusterDetails, nodes));
+	let statusCounts = $derived.by(() => {
+		return nodes.reduce(
+			(acc, node) => {
+				acc[node.status] = (acc[node.status] || 0) + 1;
+				return acc;
+			},
+			{} as Record<string, number>
+		);
+	});
 </script>
 
-<div class="flex h-full w-full flex-col">
-	<div class="min-h-0 flex-1">
-		<div class="p-4">
-			<Card.Root class="gap-2">
-				<Card.Header>
-					<Card.Title>
+<div class="flex h-full w-full flex-col space-y-4">
+	<div class="px-4 pt-4">
+		<Card.Root class="gap-2">
+			<Card.Header>
+				<Card.Title>
+					<div class="flex items-center gap-2">
+						<Icon icon="solar:health-bold" />
+						<span>Health</span>
+					</div>
+				</Card.Title>
+			</Card.Header>
+			<Card.Content>
+				<div class="flex items-start justify-center gap-8">
+					<div class="flex flex-1 flex-col items-center space-y-2 text-center">
+						<span class="text-xl font-bold">Status</span>
+						{#if !clustered}
+							<Icon icon="mdi:check-circle" class="h-12 w-12 text-green-500" />
+							<span class="text-sm font-semibold">Single Node</span>
+						{:else if quorumStatus === 'ok'}
+							<Icon icon="mdi:check-circle" class="h-12 w-12 text-green-500" />
+							<span class="text-sm font-semibold">Quorate: Yes</span>
+						{:else if quorumStatus === 'warning'}
+							<Icon icon="material-symbols:warning" class="h-12 w-12 text-yellow-500" />
+							<span class="text-sm font-semibold">Quorate: Yes (Degraded)</span>
+						{:else}
+							<Icon icon="mdi:close-circle" class="h-12 w-12 text-red-500" />
+							<span class="text-sm font-semibold">Quorate: No</span>
+						{/if}
+					</div>
+
+					<div class="flex flex-1 flex-col items-center space-y-2 text-center">
+						<span class="text-xl font-bold">Nodes</span>
+
 						<div class="flex items-center gap-2">
-							<Icon icon="clarity:resource-pool-solid" />
-							<span>Resources</span>
+							<Icon icon="mdi:check-circle" class="h-5 w-5 text-green-500" />
+							{#if clustered}
+								<span class="text-md font-semibold">Online: {statusCounts.online || 0}</span>
+							{:else}
+								<span class="text-md font-semibold">Online: 1</span>
+							{/if}
 						</div>
-					</Card.Title>
-				</Card.Header>
-				<Card.Content>
-					<!-- Split left and right span with div -->
-					<div class="flex items-center justify-center">
+
+						<div class="flex items-center gap-2">
+							<Icon icon="mdi:close-circle" class="h-5 w-5 text-red-500" />
+							{#if clustered}
+								<span class="text-md font-semibold">Offline: {statusCounts.offline || 0}</span>
+							{:else}
+								<span class="text-md font-semibold">Offline: N/A</span>
+							{/if}
+						</div>
+					</div>
+				</div>
+			</Card.Content>
+			<Card.Footer></Card.Footer>
+		</Card.Root>
+	</div>
+
+	<div class="px-4">
+		<Card.Root class="gap-2">
+			<Card.Header>
+				<Card.Title>
+					<div class="flex items-center gap-2">
+						<Icon icon="clarity:resource-pool-solid" />
+						<span>Resources</span>
+					</div>
+				</Card.Title>
+			</Card.Header>
+			<Card.Content>
+				<div class="flex items-center justify-center">
+					{#if clustered}
 						<div class="flex flex-1 justify-center">
 							<Arc value={total.cpu.usage} title="CPU" subtitle="{total.cpu.total} vCPUs" />
 						</div>
@@ -98,12 +226,24 @@
 						<div class="flex flex-1 justify-center">
 							<Arc value={total.disk.usage} subtitle={humanFormat(total.disk.total)} title="Disk" />
 						</div>
-					</div>
-				</Card.Content>
-				<Card.Footer></Card.Footer>
-			</Card.Root>
-		</div>
+					{:else}
+						<div class="flex flex-1 justify-center">
+							<Arc value={cpuInfo?.usage} title="CPU" subtitle="{cpuInfo.physicalCores} vCPUs" />
+						</div>
+						<div class="flex flex-1 justify-center">
+							<Arc value={ramInfo?.usedPercent} title="RAM" subtitle={humanFormat(ramInfo.total)} />
+						</div>
+						<div class="flex flex-1 justify-center">
+							<Arc value={diskInfo?.usage} title="RAM" subtitle={humanFormat(diskInfo.total)} />
+						</div>
+					{/if}
+				</div>
+			</Card.Content>
+			<Card.Footer></Card.Footer>
+		</Card.Root>
+	</div>
 
+	{#if clustered}
 		<div class="px-4">
 			<Card.Root class="gap-2">
 				<Card.Header>
@@ -148,5 +288,5 @@
 				<Card.Footer></Card.Footer>
 			</Card.Root>
 		</div>
-	</div>
+	{/if}
 </div>

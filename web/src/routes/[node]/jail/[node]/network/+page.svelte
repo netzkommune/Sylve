@@ -156,9 +156,6 @@
 	};
 
 	let modals = $state(options);
-
-	$inspect(modals);
-
 	let query = $state('');
 	let activeRows: Row[] = $state([] as Row[]);
 	let activeRow: Row | null = $derived(

@@ -168,8 +168,6 @@
 			}
 		}
 	}
-
-	$inspect(modalState.isBulkDelete);
 </script>
 
 {#snippet button(type: string)}

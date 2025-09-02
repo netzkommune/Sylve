@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { logOut } from '$lib/api/auth';
 	import { getDetails, resetCluster } from '$lib/api/cluster/cluster';
 	import Create from '$lib/components/custom/Cluster/Create.svelte';
 	import Join from '$lib/components/custom/Cluster/Join.svelte';
@@ -139,8 +140,6 @@
 			columns
 		};
 	});
-
-	$inspect(dataCenter);
 </script>
 
 {#snippet button(type: string, icon: string, title: string, disabled: boolean)}
@@ -225,10 +224,8 @@
 				return;
 			}
 
-			toast.success('Cluster reset on node', {
-				position: 'bottom-center'
-			});
 			modals.reset.open = false;
+			await logOut('Login required after cluster reset');
 		},
 		onCancel: () => {
 			modals.reset.open = false;

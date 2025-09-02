@@ -22,8 +22,6 @@
 
 		open = false;
 	}
-
-	$inspect(cluster);
 </script>
 
 <Dialog.Root bind:open>

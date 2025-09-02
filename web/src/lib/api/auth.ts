@@ -107,6 +107,19 @@ export function getToken(): string | null {
 	return null;
 }
 
+export function getClusterToken(): string | null {
+	if (browser) {
+		try {
+			const parsed = JSON.parse(localStorage.getItem('clusterToken') || '');
+			return parsed.value;
+		} catch (_e: unknown) {
+			return null;
+		}
+	}
+
+	return null;
+}
+
 export async function isTokenValid(): Promise<boolean> {
 	try {
 		const response = await axios.get('/api/health/basic', {
@@ -131,13 +144,46 @@ export async function isTokenValid(): Promise<boolean> {
 	return false;
 }
 
-export async function logOut() {
+export async function isClusterTokenValid(): Promise<boolean> {
+	try {
+		const clusterToken = getClusterToken();
+		if (clusterToken === null || clusterToken === '') {
+			return true;
+		}
+
+		const response = await axios.get('/api/health/basic', {
+			headers: {
+				Authorization: `Bearer ${clusterToken}`,
+				'X-Cluster-Token': `Bearer ${clusterToken}`
+			}
+		});
+
+		if (response.status < 400) {
+			if (response.data?.hostname) {
+				hostname.set(response.data.hostname);
+			}
+			if (response.data?.nodeId) {
+				nodeId.set(response.data.nodeId);
+			}
+			return true;
+		} else {
+			localStorage.removeItem('clusterToken');
+		}
+	} catch (_e: unknown) {
+		return false;
+	}
+
+	return false;
+}
+
+export async function logOut(message?: string) {
 	const token = getToken();
 	if (token) {
 		oldStore.set(token);
 	}
 
 	store.set('');
+	clusterStore.set('');
 	hostname.set('');
 	nodeId.set('');
 
@@ -145,6 +191,13 @@ export async function logOut() {
 		localStorage.removeItem('token');
 		localStorage.removeItem('hostname');
 		localStorage.removeItem('nodeId');
+		localStorage.removeItem('clusterToken');
+	}
+
+	if (message) {
+		toast.success(message, {
+			position: 'bottom-center'
+		});
 	}
 
 	goto('/', {

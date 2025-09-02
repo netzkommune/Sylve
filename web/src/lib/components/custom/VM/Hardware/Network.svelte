@@ -40,8 +40,6 @@
 		);
 	});
 
-	$inspect(usableMacs, 'usable macs');
-
 	let options = {
 		emulation: '',
 		mac: {

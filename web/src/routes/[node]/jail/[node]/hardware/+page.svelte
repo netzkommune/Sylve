@@ -71,8 +71,6 @@
 		}
 	});
 
-	$inspect(jail);
-
 	let activeRows: Row[] | null = $state(null);
 	let activeRow: Row | null = $derived(activeRows ? (activeRows[0] as Row) : ({} as Row));
 	let query = $state('');

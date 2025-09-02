@@ -147,6 +147,7 @@ export const PoolStatPointsResponseSchema = z.object({
 });
 
 export const PoolsDiskUsageSchema = z.object({
+	total: z.number().default(0),
 	usage: z.number().default(0)
 });
 

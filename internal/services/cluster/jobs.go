@@ -8,6 +8,7 @@ import (
 	"github.com/alchemillahq/sylve/internal"
 	"github.com/alchemillahq/sylve/internal/config"
 	clusterModels "github.com/alchemillahq/sylve/internal/db/models/cluster"
+	infoServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/info"
 	"github.com/alchemillahq/sylve/pkg/utils"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -27,32 +28,11 @@ type curInfo struct {
 	cpu      int
 	cpuUsage float64
 
-	memory   uint64  // bytes
-	memUsage float64 // %
+	memory   uint64
+	memUsage float64
 
-	disk      uint64  // bytes
-	diskUsage float64 // %
-}
-
-// ---------- CPU ----------
-
-type CPUInfo struct {
-	Name           string   `json:"name"`
-	PhysicalCores  int16    `json:"physicalCores"`
-	ThreadsPerCore int16    `json:"threadsPerCore"`
-	LogicalCores   int16    `json:"logicalCores"`
-	Family         int16    `json:"family"`
-	Model          int16    `json:"model"`
-	Features       []string `json:"features"`
-	CacheLine      int16    `json:"cacheLine"`
-	Cache          struct {
-		L1D int16 `json:"l1d"`
-		L1I int16 `json:"l1i"`
-		L2  int16 `json:"l2"`
-		L3  int16 `json:"l3"`
-	} `json:"cache"`
-	Frequency int64   `json:"frequency"`
-	Usage     float64 `json:"usage"`
+	disk      uint64
+	diskUsage float64
 }
 
 func (s *Service) fetchCPUInfo(host string, port int, clusterToken, clusterKey string) (int, float64, bool) {
@@ -66,30 +46,23 @@ func (s *Service) fetchCPUInfo(host string, port int, clusterToken, clusterKey s
 			"X-Cluster-Token": fmt.Sprintf("Bearer %s", clusterToken),
 		},
 	)
+
 	if err != nil {
 		return 0, 0, false
 	}
 
-	var resp internal.APIResponse[CPUInfo]
+	var resp internal.APIResponse[infoServiceInterfaces.CPUInfo]
 	if err := json.Unmarshal(body, &resp); err != nil {
 		return 0, 0, false
 	}
+
 	if resp.Status != "success" {
 		return 0, 0, false
 	}
 
-	// Store physical cores; switch to logical if you prefer.
 	cores := int(resp.Data.PhysicalCores)
 	usage := resp.Data.Usage
 	return cores, usage, true
-}
-
-// ---------- RAM ----------
-
-type RAMInfo struct {
-	Total       uint64  `json:"total"`       // bytes
-	Free        uint64  `json:"free"`        // bytes
-	UsedPercent float64 `json:"usedPercent"` // 0..100
 }
 
 func (s *Service) fetchRAMInfo(host string, port int, clusterToken, clusterKey string) (uint64, float64, bool) {
@@ -107,7 +80,7 @@ func (s *Service) fetchRAMInfo(host string, port int, clusterToken, clusterKey s
 		return 0, 0, false
 	}
 
-	var resp internal.APIResponse[RAMInfo]
+	var resp internal.APIResponse[infoServiceInterfaces.RAMInfo]
 	if err := json.Unmarshal(body, &resp); err != nil {
 		return 0, 0, false
 	}
@@ -115,17 +88,12 @@ func (s *Service) fetchRAMInfo(host string, port int, clusterToken, clusterKey s
 		return 0, 0, false
 	}
 
-	// Store bytes directly; UI can format (MB/GiB).
 	return resp.Data.Total, resp.Data.UsedPercent, true
 }
 
-// ---------- DISK/ZFS ----------
-
-// Assumption: endpoint returns bytes for Total and Usage (used bytes).
-// If your endpoint returns different semantics, adjust here centrally.
 type PoolDisksUsageResponse struct {
-	Total float64 `json:"total"` // bytes
-	Usage float64 `json:"usage"` // used bytes
+	Total float64 `json:"total"`
+	Usage float64 `json:"usage"`
 }
 
 func (s *Service) fetchDiskInfo(host string, port int, clusterToken, clusterKey string) (uint64, float64, bool) {
@@ -162,8 +130,6 @@ func (s *Service) fetchDiskInfo(host string, port int, clusterToken, clusterKey 
 
 	return uint64(resp.Data.Total), pct, true
 }
-
-// ---------- Health + combined fetch ----------
 
 func (s *Service) fetchCanonicalHostnameAndCPU(host string, port int, clusterToken, clusterKey, selfHostname string) (string, bool, int, float64, bool) {
 	if utils.IsLocalIP(host) {
@@ -205,8 +171,6 @@ func (s *Service) fetchCanonicalHostnameWithToken(host string, port int, cluster
 	}
 	return "", false
 }
-
-// ---------- Main ----------
 
 func (s *Service) PopulateClusterNodes() error {
 	var c clusterModels.Cluster
@@ -254,10 +218,7 @@ func (s *Service) PopulateClusterNodes() error {
 		canon, okHealth, cores, cpuUsage, okCPU :=
 			s.fetchCanonicalHostnameAndCPU(host, config.ParsedConfig.Port, clusterToken, clusterKey, selfHostname)
 
-		// RAM (bytes + %)
 		memBytes, memUsedPct, okRAM := s.fetchRAMInfo(host, config.ParsedConfig.Port, clusterToken, clusterKey)
-
-		// DISK (bytes + computed %)
 		diskBytes, diskUsedPct, okDisk := s.fetchDiskInfo(host, config.ParsedConfig.Port, clusterToken, clusterKey)
 
 		ci := curInfo{
@@ -309,12 +270,12 @@ func (s *Service) PopulateClusterNodes() error {
 				}(),
 				API:         cur.api,
 				Status:      status,
-				CPU:         cur.cpu,       // 0 if unknown
-				CPUUsage:    cur.cpuUsage,  // 0 if unknown
-				Memory:      cur.memory,    // bytes; 0 if unknown
-				MemoryUsage: cur.memUsage,  // %
-				Disk:        cur.disk,      // bytes; 0 if unknown
-				DiskUsage:   cur.diskUsage, // %
+				CPU:         cur.cpu,
+				CPUUsage:    cur.cpuUsage,
+				Memory:      cur.memory,
+				MemoryUsage: cur.memUsage,
+				Disk:        cur.disk,
+				DiskUsage:   cur.diskUsage,
 			}
 
 			updates := map[string]any{
@@ -325,21 +286,21 @@ func (s *Service) PopulateClusterNodes() error {
 			if cur.canonHost != "" {
 				updates["hostname"] = cur.canonHost
 			}
-			// CPU fields
+
 			if cur.cpu > 0 {
 				updates["cpu"] = cur.cpu
 			}
 			if cur.cpu > 0 || cur.cpuUsage > 0 {
 				updates["cpu_usage"] = cur.cpuUsage
 			}
-			// RAM fields (write only if fetched)
+
 			if cur.memory > 0 {
 				updates["memory"] = cur.memory
 			}
 			if cur.memory > 0 || cur.memUsage > 0 {
 				updates["memory_usage"] = cur.memUsage
 			}
-			// DISK fields
+
 			if cur.disk > 0 {
 				updates["disk"] = cur.disk
 			}
@@ -357,7 +318,6 @@ func (s *Service) PopulateClusterNodes() error {
 			delete(exByUUID, cur.nodeUUID)
 		}
 
-		// Mark nodes not in RAFT config as offline
 		if len(exByUUID) > 0 {
 			ids := make([]string, 0, len(exByUUID))
 			for uuid := range exByUUID {

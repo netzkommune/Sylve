@@ -11,6 +11,7 @@ package db
 import (
 	"github.com/alchemillahq/sylve/internal"
 	"github.com/alchemillahq/sylve/internal/db/models"
+	clusterModels "github.com/alchemillahq/sylve/internal/db/models/cluster"
 	infoModels "github.com/alchemillahq/sylve/internal/db/models/info"
 	jailModels "github.com/alchemillahq/sylve/internal/db/models/jail"
 	networkModels "github.com/alchemillahq/sylve/internal/db/models/network"
@@ -95,6 +96,11 @@ func SetupDatabase(cfg *internal.SylveConfig, isTest bool) *gorm.DB {
 		&sambaModels.SambaSettings{},
 		&sambaModels.SambaShare{},
 		&sambaModels.SambaAuditLog{},
+
+		&clusterModels.Cluster{},
+		&clusterModels.ClusterNode{},
+		&clusterModels.ClusterOption{},
+		&clusterModels.ClusterNote{},
 	)
 
 	if err != nil {
@@ -104,9 +110,13 @@ func SetupDatabase(cfg *internal.SylveConfig, isTest bool) *gorm.DB {
 	db.Exec("PRAGMA foreign_keys = ON")
 
 	err = setupInitUsers(db, cfg)
-
 	if err != nil {
 		logger.L.Fatal().Msgf("Error setting up initial users: %v", err)
+	}
+
+	err = initClusterRecord(db)
+	if err != nil {
+		logger.L.Fatal().Msgf("Error initializing cluster record: %v", err)
 	}
 
 	if !isTest {
@@ -185,6 +195,23 @@ func setupInitUsers(db *gorm.DB, cfg *internal.SylveConfig) error {
 			return err
 		}
 		logger.L.Info().Msg("Unix user 'admin' created successfully")
+	}
+
+	return nil
+}
+
+func initClusterRecord(db *gorm.DB) error {
+	cluster := &clusterModels.Cluster{
+		Enabled:       false,
+		Key:           "",
+		RaftBootstrap: nil,
+		RaftIP:        "",
+		RaftPort:      0,
+	}
+
+	if err := db.Create(cluster).Error; err != nil {
+		logger.L.Error().Msgf("Failed to create initial data center record: %v", err)
+		return err
 	}
 
 	return nil

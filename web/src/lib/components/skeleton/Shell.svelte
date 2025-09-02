@@ -1,15 +1,33 @@
 <script lang="ts">
+	import { getDetails } from '$lib/api/cluster/cluster';
 	import Header from '$lib/components/custom/Header.svelte';
-	import * as Resizable from '$lib/components/ui/resizable';
-
 	import Terminal from '$lib/components/custom/Terminal.svelte';
 	import BottomPanel from '$lib/components/skeleton/BottomPanel.svelte';
 	import LeftPanel from '$lib/components/skeleton/LeftPanel.svelte';
+	import * as Resizable from '$lib/components/ui/resizable';
+	import { useQueries } from '@sveltestack/svelte-query';
+	import LeftPanelClustered from './LeftPanelClustered.svelte';
+
 	interface Props {
 		children?: import('svelte').Snippet;
 	}
 
 	let { children }: Props = $props();
+
+	const results = useQueries([
+		{
+			queryKey: 'cluster-details',
+			queryFn: async () => {
+				return await getDetails();
+			},
+			refetchInterval: 1000,
+			keepPreviousData: true,
+			refetchOnMount: 'always'
+		}
+	]);
+
+	let details = $derived($results[0].data);
+	let clustered = $derived(details?.cluster.enabled || false);
 </script>
 
 <div class="flex min-h-screen w-full flex-col">
@@ -28,7 +46,11 @@
 						autoSaveId="child-left-pane-auto-save"
 					>
 						<Resizable.Pane defaultSize={12} class="border-l">
-							<LeftPanel />
+							{#if clustered}
+								<LeftPanelClustered />
+							{:else}
+								<LeftPanel />
+							{/if}
 						</Resizable.Pane>
 
 						<Resizable.Handle withHandle />

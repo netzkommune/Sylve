@@ -112,8 +112,6 @@
 		}
 	};
 
-	$inspect(vm);
-
 	let properties = $state(options);
 
 	$effect(() => {

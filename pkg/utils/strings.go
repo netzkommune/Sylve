@@ -33,6 +33,7 @@ import (
 )
 
 const Base62Chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+const letters = "abcdefghijklmnopqrstuvwxyz"
 
 func FNVHash(s string) uint64 {
 	hasher := fnv.New64a()
@@ -63,6 +64,10 @@ func SHA256(input string, count int) string {
 	}
 
 	return hex.EncodeToString(sum)
+}
+
+func PasswordQueryHash(input string) string {
+	return SHA256(input, 1)
 }
 
 func RemoveSpaces(input string) string {
@@ -553,25 +558,24 @@ func MakeValidHostname(name string) string {
 }
 
 func HashIntToNLetters(n int, length int) string {
-	const letters = "abcdefghijklmnopqrstuvwxyz"
-	max := 1
-	for i := 0; i < length; i++ {
-		max *= 26
+	if n < 0 {
+		n = 0
 	}
 
-	hasher := sha256.New()
-	buf := make([]byte, 8)
-	binary.BigEndian.PutUint64(buf, uint64(n))
-	hasher.Write(buf)
-	sum := hasher.Sum(nil)
-	num := binary.BigEndian.Uint32(sum[:4]) % uint32(max)
+	// Compute 26^length
+	max := new(big.Int).Exp(big.NewInt(26), big.NewInt(int64(length)), nil).Int64()
+	if int64(n) >= max {
+		panic("HashIntToNLetters: n too large, would cause collisions")
+	}
 
+	num := n
 	out := make([]byte, length)
 	for i := length - 1; i >= 0; i-- {
 		out[i] = letters[num%26]
 		num /= 26
 	}
-	return string(out)
+
+	return string(out) // unique & deterministic as long as n < 26^length
 }
 
 func PreviousMAC(macStr string) (string, error) {
@@ -644,4 +648,9 @@ func UintSliceToJSON(slice []uint) (string, error) {
 
 func FormatMAC(mac []byte) string {
 	return net.HardwareAddr(mac).String()
+}
+
+func MustJSON(v any) []byte {
+	b, _ := json.Marshal(v)
+	return b
 }

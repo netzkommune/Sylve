@@ -19,7 +19,8 @@ type CustomClaims struct {
 type AuthServiceInterface interface {
 	VerifyTokenInDb(token string) bool
 	GetJWTSecret() (string, error)
-	CreateJWT(username, password, authType string, remember bool) (string, error)
+	CreateJWT(username, password, authType string, remember bool) (uint, string, error)
+	CreateClusterJWT(userId uint, username string, authType string, forceSecret string) (string, error)
 	RevokeJWT(token string) error
 	ValidateToken(tokenString string) (CustomClaims, error)
 	ClearExpiredJWTTokens()

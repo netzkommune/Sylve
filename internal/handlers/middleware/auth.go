@@ -9,6 +9,9 @@
 package middleware
 
 import (
+	"bytes"
+	"encoding/json"
+	"io"
 	"net/http"
 	"strings"
 
@@ -24,41 +27,82 @@ func EnsureAuthenticated(authService *authService.Service) gin.HandlerFunc {
 
 		if strings.HasPrefix(path, "/api/utilities/downloads/") &&
 			len(path) > len("/api/utilities/downloads/") {
+			c.Next()
 			return
 		}
 
 		if path == "/api/auth/login" {
+			c.Next()
 			return
 		}
 
-		var token string
-		var err error
+		if (path == "/api/cluster/accept-join" || strings.HasPrefix(path, "/api/health/basic")) &&
+			c.Request.Method == http.MethodPost {
+			raw, err := io.ReadAll(c.Request.Body)
+			if err == nil {
+				c.Request.Body = io.NopCloser(bytes.NewBuffer(raw))
 
+				var body struct {
+					ClusterKey string `json:"clusterKey"`
+				}
+
+				if json.Unmarshal(raw, &body) == nil && body.ClusterKey != "" && authService.IsValidClusterKey(body.ClusterKey) {
+					c.Next()
+					return
+				}
+			} else {
+				c.Request.Body = io.NopCloser(bytes.NewBuffer(nil))
+			}
+		}
+
+		if clusterJWT, err := utils.GetClusterTokenFromHeader(c.Request.Header); err == nil && clusterJWT != "" {
+			clusterClaims, err := authService.VerifyClusterJWT(clusterJWT)
+
+			if err != nil {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"status": "error", "error": "invalid_cluster_token"})
+				return
+			}
+
+			c.Set("Token", clusterJWT)
+			c.Set("AuthScope", "cluster")
+			c.Set("UserID", clusterClaims.UserID)
+			c.Set("Username", clusterClaims.Username)
+			c.Set("AuthType", clusterClaims.AuthType)
+			c.Next()
+			return
+		}
+
+		var localJWT string
 		if hash := c.Query("hash"); hash != "" {
-			token, err = authService.GetTokenBySHA256(hash)
+			tok, err := authService.GetTokenBySHA256(hash)
 			if err != nil {
 				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"status": "error", "error": "invalid_hash"})
 				return
 			}
+			localJWT = tok
 		}
 
-		if token == "" {
-			token, err = utils.GetTokenFromHeader(c.Request.Header)
+		if localJWT == "" {
+			var err error
+			localJWT, err = utils.GetTokenFromHeader(c.Request.Header)
 			if err != nil {
 				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "no_token_provided"})
 				return
 			}
 		}
 
-		claims, err := authService.ValidateToken(token)
+		claims, err := authService.ValidateToken(localJWT)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"status": "error", "error": err.Error()})
 			return
 		}
 
+		c.Set("Token", localJWT)
+		c.Set("AuthScope", "local")
+		c.Set("UserID", claims.UserID)
+		c.Set("Username", claims.Username)
+		c.Set("AuthType", claims.AuthType)
 		authService.UpdateLastUsageTime(claims.UserID)
-
-		c.Set("Token", token)
 		c.Next()
 	}
 }

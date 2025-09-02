@@ -26,8 +26,10 @@ type LoginRequest struct {
 }
 
 type SuccessfulLogin struct {
-	Token    string `json:"token"`
-	Hostname string `json:"hostname"`
+	Token        string `json:"token"`
+	ClusterToken string `json:"clusterToken"`
+	Hostname     string `json:"hostname"`
+	NodeID       string `json:"nodeId"`
 }
 
 // @Summary Login
@@ -58,7 +60,7 @@ func LoginHandler(authService *auth.Service) gin.HandlerFunc {
 			return
 		}
 
-		token, err := authService.CreateJWT(r.Username, r.Password, r.AuthType, r.Remember)
+		userId, token, err := authService.CreateJWT(r.Username, r.Password, r.AuthType, r.Remember)
 
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, internal.APIResponse[any]{
@@ -70,8 +72,20 @@ func LoginHandler(authService *auth.Service) gin.HandlerFunc {
 			return
 		}
 
+		clusterToken, _ := authService.CreateClusterJWT(userId, r.Username, r.AuthType, "")
 		hostname, err := utils.GetSystemHostname()
 
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "internal_server_error",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		nodeId, err := utils.GetSystemUUID()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
 				Status:  "error",
@@ -86,7 +100,12 @@ func LoginHandler(authService *auth.Service) gin.HandlerFunc {
 			Status:  "success",
 			Message: "login_successful",
 			Error:   "",
-			Data:    SuccessfulLogin{Token: token, Hostname: hostname},
+			Data: SuccessfulLogin{
+				Token:        token,
+				ClusterToken: clusterToken,
+				Hostname:     hostname,
+				NodeID:       nodeId,
+			},
 		})
 	}
 }

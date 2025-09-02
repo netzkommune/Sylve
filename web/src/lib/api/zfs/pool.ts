@@ -8,6 +8,7 @@ import {
 	type CreateZpool,
 	type IODelay,
 	type IODelayHistorical,
+	type PoolsDiskUsage,
 	type PoolStatPointsResponse,
 	type ReplaceDevice,
 	type Zpool
@@ -42,6 +43,15 @@ export async function getPoolsDiskUsage(): Promise<number> {
 		return response.usage;
 	} catch (error) {
 		return 0;
+	}
+}
+
+export async function getPoolsDiskUsageFull(): Promise<PoolsDiskUsage> {
+	try {
+		const response = await apiRequest('/zfs/pools/disks-usage', PoolsDiskUsageSchema, 'GET');
+		return response;
+	} catch (error) {
+		return { total: 0, usage: 0 };
 	}
 }
 

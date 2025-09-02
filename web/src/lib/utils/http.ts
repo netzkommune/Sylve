@@ -10,6 +10,7 @@
 
 import { api } from '$lib/api/common';
 import { reload } from '$lib/stores/api.svelte';
+import { clusterStore } from '$lib/stores/auth';
 import { APIResponseSchema, type APIResponse } from '$lib/types/common';
 import type { QueryFunctionContext } from '@sveltestack/svelte-query';
 import adze from 'adze';
@@ -36,6 +37,15 @@ export async function apiRequest<T extends z.ZodType>(
 
 		const response = await api.request({ ...config, validateStatus: () => true });
 		const apiResponse = APIResponseSchema.safeParse(response.data);
+
+		if (apiResponse.data) {
+			if (apiResponse.data.status && apiResponse.data.status === 'error') {
+				if (apiResponse.data.error && apiResponse.data.error === 'invalid_cluster_token') {
+					clusterStore.set('');
+					return apiRequest(endpoint, schema, method, body);
+				}
+			}
+		}
 
 		/* Couldn't parse response data into APIResponse so we'll just return the data? */
 		if (!apiResponse.success) {

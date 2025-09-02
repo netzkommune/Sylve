@@ -130,7 +130,6 @@ func (z *zfs) GetZdb(name string) (*ZDB, error) {
 	zdbCacheMutex.RLock()
 	if entry, ok := zdbCache[name]; ok && time.Now().Before(entry.expiry) && entry.guid == currentGUID {
 		zdbCacheMutex.RUnlock()
-		fmt.Println("Cache hit for zdb:", name)
 		return entry.zdb, nil
 	}
 	zdbCacheMutex.RUnlock()

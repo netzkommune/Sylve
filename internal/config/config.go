@@ -20,8 +20,10 @@ import (
 )
 
 var ParsedConfig *internal.SylveConfig
+var ConfigPath string
 
 func ParseConfig(path string) *internal.SylveConfig {
+	ConfigPath = path
 	file, err := os.Open(path)
 
 	if err != nil {
@@ -86,6 +88,7 @@ func SetupDataPath() error {
 		dataPath,
 		filepath.Join(dataPath, "vms"),
 		filepath.Join(dataPath, "jails"),
+		filepath.Join(dataPath, "raft"),
 		filepath.Join(dataPath, "downloads"),
 		filepath.Join(dataPath, "downloads", "torrents"),
 		filepath.Join(dataPath, "downloads", "http"),
@@ -146,4 +149,36 @@ func GetJailsPath() (string, error) {
 	jailsPath := filepath.Join(dataPath, "jails")
 
 	return jailsPath, nil
+}
+
+func GetRaftPath() (string, error) {
+	dataPath, err := GetDataPath()
+	if err != nil {
+		return "", fmt.Errorf("failed to get data path: %w", err)
+	}
+
+	raftPath := filepath.Join(dataPath, "raft")
+
+	return raftPath, nil
+}
+
+func ResetRaftReset() error {
+	if ParsedConfig.Raft.Reset {
+		ParsedConfig.Raft.Reset = false
+	}
+
+	file, err := os.OpenFile(ConfigPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		return fmt.Errorf("failed to open config file for writing: %w", err)
+	}
+
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ")
+	if err := encoder.Encode(ParsedConfig); err != nil {
+		return fmt.Errorf("failed to write config file: %w", err)
+	}
+
+	return nil
 }

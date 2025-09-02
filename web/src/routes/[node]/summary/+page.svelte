@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import { getBasicInfo } from '$lib/api/info/basic';
 	import { getCPUInfo } from '$lib/api/info/cpu';
 	import { getNetworkInterfaceInfoHistorical } from '$lib/api/info/network';
@@ -10,6 +11,7 @@
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { reload } from '$lib/stores/api.svelte';
+	import { currentHostname } from '$lib/stores/auth';
 	import type { BasicInfo } from '$lib/types/info/basic';
 	import type { CPUInfo, CPUInfoHistorical } from '$lib/types/info/cpu';
 	import type { HistoricalNetworkInterface } from '$lib/types/info/network';
@@ -19,9 +21,10 @@
 	import { bytesToHumanReadable, floatToNDecimals } from '$lib/utils/numbers';
 	import { formatUptime, secondsToHoursAgo } from '$lib/utils/time';
 	import Icon from '@iconify/svelte';
-	import { useQueries } from '@sveltestack/svelte-query';
+	import { useQueries, useQueryClient } from '@sveltestack/svelte-query';
 	import type { Chart } from 'chart.js';
 	import { onMount } from 'svelte';
+	import { get } from 'svelte/store';
 
 	interface Data {
 		basicInfo: BasicInfo;
@@ -39,6 +42,7 @@
 
 	let { data }: { data: Data } = $props();
 
+	const queryClient = useQueryClient();
 	const results = useQueries([
 		{
 			queryKey: ['basicInfo'],
@@ -173,6 +177,22 @@
 			refetchOnWindowFocus: true
 		}
 	]);
+
+	$effect(() => {
+		if (page.url) {
+			queryClient.refetchQueries('cpuInfo');
+			queryClient.refetchQueries('basicInfo');
+			queryClient.refetchQueries('ramInfo');
+			queryClient.refetchQueries('swapInfo');
+			queryClient.refetchQueries('ioDelay');
+			queryClient.refetchQueries('totalDiskUsage');
+			queryClient.refetchQueries('cpuInfoHistorical');
+			queryClient.refetchQueries('ioDelayHistorical');
+			queryClient.refetchQueries('ramInfoHistorical');
+			queryClient.refetchQueries('swapInfoHistorical');
+			queryClient.refetchQueries('networkUsageHistorical');
+		}
+	});
 
 	let basicInfo = $derived($results[0].data as BasicInfo);
 	let cpuInfo = $derived($results[1].data as CPUInfo);

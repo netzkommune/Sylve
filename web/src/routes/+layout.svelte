@@ -2,9 +2,8 @@
 	import '@fontsource/noto-sans';
 	import '@fontsource/noto-sans/700.css';
 
-	import { goto, pushState, replaceState } from '$app/navigation';
-	import { page } from '$app/state';
-	import { isTokenValid, login } from '$lib/api/auth';
+	import { goto } from '$app/navigation';
+	import { isClusterTokenValid, isTokenValid, login } from '$lib/api/auth';
 	import Login from '$lib/components/custom/Login.svelte';
 	import Throbber from '$lib/components/custom/Throbber.svelte';
 	import Shell from '$lib/components/skeleton/Shell.svelte';
@@ -15,12 +14,11 @@
 	import { preloadIcons } from '$lib/utils/icons';
 	import { addTabulatorFilters } from '$lib/utils/table';
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
-    import { loadLocale } from 'wuchale/run-client'
 	import { ModeWatcher } from 'mode-watcher';
 	import { onMount, tick } from 'svelte';
+	import { loadLocale } from 'wuchale/run-client';
 
 	import type { Locales } from '$lib/types/common';
-	import { toast } from 'svelte-sonner';
 	import '../app.css';
 
 	$effect.pre(() => {
@@ -35,8 +33,8 @@
 	$effect(() => {
 		if (isLoggedIn && $hostname) {
 			const path = window.location.pathname;
-			if (path === '/' || !path.startsWith(`/${$hostname}`)) {
-				goto(`/${$hostname}/summary`, { replaceState: true });
+			if (path === '/') {
+				goto('/datacenter/summary', { replaceState: true });
 			}
 		}
 	});
@@ -55,7 +53,7 @@
 
 		if ($token) {
 			try {
-				if (await isTokenValid()) {
+				if ((await isTokenValid()) && (await isClusterTokenValid())) {
 					isLoggedIn = true;
 				} else {
 					$token = '';
@@ -91,8 +89,8 @@
 				isLoggedIn = true;
 				const path = window.location.pathname;
 
-				if (path === '/' || !path.startsWith(`/${$hostname}`)) {
-					await goto(`/${$hostname}/summary`, { replaceState: true });
+				if (path === '/') {
+					await goto('/datacenter/summary', { replaceState: true });
 				}
 			} else {
 				isError = true;

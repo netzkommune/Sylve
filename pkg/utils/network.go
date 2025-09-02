@@ -142,3 +142,19 @@ func GetPortUserPID(proto string, port int) (int, error) {
 
 	return 0, fmt.Errorf("no process found using %s port %d", proto, port)
 }
+
+func IsValidIPPort(ipPort string) bool {
+	parts := strings.Split(ipPort, ":")
+	if len(parts) != 2 {
+		return false
+	}
+
+	ip := parts[0]
+	portStr := parts[1]
+	portInt, err := strconv.Atoi(portStr)
+	if err != nil {
+		return false
+	}
+
+	return IsValidIP(ip) && IsValidPort(portInt)
+}

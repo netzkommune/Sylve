@@ -44,7 +44,8 @@ const icons = [
 	'mdi:file-plus',
 	'mdi:rename',
 	'lets-icons:check-fill',
-	'gridicons:cross-circle'
+	'gridicons:cross-circle',
+	'fluent-mdl2:party-leader'
 ];
 
 export async function preloadIcons() {

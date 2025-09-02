@@ -31,6 +31,7 @@ type AvgIODelayResponse struct {
 }
 
 type PoolDisksUsageResponse struct {
+	Total float64 `json:"total"`
 	Usage float64 `json:"usage"`
 }
 
@@ -176,6 +177,7 @@ func GetDisksUsage(zfsService *zfs.Service) gin.HandlerFunc {
 			usage = 0
 		}
 
+		poolDisksUsageResponse.Total = float64(totalSize)
 		poolDisksUsageResponse.Usage = usage
 
 		c.JSON(http.StatusOK, internal.APIResponse[any]{

@@ -10,8 +10,8 @@
 
 import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
-import { oldStore, store } from '$lib/stores/auth';
-import { hostname, language as langStore } from '$lib/stores/basic';
+import { clusterStore, oldStore, store } from '$lib/stores/auth';
+import { hostname, language as langStore, nodeId } from '$lib/stores/basic';
 import type { JWTClaims } from '$lib/types/auth';
 import type { APIResponse } from '$lib/types/common';
 import { handleAPIError } from '$lib/utils/http';
@@ -57,7 +57,9 @@ export async function login(
 			if (response.data.data?.hostname && response.data.data?.token) {
 				langStore.set(language);
 				hostname.set(response.data.data.hostname);
+				nodeId.set(response.data.data.nodeId || '');
 				store.set(response.data.data.token);
+				clusterStore.set(response.data.data.clusterToken || '');
 				return true;
 			} else {
 				toast.error('Invalid response received', {
@@ -105,6 +107,19 @@ export function getToken(): string | null {
 	return null;
 }
 
+export function getClusterToken(): string | null {
+	if (browser) {
+		try {
+			const parsed = JSON.parse(localStorage.getItem('clusterToken') || '');
+			return parsed.value;
+		} catch (_e: unknown) {
+			return null;
+		}
+	}
+
+	return null;
+}
+
 export async function isTokenValid(): Promise<boolean> {
 	try {
 		const response = await axios.get('/api/health/basic', {
@@ -117,6 +132,9 @@ export async function isTokenValid(): Promise<boolean> {
 			if (response.data?.hostname) {
 				hostname.set(response.data.hostname);
 			}
+			if (response.data?.nodeId) {
+				nodeId.set(response.data.nodeId);
+			}
 			return true;
 		}
 	} catch (_e: unknown) {
@@ -126,18 +144,60 @@ export async function isTokenValid(): Promise<boolean> {
 	return false;
 }
 
-export async function logOut() {
+export async function isClusterTokenValid(): Promise<boolean> {
+	try {
+		const clusterToken = getClusterToken();
+		if (clusterToken === null || clusterToken === '') {
+			return true;
+		}
+
+		const response = await axios.get('/api/health/basic', {
+			headers: {
+				Authorization: `Bearer ${clusterToken}`,
+				'X-Cluster-Token': `Bearer ${clusterToken}`
+			}
+		});
+
+		if (response.status < 400) {
+			if (response.data?.hostname) {
+				hostname.set(response.data.hostname);
+			}
+			if (response.data?.nodeId) {
+				nodeId.set(response.data.nodeId);
+			}
+			return true;
+		} else {
+			localStorage.removeItem('clusterToken');
+		}
+	} catch (_e: unknown) {
+		return false;
+	}
+
+	return false;
+}
+
+export async function logOut(message?: string) {
 	const token = getToken();
 	if (token) {
 		oldStore.set(token);
 	}
 
 	store.set('');
+	clusterStore.set('');
 	hostname.set('');
+	nodeId.set('');
 
 	if (browser) {
 		localStorage.removeItem('token');
 		localStorage.removeItem('hostname');
+		localStorage.removeItem('nodeId');
+		localStorage.removeItem('clusterToken');
+	}
+
+	if (message) {
+		toast.success(message, {
+			position: 'bottom-center'
+		});
 	}
 
 	goto('/', {

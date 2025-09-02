@@ -97,7 +97,7 @@
 				{item.label}
 			</p>
 		</div>
-		{#if item.children}
+		{#if item.children && item.children.length > 0}
 			<Icon
 				icon={isOpen ? 'teenyicons:down-solid' : 'teenyicons:right-solid'}
 				class="h-3.5 w-3.5"

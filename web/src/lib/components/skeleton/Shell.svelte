@@ -1,12 +1,11 @@
 <script lang="ts">
-	import Header from '$lib/components/custom/Header.svelte';
-	import * as Resizable from '$lib/components/ui/resizable';
-
 	import { getDetails } from '$lib/api/cluster/cluster';
+	import Header from '$lib/components/custom/Header.svelte';
 	import Terminal from '$lib/components/custom/Terminal.svelte';
 	import BottomPanel from '$lib/components/skeleton/BottomPanel.svelte';
 	import LeftPanel from '$lib/components/skeleton/LeftPanel.svelte';
-	import { onMount } from 'svelte';
+	import * as Resizable from '$lib/components/ui/resizable';
+	import { useQueries } from '@sveltestack/svelte-query';
 	import LeftPanelClustered from './LeftPanelClustered.svelte';
 
 	interface Props {
@@ -14,14 +13,21 @@
 	}
 
 	let { children }: Props = $props();
-	let clustered = $state(false);
 
-	onMount(async () => {
-		const details = await getDetails();
-		if (details.cluster.enabled === true) {
-			clustered = true;
+	const results = useQueries([
+		{
+			queryKey: 'cluster-details',
+			queryFn: async () => {
+				return await getDetails();
+			},
+			refetchInterval: 1000,
+			keepPreviousData: true,
+			refetchOnMount: 'always'
 		}
-	});
+	]);
+
+	let details = $derived($results[0].data);
+	let clustered = $derived(details?.cluster.enabled || false);
 </script>
 
 <div class="flex min-h-screen w-full flex-col">

@@ -24,8 +24,8 @@
 				? window.location.hostname
 				: '',
 		port: 8182,
-		clusterKey: '6yQbY4FaqTk6zu0HHFtGKaiG38uBfvbd',
-		leaderApi: '10.254.248.239:8181'
+		clusterKey: '',
+		leaderApi: ''
 	};
 
 	let properties = $state(options);

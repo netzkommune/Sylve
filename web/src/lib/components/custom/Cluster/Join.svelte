@@ -1,5 +1,4 @@
 <script lang="ts">
-	// import { createCluster, joinCluster } from '$lib/api/datacenter/cluster';
 	import { joinCluster } from '$lib/api/cluster/cluster';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';

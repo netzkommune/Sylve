@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-22T21:29:52.875Z\n"
-"PO-Revision-Date: 2025-09-03T10:14:20.842Z\n"
+"PO-Revision-Date: 2025-09-03T14:14:42.259Z\n"
 "Last-Translator: \n"
 "Language: English\n"
 "Language-Team: \n"
@@ -162,8 +162,6 @@ msgstr "Minimize"
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 #: src/lib/components/custom/Cluster/Create.svelte
 #: src/lib/components/custom/Cluster/Create.svelte
-#: src/lib/components/custom/Cluster/Join.svelte
-#: src/lib/components/custom/Cluster/Join.svelte
 #: src/lib/components/custom/Cluster/JoinInformation.svelte
 #: src/lib/components/custom/Cluster/JoinInformation.svelte
 #: src/routes/datacenter/notes/+page.svelte
@@ -200,6 +198,10 @@ msgstr "Minimize"
 #: src/routes/[node]/utilities/downloader/+page.svelte
 #: src/lib/components/custom/VM/Create/CreateVM.svelte
 #: src/lib/components/custom/VM/Create/CreateVM.svelte
+#: src/lib/components/custom/Cluster/Join.svelte
+#: src/lib/components/custom/Cluster/Join.svelte
+#: src/lib/components/custom/Cluster/Storage/Create.svelte
+#: src/lib/components/custom/Cluster/Storage/Create.svelte
 msgid "Close"
 msgstr "Close"
 
@@ -250,8 +252,8 @@ msgstr "Login"
 
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
 #: src/lib/components/skeleton/BottomPanel.svelte
-#: src/routes/datacenter/+layout.svelte
 #: src/routes/[node]/+layout.svelte
+#: src/routes/datacenter/+layout.svelte
 msgid "Notes"
 msgstr "Notes"
 
@@ -387,8 +389,6 @@ msgstr "Login - Create"
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 #: src/lib/components/custom/Cluster/Create.svelte
 #: src/lib/components/custom/Cluster/Create.svelte
-#: src/lib/components/custom/Cluster/Join.svelte
-#: src/lib/components/custom/Cluster/Join.svelte
 #: src/routes/datacenter/notes/+page.svelte
 #: src/routes/datacenter/notes/+page.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
@@ -423,6 +423,10 @@ msgstr "Login - Create"
 #: src/routes/[node]/utilities/downloader/+page.svelte
 #: src/lib/components/custom/VM/Create/CreateVM.svelte
 #: src/lib/components/custom/VM/Create/CreateVM.svelte
+#: src/lib/components/custom/Cluster/Join.svelte
+#: src/lib/components/custom/Cluster/Join.svelte
+#: src/lib/components/custom/Cluster/Storage/Create.svelte
+#: src/lib/components/custom/Cluster/Storage/Create.svelte
 msgid "Reset"
 msgstr "Reset"
 
@@ -749,20 +753,20 @@ msgstr "Select installation media"
 msgid "None"
 msgstr "None"
 
-#: src/routes/datacenter/+layout.svelte
 #: src/routes/[node]/+layout.svelte
+#: src/routes/datacenter/+layout.svelte
 msgid "Help"
 msgstr "Help"
 
-#: src/routes/datacenter/+layout.svelte
 #: src/routes/[node]/+layout.svelte
+#: src/routes/datacenter/+layout.svelte
 msgid "Difuse-sidebar"
 msgstr "Difuse-sidebar"
 
+#: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/+layout.svelte
+#: src/routes/[node]/+layout.svelte
 #: src/routes/datacenter/+layout.svelte
-#: src/routes/[node]/+layout.svelte
-#: src/routes/[node]/+layout.svelte
-#: src/routes/[node]/+layout.svelte
 msgid "Summary"
 msgstr "Summary"
 
@@ -773,6 +777,7 @@ msgstr "Console"
 
 #: src/routes/[node]/+layout.svelte
 #: src/routes/[node]/+layout.svelte
+#: src/routes/datacenter/+layout.svelte
 msgid "Storage"
 msgstr "Storage"
 
@@ -1119,6 +1124,7 @@ msgstr "Start"
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
 #: src/routes/datacenter/notes/+page.svelte
 #: src/routes/[node]/network/switches/+page.svelte
+#: src/routes/datacenter/storage/+page.svelte
 msgid "Delete"
 msgstr "Delete"
 
@@ -1214,6 +1220,7 @@ msgstr "Edit"
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
+#: src/routes/datacenter/storage/+page.svelte
 msgid "New"
 msgstr "New"
 
@@ -1258,6 +1265,7 @@ msgstr "Create Object"
 #: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/routes/datacenter/storage/+page.svelte
 msgid "Name"
 msgstr "Name"
 
@@ -1268,6 +1276,8 @@ msgstr "Windows"
 #: src/lib/components/custom/Network/Objects/CreateOrEdit.svelte
 #: src/lib/components/custom/FileExplorer/Toolbar.svelte
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/routes/datacenter/storage/+page.svelte
+#: src/lib/components/custom/Cluster/Storage/Create.svelte
 msgid "Type"
 msgstr "Type"
 
@@ -1335,6 +1345,7 @@ msgstr "Select MACs"
 #: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
+#: src/lib/components/custom/Cluster/Storage/Create.svelte
 msgid "Create"
 msgstr "Create"
 
@@ -1445,6 +1456,7 @@ msgstr "View"
 #: src/routes/datacenter/notes/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/Jobs.svelte
+#: src/routes/datacenter/storage/+page.svelte
 msgid "ID"
 msgstr "ID"
 
@@ -1811,6 +1823,7 @@ msgid "New Storage"
 msgstr "New Storage"
 
 #: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/Cluster/Storage/Create.svelte
 msgid "Select Type"
 msgstr "Select Type"
 
@@ -2221,8 +2234,8 @@ msgstr "Cluster Information"
 #~ msgid "Leader API"
 #~ msgstr "Leader API"
 
-#: src/lib/components/custom/Cluster/Join.svelte
 #: src/lib/components/custom/Cluster/JoinInformation.svelte
+#: src/lib/components/custom/Cluster/Join.svelte
 msgid "Cluster Key"
 msgstr "Cluster Key"
 
@@ -3818,3 +3831,62 @@ msgstr "Network deleted"
 #: src/lib/components/custom/VM/Create/Basic.svelte
 msgid "Select Node"
 msgstr "Select Node"
+
+#~ msgid "v"
+#~ msgstr "v"
+
+#~ msgid "Test"
+#~ msgstr "Test"
+
+#: src/lib/components/custom/Cluster/Storage/Create.svelte
+msgid "Create Storage"
+msgstr "Create Storage"
+
+#: src/routes/datacenter/storage/+page.svelte
+#: src/routes/datacenter/storage/+page.svelte
+#: src/lib/components/custom/Cluster/Storage/Create.svelte
+msgid "S3"
+msgstr "S3"
+
+#~ msgid "Endpoint"
+#~ msgstr "Endpoint"
+
+#~ msgid "Region"
+#~ msgstr "Region"
+
+#: src/routes/datacenter/storage/+page.svelte
+msgid "Bucket"
+msgstr "Bucket"
+
+#~ msgid "Access Key"
+#~ msgstr "Access Key"
+
+#~ msgid "Secret Key"
+#~ msgstr "Secret Key"
+
+#: src/lib/components/custom/Cluster/Storage/Create.svelte
+msgid "Missing required fields"
+msgstr "Missing required fields"
+
+#: src/lib/components/custom/Cluster/Storage/Create.svelte
+msgid "Failed to create S3 storage"
+msgstr "Failed to create S3 storage"
+
+#: src/lib/components/custom/Cluster/Storage/Create.svelte
+msgid "S3 storage created"
+msgstr "S3 storage created"
+
+#: src/routes/datacenter/storage/+page.svelte
+msgid "This will delete {0}"
+msgstr "This will delete {0}"
+
+#~ msgid "Failed to delete S3 storage"
+#~ msgstr "Failed to delete S3 storage"
+
+#: src/routes/datacenter/storage/+page.svelte
+msgid "Failed to delete {0}"
+msgstr "Failed to delete {0}"
+
+#: src/routes/datacenter/storage/+page.svelte
+msgid "Deleted {0}"
+msgstr "Deleted {0}"

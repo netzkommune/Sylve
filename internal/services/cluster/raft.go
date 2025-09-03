@@ -173,6 +173,8 @@ func (s *Service) RemovePeer(id raft.ServerID) error {
 
 func (s *Service) ResetRaftNode() error {
 	if s.Raft.State() != raft.Leader {
+		nodeId := s.Detail().NodeID
+
 		leaderAddr := s.Raft.Leader()
 		host, _, err := net.SplitHostPort(string(leaderAddr))
 		if err != nil {
@@ -189,13 +191,18 @@ func (s *Service) ResetRaftNode() error {
 			return fmt.Errorf("failed_to_get_cluster_token: %v", err)
 		}
 
+		payload := map[string]interface{}{
+			"nodeId": nodeId,
+		}
+
 		headers := map[string]string{
 			"Accept":          "application/json",
 			"Content-Type":    "application/json",
 			"X-Cluster-Token": fmt.Sprintf("Bearer %s", clusterToken),
 		}
 
-		err = utils.HTTPPostJSON(fmt.Sprintf("https://%s:%d/api/cluster/remove-peer", host, config.ParsedConfig.Port), nil, headers)
+		err = utils.HTTPPostJSON(
+			fmt.Sprintf("https://%s:%d/api/cluster/remove-peer", host, config.ParsedConfig.Port), payload, headers)
 
 		if err != nil {
 			return fmt.Errorf("failed_to_remove_peer_from_leader: %v", err)

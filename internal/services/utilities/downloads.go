@@ -327,7 +327,7 @@ func (s *Service) DeleteDownload(id int) error {
 	if download.Type == "http" {
 		if strings.HasSuffix(download.Name, ".txz") {
 			extractsPath := filepath.Join(config.GetDownloadsPath("extracted"), download.UUID)
-			_, err := utils.RunCommand("sudo", "chflags", "-R", "noschg", extractsPath)
+			_, err := utils.RunCommand("chflags", "-R", "noschg", extractsPath)
 
 			if err != nil {
 				logger.L.Error().Msgf("Failed to change flags for extracts folder: %v", err)

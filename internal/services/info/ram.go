@@ -12,6 +12,7 @@ import (
 	"github.com/alchemillahq/sylve/internal/db"
 	infoModels "github.com/alchemillahq/sylve/internal/db/models/info"
 	infoServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/info"
+	"github.com/alchemillahq/sylve/pkg/system/swapctl"
 
 	ram "github.com/shirou/gopsutil/mem"
 )
@@ -30,10 +31,23 @@ func (s *Service) GetRAMInfo() (infoServiceInterfaces.RAMInfo, error) {
 }
 
 func (s *Service) GetSwapInfo() (infoServiceInterfaces.SwapInfo, error) {
+	swapDevices, err := swapctl.GetSwapDevices()
+	if len(swapDevices) == 0 {
+		return infoServiceInterfaces.SwapInfo{
+			Total:       0,
+			Free:        0,
+			UsedPercent: 0,
+		}, nil
+	}
+
 	swapInfo, err := ram.SwapMemory()
 
 	if err != nil {
-		return infoServiceInterfaces.SwapInfo{}, err
+		return infoServiceInterfaces.SwapInfo{
+			Total:       0,
+			Free:        0,
+			UsedPercent: 0,
+		}, err
 	}
 
 	return infoServiceInterfaces.SwapInfo{

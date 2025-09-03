@@ -39,6 +39,7 @@ func BasicInfo(infoService *info.Service) gin.HandlerFunc {
 				Error:   err.Error(),
 				Data:    nil,
 			})
+			return
 		}
 
 		c.JSON(http.StatusOK, internal.APIResponse[infoServiceInterfaces.BasicInfo]{

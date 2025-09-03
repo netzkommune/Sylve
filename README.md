@@ -25,7 +25,7 @@ Sylve is designed to run on FreeBSD 14.3 or later, and it is recommended to use 
 
 ## Dependencies
 
-Running Sylve is pretty easy, but sylve depends on some packages that you can install using `pkg` or the corresponding port to that package. Here's a list of what you'd need:
+Running Sylve is pretty easy, but `sylve` depends on some packages that you can install using `pkg` or the corresponding port to that package. Here's a list of what you'd need:
 
 | Dep            | Min. version | Vendored | Optional | Purpose                                          |
 | -------------- | ------------ | -------- | -------- | ------------------------------------------------ |

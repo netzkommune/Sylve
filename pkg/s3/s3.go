@@ -16,6 +16,27 @@ import (
 	"github.com/google/uuid"
 )
 
+func buildClient(ctx context.Context, endpoint, region, accessKey, secretKey string) (*awss3.Client, error) {
+	cfg, err := awsconfig.LoadDefaultConfig(
+		ctx,
+		awsconfig.WithRegion(region),
+		awsconfig.WithCredentialsProvider(
+			credentials.NewStaticCredentialsProvider(accessKey, secretKey, ""),
+		),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("load_config_failed: %w", err)
+	}
+
+	ep := strings.TrimRight(endpoint, "/")
+
+	return awss3.NewFromConfig(cfg, func(o *awss3.Options) {
+		o.Region = region
+		o.UsePathStyle = true
+		o.BaseEndpoint = aws.String(ep)
+	}), nil
+}
+
 func ValidateConfig(endpoint, region, bucket, accessKey, secretKey string) error {
 	if endpoint == "" {
 		return fmt.Errorf("endpoint_is_required")
@@ -36,35 +57,10 @@ func ValidateConfig(endpoint, region, bucket, accessKey, secretKey string) error
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
-	resolver := aws.EndpointResolverWithOptionsFunc(
-		func(service, _region string, _ ...interface{}) (aws.Endpoint, error) {
-			if service == awss3.ServiceID {
-				return aws.Endpoint{
-					URL:               strings.TrimRight(endpoint, "/"),
-					PartitionID:       "aws",
-					HostnameImmutable: true,
-					SigningRegion:     region,
-				}, nil
-			}
-			return aws.Endpoint{}, &aws.EndpointNotFoundError{}
-		},
-	)
-
-	cfg, err := awsconfig.LoadDefaultConfig(
-		ctx,
-		awsconfig.WithRegion(region),
-		awsconfig.WithCredentialsProvider(
-			credentials.NewStaticCredentialsProvider(accessKey, secretKey, ""),
-		),
-		awsconfig.WithEndpointResolverWithOptions(resolver),
-	)
+	s3, err := buildClient(ctx, endpoint, region, accessKey, secretKey)
 	if err != nil {
-		return fmt.Errorf("load_config_failed: %w", err)
+		return err
 	}
-
-	s3 := awss3.NewFromConfig(cfg, func(o *awss3.Options) {
-		o.UsePathStyle = true
-	})
 
 	var missing []string
 	markMissing := func(perm string, e error) {
@@ -101,7 +97,6 @@ func ValidateConfig(endpoint, region, bucket, accessKey, secretKey string) error
 			Bucket: &bucket,
 			Key:    &key,
 		})
-
 		if err != nil {
 			markMissing("s3:GetObject", err)
 		} else {
@@ -118,8 +113,58 @@ func ValidateConfig(endpoint, region, bucket, accessKey, secretKey string) error
 	}
 
 	if len(missing) > 0 {
-		return fmt.Errorf("s3_config_validation_failed: missing/denied permissions -> %s", strings.Join(missing, ", "))
+		return fmt.Errorf("s3_config_validation_failed: %s", strings.Join(missing, ", "))
+	}
+	return nil
+}
+
+type countingReader struct {
+	r io.Reader
+	n int64
+}
+
+func (c *countingReader) Read(p []byte) (int, error) {
+	n, err := c.r.Read(p)
+	c.n += int64(n)
+	return n, err
+}
+
+func Put(endpoint, region, bucket, accessKey, secretKey, key string, body io.Reader) (etag string, size int64, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+
+	s3, err := buildClient(ctx, endpoint, region, accessKey, secretKey)
+	if err != nil {
+		return "", 0, err
 	}
 
+	cr := &countingReader{r: body}
+	out, err := s3.PutObject(ctx, &awss3.PutObjectInput{
+		Bucket: &bucket,
+		Key:    &key,
+		Body:   cr,
+	})
+	if err != nil {
+		return "", 0, fmt.Errorf("put_failed: %w", err)
+	}
+
+	return aws.ToString(out.ETag), cr.n, nil
+}
+
+func Delete(endpoint, region, bucket, accessKey, secretKey, key string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	s3, err := buildClient(ctx, endpoint, region, accessKey, secretKey)
+	if err != nil {
+		return err
+	}
+
+	if _, err := s3.DeleteObject(ctx, &awss3.DeleteObjectInput{
+		Bucket: &bucket,
+		Key:    &key,
+	}); err != nil {
+		return fmt.Errorf("delete_failed: %w", err)
+	}
 	return nil
 }

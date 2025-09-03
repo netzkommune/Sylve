@@ -44,7 +44,21 @@ api.interceptors.request.use(
 			}
 
 			if (get(currentHostname)) {
-				config.headers['X-Current-Hostname'] = `${get(currentHostname)}`;
+				if (config.url === '/vm' && config.method === 'post') {
+					let data;
+
+					try {
+						data = config.data;
+						if (data.node) {
+							config.headers['X-Current-Hostname'] = `${get(currentHostname)}`;
+						}
+					} catch (e) {
+						adze.withEmoji.error('Error parsing request data:', e);
+						config.headers['X-Current-Hostname'] = `${get(currentHostname)}`;
+					}
+				} else {
+					config.headers['X-Current-Hostname'] = `${get(currentHostname)}`;
+				}
 			}
 		}
 		return config;

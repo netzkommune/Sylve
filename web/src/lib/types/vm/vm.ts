@@ -3,6 +3,7 @@ import { NetworkObjectSchema } from '../network/object';
 
 export interface CreateData {
 	name: string;
+	node: string;
 	id: number;
 	description: string;
 	storage: {

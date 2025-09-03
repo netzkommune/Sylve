@@ -16,16 +16,18 @@
 	import { generatePassword } from '$lib/utils/string';
 	import { getNextId, isValidCreateData } from '$lib/utils/vm/vm';
 	import Icon from '@iconify/svelte';
-	import { useQueries } from '@sveltestack/svelte-query';
+	import { useQueries, useQueryClient } from '@sveltestack/svelte-query';
 	import Advanced from './Advanced.svelte';
 	import Basic from './Basic.svelte';
 	import Hardware from './Hardware.svelte';
 	import Network from './Network.svelte';
 	import Storage from './Storage.svelte';
 
+	import { getNodes } from '$lib/api/cluster/cluster';
 	import { getJails } from '$lib/api/jail/jail';
 	import { getNetworkObjects } from '$lib/api/network/object';
 	import { reload } from '$lib/stores/api.svelte';
+	import type { ClusterNode } from '$lib/types/cluster/cluster';
 	import type { Jail } from '$lib/types/jail/jail';
 	import type { NetworkObject } from '$lib/types/network/object';
 	import { type CreateData, type VM } from '$lib/types/vm/vm';
@@ -38,119 +40,138 @@
 
 	let { open = $bindable() }: Props = $props();
 
+	const queryClient = useQueryClient();
 	const results = useQueries([
 		{
-			queryKey: ['poolList-svm'],
+			queryKey: 'pool-list',
 			queryFn: async () => {
 				return await getPools();
 			},
-			refetchInterval: 1000,
 			keepPreviousData: true,
 			initialData: [],
 			refetchOnMount: 'always'
 		},
 		{
-			queryKey: ['zfs-filesystems'],
+			queryKey: 'zfs-filesystems',
 			queryFn: async () => {
 				return await getDatasets('filesystem');
 			},
-			refetchInterval: 1000,
 			keepPreviousData: true,
 			initialData: [],
 			refetchOnMount: 'always'
 		},
 		{
-			queryKey: ['zfs-volumes'],
+			queryKey: 'zfs-volumes',
 			queryFn: async () => {
 				return await getDatasets('volume');
 			},
-			refetchInterval: 1000,
 			keepPreviousData: true,
 			initialData: [],
 			refetchOnMount: 'always'
 		},
 		{
-			queryKey: ['networkInterfaces-svm'],
+			queryKey: 'network-interfaces',
 			queryFn: async () => {
 				return await getInterfaces();
 			},
-			refetchInterval: 1000,
 			keepPreviousData: true,
 			initialData: [],
 			refetchOnMount: 'always'
 		},
 		{
-			queryKey: ['networkSwitches-svm'],
-
+			queryKey: 'network-switches',
 			queryFn: async () => {
 				return await getSwitches();
 			},
-			refetchInterval: 1000,
 			keepPreviousData: true,
 			initialData: {} as SwitchList,
 			refetchOnMount: 'always'
 		},
 		{
-			queryKey: ['pciDevices-svm'],
+			queryKey: 'pci-devices',
 			queryFn: async () => {
 				return (await getPCIDevices()) as PCIDevice[];
 			},
-			refetchInterval: 1000,
 			keepPreviousData: true,
 			initialData: [] as PCIDevice[],
 			refetchOnMount: 'always'
 		},
 		{
-			queryKey: ['pptDevices-svm'],
+			queryKey: 'ppt-devices',
 			queryFn: async () => {
 				return (await getPPTDevices()) as PPTDevice[];
 			},
-			refetchInterval: 1000,
 			keepPreviousData: true,
 			initialData: [] as PPTDevice[],
 			refetchOnMount: 'always'
 		},
 		{
-			queryKey: ['downloads-svm'],
+			queryKey: 'downloads',
 			queryFn: async () => {
 				return await getDownloads();
 			},
-			refetchInterval: 1000,
 			keepPreviousData: true,
 			initialData: [],
 			refetchOnMount: 'always'
 		},
 		{
-			queryKey: ['vms-svm'],
+			queryKey: 'vm-list',
 			queryFn: async () => {
 				return await getVMs();
 			},
-			refetchInterval: 1000,
 			keepPreviousData: true,
 			initialData: [],
 			refetchOnMount: 'always'
 		},
 		{
-			queryKey: ['network-objects-svm'],
+			queryKey: 'network-objects',
 			queryFn: async () => {
 				return await getNetworkObjects();
 			},
-			refetchInterval: 1000,
 			keepPreviousData: true,
 			initialData: [],
 			refetchOnMount: 'always'
 		},
 		{
-			queryKey: ['jails-svm'],
+			queryKey: 'jail-list',
 			queryFn: async () => {
 				return await getJails();
 			},
-			refetchInterval: 1000,
+			keepPreviousData: true,
+			initialData: [],
+			refetchOnMount: 'always'
+		},
+		{
+			queryKey: 'cluster-nodes',
+			queryFn: async () => {
+				return await getNodes();
+			},
 			keepPreviousData: true,
 			initialData: [],
 			refetchOnMount: 'always'
 		}
 	]);
+
+	let refetch = $state(false);
+
+	$effect(() => {
+		if (refetch) {
+			queryClient.refetchQueries('pool-list');
+			queryClient.refetchQueries('zfs-filesystems');
+			queryClient.refetchQueries('zfs-volumes');
+			queryClient.refetchQueries('network-interfaces');
+			queryClient.refetchQueries('network-switches');
+			queryClient.refetchQueries('pci-devices');
+			queryClient.refetchQueries('ppt-devices');
+			queryClient.refetchQueries('downloads');
+			queryClient.refetchQueries('vm-list');
+			queryClient.refetchQueries('network-objects');
+			queryClient.refetchQueries('jail-list');
+			queryClient.refetchQueries('cluster-nodes');
+
+			refetch = false;
+		}
+	});
 
 	let vms: VM[] = $derived($results[8].data as VM[]);
 	let jails: Jail[] = $derived($results[10].data as Jail[]);
@@ -166,6 +187,9 @@
 	});
 
 	let downloads = $derived($results[7].data as Download[]);
+	let nodes = $derived($results[11].data as ClusterNode[]);
+
+	$inspect(nodes);
 
 	const tabs = [
 		{ value: 'basic', label: 'Basic' },
@@ -179,6 +203,7 @@
 		name: '',
 		id: 0,
 		description: '',
+		node: '',
 		storage: {
 			type: 'zvol',
 			guid: '',
@@ -290,8 +315,11 @@
 							{#if value === 'basic'}
 								<Basic
 									bind:name={modal.name}
+									bind:node={modal.node}
 									bind:id={modal.id}
 									bind:description={modal.description}
+									{nodes}
+									bind:refetch
 								/>
 							{:else if value === 'storage'}
 								<Storage

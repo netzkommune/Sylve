@@ -162,13 +162,17 @@ func (s *Service) RemovePeer(id raft.ServerID) error {
 		return fmt.Errorf("not_leader")
 	}
 
-	fut := s.Raft.RemoveServer(id, 0, 2000)
+	fut := s.Raft.RemoveServer(id, 0, 8000)
 
 	if fut.Error() != nil {
 		return fmt.Errorf("failed_to_remove_peer: %v", fut.Error())
 	}
 
 	return nil
+}
+
+func (s *Service) ClearClusterNode(id string) error {
+	return s.DB.Exec("DELETE FROM cluster_nodes WHERE node_uuid = ?", id).Error
 }
 
 func (s *Service) ResetRaftNode() error {

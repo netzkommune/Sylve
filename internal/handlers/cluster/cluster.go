@@ -352,6 +352,16 @@ func RemovePeer(cS *cluster.Service) gin.HandlerFunc {
 			return
 		}
 
+		if err := cS.ClearClusterNode(req.NodeID); err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "error_clearing_cluster_node",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
 		c.JSON(http.StatusOK, internal.APIResponse[any]{
 			Status:  "success",
 			Message: "peer_removed",

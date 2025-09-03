@@ -24,6 +24,7 @@ export async function getSimpleVMs(): Promise<SimpleVm[]> {
 export async function newVM(data: CreateData): Promise<APIResponse> {
 	return await apiRequest('/vm', APIResponseSchema, 'POST', {
 		name: data.name,
+		node: data.node,
 		vmId: parseInt(data.id.toString(), 10),
 		iso: data.storage.iso,
 		storageType: data.storage.type,

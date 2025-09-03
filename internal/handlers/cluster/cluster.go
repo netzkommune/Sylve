@@ -34,6 +34,10 @@ type AcceptJoinRequest struct {
 	ClusterKey string `json:"clusterKey" binding:"required"`
 }
 
+type RemovePeerRequest struct {
+	NodeID string `json:"nodeId" binding:"required"`
+}
+
 // @Summary Get Cluster
 // @Description Get cluster details with information about RAFT nodes too
 // @Tags Cluster
@@ -306,6 +310,51 @@ func ResetRaftNode(cS *cluster.Service) gin.HandlerFunc {
 		c.JSON(http.StatusOK, internal.APIResponse[any]{
 			Status:  "success",
 			Message: "raft_node_reset",
+			Error:   "",
+			Data:    nil,
+		})
+	}
+}
+
+// @Summary Remove Peer
+// @Description Remove a peer from the cluster
+// @Tags Cluster
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body RemovePeerRequest true "Remove Peer Request"
+// @Success 200 {object} internal.APIResponse[any] "Success"
+// @Failure 400 {object} internal.APIResponse[any] "Bad Request"
+// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
+// @Router /cluster/remove-peer [post]
+func RemovePeer(cS *cluster.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var req RemovePeerRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request_payload",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		raftId := raft.ServerID(req.NodeID)
+
+		if err := cS.RemovePeer(raftId); err != nil {
+			c.JSON(http.StatusInternalServerError, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "error_removing_peer",
+				Error:   err.Error(),
+				Data:    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, internal.APIResponse[any]{
+			Status:  "success",
+			Message: "peer_removed",
 			Error:   "",
 			Data:    nil,
 		})

@@ -350,6 +350,7 @@ func RegisterRoutes(r *gin.Engine,
 		cluster.POST("/join", clusterHandlers.JoinCluster(authService, clusterService, fsm))
 		cluster.POST("/accept-join", clusterHandlers.AcceptJoin(clusterService))
 		cluster.DELETE("/reset-node", clusterHandlers.ResetRaftNode(clusterService))
+		cluster.POST("/remove-peer", clusterHandlers.RemovePeer(clusterService))
 	}
 
 	clusterNotes := cluster.Group("/notes")

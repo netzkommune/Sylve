@@ -234,7 +234,7 @@
 							<Arc value={ramInfo?.usedPercent} title="RAM" subtitle={humanFormat(ramInfo.total)} />
 						</div>
 						<div class="flex flex-1 justify-center">
-							<Arc value={diskInfo?.usage} title="RAM" subtitle={humanFormat(diskInfo.total)} />
+							<Arc value={diskInfo?.usage} title="Disk" subtitle={humanFormat(diskInfo.total)} />
 						</div>
 					{/if}
 				</div>

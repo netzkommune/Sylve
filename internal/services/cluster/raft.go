@@ -157,6 +157,20 @@ func (s *Service) InitRaft(fsm raft.FSM) error {
 	return err
 }
 
+func (s *Service) RemovePeer(id raft.ServerID) error {
+	if s.Raft.State() != raft.Leader {
+		return fmt.Errorf("not_leader")
+	}
+
+	fut := s.Raft.RemoveServer(id, 0, 2000)
+
+	if fut.Error() != nil {
+		return fmt.Errorf("failed_to_remove_peer: %v", fut.Error())
+	}
+
+	return nil
+}
+
 func (s *Service) ResetRaftNode() error {
 	if r := s.Raft; r != nil {
 		_ = r.Shutdown().Error()

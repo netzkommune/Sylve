@@ -1,17 +1,63 @@
 <script lang="ts">
+	import CustomComboBox from '$lib/components/ui/custom-input/combobox.svelte';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
+	import { currentHostname } from '$lib/stores/auth';
+	import type { ClusterNode } from '$lib/types/cluster/cluster';
 
 	interface Props {
 		name: string;
 		id: number;
 		description: string;
+		refetch: boolean;
+		nodes: ClusterNode[];
+		node: string;
 	}
 
-	let { name = $bindable(), id = $bindable(), description = $bindable() }: Props = $props();
+	let {
+		name = $bindable(),
+		id = $bindable(),
+		description = $bindable(),
+		refetch = $bindable(),
+		nodes,
+		node = $bindable()
+	}: Props = $props();
+
+	let host = $state({
+		combobox: {
+			open: false
+		}
+	});
+
+	let hosts = $derived.by(() => {
+		return nodes.map((n) => ({
+			label: n.hostname,
+			value: n.hostname
+		}));
+	});
+
+	$effect(() => {
+		if (node) {
+			currentHostname.set(node);
+			refetch = true;
+		}
+	});
 </script>
 
 <div class="flex flex-col gap-4 p-4">
 	<div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+		{#if hosts.length > 0}
+			<CustomComboBox
+				bind:open={host.combobox.open}
+				label="Node"
+				bind:value={node}
+				data={hosts}
+				classes="flex-1 space-y-1"
+				placeholder="Select Node"
+				triggerWidth="w-full "
+				width="w-full lg:w-[75%]"
+			></CustomComboBox>
+		{/if}
+
 		<CustomValueInput
 			label="Jail Name"
 			placeholder="Postgres"

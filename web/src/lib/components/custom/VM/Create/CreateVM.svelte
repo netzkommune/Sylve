@@ -189,8 +189,6 @@
 	let downloads = $derived($results[7].data as Download[]);
 	let nodes = $derived($results[11].data as ClusterNode[]);
 
-	$inspect(nodes);
-
 	const tabs = [
 		{ value: 'basic', label: 'Basic' },
 		{ value: 'storage', label: 'Storage' },

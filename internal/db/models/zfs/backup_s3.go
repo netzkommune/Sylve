@@ -22,7 +22,6 @@ type ZFSS3Backup struct {
 	Dataset        string `gorm:"not null;index" json:"dataset"`
 	Name           string `gorm:"not null;unique" json:"name"`
 
-	// === incremental toggle ===
 	Incremental  bool    `gorm:"default:true" json:"incremental"` // if false => always full
 	LastSnapshot *string `json:"lastSnapshot"`                    // last successfully sent snapshot (e.g. "pool/ds@2025-09-03T00:00:00Z")
 

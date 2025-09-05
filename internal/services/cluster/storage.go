@@ -50,6 +50,8 @@ func (s *Service) ProposeS3Config(name,
 		if err != nil {
 			return err
 		}
+
+		return nil
 	}
 
 	if s.Raft == nil {

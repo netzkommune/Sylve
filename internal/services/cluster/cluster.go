@@ -190,9 +190,9 @@ func (s *Service) backfillPreClusterState() error {
 			}
 
 			data, _ := json.Marshal(payloadStruct)
-			cmd := clusterModels.Command{Type: "s3cfg", Action: "upsert", Data: data}
+			cmd := clusterModels.Command{Type: "s3Configs", Action: "create", Data: data}
 			if err := s.Raft.Apply(utils.MustJSON(cmd), 5*time.Second).Error(); err != nil {
-				return fmt.Errorf("apply_synth_upsert_s3cfg id=%d: %w", c.ID, err)
+				return fmt.Errorf("apply_synth_create_s3cfg id=%d: %w", c.ID, err)
 			}
 		}
 	}

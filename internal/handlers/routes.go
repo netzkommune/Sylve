@@ -274,6 +274,7 @@ func RegisterRoutes(r *gin.Engine,
 	}
 
 	jail := api.Group("/jail")
+	jail.Use(EnsureCorrectHost(db))
 	jail.Use(middleware.EnsureAuthenticated(authService))
 	jail.Use(middleware.RequestLoggerMiddleware(db, authService))
 	{

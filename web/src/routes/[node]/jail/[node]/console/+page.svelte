@@ -79,7 +79,6 @@
 		fit.fit();
 
 		const hash = await sha256($store, 1);
-		const clusterToken = $clusterStore;
 		const wssAuth = {
 			hostname: get(currentHostname),
 			token: $clusterStore

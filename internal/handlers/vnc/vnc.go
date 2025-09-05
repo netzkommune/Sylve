@@ -9,25 +9,23 @@
 package vncHandler
 
 import (
-	"fmt"
 	"io"
 	"net"
 	"net/http"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/alchemillahq/sylve/internal/logger"
-
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
 
 var upgrader = websocket.Upgrader{
-	ReadBufferSize:  32 * 1024,
-	WriteBufferSize: 32 * 1024,
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
+	ReadBufferSize:    8 * 1024,
+	WriteBufferSize:   8 * 1024,
+	EnableCompression: false,
+	CheckOrigin:       func(r *http.Request) bool { return true },
 }
 
 func VNCProxyHandler(c *gin.Context) {
@@ -37,33 +35,39 @@ func VNCProxyHandler(c *gin.Context) {
 		return
 	}
 
-	vncAddress := fmt.Sprintf("localhost:%s", port)
-	rawConn, err := net.Dial("tcp", vncAddress)
+	rawConn, err := net.Dial("tcp", "localhost:"+port)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to connect to VNC on port %s", port)})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to VNC"})
 		return
 	}
 	defer rawConn.Close()
 
-	// Disable Nagle's algorithm for lower latency
-	if tcpConn, ok := rawConn.(*net.TCPConn); ok {
-		tcpConn.SetNoDelay(true)
+	if tcp, ok := rawConn.(*net.TCPConn); ok {
+		_ = tcp.SetNoDelay(true)
+		_ = tcp.SetKeepAlive(true)
+		_ = tcp.SetKeepAlivePeriod(30 * time.Second)
 	}
 
 	wsConn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "WebSocket upgrade failed"})
 		return
 	}
 	defer wsConn.Close()
+
+	// WS keepalive
+	wsConn.SetReadDeadline(time.Now().Add(60 * time.Second))
+	wsConn.SetPongHandler(func(string) error {
+		wsConn.SetReadDeadline(time.Now().Add(60 * time.Second))
+		return nil
+	})
 
 	done := make(chan struct{})
 	var once sync.Once
 	closeDone := func() { once.Do(func() { close(done) }) }
 
-	const bufSize = 32 * 1024
-	buffer := make([]byte, bufSize)
+	buf := make([]byte, 32*1024)
 
+	// WS → VNC
 	go func() {
 		defer closeDone()
 		for {
@@ -71,27 +75,24 @@ func VNCProxyHandler(c *gin.Context) {
 			if err != nil {
 				return
 			}
-
 			if msgType != websocket.BinaryMessage {
-				io.Copy(io.Discard, reader)
+				_, _ = io.Copy(io.Discard, reader)
 				continue
 			}
-
 			if _, err := io.Copy(rawConn, reader); err != nil {
 				return
 			}
 		}
 	}()
 
+	// VNC → WS
 	go func() {
 		defer closeDone()
 		for {
-			n, err := rawConn.Read(buffer)
+			n, err := rawConn.Read(buf)
 			if err != nil {
-				if err != io.EOF {
-					if !strings.Contains(err.Error(), "use of closed network connection") {
-						logger.L.Debug().Err(err).Msg("Error reading from VNC connection")
-					}
+				if err != io.EOF && !strings.Contains(err.Error(), "use of closed network connection") {
+					logger.L.Debug().Err(err).Msg("VNC read error")
 				}
 				return
 			}
@@ -99,8 +100,8 @@ func VNCProxyHandler(c *gin.Context) {
 			if err != nil {
 				return
 			}
-			if _, err := writer.Write(buffer[:n]); err != nil {
-				writer.Close()
+			if _, err := writer.Write(buf[:n]); err != nil {
+				_ = writer.Close()
 				return
 			}
 			if err := writer.Close(); err != nil {

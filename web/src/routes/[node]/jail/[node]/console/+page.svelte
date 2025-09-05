@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { getJails, getJailStates } from '$lib/api/jail/jail';
-	import { store } from '$lib/stores/auth';
+	import { clusterStore, currentHostname, store } from '$lib/stores/auth';
 	import type { Jail, JailState } from '$lib/types/jail/jail';
 	import { updateCache } from '$lib/utils/http';
-	import { sha256 } from '$lib/utils/string';
+	import { sha256, toBase64, toHex } from '$lib/utils/string';
 	import {
 		Xterm,
 		XtermAddon,
@@ -16,6 +16,7 @@
 	import Icon from '@iconify/svelte';
 	import { useQueries } from '@sveltestack/svelte-query';
 	import adze from 'adze';
+	import { get } from 'svelte/store';
 
 	interface Data {
 		jails: Jail[];
@@ -78,9 +79,17 @@
 		fit.fit();
 
 		const hash = await sha256($store, 1);
-		ws = new WebSocket(`/api/jail/console?ctid=${jail.ctId}&hash=${hash}`);
-		ws.binaryType = 'arraybuffer';
+		const clusterToken = $clusterStore;
+		const wssAuth = {
+			hostname: get(currentHostname),
+			token: $clusterStore
+		};
 
+		ws = new WebSocket(`/api/jail/console?ctid=${jail.ctId}&hash=${hash}`, [
+			toHex(JSON.stringify(wssAuth))
+		]);
+
+		ws.binaryType = 'arraybuffer';
 		ws.onopen = () => {
 			adze.info(`Jail console connected for jail ${jail.ctId}`);
 			const dims = fit.proposeDimensions();

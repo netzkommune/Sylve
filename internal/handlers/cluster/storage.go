@@ -6,7 +6,6 @@ import (
 	"github.com/alchemillahq/sylve/internal"
 	clusterServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/cluster"
 	"github.com/alchemillahq/sylve/internal/services/cluster"
-	"github.com/alchemillahq/sylve/pkg/s3"
 	"github.com/gin-gonic/gin"
 	"github.com/hashicorp/raft"
 )
@@ -65,30 +64,18 @@ func Storages(cS *cluster.Service) gin.HandlerFunc {
 // @Router /cluster/storage/s3 [post]
 func CreateS3Storage(cS *cluster.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var req CreateS3StorageRequest
-		if err := c.ShouldBindJSON(&req); err != nil {
-			c.JSON(400, internal.APIResponse[any]{
-				Status:  "error",
-				Message: "invalid_request",
-				Error:   err.Error(),
-				Data:    nil,
-			})
-			return
-		}
-
-		err := s3.ValidateConfig(req.Endpoint, req.Region, req.Bucket, req.AccessKey, req.SecretKey)
-		if err != nil {
-			c.JSON(500, internal.APIResponse[any]{
-				Status:  "error",
-				Message: "s3_config_validation_failed",
-				Error:   err.Error(),
-				Data:    nil,
-			})
-
-			return
-		}
-
 		if cS.Raft == nil {
+			var req CreateS3StorageRequest
+			if err := c.ShouldBindJSON(&req); err != nil {
+				c.JSON(400, internal.APIResponse[any]{
+					Status:  "error",
+					Message: "invalid_request",
+					Error:   err.Error(),
+					Data:    nil,
+				})
+				return
+			}
+
 			if err := cS.ProposeS3Config(
 				req.Name, req.Endpoint, req.Region, req.Bucket, req.AccessKey, req.SecretKey, true,
 			); err != nil {
@@ -112,6 +99,17 @@ func CreateS3Storage(cS *cluster.Service) gin.HandlerFunc {
 
 		if cS.Raft.State() != raft.Leader {
 			forwardToLeader(c, cS)
+			return
+		}
+
+		var req CreateS3StorageRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(400, internal.APIResponse[any]{
+				Status:  "error",
+				Message: "invalid_request",
+				Error:   err.Error(),
+				Data:    nil,
+			})
 			return
 		}
 

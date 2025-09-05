@@ -7,6 +7,7 @@ import (
 
 	clusterModels "github.com/alchemillahq/sylve/internal/db/models/cluster"
 	clusterServiceInterfaces "github.com/alchemillahq/sylve/internal/interfaces/services/cluster"
+	"github.com/alchemillahq/sylve/pkg/s3"
 )
 
 /*
@@ -36,6 +37,11 @@ func (s *Service) ProposeS3Config(name,
 	accessKey,
 	secretKey string,
 	bypassRaft bool) error {
+	err := s3.ValidateConfig(endpoint, region, bucket, accessKey, secretKey)
+	if err != nil {
+		return fmt.Errorf("s3_config_invalid: %w", err)
+	}
+
 	if bypassRaft {
 		s3 := clusterModels.ClusterS3Config{
 			Name:      name,

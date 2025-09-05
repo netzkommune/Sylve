@@ -1,13 +1,18 @@
 <script lang="ts">
 	import { getClusterResources, getNodes } from '$lib/api/cluster/cluster';
-	import { default as TreeView } from '$lib/components/custom/TreeView.svelte';
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
 	import { reload } from '$lib/stores/api.svelte';
 	import type { ClusterNode, NodeResource } from '$lib/types/cluster/cluster';
 	import { useQueries, useQueryClient } from '@sveltestack/svelte-query';
+	import { default as TreeViewCluster } from './TreeViewCluster.svelte';
 
-	let openCategories: Record<string, boolean> = $state({});
-	const onToggle = (label: string) => (openCategories[label] = !openCategories[label]);
+	let openIds = $state(new Set<string>(['datacenter']));
+
+	const toggleOpen = (id: string) => {
+		if (openIds.has(id)) openIds.delete(id);
+		else openIds.add(id);
+		openIds = new Set(openIds);
+	};
 
 	const queryClient = useQueryClient();
 	const results = useQueries([
@@ -34,6 +39,7 @@
 
 	const tree = $derived([
 		{
+			id: 'datacenter',
 			label: 'Data Center',
 			icon: 'ant-design:cluster-outlined',
 			href: '/datacenter',
@@ -84,8 +90,8 @@
 	<nav aria-label="sylve-sidebar" class="menu thin-scrollbar w-full">
 		<ul>
 			<ScrollArea orientation="both" class="h-full w-full">
-				{#each tree as item}
-					<TreeView {item} {onToggle} bind:this={openCategories} />
+				{#each tree as item (item.id)}
+					<TreeViewCluster {item} {openIds} onToggleId={toggleOpen} />
 				{/each}
 			</ScrollArea>
 		</ul>

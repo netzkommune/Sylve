@@ -3,9 +3,10 @@
 	import { page } from '$app/state';
 	import Icon from '@iconify/svelte';
 	import { slide } from 'svelte/transition';
-	import SidebarElement from './TreeView.svelte';
+	import SidebarElement from './TreeViewCluster.svelte';
 
 	interface SidebarProps {
+		id: string;
 		label: string;
 		icon: string;
 		href?: string;
@@ -15,36 +16,23 @@
 
 	interface Props {
 		item: SidebarProps;
-		onToggle: (label: string) => void;
+		openIds: Set<string>;
+		onToggleId: (id: string) => void;
 	}
 
-	let { item, onToggle }: Props = $props();
-
-	let isOpen = $state(false);
+	let { item, openIds, onToggleId }: Props = $props();
 
 	const toggle = (e: MouseEvent) => {
+		if (item.children?.length) onToggleId(item.id);
+		if (item.href) goto(item.href, { replaceState: false, noScroll: false });
 		e.preventDefault();
-
-		if (item.children) {
-			isOpen = !isOpen;
-			onToggle(item.label);
-		}
-
-		if (item.href) {
-			goto(item.href, { replaceState: false, noScroll: false });
-		}
 	};
 
 	const sidebarActive = 'rounded-md bg-muted dark:bg-muted font-inter font-medium';
 
 	function isItemActive(menuItem: SidebarProps, currentUrl: string): boolean {
-		if (menuItem.href && currentUrl.startsWith(menuItem.href)) {
-			return true;
-		}
-		if (menuItem.children) {
-			return menuItem.children.some((child) => isItemActive(child, currentUrl));
-		}
-		return false;
+		if (menuItem.href && currentUrl.startsWith(menuItem.href)) return true;
+		return menuItem.children?.some((c) => isItemActive(c, currentUrl)) ?? false;
 	}
 
 	let activeUrl = $derived(page.url.pathname);
@@ -53,20 +41,7 @@
 		const segments = activeUrl.split('/');
 		return segments[segments.length - 1];
 	});
-
-	function isItemOpen(menuItem: SidebarProps, currentUrl: string): boolean {
-		if (menuItem.href && currentUrl.startsWith(menuItem.href)) {
-			return true;
-		}
-		if (menuItem.children) {
-			return menuItem.children.some((child) => isItemOpen(child, currentUrl));
-		}
-		return false;
-	}
-
-	$effect(() => {
-		isOpen = isItemOpen(item, activeUrl);
-	});
+	let isOpen = $derived(openIds.has(item.id));
 </script>
 
 <li class="w-full">
@@ -107,8 +82,8 @@
 
 {#if isOpen && item.children}
 	<ul class="pl-5" transition:slide={{ duration: 200, easing: (t) => t }} style="overflow: hidden;">
-		{#each item.children as child (child.label)}
-			<SidebarElement item={child} {onToggle} />
+		{#each item.children as child (child.id)}
+			<SidebarElement item={child} {openIds} {onToggleId} />
 		{/each}
 	</ul>
 {/if}

@@ -102,12 +102,35 @@ func GetClusterTokenFromHeader(r http.Header) (string, error) {
 	return "", errors.New("no cluster token provided")
 }
 
-func GetCurrentHostnameFromHeader(r http.Header) (string, error) {
+func GetCurrentHostnameFromHeader(r http.Header, rC *http.Request) (string, error) {
 	if v := r.Get("X-Current-Hostname"); v != "" {
 		return RemoveSpaces(v), nil
 	}
 
 	if v := r.Get("Sec-WebSocket-Protocol"); v != "" {
+		text := RemoveSpaces(v)
+		data, err := hex.DecodeString(text)
+		if err != nil {
+			return "", fmt.Errorf("failed to decode hex: %w", err)
+		}
+
+		var obj struct {
+			Hostname string `json:"hostname"`
+			Token    string `json:"token"`
+		}
+
+		if err := json.Unmarshal(data, &obj); err != nil {
+			return "", fmt.Errorf("failed to unmarshal json: %w", err)
+		}
+
+		if obj.Hostname == "" {
+			return "", errors.New("no_current_hostname_provided")
+		}
+
+		return obj.Hostname, nil
+	}
+
+	if v := rC.URL.Query().Get("auth"); v != "" {
 		text := RemoveSpaces(v)
 		data, err := hex.DecodeString(text)
 		if err != nil {

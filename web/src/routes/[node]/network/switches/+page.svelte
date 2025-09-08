@@ -75,7 +75,7 @@
 
 	let query: string = $state('');
 	let useablePorts = $derived.by(() => {
-		const available: string[] = [];
+		let available: string[] = [];
 
 		if (interfaces) {
 			for (const iface of interfaces) {
@@ -83,7 +83,7 @@
 			}
 		}
 
-		return available;
+		return available.filter((item, index) => available.indexOf(item) === index);
 	});
 
 	let confirmModals = $state({

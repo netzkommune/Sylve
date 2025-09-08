@@ -7,9 +7,18 @@
 > [!WARNING]
 > This project is still in development so expect breaking changes!
 
-https://github.com/user-attachments/assets/bf727ef4-4316-4084-a61f-cb8ec978e43d
+https://gist.github.com/user-attachments/assets/7a9d002c-f647-4872-8b55-6b0cb1ce563b
 
 Sylve aims to be a lightweight, open-source virtualization platform for FreeBSD, leveraging Bhyve for VMs and Jails for containerization, with deep ZFS integration. It seeks to provide a streamlined, Proxmox-like experience tailored for FreeBSD environments. It's backend is written in Go and the frontend is written in Svelte (with Kit).
+
+## Sponsors
+
+Sylve is sponsored by:
+
+- [FreeBSD Foundation](https://freebsdfoundation.org/)
+- [Alchemilla](https://alchemilla.io)
+
+We’re grateful for their support in helping us build and grow Sylve.
 
 # Development Requirements
 
@@ -53,7 +62,7 @@ samba_server_enable="YES"
 
 Enabling `rctl` is required. Do this by adding the following line to `/boot/loader.conf`:
 
-``` sh
+```sh
 kern.racct.enable=1
 ```
 

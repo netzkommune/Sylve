@@ -350,6 +350,7 @@
 		}
 
 		modals.delete.open = false;
+		activeRows = [];
 	}
 
 	$effect(() => {

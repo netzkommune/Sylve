@@ -132,7 +132,7 @@ func (s *Service) ShareConfig() (string, error) {
 		return "", fmt.Errorf("failed to retrieve Samba shares: %w", err)
 	}
 
-	datasets, err := zfs.Datasets("")
+	datasets, err := zfs.Filesystems("")
 
 	if err != nil {
 		return "", fmt.Errorf("failed to fetch datasets: %v", err)
@@ -143,12 +143,7 @@ func (s *Service) ShareConfig() (string, error) {
 		var dataset *zfs.Dataset
 
 		for _, ds := range datasets {
-			dProps, err := ds.GetAllProperties()
-			if err != nil {
-				return "", fmt.Errorf("failed to get properties for dataset %s: %v", share.Dataset, err)
-			}
-
-			if dProps["guid"] == share.Dataset {
+			if ds.GUID == share.Dataset {
 				dataset = ds
 				break
 			}

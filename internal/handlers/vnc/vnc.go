@@ -28,6 +28,12 @@ var upgrader = websocket.Upgrader{
 	CheckOrigin:       func(r *http.Request) bool { return true },
 }
 
+const (
+	writeWait  = 10 * time.Second
+	pongWait   = 10 * time.Minute // how long we’ll wait for the next pong
+	pingPeriod = pongWait / 2     // how often we’ll send pings (must be < pongWait)
+)
+
 func VNCProxyHandler(c *gin.Context) {
 	port := c.Param("port")
 	if port == "" {
@@ -54,16 +60,35 @@ func VNCProxyHandler(c *gin.Context) {
 	}
 	defer wsConn.Close()
 
-	// WS keepalive
-	wsConn.SetReadDeadline(time.Now().Add(60 * time.Second))
+	// Keepalive: expect a pong within pongWait; extend on each pong.
+	wsConn.SetReadDeadline(time.Now().Add(pongWait))
 	wsConn.SetPongHandler(func(string) error {
-		wsConn.SetReadDeadline(time.Now().Add(60 * time.Second))
+		wsConn.SetReadDeadline(time.Now().Add(pongWait))
 		return nil
 	})
 
 	done := make(chan struct{})
 	var once sync.Once
 	closeDone := func() { once.Do(func() { close(done) }) }
+
+	// Ping loop (WS → client)
+	pingTicker := time.NewTicker(pingPeriod)
+	defer pingTicker.Stop()
+	go func() {
+		defer closeDone()
+		for {
+			select {
+			case <-done:
+				return
+			case <-pingTicker.C:
+				// Write a ping; if it fails, terminate.
+				_ = wsConn.SetWriteDeadline(time.Now().Add(writeWait))
+				if err := wsConn.WriteControl(websocket.PingMessage, nil, time.Now().Add(writeWait)); err != nil {
+					return
+				}
+			}
+		}
+	}()
 
 	buf := make([]byte, 32*1024)
 
@@ -96,15 +121,16 @@ func VNCProxyHandler(c *gin.Context) {
 				}
 				return
 			}
-			writer, err := wsConn.NextWriter(websocket.BinaryMessage)
+			_ = wsConn.SetWriteDeadline(time.Now().Add(writeWait))
+			w, err := wsConn.NextWriter(websocket.BinaryMessage)
 			if err != nil {
 				return
 			}
-			if _, err := writer.Write(buf[:n]); err != nil {
-				_ = writer.Close()
+			if _, err := w.Write(buf[:n]); err != nil {
+				_ = w.Close()
 				return
 			}
-			if err := writer.Close(); err != nil {
+			if err := w.Close(); err != nil {
 				return
 			}
 		}

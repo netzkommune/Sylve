@@ -73,12 +73,7 @@ func (s *Service) GetDatasetByGUID(guid string) (*zfs.Dataset, error) {
 	}
 
 	for _, dataset := range datasets {
-		gguid, err := dataset.GetProperty("guid")
-		if err != nil {
-			return nil, err
-		}
-
-		if gguid == guid {
+		if dataset.GUID == guid {
 			return dataset, nil
 		}
 	}

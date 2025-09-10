@@ -23,7 +23,7 @@ import (
 )
 
 func (s *Service) CreateDiskImage(vmId int, guid string, size int64, name string) error {
-	dataset, err := zfs.Datasets("")
+	dataset, err := zfs.Filesystems("")
 	if err != nil {
 		return fmt.Errorf("failed_to_get_datasets: %w", err)
 	}
@@ -31,13 +31,7 @@ func (s *Service) CreateDiskImage(vmId int, guid string, size int64, name string
 	var targetDataset *zfs.Dataset
 
 	for _, d := range dataset {
-		guidProp, err := d.GetProperty("guid")
-
-		if err != nil {
-			return fmt.Errorf("failed_to_get_dataset_properties: %w", err)
-		}
-
-		if guidProp == guid {
+		if d.GUID == guid {
 			targetDataset = d
 			break
 		}
@@ -91,8 +85,7 @@ func (s *Service) CreateDiskImage(vmId int, guid string, size int64, name string
 func (s *Service) StorageDetach(vmId int, storageId int) error {
 	var storage vmModels.Storage
 
-	err := s.DB.Find(&storage, "id = ?", storageId).Error
-	if err != nil {
+	if err := s.DB.Find(&storage, "id = ?", storageId).Error; err != nil {
 		return fmt.Errorf("failed_to_find_storage: %w", err)
 	}
 
@@ -102,11 +95,9 @@ func (s *Service) StorageDetach(vmId int, storageId int) error {
 	}
 
 	state, _, err := s.Conn.DomainGetState(domain, 0)
-
 	if err != nil {
 		return fmt.Errorf("failed_to_get_domain_state: %w", err)
 	}
-
 	if state != 5 {
 		return fmt.Errorf("domain_state_not_shutoff: %d", vmId)
 	}
@@ -118,7 +109,7 @@ func (s *Service) StorageDetach(vmId int, storageId int) error {
 
 	doc := etree.NewDocument()
 	if err := doc.ReadFromString(xml); err != nil {
-		return fmt.Errorf("failed to parse XML: %w", err)
+		return fmt.Errorf("failed_to_parse_xml: %w", err)
 	}
 
 	bhyveCommandline := doc.FindElement("//commandline")
@@ -130,90 +121,77 @@ func (s *Service) StorageDetach(vmId int, storageId int) error {
 		bhyveCommandline = root.CreateElement("bhyve:commandline")
 	}
 
-	filePath := ""
+	// Best-effort dataset resolve (no error if not found)
+	var dataset *zfs.Dataset
+	haveDataset := false
+	if storage.Type == "zvol" || storage.Type == "raw" {
+		if dsets, derr := zfs.Datasets(""); derr == nil {
+			for _, d := range dsets {
+				if d.GUID == storage.Dataset {
+					dataset = d
+					haveDataset = true
+					break
+				}
+			}
+		}
+	}
 
+	filePath := ""
 	if storage.Type == "iso" {
-		filePath, err = s.FindISOByUUID(storage.Dataset, false)
-		if err != nil {
-			return fmt.Errorf("failed_to_find_iso_by_uuid: %w", err)
+		// If ISO isn’t found, we can still proceed; no need to fail
+		if p, ferr := s.FindISOByUUID(storage.Dataset, false); ferr == nil {
+			filePath = p
 		}
 	}
 
 	for _, arg := range bhyveCommandline.ChildElements() {
-		valueAttr := arg.SelectAttr("value")
-		if valueAttr != nil {
-			value := valueAttr.Value
-			if value != "" {
-				/* Takes care of CD removals */
-				if strings.Contains(value, "ahci-cd") &&
-					strings.Contains(value, filePath) &&
-					storage.Type == "iso" {
-					bhyveCommandline.RemoveChild(arg)
+		valAttr := arg.SelectAttr("value")
+		if valAttr == nil {
+			continue
+		}
+		val := valAttr.Value
+		if val == "" {
+			continue
+		}
+
+		// ISO removal (best-effort if we know the path)
+		if storage.Type == "iso" && filePath != "" &&
+			strings.Contains(val, "ahci-cd") && strings.Contains(val, filePath) {
+			bhyveCommandline.RemoveChild(arg)
+			continue
+		}
+
+		// ZVOL removal: only remove when we can precisely match the resolved device path.
+		if storage.Type == "zvol" && haveDataset && dataset.Type == "volume" {
+			if strings.Contains(val, "/dev/zvol/"+dataset.Name) {
+				bhyveCommandline.RemoveChild(arg)
+				continue
+			}
+		}
+
+		// RAW removal: require dataset to compute the image path reliably.
+		if storage.Type == "raw" && haveDataset {
+			if strings.Contains(val, dataset.Name) && strings.Contains(val, storage.Name) {
+				bhyveCommandline.RemoveChild(arg)
+				// Best-effort delete of image file
+				imagePath := filepath.Join(dataset.Mountpoint, "sylve-vm-images",
+					strconv.Itoa(vmId), fmt.Sprintf("%s.img", storage.Name))
+				if _, statErr := os.Stat(imagePath); statErr == nil {
+					_ = os.Remove(imagePath) // ignore error; detach should still succeed
 				}
-
-				var dataset *zfs.Dataset
-
-				if storage.Type == "zvol" || storage.Type == "raw" {
-					datasets, err := zfs.Datasets("")
-					if err != nil {
-						return fmt.Errorf("failed_to_get_datasets: %w", err)
-					}
-
-					for _, d := range datasets {
-						guid, err := d.GetProperty("guid")
-						if err != nil {
-							return fmt.Errorf("failed_to_get_dataset_property: %w", err)
-						}
-
-						if guid == storage.Dataset {
-							dataset = d
-							break
-						}
-					}
-
-					if dataset == nil {
-						return fmt.Errorf("dataset_not_found: %s", storage.Dataset)
-					}
-				}
-
-				/* Takes care of ZVOL removals */
-				if storage.Type == "zvol" {
-					if dataset.Type != "volume" {
-						return fmt.Errorf("invalid_dataset_type: %s", dataset.Type)
-					}
-
-					if strings.Contains(value, fmt.Sprintf("/dev/zvol/%s", dataset.Name)) {
-						bhyveCommandline.RemoveChild(arg)
-					}
-				}
-
-				/* Takes care of RAW Disk removals */
-				if storage.Type == "raw" {
-					if strings.Contains(value, dataset.Name) &&
-						strings.Contains(value, storage.Name) {
-						bhyveCommandline.RemoveChild(arg)
-					}
-
-					imagePath := filepath.Join(dataset.Mountpoint, "sylve-vm-images", strconv.Itoa(vmId), fmt.Sprintf("%s.img", storage.Name))
-					if _, err := os.Stat(imagePath); !os.IsNotExist(err) {
-						if err := os.Remove(imagePath); err != nil {
-							return fmt.Errorf("failed_to_remove_disk_image: %w", err)
-						}
-					}
-				}
+				continue
 			}
 		}
 	}
 
 	out, err := doc.WriteToString()
 	if err != nil {
-		return fmt.Errorf("failed to serialize XML: %w", err)
+		return fmt.Errorf("failed_to_serialize_xml: %w", err)
 	}
 
 	if err := s.Conn.DomainUndefineFlags(domain, 0); err != nil {
 		return fmt.Errorf("failed_to_undefine_domain: %w", err)
 	}
-
 	if _, err := s.Conn.DomainDefineXML(out); err != nil {
 		return fmt.Errorf("failed_to_define_domain_with_modified_xml: %w", err)
 	}
@@ -325,19 +303,14 @@ func (s *Service) StorageAttach(vmId int, sType string, dataset string, emulatio
 		argValue := fmt.Sprintf("-s %d:0,ahci-cd,%s", index, filePath)
 		bhyveCommandline.CreateElement("bhyve:arg").CreateAttr("value", argValue)
 	} else if sType == "zvol" {
-		datasets, err := zfs.Datasets("")
+		datasets, err := zfs.Volumes("")
 		if err != nil {
 			return fmt.Errorf("failed_to_get_datasets: %w", err)
 		}
 
 		var targetDataset *zfs.Dataset
 		for _, d := range datasets {
-			guid, err := d.GetProperty("guid")
-			if err != nil {
-				return fmt.Errorf("failed_to_get_dataset_property: %w", err)
-			}
-
-			if guid == dataset {
+			if d.GUID == dataset {
 				targetDataset = d
 				break
 			}
@@ -401,19 +374,14 @@ func (s *Service) StorageAttach(vmId int, sType string, dataset string, emulatio
 			return fmt.Errorf("name_required_for_raw_storage")
 		}
 
-		datasets, err := zfs.Datasets("")
+		datasets, err := zfs.Filesystems("")
 		if err != nil {
 			return fmt.Errorf("failed_to_get_datasets: %w", err)
 		}
 
 		var targetDataset *zfs.Dataset
 		for _, d := range datasets {
-			guid, err := d.GetProperty("guid")
-			if err != nil {
-				return fmt.Errorf("failed_to_get_dataset_property: %w", err)
-			}
-
-			if guid == dataset {
+			if d.GUID == dataset {
 				targetDataset = d
 				break
 			}

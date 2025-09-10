@@ -134,13 +134,9 @@ func validateCreate(data libvirtServiceInterfaces.CreateVMRequest, db *gorm.DB) 
 		var dataset *zfs.Dataset
 
 		for _, d := range datasets {
-			guid, err := d.GetProperty("guid")
-			if err != nil {
-				return fmt.Errorf("failed_to_get_dataset_properties: %w", err)
-			}
-
-			if guid == data.StorageDataset {
+			if d.GUID == data.StorageDataset {
 				dataset = d
+				break
 			}
 		}
 

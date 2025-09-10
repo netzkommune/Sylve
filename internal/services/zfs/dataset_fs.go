@@ -67,12 +67,7 @@ func (s *Service) EditFilesystem(guid string, props map[string]string) error {
 	}
 
 	for _, dataset := range datasets {
-		property, err := dataset.GetProperty("guid")
-		if err != nil {
-			return err
-		}
-
-		if property == guid {
+		if dataset.GUID == guid {
 			return zfs.EditFilesystem(dataset.Name, props)
 		}
 	}

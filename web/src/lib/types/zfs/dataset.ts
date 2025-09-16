@@ -7,7 +7,7 @@ export const DatasetSchema = z.object({
 	guid: z.string(),
 	used: z.number(),
 	avail: z.number(),
-        recordsize: z.number(),
+	recordsize: z.number(),
 	mountpoint: z.string(),
 	compression: z.string(),
 	type: z.string(),

@@ -85,6 +85,10 @@ func (d *Dataset) parseProps(out [][]string) error {
 	setString(&d.Compression, d.Props["compress"])
 	setString(&d.Type, d.Props["type"])
 
+	if err = setUint(&d.Recordsize, d.Props["recsize"]); err != nil {
+		return fmt.Errorf("failed to parse recordsize: %w", err)
+	}
+	
 	if err = setUint(&d.Volsize, d.Props["volsize"]); err != nil {
 		return fmt.Errorf("failed to parse volsize: %w", err)
 	}

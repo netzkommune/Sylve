@@ -31,7 +31,7 @@ const (
 )
 
 var (
-	dsPropList           = []string{"name", "origin", "used", "avail", "mountpoint", "compression", "type", "volsize", "quota", "referenced", "written", "logicalused", "usedbydataset", "guid", "mounted", "checksum", "aclmode", "aclinherit", "primarycache", "volmode"}
+	dsPropList           = []string{"name", "origin", "used", "avail", "recordsize", "mountpoint", "compression", "type", "volsize", "quota", "referenced", "written", "logicalused", "usedbydataset", "guid", "mounted", "checksum", "aclmode", "aclinherit", "primarycache", "volmode"}
 	zpoolPropList        = []string{"name", "health", "allocated", "size", "free", "readonly", "dedupratio", "fragmentation", "freeing", "leaked", "guid"}
 	zpoolPropListOptions = strings.Join(zpoolPropList, ",")
 	zpoolArgs            = []string{"get", "-Hp", zpoolPropListOptions}

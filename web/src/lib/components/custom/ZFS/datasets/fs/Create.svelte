@@ -55,7 +55,8 @@
 		encryptionKey: '',
 		quota: '',
 		aclinherit: 'passthrough',
-		aclmode: 'passthrough'
+		aclmode: 'passthrough',
+		recordsize: '131072'
 	};
 
 	let zfsProperties = $state(createFSProps);
@@ -133,7 +134,8 @@
 			encryptionKey: properties.encryptionKey,
 			quota: properties.quota,
 			aclinherit: properties.aclinherit,
-			aclmode: properties.aclmode
+			aclmode: properties.aclmode,
+			recordsize: properties.recordsize
 		});
 
 		reload = true;
@@ -317,6 +319,14 @@
 					options={zfsProperties.aclMode}
 					bind:value={properties.aclmode}
 					onChange={(value) => (properties.aclmode = value)}
+				/>
+
+				<SimpleSelect
+					label="Recordsize"
+					placeholder="Select Recordsize"
+					options={zfsProperties.recordsize}
+					bind:value={properties.recordsize}
+					onChange={(value) => (properties.recordsize = value)}
 				/>
 			</div>
 		</div>

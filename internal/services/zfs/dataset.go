@@ -43,6 +43,7 @@ func (s *Service) GetDatasets(t string) ([]*zfsServiceInterfaces.Dataset, error)
 			GUID:          dataset.GUID,
 			Used:          dataset.Used,
 			Avail:         dataset.Avail,
+			Recordsize:    dataset.Recordsize,
 			Mountpoint:    dataset.Mountpoint,
 			Compression:   dataset.Compression,
 			Type:          dataset.Type,

@@ -18,6 +18,7 @@ type Dataset struct {
 	GUID          string `json:"guid"`
 	Used          uint64 `json:"used"`
 	Avail         uint64 `json:"avail"`
+	Recordsize    uint64 `json:"recordsize"`
 	Mountpoint    string `json:"mountpoint"`
 	Compression   string `json:"compression"`
 	Type          string `json:"type"`

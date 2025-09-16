@@ -169,7 +169,25 @@ export const createFSProps = {
 			label: 'Restricted',
 			value: 'restricted'
 		}
-	]
+	],
+        recordsize: [
+                {
+                        label: '8K - Postgres',
+                        value: '8192'
+                },
+                {
+                        label: '16K - MySQL',
+                        value: '16384'
+                },
+                {
+                        label: '128K - default',
+                        value: '131072'
+                },
+                {
+                        label: '1M - Large Files',
+                        value: '1048576'
+                }
+       ]
 };
 
 export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; columns: Column[] } {

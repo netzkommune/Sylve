@@ -13,12 +13,25 @@ Sylve aims to be a lightweight, open-source virtualization platform for FreeBSD,
 
 ## Sponsors
 
-Sylve is sponsored by:
+We’re proud to be supported by:
 
-- [FreeBSD Foundation](https://freebsdfoundation.org/)
-- [Alchemilla](https://alchemilla.io)
+<p align="center">
+ <a href="https://freebsdfoundation.org">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="./docs/sponsors/FreeBSD-White.png">
+        <img src="./docs/sponsors/FreeBSD-Red.png" alt="FreeBSD Foundation" width="200"/>
+    </picture>
+  </a>
+  &emsp;&emsp;&emsp;
+  <a href="https://alchemilla.io">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="./docs/sponsors/Alchemilla-White.png">
+      <img src="./docs/sponsors/Alchemilla-Dark.png" alt="Alchemilla" width="150"/>
+    </picture>
+  </a>
+</p>
 
-We’re grateful for their support in helping us build and grow Sylve.
+You can also support the project by [sponsoring us on GitHub](https://github.com/sponsors/AlchemillaHQ).
 
 # Development Requirements
 

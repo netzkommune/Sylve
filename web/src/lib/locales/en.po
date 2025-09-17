@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-22T21:29:52.875Z\n"
-"PO-Revision-Date: 2025-09-16T21:02:27.946Z\n"
+"PO-Revision-Date: 2025-09-17T18:12:28.093Z\n"
 "Last-Translator: \n"
 "Language: English\n"
 "Language-Team: \n"
@@ -22,25 +22,25 @@ msgstr "Search..."
 msgid "No data"
 msgstr "No data"
 
-#: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/Terminal.svelte
 #: src/lib/components/ui/custom-input/combobox.svelte
 #: src/lib/components/ui/custom-input/combobox-bindable.svelte
+#: src/lib/components/custom/Login.svelte
 msgid "Enter"
 msgstr "Enter"
 
+#: src/lib/components/custom/Header.svelte
+#: src/lib/components/custom/Header.svelte
+#: src/lib/components/custom/Header.svelte
 #: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/Login.svelte
-#: src/lib/components/custom/Header.svelte
-#: src/lib/components/custom/Header.svelte
-#: src/lib/components/custom/Header.svelte
 msgid "Sylve Logo"
 msgstr "Sylve Logo"
 
-#: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/Throbber.svelte
 #: src/lib/components/custom/Header.svelte
 #: src/lib/components/custom/Header.svelte
+#: src/lib/components/custom/Login.svelte
 msgid "SYLVE"
 msgstr "SYLVE"
 
@@ -54,8 +54,8 @@ msgid "Enter your username"
 msgstr "Enter your username"
 
 #: src/lib/components/custom/Authentication/CreateOrEdit.svelte
-#: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/Login.svelte
 msgid "Password"
 msgstr "Password"
 
@@ -176,8 +176,6 @@ msgstr "Minimize"
 #: src/lib/components/custom/VM/Options/StartOrder.svelte
 #: src/lib/components/custom/VM/Options/WoL.svelte
 #: src/lib/components/custom/VM/Options/WoL.svelte
-#: src/lib/components/custom/VM/Hardware/Storage.svelte
-#: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 #: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
@@ -202,6 +200,8 @@ msgstr "Minimize"
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Close"
 msgstr "Close"
 
@@ -356,10 +356,10 @@ msgstr "Login - Create"
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/vm/[node]/console/+page.svelte
-#: src/routes/[node]/vm/[node]/storage/+page.svelte
-#: src/routes/[node]/vm/[node]/storage/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
 msgid "Shutoff"
 msgstr "Shutoff"
 
@@ -544,8 +544,6 @@ msgstr "Terminal"
 #: src/lib/components/custom/VM/Options/StartOrder.svelte
 #: src/lib/components/custom/VM/Options/WoL.svelte
 #: src/lib/components/custom/VM/Options/WoL.svelte
-#: src/lib/components/custom/VM/Hardware/Storage.svelte
-#: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 #: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
@@ -568,6 +566,8 @@ msgstr "Terminal"
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Reset"
 msgstr "Reset"
 
@@ -1005,22 +1005,22 @@ msgstr "Users"
 msgid "Groups"
 msgstr "Groups"
 
-#: src/routes/[node]/summary/+page.svelte
-#: src/routes/[node]/summary/+page.svelte
-#: src/routes/[node]/summary/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/summary/+page.svelte
 msgid "CPU Usage"
 msgstr "CPU Usage"
 
-#: src/routes/[node]/summary/+page.svelte
-#: src/routes/[node]/summary/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/summary/+page.svelte
 msgid "RAM Usage"
 msgstr "RAM Usage"
 
@@ -1062,11 +1062,11 @@ msgstr "Boot Mode"
 msgid "Sylve Version"
 msgstr "Sylve Version"
 
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/jail/[node]/summary/+page.svelte
 #: src/routes/[node]/summary/+page.svelte
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
-#: src/routes/[node]/jail/[node]/summary/+page.svelte
-#: src/routes/[node]/jail/[node]/summary/+page.svelte
 msgid "Memory Usage"
 msgstr "Memory Usage"
 
@@ -1161,11 +1161,11 @@ msgstr "Bulk Delete"
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
-#: src/routes/[node]/vm/[node]/storage/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/routes/[node]/jail/[node]/network/+page.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
 msgid "New"
 msgstr "New"
 
@@ -1193,9 +1193,9 @@ msgstr "Note"
 #: src/lib/components/custom/ZFS/datasets/volumes/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
-#: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Name"
 msgstr "Name"
 
@@ -2484,8 +2484,8 @@ msgid "Recursive"
 msgstr "Recursive"
 
 #: src/lib/components/custom/ZFS/datasets/snapshots/Create.svelte
-#: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Invalid name"
 msgstr "Invalid name"
 
@@ -3018,9 +3018,9 @@ msgstr "Starting Jail"
 msgid "Please wait while Jail <b>{0} ({1})</b> is being started"
 msgstr "Please wait while Jail <b>{0} ({1})</b> is being started"
 
-#: src/routes/[node]/vm/[node]/storage/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/routes/[node]/jail/[node]/network/+page.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
 msgid "Detach"
 msgstr "Detach"
 
@@ -3065,14 +3065,14 @@ msgstr "Select ZFS Volume"
 msgid "Select ZFS Filesystem"
 msgstr "Select ZFS Filesystem"
 
-#: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Emulation"
 msgstr "Emulation"
 
-#: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Select Emulation"
 msgstr "Select Emulation"
 
@@ -3815,3 +3815,10 @@ msgstr "Recordsize"
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 msgid "Select Recordsize"
 msgstr "Select Recordsize"
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Existing image will be used"
+msgstr "Existing image will be used"
+
+#~ msgid "GB"
+#~ msgstr "GB"

@@ -143,7 +143,7 @@ func (s *Service) CreateVmXML(vm vmModels.VM, vmPath string) (string, error) {
 
 				sIndex++
 			} else if storage.Type == "raw" {
-				imagePath := filepath.Join(dataset.Mountpoint, strconv.Itoa(vm.VmID), fmt.Sprintf("%d.img", vm.VmID))
+				imagePath := filepath.Join(dataset.Mountpoint, fmt.Sprintf("%d.img", vm.VmID))
 
 				if _, err := os.Stat(imagePath); os.IsNotExist(err) {
 					return "", fmt.Errorf("image_file_not_found: %s", imagePath)

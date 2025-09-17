@@ -88,7 +88,7 @@ export function generateTableData(
 						if (storage.name?.endsWith('.img')) {
 							name += `/${storage.name}`;
 						} else {
-							name += `/${vm.vmId}/${storage.name}.img`;
+							name += `/${storage.name}.img`;
 						}
 						size = storage.size || 0;
 					} else if (storage.type === 'zvol') {

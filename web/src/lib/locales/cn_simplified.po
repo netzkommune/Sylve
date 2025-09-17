@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-19T15:13:43.695Z\n"
-"PO-Revision-Date: 2025-09-16T21:02:27.968Z\n"
+"PO-Revision-Date: 2025-09-17T18:12:14.740Z\n"
 "Last-Translator: \n"
 "Language: 简体中文\n"
 "Language-Team: \n"
@@ -72,8 +72,6 @@ msgstr "<0/> 创建虚拟机"
 #: src/lib/components/custom/VM/Options/StartOrder.svelte
 #: src/lib/components/custom/VM/Options/WoL.svelte
 #: src/lib/components/custom/VM/Options/WoL.svelte
-#: src/lib/components/custom/VM/Hardware/Storage.svelte
-#: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 #: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
@@ -94,6 +92,8 @@ msgstr "<0/> 创建虚拟机"
 #: src/routes/[node]/utilities/downloader/+page.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Reset"
 msgstr "重置"
 
@@ -162,8 +162,6 @@ msgstr "重置"
 #: src/lib/components/custom/VM/Options/StartOrder.svelte
 #: src/lib/components/custom/VM/Options/WoL.svelte
 #: src/lib/components/custom/VM/Options/WoL.svelte
-#: src/lib/components/custom/VM/Hardware/Storage.svelte
-#: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 #: src/lib/components/custom/VM/Hardware/CPU.svelte
 #: src/lib/components/custom/VM/Hardware/PCIDevices.svelte
@@ -186,6 +184,8 @@ msgstr "重置"
 #: src/routes/[node]/utilities/downloader/+page.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Close"
 msgstr "关闭"
 
@@ -371,10 +371,10 @@ msgstr "搜索..."
 msgid "No data"
 msgstr "没有数据"
 
-#: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/Terminal.svelte
 #: src/lib/components/ui/custom-input/combobox.svelte
 #: src/lib/components/ui/custom-input/combobox-bindable.svelte
+#: src/lib/components/custom/Login.svelte
 msgid "Enter"
 msgstr "进入<<<<<<< HEAD"
 
@@ -396,10 +396,10 @@ msgstr "Difuse-侧边栏"
 
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/vm/[node]/console/+page.svelte
-#: src/routes/[node]/vm/[node]/storage/+page.svelte
-#: src/routes/[node]/vm/[node]/storage/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
 msgid "Shutoff"
 msgstr ""
 
@@ -411,18 +411,18 @@ msgstr ""
 msgid "The VM is currently powered off.<0/> Start the VM to access its console."
 msgstr ""
 
-#: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/Throbber.svelte
 #: src/lib/components/custom/Header.svelte
 #: src/lib/components/custom/Header.svelte
+#: src/lib/components/custom/Login.svelte
 msgid "SYLVE"
 msgstr ""
 
+#: src/lib/components/custom/Header.svelte
+#: src/lib/components/custom/Header.svelte
+#: src/lib/components/custom/Header.svelte
 #: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/Login.svelte
-#: src/lib/components/custom/Header.svelte
-#: src/lib/components/custom/Header.svelte
-#: src/lib/components/custom/Header.svelte
 msgid "Sylve Logo"
 msgstr ""
 
@@ -436,8 +436,8 @@ msgid "Enter your username"
 msgstr ""
 
 #: src/lib/components/custom/Authentication/CreateOrEdit.svelte
-#: src/lib/components/custom/Login.svelte
 #: src/lib/components/custom/VM/Hardware/VNC.svelte
+#: src/lib/components/custom/Login.svelte
 msgid "Password"
 msgstr ""
 
@@ -1013,22 +1013,22 @@ msgstr ""
 msgid "Groups"
 msgstr ""
 
-#: src/routes/[node]/summary/+page.svelte
-#: src/routes/[node]/summary/+page.svelte
-#: src/routes/[node]/summary/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/summary/+page.svelte
 msgid "CPU Usage"
 msgstr ""
 
-#: src/routes/[node]/summary/+page.svelte
-#: src/routes/[node]/summary/+page.svelte
 #: src/routes/[node]/vm/[node]/summary/+page.svelte
 #: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/summary/+page.svelte
+#: src/routes/[node]/summary/+page.svelte
 msgid "RAM Usage"
 msgstr ""
 
@@ -1070,11 +1070,11 @@ msgstr ""
 msgid "Sylve Version"
 msgstr ""
 
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/vm/[node]/summary/+page.svelte
+#: src/routes/[node]/jail/[node]/summary/+page.svelte
+#: src/routes/[node]/jail/[node]/summary/+page.svelte
 #: src/routes/[node]/summary/+page.svelte
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
-#: src/routes/[node]/vm/[node]/summary/+page.svelte
-#: src/routes/[node]/jail/[node]/summary/+page.svelte
-#: src/routes/[node]/jail/[node]/summary/+page.svelte
 msgid "Memory Usage"
 msgstr ""
 
@@ -1169,11 +1169,11 @@ msgstr ""
 #: src/routes/[node]/storage/zfs/datasets/volumes/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/snapshots/+page.svelte
 #: src/routes/[node]/storage/zfs/pools/+page.svelte
-#: src/routes/[node]/vm/[node]/storage/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/routes/[node]/jail/[node]/network/+page.svelte
 #: src/routes/[node]/utilities/downloader/+page.svelte
 #: src/routes/[node]/storage/zfs/datasets/fs/+page.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
 msgid "New"
 msgstr ""
 
@@ -1202,8 +1202,8 @@ msgstr ""
 #: src/lib/components/custom/ZFS/datasets/fs/Create.svelte
 #: src/lib/components/custom/ZFS/datasets/snapshots/CreateDetailed.svelte
 #: src/lib/components/custom/ZFS/pools/Create.svelte
-#: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Name"
 msgstr ""
 
@@ -3026,9 +3026,9 @@ msgstr ""
 msgid "Please wait while Jail <b>{0} ({1})</b> is being started"
 msgstr ""
 
-#: src/routes/[node]/vm/[node]/storage/+page.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/routes/[node]/jail/[node]/network/+page.svelte
+#: src/routes/[node]/vm/[node]/storage/+page.svelte
 msgid "Detach"
 msgstr ""
 
@@ -3073,14 +3073,14 @@ msgstr ""
 msgid "Select ZFS Filesystem"
 msgstr ""
 
-#: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/routes/[node]/vm/[node]/network/+page.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Emulation"
 msgstr ""
 
-#: src/lib/components/custom/VM/Hardware/Storage.svelte
 #: src/lib/components/custom/VM/Hardware/Network.svelte
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
 msgid "Select Emulation"
 msgstr ""
 
@@ -3812,4 +3812,12 @@ msgstr ""
 
 #: src/lib/components/custom/ZFS/datasets/fs/Edit.svelte
 msgid "Select Recordsize"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "Existing image will be used"
+msgstr ""
+
+#: src/lib/components/custom/VM/Hardware/Storage.svelte
+msgid "GB"
 msgstr ""

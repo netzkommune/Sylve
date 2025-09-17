@@ -96,8 +96,6 @@
 		return null;
 	});
 
-	$inspect(activeDataset);
-
 	let activeDatasets: Dataset[] = $derived.by(() => {
 		if (activeRows) {
 			let datasets: Dataset[] = [];

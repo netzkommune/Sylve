@@ -10,9 +10,7 @@ package libvirt
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"github.com/alchemillahq/sylve/internal/db/models"
@@ -120,8 +118,12 @@ func validateCreate(data libvirtServiceInterfaces.CreateVMRequest, db *gorm.DB) 
 			return fmt.Errorf("failed_to_check_storage_dataset_usage: %w", err)
 		}
 
-		if count > 0 && data.StorageType == "zvol" {
-			return fmt.Errorf("storage_dataset_zvol_already_in_use")
+		if count > 0 {
+			if data.StorageType == "zvol" {
+				return fmt.Errorf("storage_dataset_zvol_already_in_use")
+			} else if data.StorageType == "raw" {
+				return fmt.Errorf("storage_dataset_filesystem_already_in_use")
+			}
 		}
 
 		datasets, err := zfs.Datasets("")
@@ -537,6 +539,10 @@ func (s *Service) RemoveVM(id uint, cleanUpMacs bool) error {
 
 	filesystems, err := zfs.Filesystems("")
 
+	if err != nil {
+		return fmt.Errorf("failed_to_get_filesystems: %w", err)
+	}
+
 	for _, storage := range vm.Storages {
 		if storage.Type == "raw" {
 			var dataset *zfs.Dataset
@@ -555,14 +561,11 @@ func (s *Service) RemoveVM(id uint, cleanUpMacs bool) error {
 				return fmt.Errorf("raw_storage_dataset_must_have_mountpoint")
 			}
 
-			datasetPath := filepath.Join(dataset.Mountpoint, strconv.Itoa(vm.VmID))
-
-			if err := os.RemoveAll(datasetPath); err != nil {
-				return fmt.Errorf("failed_to_remove_raw_storage_files: %w", err)
-			}
+			datasetPath := filepath.Join(dataset.Mountpoint)
+			err := utils.RemoveDirContents(datasetPath)
 
 			if err != nil {
-				return fmt.Errorf("failed_to_get_datasets: %w", err)
+				return fmt.Errorf("failed_to_remove_raw_storage_files: %w", err)
 			}
 		}
 

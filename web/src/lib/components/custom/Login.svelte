@@ -24,8 +24,6 @@
 
 	let { onLogin, loading = $bindable() }: Props = $props();
 
-	$inspect(loading);
-
 	let username = $state('');
 	let password = $state('');
 	let authType = $state('sylve');

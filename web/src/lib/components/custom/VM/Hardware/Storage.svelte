@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { getFiles } from '$lib/api/system/file-explorer';
 	import { storageAttach } from '$lib/api/vm/storage';
 	import SimpleSelect from '$lib/components/custom/SimpleSelect.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -49,6 +50,31 @@
 					return storage.dataset === dataset.guid;
 				});
 			});
+	});
+
+	let existingImage = $state(false);
+
+	$effect(() => {
+		if (properties.name && properties.type === 'raw' && properties.dataset) {
+			const dataset = datasets.find(
+				(d) => d.guid === properties.dataset || d.name === properties.dataset
+			);
+			const mountPoint = dataset?.mountpoint || '';
+			if (mountPoint) {
+				getFiles(mountPoint).then((files) => {
+					for (const file of files) {
+						console.log(file.id, `${mountPoint}/${properties.name}.img`);
+						if (file.id === `${mountPoint}/${properties.name}.img`) {
+							existingImage = true;
+							properties.size = humanFormat(file.size || 0);
+							return;
+						}
+					}
+
+					existingImage = false;
+				});
+			}
+		}
 	});
 
 	async function attach() {
@@ -288,7 +314,12 @@
 					placeholder="8 GB"
 					bind:value={properties.size}
 					classes="flex-1 space-y-1"
+					disabled={existingImage}
 				/>
+
+				{#if existingImage}
+					<span class="-mt-3 text-xs text-yellow-500">Existing image will be used</span>
+				{/if}
 			</div>
 		{/if}
 

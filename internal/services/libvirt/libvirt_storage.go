@@ -54,7 +54,7 @@ func (s *Service) CreateDiskImage(vmId int, guid string, size int64, name string
 		return fmt.Errorf("mountpoint_property_is_empty_for_dataset: %s", guid)
 	}
 
-	vmPath := filepath.Join(mountpoint, strconv.Itoa(vmId))
+	vmPath := filepath.Join(mountpoint)
 	if _, err := os.Stat(vmPath); os.IsNotExist(err) {
 		if err := os.MkdirAll(vmPath, 0755); err != nil {
 			return fmt.Errorf("failed_to_create_vm_images_directory: %w", err)
@@ -171,14 +171,14 @@ func (s *Service) StorageDetach(vmId int, storageId int) error {
 
 		// RAW removal: require dataset to compute the image path reliably.
 		if storage.Type == "raw" && haveDataset {
-			if strings.Contains(val, dataset.Name) && strings.Contains(val, storage.Name) {
+			if strings.Contains(val, dataset.Name) && strings.HasSuffix(val, fmt.Sprintf("%s.img", storage.Name)) {
 				bhyveCommandline.RemoveChild(arg)
-				// Best-effort delete of image file
-				imagePath := filepath.Join(dataset.Mountpoint,
-					strconv.Itoa(vmId), fmt.Sprintf("%s.img", storage.Name))
-				if _, statErr := os.Stat(imagePath); statErr == nil {
-					_ = os.Remove(imagePath) // ignore error; detach should still succeed
-				}
+				// Let's not remove the image file itself, since we're "detaching" and not "deleting".
+				// imagePath := filepath.Join(dataset.Mountpoint,
+				// 	strconv.Itoa(vmId), fmt.Sprintf("%s.img", storage.Name))
+				// if _, statErr := os.Stat(imagePath); statErr == nil {
+				// 	_ = os.Remove(imagePath) // ignore error; detach should still succeed
+				// }
 				continue
 			}
 		}
@@ -395,9 +395,19 @@ func (s *Service) StorageAttach(vmId int, sType string, dataset string, emulatio
 			return fmt.Errorf("dataset_not_found: %s", dataset)
 		}
 
-		imagePath := filepath.Join(targetDataset.Mountpoint, strconv.Itoa(vmId), fmt.Sprintf("%s.img", name))
-		if _, err := os.Stat(imagePath); err == nil {
-			return fmt.Errorf("image_file_already_exists: %s", imagePath)
+		imagePath := filepath.Join(targetDataset.Mountpoint, fmt.Sprintf("%s.img", name))
+		if _, err := os.Stat(imagePath); err != nil {
+			if os.IsNotExist(err) {
+				if err := s.CreateDiskImage(vmId, dataset, size, name); err != nil {
+					return fmt.Errorf("failed_to_create_disk_image: %w", err)
+				}
+			}
+		} else {
+			info, err := os.Stat(imagePath)
+			if err != nil {
+				return fmt.Errorf("failed_to_stat_existing_image: %w", err)
+			}
+			size = info.Size()
 		}
 
 		newStorage := vmModels.Storage{
@@ -411,10 +421,6 @@ func (s *Service) StorageAttach(vmId int, sType string, dataset string, emulatio
 
 		if err := s.DB.Create(&newStorage).Error; err != nil {
 			return fmt.Errorf("failed_to_create_storage: %w", err)
-		}
-
-		if err := s.CreateDiskImage(vmId, dataset, size, name); err != nil {
-			return fmt.Errorf("failed_to_create_disk_image: %w", err)
 		}
 
 		index, err := findLowestIndex(xml)

@@ -86,9 +86,9 @@ export function generateTableData(
 					name = (found as Dataset).name;
 					if (storage.type === 'raw') {
 						if (storage.name?.endsWith('.img')) {
-							name += `/sylve-vm-images/${storage.name}`;
+							name += `/${storage.name}`;
 						} else {
-							name += `/sylve-vm-images/${storage.name}.img`;
+							name += `/${vm.vmId}/${storage.name}.img`;
 						}
 						size = storage.size || 0;
 					} else if (storage.type === 'zvol') {

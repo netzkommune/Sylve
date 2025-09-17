@@ -54,7 +54,7 @@ func (s *Service) CreateDiskImage(vmId int, guid string, size int64, name string
 		return fmt.Errorf("mountpoint_property_is_empty_for_dataset: %s", guid)
 	}
 
-	vmPath := filepath.Join(mountpoint, "sylve-vm-images", strconv.Itoa(vmId))
+	vmPath := filepath.Join(mountpoint, strconv.Itoa(vmId))
 	if _, err := os.Stat(vmPath); os.IsNotExist(err) {
 		if err := os.MkdirAll(vmPath, 0755); err != nil {
 			return fmt.Errorf("failed_to_create_vm_images_directory: %w", err)
@@ -174,7 +174,7 @@ func (s *Service) StorageDetach(vmId int, storageId int) error {
 			if strings.Contains(val, dataset.Name) && strings.Contains(val, storage.Name) {
 				bhyveCommandline.RemoveChild(arg)
 				// Best-effort delete of image file
-				imagePath := filepath.Join(dataset.Mountpoint, "sylve-vm-images",
+				imagePath := filepath.Join(dataset.Mountpoint,
 					strconv.Itoa(vmId), fmt.Sprintf("%s.img", storage.Name))
 				if _, statErr := os.Stat(imagePath); statErr == nil {
 					_ = os.Remove(imagePath) // ignore error; detach should still succeed
@@ -374,6 +374,10 @@ func (s *Service) StorageAttach(vmId int, sType string, dataset string, emulatio
 			return fmt.Errorf("name_required_for_raw_storage")
 		}
 
+		if !utils.IsValidDiskName(name) {
+			return fmt.Errorf("invalid_characters_in_disk_name: %s", name)
+		}
+
 		datasets, err := zfs.Filesystems("")
 		if err != nil {
 			return fmt.Errorf("failed_to_get_datasets: %w", err)
@@ -389,6 +393,11 @@ func (s *Service) StorageAttach(vmId int, sType string, dataset string, emulatio
 
 		if targetDataset == nil {
 			return fmt.Errorf("dataset_not_found: %s", dataset)
+		}
+
+		imagePath := filepath.Join(targetDataset.Mountpoint, strconv.Itoa(vmId), fmt.Sprintf("%s.img", name))
+		if _, err := os.Stat(imagePath); err == nil {
+			return fmt.Errorf("image_file_already_exists: %s", imagePath)
 		}
 
 		newStorage := vmModels.Storage{
@@ -413,7 +422,14 @@ func (s *Service) StorageAttach(vmId int, sType string, dataset string, emulatio
 			return fmt.Errorf("failed_to_find_lowest_index: %w", err)
 		}
 
-		argValue := fmt.Sprintf("-s %d:0,%s,%s/%s.img", index, emulation, filepath.Join(targetDataset.Mountpoint, "sylve-vm-images", strconv.Itoa(vmId)), name)
+		argValue := fmt.Sprintf(
+			"-s %d:0,%s,%s/%s.img",
+			index,
+			emulation,
+			filepath.Join(targetDataset.Mountpoint, strconv.Itoa(vmId)),
+			name,
+		)
+
 		bhyveCommandline.CreateElement("bhyve:arg").CreateAttr("value", argValue)
 	}
 

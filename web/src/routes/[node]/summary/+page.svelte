@@ -10,8 +10,6 @@
 	import { Progress } from '$lib/components/ui/progress/index.js';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
-	import { reload } from '$lib/stores/api.svelte';
-	import { currentHostname } from '$lib/stores/auth';
 	import type { BasicInfo } from '$lib/types/info/basic';
 	import type { CPUInfo, CPUInfoHistorical } from '$lib/types/info/cpu';
 	import type { HistoricalNetworkInterface } from '$lib/types/info/network';
@@ -19,12 +17,10 @@
 	import type { IODelay, IODelayHistorical } from '$lib/types/zfs/pool';
 	import { updateCache } from '$lib/utils/http';
 	import { bytesToHumanReadable, floatToNDecimals } from '$lib/utils/numbers';
-	import { formatUptime, secondsToHoursAgo } from '$lib/utils/time';
+	import { formatUptime } from '$lib/utils/time';
 	import Icon from '@iconify/svelte';
 	import { useQueries, useQueryClient } from '@sveltestack/svelte-query';
 	import type { Chart } from 'chart.js';
-	import { onMount } from 'svelte';
-	import { get } from 'svelte/store';
 
 	interface Data {
 		basicInfo: BasicInfo;

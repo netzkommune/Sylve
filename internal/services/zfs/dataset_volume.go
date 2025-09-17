@@ -79,25 +79,23 @@ func (s *Service) DeleteVolume(guid string) error {
 		return fmt.Errorf("dataset_in_use_by_vm")
 	}
 
-	datasets, err := zfs.Datasets("")
+	volumes, err := zfs.Volumes("")
 	if err != nil {
 		return err
 	}
 
-	for _, dataset := range datasets {
-		properties, err := dataset.GetAllProperties()
+	for _, volume := range volumes {
+		g, err := volume.GetProperty("guid")
 		if err != nil {
 			return err
 		}
 
-		for _, v := range properties {
-			if v == guid {
-				err := dataset.Destroy(zfs.DestroyDefault)
-				if err != nil {
-					return err
-				}
-				return nil
+		if g == guid {
+			err := volume.Destroy(zfs.DestroyRecursive)
+			if err != nil {
+				return err
 			}
+			return nil
 		}
 	}
 

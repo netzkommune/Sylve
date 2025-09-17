@@ -54,6 +54,12 @@
 		}
 	]);
 
+	let pools: Zpool[] = $derived($results[0].data as Zpool[]);
+	let datasets: Dataset[] = $derived($results[1].data as Dataset[]);
+	let grouped = $derived(groupByPool(pools, datasets));
+	let tableData = $derived(generateTableData(grouped));
+	let activeRows: Row[] | null = $state(null);
+	let activeRow: Row | null = $derived(activeRows ? (activeRows[0] as Row) : ({} as Row));
 	let reload = $state(false);
 
 	$effect(() => {
@@ -66,13 +72,6 @@
 			});
 		}
 	});
-
-	let pools: Zpool[] = $derived($results[0].data as Zpool[]);
-	let datasets: Dataset[] = $derived($results[1].data as Dataset[]);
-	let grouped = $derived(groupByPool(pools, datasets));
-	let tableData = $derived(generateTableData(grouped));
-	let activeRows: Row[] | null = $state(null);
-	let activeRow: Row | null = $derived(activeRows ? (activeRows[0] as Row) : ({} as Row));
 
 	let activeDataset: Dataset | null = $derived.by(() => {
 		if (activeRow) {
@@ -96,6 +95,8 @@
 
 		return null;
 	});
+
+	$inspect(activeDataset);
 
 	let activeDatasets: Dataset[] = $derived.by(() => {
 		if (activeRows) {

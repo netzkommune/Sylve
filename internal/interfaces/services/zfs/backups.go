@@ -7,10 +7,3 @@
 // under sponsorship from the FreeBSD Foundation.
 
 package zfsServiceInterfaces
-
-import zfsModels "github.com/alchemillahq/sylve/internal/db/models/zfs"
-
-type ZFSS3Backup struct {
-	Job  zfsModels.ZFSS3Backup
-	Runs []zfsModels.ZFSS3BackupRun
-}

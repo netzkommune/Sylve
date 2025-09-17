@@ -88,47 +88,42 @@ func (s *Service) DeleteFilesystem(guid string) error {
 		return fmt.Errorf("dataset_in_use_by_vm")
 	}
 
-	datasets, err := zfs.Datasets("")
+	filesystems, err := zfs.Filesystems("")
 	if err != nil {
 		return err
 	}
 
-	for _, dataset := range datasets {
-		properties, err := dataset.GetAllProperties()
+	for _, filesystem := range filesystems {
+		fguid, err := filesystem.GetProperty("guid")
 		if err != nil {
 			return err
 		}
 
-		var keylocation string
-		found := false
-
-		for k, v := range properties {
-			if v == guid {
-				found = true
-			}
-			if k == "keylocation" {
-				keylocation = v
-			}
+		if fguid != guid {
+			continue
 		}
 
-		if found {
-			if err := dataset.Destroy(zfs.DestroyRecursive); err != nil {
-				return err
-			}
+		keylocation, err := filesystem.GetProperty("keylocation")
+		if err != nil {
+			return err
+		}
 
-			if keylocation != "" && keylocation != "none" {
-				keylocation = keylocation[7:]
-				if _, err := os.Stat(keylocation); err == nil {
-					if err := os.Remove(keylocation); err != nil {
-						return err
-					}
-				} else {
-					return fmt.Errorf("keylocation_file_not_found: %s", keylocation)
+		if err := filesystem.Destroy(zfs.DestroyRecursive); err != nil {
+			return err
+		}
+
+		if keylocation != "" && keylocation != "none" {
+			keylocation = keylocation[7:]
+			if _, err := os.Stat(keylocation); err == nil {
+				if err := os.Remove(keylocation); err != nil {
+					return err
 				}
+			} else {
+				return fmt.Errorf("keylocation_file_not_found: %s", keylocation)
 			}
-
-			return nil
 		}
+
+		return nil
 	}
 
 	return fmt.Errorf("filesystem with guid %s not found", guid)

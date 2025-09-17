@@ -5,14 +5,10 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import { Label } from '$lib/components/ui/label/index.js';
-	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
-	import type { CPUInfo } from '$lib/types/info/cpu';
-	import type { RAMInfo } from '$lib/types/info/ram';
 	import type { Download } from '$lib/types/utilities/downloader';
 	import type { VM } from '$lib/types/vm/vm';
 	import type { Dataset } from '$lib/types/zfs/dataset';
-	import { getCache, handleAPIError } from '$lib/utils/http';
+	import { handleAPIError } from '$lib/utils/http';
 	import { getISOs } from '$lib/utils/utilities/downloader';
 	import Icon from '@iconify/svelte';
 	import humanFormat from 'human-format';
@@ -63,7 +59,6 @@
 			if (mountPoint) {
 				getFiles(mountPoint).then((files) => {
 					for (const file of files) {
-						console.log(file.id, `${mountPoint}/${properties.name}.img`);
 						if (file.id === `${mountPoint}/${properties.name}.img`) {
 							existingImage = true;
 							properties.size = humanFormat(file.size || 0);

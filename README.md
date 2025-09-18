@@ -16,8 +16,8 @@ Sylve aims to be a lightweight, open-source virtualization platform for FreeBSD,
 These only apply to the development version of Sylve, the production version will be a single binary.
 
 - Go >= 1.24
-- Node.js (v20.18.2)
-- NPM (v10.9.2)
+- Node.js >= v20.18.2
+- NPM >= v10.9.2
 
 # Runtime Requirements
 

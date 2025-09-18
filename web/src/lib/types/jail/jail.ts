@@ -3,6 +3,7 @@ import { z } from 'zod/v4';
 export interface CreateData {
 	name: string;
 	id: number;
+	node: string;
 	description: string;
 	storage: {
 		dataset: string;

@@ -216,7 +216,7 @@ export function generateTableData(grouped: GroupedByPool[]): { rows: Row[]; colu
 				const value = cell.getValue();
 
 				if (value.includes('/')) {
-					const [, volume] = value.split('/');
+					const volume = value.substring(value.indexOf('/') + 1);
 					return renderWithIcon('carbon:volume-block-storage', volume);
 				}
 

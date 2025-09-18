@@ -1,6 +1,9 @@
 <script lang="ts">
+	import { clusterStore, currentHostname } from '$lib/stores/auth';
 	import type { VMDomain } from '$lib/types/vm/vm';
+	import { toHex } from '$lib/utils/string';
 	import Icon from '@iconify/svelte';
+	import { get } from 'svelte/store';
 
 	interface Data {
 		port: number;
@@ -10,9 +13,17 @@
 	}
 
 	let { data }: { data: Data } = $props();
-	let path = $derived(`/api/vnc/${encodeURIComponent(String(data.port))}?hash=${data.hash}`);
+
+	const wssAuth = $state({
+		hash: data.hash,
+		hostname: get(currentHostname) || '',
+		token: $clusterStore || ''
+	});
 
 	let revealIframe = $state(false);
+	let path = $derived(
+		`/api/vnc/${encodeURIComponent(String(data.port))}?auth=${toHex(JSON.stringify(wssAuth))}`
+	);
 
 	if (data.domain && data.domain.status !== 'Shutoff') {
 		setTimeout(() => {

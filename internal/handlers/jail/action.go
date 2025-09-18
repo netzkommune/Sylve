@@ -18,36 +18,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-/*
-// @Summary List all Jails
-// @Description Retrieve a list of all jails
-// @Tags Jail
-// @Accept json
-// @Produce json
-// @Security BearerAuth
-// @Success 200 {object} internal.APIResponse[[]jailModels.Jail] "Success"
-// @Failure 500 {object} internal.APIResponse[any] "Internal Server Error"
-// @Router /jail [get]
-func ListJails(jailService *jail.Service) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		jails, err := jailService.GetJails()
-
-		if err != nil {
-			c.JSON(500, internal.APIResponse[any]{Error: "failed_to_list_jails: " + err.Error()})
-			return
-		}
-
-		c.JSON(200, internal.APIResponse[[]jailModels.Jail]{
-			Status:  "success",
-			Message: "jail_listed",
-			Data:    jails,
-			Error:   "",
-		})
-	}
-}
-
-// something like that for action /jail/action/{ctid}/{action}
-*/
 // @Summary Perform Jail Action
 // @Description Perform an action (start/stop) on a specific jail
 // @Tags Jail

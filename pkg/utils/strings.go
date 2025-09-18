@@ -654,3 +654,8 @@ func MustJSON(v any) []byte {
 	b, _ := json.Marshal(v)
 	return b
 }
+
+func IsValidDiskName(name string) bool {
+	regex := regexp.MustCompile(`^[a-zA-Z0-9-_]+$`)
+	return regex.MatchString(name)
+}

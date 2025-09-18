@@ -122,7 +122,9 @@ func EnsureCorrectHost(db *gorm.DB) gin.HandlerFunc {
 			}
 		}
 
-		reqHost, err := utils.GetCurrentHostnameFromHeader(c.Request.Header)
+		requestCopy := c.Request.Clone(c.Request.Context())
+
+		reqHost, err := utils.GetCurrentHostnameFromHeader(c.Request.Header, requestCopy)
 		if err != nil {
 			c.Next()
 			return

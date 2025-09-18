@@ -7,9 +7,32 @@
 > [!WARNING]
 > This project is still in development so expect breaking changes!
 
-https://github.com/user-attachments/assets/bf727ef4-4316-4084-a61f-cb8ec978e43d
+https://gist.github.com/user-attachments/assets/7a9d002c-f647-4872-8b55-6b0cb1ce563b
 
 Sylve aims to be a lightweight, open-source virtualization platform for FreeBSD, leveraging [Bhyve](https://wiki.freebsd.org/bhyve) for VMs and [Jails](https://wiki.freebsd.org/Jails) for containerization, with deep [ZFS](https://docs.freebsd.org/en/books/handbook/zfs/) integration. It seeks to provide a streamlined, Proxmox-like experience tailored for FreeBSD environments. Its backend is written in Go and the frontend is written in Svelte (with Kit).
+
+## Sponsors
+
+We’re proud to be supported by:
+
+<p align="center">
+  <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="./docs/sponsors/FreeBSD-White.png">
+        <img src="./docs/sponsors/FreeBSD-Red.png" alt="FreeBSD Foundation" width="200"/>
+  </picture>
+  &emsp;&emsp;&emsp;
+  <a href="https://alchemilla.io">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="./docs/sponsors/Alchemilla-White.png">
+      <img src="./docs/sponsors/Alchemilla-Dark.png" alt="Alchemilla" width="150"/>
+    </picture>
+  </a>
+</p>
+
+- [FreeBSD Foundation](https://freebsdfoundation.org)  
+- [Alchemilla](https://alchemilla.io)
+
+You can also support the project by [sponsoring us on GitHub](https://github.com/sponsors/AlchemillaHQ).
 
 # Development Requirements
 
@@ -35,6 +58,7 @@ Running Sylve is pretty easy, but `sylve` depends on some packages that you can 
 | bhyve-firmware | 1.0_2        | No       | No       | Collection of Firmware for bhyve                 |
 | samba419       | 4.19.9_9     | No       | No       | SMB file sharing service                         |
 | jansson        | 2.14.1       | No       | No       | JSON library for C                               |
+| swtpm          | 0.10.1       | No       | No       | TPM emulator for VMs                             |
 
 We also need to enable some services in order to run Sylve, you can drop these into `/etc/rc.conf` if you don't have it already:
 
@@ -53,7 +77,7 @@ samba_server_enable="YES"
 
 Enabling `rctl` is required. Do this by adding the following line to `/boot/loader.conf`:
 
-``` sh
+```sh
 kern.racct.enable=1
 ```
 

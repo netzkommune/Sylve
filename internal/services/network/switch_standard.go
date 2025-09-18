@@ -36,6 +36,28 @@ func (s *Service) GetStandardSwitches() ([]networkModels.StandardSwitch, error) 
 	return switches, nil
 }
 
+func (s *Service) conflictingPortsForVLAN(ports []string, vlan int, excludeSwitchID *int) ([]networkModels.NetworkPort, error) {
+	var eps []networkModels.NetworkPort
+	q := s.DB.Preload("Switch").Where("name IN ?", ports)
+	if excludeSwitchID != nil {
+		q = q.Where("switch_id <> ?", *excludeSwitchID)
+	}
+
+	if err := q.Find(&eps).Error; err != nil {
+		return nil, fmt.Errorf("db_error_checking_ports: %w", err)
+	}
+
+	conflicts := make([]networkModels.NetworkPort, 0, len(eps))
+	for _, ep := range eps {
+		other := ep.Switch.VLAN
+		if vlan == 0 || other == 0 || vlan == other {
+			conflicts = append(conflicts, ep)
+		}
+	}
+
+	return conflicts, nil
+}
+
 func (s *Service) NewStandardSwitch(
 	name string,
 	mtu int,
@@ -51,21 +73,22 @@ func (s *Service) NewStandardSwitch(
 	slaac bool,
 	defaultRoute bool,
 ) error {
-	var existingPorts []networkModels.NetworkPort
-	if err := s.DB.Where("name IN ?", ports).Find(&existingPorts).Error; err != nil {
-		return fmt.Errorf("db_error_checking_ports: %v", err)
-	}
-
-	if len(existingPorts) > 0 {
-		return fmt.Errorf("port_overlap")
-	}
-
 	if !utils.IsValidMTU(mtu) && mtu != 0 {
 		return fmt.Errorf("invalid_mtu")
 	}
 
 	if !utils.IsValidVLAN(vlan) && vlan != 0 {
 		return fmt.Errorf("invalid_vlan")
+	}
+
+	if conflicts, err := s.conflictingPortsForVLAN(ports, vlan, nil); err != nil {
+		return err
+	} else if len(conflicts) > 0 {
+		var msgs []string
+		for _, c := range conflicts {
+			msgs = append(msgs, fmt.Sprintf("%s (used by switch %q vlan=%d)", c.Name, c.Switch.Name, c.Switch.VLAN))
+		}
+		return fmt.Errorf("port_overlap: %s", strings.Join(msgs, ", "))
 	}
 
 	if network4Id != 0 {
@@ -305,24 +328,22 @@ func (s *Service) EditStandardSwitch(
 	slaac bool,
 	defaultRoute bool,
 ) error {
-	var conflictingPorts []networkModels.NetworkPort
-	if err := s.DB.
-		Where("name IN ?", ports).
-		Where("switch_id <> ?", id).
-		Find(&conflictingPorts).Error; err != nil {
-		return fmt.Errorf("db_error_checking_ports: %v", err)
-	}
-
-	if len(conflictingPorts) > 0 {
-		return fmt.Errorf("port_overlap")
-	}
-
 	if !utils.IsValidMTU(mtu) {
 		return fmt.Errorf("invalid_mtu")
 	}
 
-	if !utils.IsValidVLAN(vlan) {
+	if !utils.IsValidVLAN(vlan) && vlan != 0 {
 		return fmt.Errorf("invalid_vlan")
+	}
+
+	if conflicts, err := s.conflictingPortsForVLAN(ports, vlan, &id); err != nil {
+		return err
+	} else if len(conflicts) > 0 {
+		var msgs []string
+		for _, c := range conflicts {
+			msgs = append(msgs, fmt.Sprintf("%s (used by switch %q vlan=%d)", c.Name, c.Switch.Name, c.Switch.VLAN))
+		}
+		return fmt.Errorf("port_overlap: %s", strings.Join(msgs, ", "))
 	}
 
 	if network4Id != 0 {

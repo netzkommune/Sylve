@@ -19,16 +19,16 @@
 			language: string,
 			remember: boolean
 		) => void;
+		loading: boolean;
 	}
 
-	let { onLogin }: Props = $props();
+	let { onLogin, loading = $bindable() }: Props = $props();
 
 	let username = $state('');
 	let password = $state('');
 	let authType = $state('sylve');
 	let language = $state('en');
 	let remember = $state(false);
-	let loading = $state(false);
 
 	$effect(() => {
 		if (page.url.search.includes('loggedOut')) {
@@ -39,9 +39,6 @@
 	async function handleKeydown(event: KeyboardEvent) {
 		if (event.key === 'Enter') {
 			event.preventDefault();
-			if (loading) return;
-			loading = true;
-
 			try {
 				onLogin(username, password, authType, language, remember);
 			} catch (error) {
@@ -148,7 +145,6 @@
 			</div>
 			<Button
 				onclick={() => {
-					loading = true;
 					onLogin(username, password, authType, language, remember);
 				}}
 				size="sm"

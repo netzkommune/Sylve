@@ -34,6 +34,11 @@
 				label: 'Cluster',
 				icon: 'carbon:assembly-cluster',
 				href: '/datacenter/cluster'
+			},
+			{
+				label: 'Storage',
+				icon: 'mdi:storage',
+				href: '/datacenter/storage'
 			}
 		];
 	});

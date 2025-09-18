@@ -86,12 +86,7 @@ func (s *Service) CreateVmXML(vm vmModels.VM, vmPath string) (string, error) {
 
 			if storage.Dataset != "" && storage.Type != "iso" {
 				for _, d := range datasets {
-					guid, err := d.GetProperty("guid")
-					if err != nil {
-						return "", fmt.Errorf("failed_to_get_dataset_properties: %w", err)
-					}
-
-					if guid == storage.Dataset {
+					if d.GUID == storage.Dataset {
 						dataset = d
 						break
 					}
@@ -148,7 +143,7 @@ func (s *Service) CreateVmXML(vm vmModels.VM, vmPath string) (string, error) {
 
 				sIndex++
 			} else if storage.Type == "raw" {
-				imagePath := filepath.Join(dataset.Mountpoint, "sylve-vm-images", strconv.Itoa(vm.VmID), fmt.Sprintf("%d.img", vm.VmID))
+				imagePath := filepath.Join(dataset.Mountpoint, fmt.Sprintf("%d.img", vm.VmID))
 
 				if _, err := os.Stat(imagePath); os.IsNotExist(err) {
 					return "", fmt.Errorf("image_file_not_found: %s", imagePath)

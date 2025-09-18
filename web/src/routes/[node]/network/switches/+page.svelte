@@ -75,31 +75,15 @@
 
 	let query: string = $state('');
 	let useablePorts = $derived.by(() => {
-		let used: string[] = [];
-		const available: string[] = [];
-
-		if (switches) {
-			if (switches.standard) {
-				for (const sw of switches.standard) {
-					if (sw.ports) {
-						const ports = sw.ports.map((port) => port.name);
-						used = [...used, ...ports];
-					}
-				}
-			}
-		}
+		let available: string[] = [];
 
 		if (interfaces) {
-			if (interfaces) {
-				for (const iface of interfaces) {
-					if (!used.includes(iface.name) && !iface.groups?.includes('bridge')) {
-						available.push(iface.name);
-					}
-				}
+			for (const iface of interfaces) {
+				available.push(iface.name);
 			}
 		}
 
-		return available;
+		return available.filter((item, index) => available.indexOf(item) === index);
 	});
 
 	let confirmModals = $state({

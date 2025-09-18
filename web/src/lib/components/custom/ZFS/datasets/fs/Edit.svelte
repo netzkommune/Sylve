@@ -26,7 +26,8 @@
 		dedup: dataset.dedup || 'off',
 		quota: dataset.quota ? bytesToHumanReadable(dataset.quota) : '',
 		aclinherit: dataset.aclinherit || 'passthrough',
-		aclmode: dataset.aclmode || 'passthrough'
+		aclmode: dataset.aclmode || 'passthrough',
+		recordsize: dataset.recordsize ? dataset.recordsize.toString() : '131072'
 	};
 
 	let zfsProperties = $state(createFSProps);
@@ -49,7 +50,8 @@
 			dedup: properties.dedup,
 			quota: parseQuotaToZFSBytes(properties.quota),
 			aclinherit: properties.aclinherit,
-			aclmode: properties.aclmode
+			aclmode: properties.aclmode,
+			recordsize: properties.recordsize
 		});
 
 		reload = true;
@@ -179,6 +181,14 @@
 					options={zfsProperties.aclMode}
 					bind:value={properties.aclmode}
 					onChange={(value) => (properties.aclmode = value)}
+				/>
+  
+				<SimpleSelect
+					label="Recordsize"
+					placeholder="Select Recordsize"
+					options={zfsProperties.recordsize}
+					bind:value={properties.recordsize}
+					onChange={(value) => (properties.recordsize = value)}
 				/>
 			</div>
 		</div>

@@ -21,14 +21,12 @@ func GetHistorical[T any](db *gorm.DB, limit int) ([]T, error) {
 	tableName := schema.NamingStrategy{}.TableName(reflect.TypeOf((*T)(nil)).Elem().Name())
 
 	err := db.Table(tableName).
-		Order("id DESC").
+		Order("strftime('%Y-%m-%d %H:%M', created_at) ASC").
 		Limit(limit).
 		Find(&records).Error
-
 	if err != nil {
 		return nil, err
 	}
-
 	return records, nil
 }
 

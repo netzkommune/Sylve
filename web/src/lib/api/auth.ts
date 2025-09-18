@@ -18,7 +18,6 @@ import { handleAPIError } from '$lib/utils/http';
 import { sha256 } from '$lib/utils/string';
 import adze from 'adze';
 import axios, { AxiosError } from 'axios';
-// import jwt from 'jsonwebtoken';
 import { toast } from 'svelte-sonner';
 import { get } from 'svelte/store';
 
@@ -28,14 +27,14 @@ export async function login(
 	authType: string,
 	remember: boolean,
 	language: string
-) {
+): Promise<boolean> {
 	try {
 		if (username === '' || password === '') {
 			toast.error('Credentials are required', {
 				position: 'bottom-center'
 			});
 
-			return;
+			return false;
 		}
 
 		if (authType === '') {
@@ -43,7 +42,7 @@ export async function login(
 				position: 'bottom-center'
 			});
 
-			return;
+			return false;
 		}
 
 		const response = await axios.post('/api/auth/login', {
@@ -92,6 +91,8 @@ export async function login(
 		}
 		return false;
 	}
+
+	return false;
 }
 
 export function getToken(): string | null {

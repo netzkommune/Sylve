@@ -10,8 +10,10 @@
 
 export function generateComboboxOptions(values: string[], additional?: string[]) {
 	const combined = [...values, ...(additional ?? [])];
-	return combined.map((option) => ({
-		label: option,
-		value: option
-	}));
+	return combined
+		.map((option) => ({
+			label: option,
+			value: option
+		}))
+		.filter((option, index, self) => self.findIndex((o) => o.value === option.value) === index);
 }

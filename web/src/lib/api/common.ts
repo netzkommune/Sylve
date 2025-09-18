@@ -44,7 +44,7 @@ api.interceptors.request.use(
 			}
 
 			if (get(currentHostname)) {
-				if (config.url === '/vm' && config.method === 'post') {
+				if ((config.url === '/vm' || config.url === '/jail') && config.method === 'post') {
 					let data;
 
 					try {

@@ -18,6 +18,7 @@ import { z } from 'zod/v4';
 export async function newJail(data: CreateData): Promise<APIResponse> {
 	return await apiRequest('/jail', APIResponseSchema, 'POST', {
 		name: data.name,
+		node: data.node,
 		ctId: parseInt(data.id.toString(), 10),
 		description: data.description,
 		dataset: data.storage.dataset,

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { getDownloads } from '$lib/api/utilities/downloader';
-	import { storageAttach, storageDetach } from '$lib/api/vm/storage';
+	import { storageDetach } from '$lib/api/vm/storage';
 	import { getVMDomain, getVMs } from '$lib/api/vm/vm';
 	import { getDatasets } from '$lib/api/zfs/datasets';
 	import { getPools } from '$lib/api/zfs/pool';

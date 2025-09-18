@@ -264,3 +264,9 @@ export function fromBase64(input: string): string {
 	const decoded = atob(input);
 	return new TextDecoder().decode(Uint8Array.from(decoded.split('').map((c) => c.charCodeAt(0))));
 }
+
+export function toHex(input: string): string {
+	return Array.from(new TextEncoder().encode(input))
+		.map((b) => b.toString(16).padStart(2, '0'))
+		.join('');
+}

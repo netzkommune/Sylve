@@ -323,12 +323,10 @@ func (s *Service) PopulateClusterNodes() error {
 			for uuid := range exByUUID {
 				ids = append(ids, uuid)
 			}
-			if err := tx.Model(&clusterModels.ClusterNode{}).
+
+			if err := tx.
 				Where("node_uuid IN ?", ids).
-				Updates(map[string]any{
-					"status":     "offline",
-					"updated_at": gorm.Expr("CURRENT_TIMESTAMP"),
-				}).Error; err != nil {
+				Delete(&clusterModels.ClusterNode{}).Error; err != nil {
 				return err
 			}
 		}

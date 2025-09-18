@@ -54,7 +54,7 @@ type StandardSwitch struct {
 
 type NetworkPort struct {
 	ID       int            `json:"id" gorm:"primaryKey;autoIncrement"`
-	Name     string         `json:"name" gorm:"unique;not null"`
+	Name     string         `json:"name" gorm:"not null"`
 	SwitchID int            `json:"switchId" gorm:"not null"`
 	Switch   StandardSwitch `gorm:"foreignKey:SwitchID"`
 }

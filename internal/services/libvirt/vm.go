@@ -10,6 +10,7 @@ package libvirt
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/alchemillahq/sylve/internal/db/models"
@@ -117,8 +118,12 @@ func validateCreate(data libvirtServiceInterfaces.CreateVMRequest, db *gorm.DB) 
 			return fmt.Errorf("failed_to_check_storage_dataset_usage: %w", err)
 		}
 
-		if count > 0 && data.StorageType == "zvol" {
-			return fmt.Errorf("storage_dataset_zvol_already_in_use")
+		if count > 0 {
+			if data.StorageType == "zvol" {
+				return fmt.Errorf("storage_dataset_zvol_already_in_use")
+			} else if data.StorageType == "raw" {
+				return fmt.Errorf("storage_dataset_filesystem_already_in_use")
+			}
 		}
 
 		datasets, err := zfs.Datasets("")
@@ -134,13 +139,9 @@ func validateCreate(data libvirtServiceInterfaces.CreateVMRequest, db *gorm.DB) 
 		var dataset *zfs.Dataset
 
 		for _, d := range datasets {
-			guid, err := d.GetProperty("guid")
-			if err != nil {
-				return fmt.Errorf("failed_to_get_dataset_properties: %w", err)
-			}
-
-			if guid == data.StorageDataset {
+			if d.GUID == data.StorageDataset {
 				dataset = d
+				break
 			}
 		}
 
@@ -536,7 +537,44 @@ func (s *Service) RemoveVM(id uint, cleanUpMacs bool) error {
 		return fmt.Errorf("failed_to_find_vm: %w", err)
 	}
 
-	err := s.RemoveLvVm(int(vm.VmID))
+	filesystems, err := zfs.Filesystems("")
+
+	if err != nil {
+		return fmt.Errorf("failed_to_get_filesystems: %w", err)
+	}
+
+	for _, storage := range vm.Storages {
+		if storage.Type == "raw" {
+			var dataset *zfs.Dataset
+			for _, fs := range filesystems {
+				if fs.GUID == storage.Dataset {
+					dataset = fs
+					break
+				}
+			}
+
+			if dataset == nil {
+				return fmt.Errorf("dataset_not_found")
+			}
+
+			if dataset.Mountpoint == "" {
+				return fmt.Errorf("raw_storage_dataset_must_have_mountpoint")
+			}
+
+			datasetPath := filepath.Join(dataset.Mountpoint)
+			err := utils.RemoveDirContents(datasetPath)
+
+			if err != nil {
+				return fmt.Errorf("failed_to_remove_raw_storage_files: %w", err)
+			}
+		}
+
+		if err := s.DB.Delete(&storage).Error; err != nil {
+			return fmt.Errorf("failed_to_delete_storage: %w", err)
+		}
+	}
+
+	err = s.RemoveLvVm(int(vm.VmID))
 	if err != nil {
 		return fmt.Errorf("failed_to_remove_lv_vm: %w", err)
 	}
@@ -550,12 +588,6 @@ func (s *Service) RemoveVM(id uint, cleanUpMacs bool) error {
 
 		if err := s.DB.Delete(&network).Error; err != nil {
 			return fmt.Errorf("failed_to_delete_network: %w", err)
-		}
-	}
-
-	for _, storage := range vm.Storages {
-		if err := s.DB.Delete(&storage).Error; err != nil {
-			return fmt.Errorf("failed_to_delete_storage: %w", err)
 		}
 	}
 

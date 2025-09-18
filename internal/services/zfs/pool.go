@@ -115,13 +115,7 @@ func (s *Service) DeletePool(guid string) error {
 
 	if len(datasets) > 0 {
 		for _, ds := range datasets {
-			guid, err := ds.GetProperty("guid")
-
-			if err != nil {
-				return fmt.Errorf("failed_to_get_guid_for_dataset %s: %v", ds.Name, err)
-			}
-
-			inUse := s.IsDatasetInUse(guid, true)
+			inUse := s.IsDatasetInUse(ds.GUID, true)
 
 			if inUse {
 				return fmt.Errorf("dataset %s is in use and cannot be deleted", ds.Name)

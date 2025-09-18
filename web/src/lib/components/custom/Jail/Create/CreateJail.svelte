@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { getNodes } from '$lib/api/cluster/cluster';
 	import { getJails, newJail } from '$lib/api/jail/jail';
 	import { getNetworkObjects } from '$lib/api/network/object';
 	import { getSwitches } from '$lib/api/network/switch';
@@ -9,6 +10,7 @@
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import { reload } from '$lib/stores/api.svelte';
+	import type { ClusterNode } from '$lib/types/cluster/cluster';
 	import type { CreateData, Jail } from '$lib/types/jail/jail';
 	import type { NetworkObject } from '$lib/types/network/object';
 	import type { SwitchList } from '$lib/types/network/switch';
@@ -19,7 +21,7 @@
 	import { isValidCreateData } from '$lib/utils/jail/jail';
 	import { getNextId } from '$lib/utils/vm/vm';
 	import Icon from '@iconify/svelte';
-	import { useQueries } from '@sveltestack/svelte-query';
+	import { useQueries, useQueryClient } from '@sveltestack/svelte-query';
 	import { toast } from 'svelte-sonner';
 	import Basic from './Basic.svelte';
 	import Hardware from './Hardware.svelte';
@@ -38,69 +40,89 @@
 		{ value: 'hardware', label: 'Hardware & Advanced' }
 	];
 
+	let queryClient = useQueryClient();
 	const results = useQueries([
 		{
-			queryKey: ['datasetList-svm'],
+			queryKey: 'zfs-datasets',
 			queryFn: async () => {
 				return await getDatasets();
 			},
-			refetchInterval: 1000,
 			keepPreviousData: true,
 			initialData: [],
 			refetchOnMount: 'always'
 		},
 		{
-			queryKey: ['downloads-svm'],
+			queryKey: 'downloads',
 			queryFn: async () => {
 				return await getDownloads();
 			},
-			refetchInterval: 1000,
 			keepPreviousData: true,
 			initialData: [],
 			refetchOnMount: 'always'
 		},
 		{
-			queryKey: ['networkSwitches-svm'],
+			queryKey: 'network-switches',
 
 			queryFn: async () => {
 				return await getSwitches();
 			},
-			refetchInterval: 1000,
 			keepPreviousData: true,
 			initialData: {} as SwitchList,
 			refetchOnMount: 'always'
 		},
 		{
-			queryKey: ['vms-svm'],
+			queryKey: 'vm-list',
 			queryFn: async () => {
 				return await getVMs();
 			},
-			refetchInterval: 1000,
 			keepPreviousData: true,
 			initialData: [],
 			refetchOnMount: 'always'
 		},
 		{
-			queryKey: ['network-objects-svm'],
+			queryKey: 'network-objects',
 			queryFn: async () => {
 				return await getNetworkObjects();
 			},
-			refetchInterval: 1000,
 			keepPreviousData: true,
 			initialData: [],
 			refetchOnMount: 'always'
 		},
 		{
-			queryKey: ['jails-svm'],
+			queryKey: 'jail-list',
 			queryFn: async () => {
 				return await getJails();
 			},
-			refetchInterval: 1000,
+			keepPreviousData: true,
+			initialData: [],
+			refetchOnMount: 'always'
+		},
+		{
+			queryKey: 'cluster-nodes',
+			queryFn: async () => {
+				return await getNodes();
+			},
 			keepPreviousData: true,
 			initialData: [],
 			refetchOnMount: 'always'
 		}
 	]);
+
+	let refetch = $state(false);
+
+	$effect(() => {
+		if (refetch) {
+			queryClient.refetchQueries('zfs-datasets');
+			queryClient.refetchQueries('downloads');
+			queryClient.refetchQueries('network-switches');
+			queryClient.refetchQueries('vm-list');
+			queryClient.refetchQueries('network-objects');
+			queryClient.refetchQueries('jail-list');
+			queryClient.refetchQueries('cluster-nodes');
+
+			refetch = false;
+		}
+	});
 
 	let datasets: Dataset[] = $derived($results[0].data as Dataset[]);
 	let downloads = $derived($results[1].data as Download[]);
@@ -108,6 +130,7 @@
 	let networkObjects = $derived($results[4].data as NetworkObject[]);
 	let vms: VM[] = $derived($results[3].data as VM[]);
 	let jails: Jail[] = $derived($results[5].data as Jail[]);
+	let nodes: ClusterNode[] = $derived($results[6].data as ClusterNode[]);
 	let creating: boolean = $state(false);
 
 	let filesystems: Dataset[] = $derived(
@@ -117,6 +140,7 @@
 	let options = {
 		name: '',
 		id: 0,
+		node: '',
 		description: '',
 		storage: {
 			dataset: '',
@@ -248,6 +272,9 @@
 									bind:name={modal.name}
 									bind:id={modal.id}
 									bind:description={modal.description}
+									bind:refetch
+									bind:node={modal.node}
+									{nodes}
 								/>
 							{:else if value === 'storage'}
 								<Storage

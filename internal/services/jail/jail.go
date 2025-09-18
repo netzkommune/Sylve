@@ -120,13 +120,9 @@ func (s *Service) ValidateCreate(data jailServiceInterfaces.CreateJailRequest) e
 	var dataset *zfs.Dataset
 
 	for _, d := range datasets {
-		guid, err := d.GetProperty("guid")
-		if err != nil {
-			return fmt.Errorf("failed_to_get_dataset_properties: %w", err)
-		}
-
-		if guid == data.Dataset {
+		if d.GUID == data.Dataset {
 			dataset = d
+			break
 		}
 	}
 
@@ -601,12 +597,7 @@ func (s *Service) CreateJail(data jailServiceInterfaces.CreateJailRequest) error
 	}
 
 	for _, d := range datasets {
-		guid, err := d.GetProperty("guid")
-		if err != nil {
-			return fmt.Errorf("failed_to_get_dataset_properties: %w", err)
-		}
-
-		if guid == data.Dataset {
+		if d.GUID == data.Dataset {
 			dataset = d
 			break
 		}
@@ -689,12 +680,7 @@ func (s *Service) DeleteJail(ctId uint, deleteMacs bool) error {
 	}
 
 	for _, d := range datasets {
-		guid, err := d.GetProperty("guid")
-		if err != nil {
-			return fmt.Errorf("failed_to_get_dataset_properties: %w", err)
-		}
-
-		if guid == jail.Dataset {
+		if d.GUID == jail.Dataset {
 			dataset = d
 			break
 		}

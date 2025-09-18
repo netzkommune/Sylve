@@ -274,6 +274,7 @@ func RegisterRoutes(r *gin.Engine,
 	}
 
 	jail := api.Group("/jail")
+	jail.Use(EnsureCorrectHost(db))
 	jail.Use(middleware.EnsureAuthenticated(authService))
 	jail.Use(middleware.RequestLoggerMiddleware(db, authService))
 	{
@@ -358,6 +359,13 @@ func RegisterRoutes(r *gin.Engine,
 		clusterNotes.GET("", clusterHandlers.Notes(clusterService))
 		clusterNotes.POST("", clusterHandlers.CreateNote(clusterService))
 		clusterNotes.DELETE("/:id", clusterHandlers.DeleteNote(clusterService))
+	}
+
+	clusterStorages := cluster.Group("/storage")
+	{
+		clusterStorages.GET("", clusterHandlers.Storages(clusterService))
+		clusterStorages.POST("/s3", clusterHandlers.CreateS3Storage(clusterService))
+		clusterStorages.DELETE("/s3/:id", clusterHandlers.DeleteS3Storage(clusterService))
 	}
 
 	vnc := api.Group("/vnc")

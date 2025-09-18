@@ -19,6 +19,7 @@
 	import { loadLocale } from 'wuchale/run-client';
 
 	import type { Locales } from '$lib/types/common';
+	import { sleep } from '$lib/utils';
 	import '../app.css';
 
 	$effect.pre(() => {
@@ -28,7 +29,10 @@
 	const queryClient = new QueryClient();
 	let { children } = $props();
 	let isLoggedIn = $state(false);
-	let isLoading = $state(true);
+	let loading = $state({
+		throbber: true,
+		login: false
+	});
 
 	$effect(() => {
 		if (isLoggedIn && $hostname) {
@@ -65,13 +69,10 @@
 		}
 
 		await preloadIcons();
-		isLoading = false;
+		await sleep(1000);
+		loading.throbber = false;
 		await tick();
 	});
-
-	function sleep(ms: number) {
-		return new Promise((resolve) => setTimeout(resolve, ms));
-	}
 
 	async function handleLogin(
 		username: string,
@@ -81,12 +82,15 @@
 		remember: boolean
 	) {
 		let isError = false;
+		loading.login = true;
+
+		await sleep(500);
 
 		try {
 			loadLocale(language as Locales);
 			if (await login(username, password, type, remember, language)) {
-				isLoading = true;
 				isLoggedIn = true;
+				loading.login = false;
 				const path = window.location.pathname;
 
 				if (path === '/') {
@@ -95,16 +99,20 @@
 			} else {
 				isError = true;
 				isLoggedIn = false;
+				loading.login = false;
 			}
 		} catch (error) {
 			isError = true;
 			isLoggedIn = false;
+			loading.login = false;
 		} finally {
 			if (!isError) {
 				await sleep(2500);
-				isLoading = false;
 			}
 		}
+
+		loading.login = false;
+		loading.throbber = false;
 		return;
 	}
 </script>
@@ -117,7 +125,7 @@
 <Toaster />
 <ModeWatcher />
 
-{#if isLoading}
+{#if loading.throbber}
 	<Throbber />
 {:else if isLoggedIn && $hostname}
 	<QueryClientProvider client={queryClient}>
@@ -126,5 +134,5 @@
 		</Shell>
 	</QueryClientProvider>
 {:else}
-	<Login onLogin={handleLogin} />
+	<Login onLogin={handleLogin} loading={loading.login} />
 {/if}

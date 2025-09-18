@@ -87,6 +87,8 @@ func (s *Service) CheckPackageDependencies() error {
 		"smartmontools",
 		"tmux",
 		"samba419",
+		"jansson",
+		"swtpm",
 	}
 
 	var wg sync.WaitGroup

@@ -94,12 +94,7 @@ func (s *Service) GetJailMountPoint(ctid uint) (string, error) {
 	}
 
 	for _, ds := range datasets {
-		guid, err := ds.GetProperty("guid")
-		if err != nil {
-			return "", fmt.Errorf("failed_to_get_dataset_guid: %w", err)
-		}
-
-		if guid == jail.Dataset {
+		if ds.GUID == jail.Dataset {
 			dataset = ds
 			break
 		}

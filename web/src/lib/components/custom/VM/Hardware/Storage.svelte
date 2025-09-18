@@ -1,17 +1,14 @@
 <script lang="ts">
+	import { getFiles } from '$lib/api/system/file-explorer';
 	import { storageAttach } from '$lib/api/vm/storage';
 	import SimpleSelect from '$lib/components/custom/SimpleSelect.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import CustomValueInput from '$lib/components/ui/custom-input/value.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import { Label } from '$lib/components/ui/label/index.js';
-	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
-	import type { CPUInfo } from '$lib/types/info/cpu';
-	import type { RAMInfo } from '$lib/types/info/ram';
 	import type { Download } from '$lib/types/utilities/downloader';
 	import type { VM } from '$lib/types/vm/vm';
 	import type { Dataset } from '$lib/types/zfs/dataset';
-	import { getCache, handleAPIError } from '$lib/utils/http';
+	import { handleAPIError } from '$lib/utils/http';
 	import { getISOs } from '$lib/utils/utilities/downloader';
 	import Icon from '@iconify/svelte';
 	import humanFormat from 'human-format';
@@ -49,6 +46,30 @@
 					return storage.dataset === dataset.guid;
 				});
 			});
+	});
+
+	let existingImage = $state(false);
+
+	$effect(() => {
+		if (properties.name && properties.type === 'raw' && properties.dataset) {
+			const dataset = datasets.find(
+				(d) => d.guid === properties.dataset || d.name === properties.dataset
+			);
+			const mountPoint = dataset?.mountpoint || '';
+			if (mountPoint) {
+				getFiles(mountPoint).then((files) => {
+					for (const file of files) {
+						if (file.id === `${mountPoint}/${properties.name}.img`) {
+							existingImage = true;
+							properties.size = humanFormat(file.size || 0);
+							return;
+						}
+					}
+
+					existingImage = false;
+				});
+			}
+		}
 	});
 
 	async function attach() {
@@ -288,7 +309,12 @@
 					placeholder="8 GB"
 					bind:value={properties.size}
 					classes="flex-1 space-y-1"
+					disabled={existingImage}
 				/>
+
+				{#if existingImage}
+					<span class="-mt-3 text-xs text-yellow-500">Existing image will be used</span>
+				{/if}
 			</div>
 		{/if}
 

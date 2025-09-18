@@ -8,8 +8,7 @@ export async function load({ params }) {
 
 	const [jails, jailStates] = await Promise.all([
 		cachedFetch('jail-list', async () => getJails(), cacheDuration),
-		cachedFetch('jail-states', async () => getJailStates(), cacheDuration),
-		cachedFetch(`jail-stats-${vmId}`, async () => getStats(Number(vmId), 10), cacheDuration)
+		cachedFetch('jail-states', async () => getJailStates(), cacheDuration)
 	]);
 
 	const jail = jails.find((jail) => jail.ctId === parseInt(params.node, 10));

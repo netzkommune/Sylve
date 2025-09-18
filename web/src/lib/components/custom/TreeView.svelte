@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { iconCache } from '$lib/utils/icons';
 	import Icon from '@iconify/svelte';
 	import { slide } from 'svelte/transition';
 	import SidebarElement from './TreeView.svelte';
@@ -70,7 +69,7 @@
 	});
 </script>
 
-<li class={`w-full`}>
+<li class="w-full">
 	<a
 		class={`my-0.5 flex w-full items-center justify-between px-1.5 py-0.5 ${isActive ? sidebarActive : 'hover:bg-muted dark:hover:bg-muted rounded-md'}${lastActiveUrl === item.label ? '!text-primary' : ' '}`}
 		href={item.href}
@@ -108,7 +107,7 @@
 
 {#if isOpen && item.children}
 	<ul class="pl-5" transition:slide={{ duration: 200, easing: (t) => t }} style="overflow: hidden;">
-		{#each item.children as child}
+		{#each item.children as child (child.label)}
 			<SidebarElement item={child} {onToggle} />
 		{/each}
 	</ul>

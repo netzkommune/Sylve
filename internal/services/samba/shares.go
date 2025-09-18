@@ -42,7 +42,7 @@ func (s *Service) CreateShare(
 		return fmt.Errorf("cannot_create_read_only_share_with_read_only_groups")
 	}
 
-	datasets, err := zfs.Datasets("")
+	datasets, err := zfs.Filesystems("")
 	if err != nil {
 		return fmt.Errorf("failed_to_fetch_datasets: %v", err)
 	}
@@ -50,12 +50,7 @@ func (s *Service) CreateShare(
 	var fDataset *zfs.Dataset
 
 	for _, ds := range datasets {
-		properties, err := ds.GetAllProperties()
-		if err != nil {
-			return fmt.Errorf("failed_to_get_properties_for_dataset: %v", err)
-		}
-
-		if properties["guid"] == dataset {
+		if ds.GUID == dataset {
 			fDataset = ds
 			break
 		}
@@ -162,32 +157,34 @@ func (s *Service) UpdateShare(
 		return fmt.Errorf("cannot_create_read_only_share_with_read_only_groups")
 	}
 
-	datasets, err := zfs.Datasets("")
+	datasets, err := zfs.Filesystems("")
 	if err != nil {
 		return fmt.Errorf("failed_to_fetch_datasets: %v", err)
 	}
+
 	var fDataset *zfs.Dataset
+
 	for _, ds := range datasets {
-		properties, err := ds.GetAllProperties()
-		if err != nil {
-			return fmt.Errorf("failed_to_get_properties_for_dataset: %v", err)
-		}
-		if properties["guid"] == dataset {
+		if ds.GUID == dataset {
 			fDataset = ds
 			break
 		}
 	}
+
 	if fDataset == nil {
 		return fmt.Errorf("dataset_not_found")
 	}
+
 	if fDataset.Mountpoint == "" {
 		return fmt.Errorf("dataset_not_mounted")
 	}
 
 	allGroups := utils.JoinStringSlices(readOnlyGroups, writeableGroups)
+
 	if len(allGroups) == 0 && !guestOk {
 		return fmt.Errorf("no_groups_selected_and_guests_not_allowed")
 	}
+
 	for _, group := range allGroups {
 		if err := s.DB.Where("name = ?", group).First(&models.Group{}).Error; err != nil {
 			return fmt.Errorf("group_not_found: %s", group)
@@ -195,6 +192,7 @@ func (s *Service) UpdateShare(
 	}
 
 	var roGroups, wrGroups []models.Group
+
 	for _, gname := range readOnlyGroups {
 		var g models.Group
 		if err := s.DB.Where("name = ?", gname).First(&g).Error; err != nil {
@@ -202,6 +200,7 @@ func (s *Service) UpdateShare(
 		}
 		roGroups = append(roGroups, g)
 	}
+
 	for _, gname := range writeableGroups {
 		var g models.Group
 		if err := s.DB.Where("name = ?", gname).First(&g).Error; err != nil {
